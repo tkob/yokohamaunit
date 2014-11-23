@@ -1,0 +1,171 @@
+package yokohama.unit.translator;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import yokohama.unit.ast.Assertion;
+import yokohama.unit.ast.Binding;
+import yokohama.unit.ast.Bindings;
+import yokohama.unit.ast.Copula;
+import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.Fixture;
+import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.Row;
+import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableRef;
+import yokohama.unit.ast.TableType;
+import yokohama.unit.ast.Test;
+import yokohama.unit.grammar.YokohamaUnitParser;
+import yokohama.unit.grammar.YokohamaUnitParserVisitor;
+
+public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> implements YokohamaUnitParserVisitor<Object> 
+{
+
+    @Override
+    public Group visitGroup(YokohamaUnitParser.GroupContext ctx) {
+        List<Definition>definitions =
+                ctx.definition().stream()
+                                .map(this::visitDefinition)
+                                .collect(Collectors.toList());
+        return new Group(definitions);
+    }
+
+    @Override
+    public Definition visitDefinition(YokohamaUnitParser.DefinitionContext ctx) {
+        return (Definition)visitChildren(ctx);
+    }
+
+    @Override
+    public Test visitTest(YokohamaUnitParser.TestContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        String name = ctx.TestName().getText();
+        List<Assertion> assertions =
+                ctx.assertion().stream()
+                               .map(this::visitAssertion)
+                               .collect(Collectors.toList());
+        return new Test(name, assertions, numHashes);
+    }
+
+    @Override
+    public Integer visitHash(YokohamaUnitParser.HashContext ctx) {
+        return ctx.getText().length();
+    }
+
+    @Override
+    public Assertion visitAssertion(YokohamaUnitParser.AssertionContext ctx) {
+        List<Proposition> propositions = visitPropositions(ctx.propositions());
+        YokohamaUnitParser.ConditionContext conditionCtx = (ctx.condition());
+        Fixture fixture =
+                conditionCtx == null ? Fixture.none()
+                                     : visitCondition(ctx.condition());
+        return new Assertion(propositions, fixture);
+    }
+
+    @Override
+    public List<Proposition> visitPropositions(YokohamaUnitParser.PropositionsContext ctx) {
+        return ctx.proposition().stream()
+                                .map(this::visitProposition)
+                                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
+        Expr subject = new Expr(ctx.Expr(0).getText());
+        Copula copula = visitCopula(ctx.copula());
+        Expr complement = new Expr(ctx.Expr(1).getText());
+        return new Proposition(subject, copula, complement);
+    }
+
+    @Override
+    public Copula visitCopula(YokohamaUnitParser.CopulaContext ctx) {
+        String copulaText = ctx.getText();
+        switch (copulaText) {
+            case "is":
+                return Copula.IS;
+            case "isnot":
+                return Copula.IS_NOT;
+            case "throws":
+                return Copula.THROWS;
+        }
+        throw new IllegalArgumentException("'" + copulaText + "' is not a copula.");
+    }
+
+    @Override
+    public Fixture visitCondition(YokohamaUnitParser.ConditionContext ctx) {
+        return (Fixture)visitChildren(ctx);
+    }
+
+    @Override
+    public TableRef visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
+        TableType tableType = visitTableType(ctx.tableType());
+        String name = ctx.Quoted().getText();
+        return new TableRef(tableType, name);
+    }
+
+    @Override
+    public TableType visitTableType(YokohamaUnitParser.TableTypeContext ctx) {
+        String text = ctx.getText();
+        switch (text) {
+            case "Table":
+                return TableType.INLINE;
+            case "CSV":
+                return TableType.CSV;
+            case "TSV":
+                return TableType.TSV;
+            case "Excel":
+                return TableType.EXCEL;
+       }
+        throw new IllegalArgumentException("'" + text + "' is not a table type.");
+    }
+
+    @Override
+    public Bindings visitBindings(YokohamaUnitParser.BindingsContext ctx) {
+        List<Binding> bindings = ctx.binding().stream()
+                                              .map(this::visitBinding)
+                                              .collect(Collectors.toList());
+	return new Bindings(bindings);
+   }
+
+    @Override
+    public Binding visitBinding(YokohamaUnitParser.BindingContext ctx) {
+        String ident = ctx.Identifier().getText();
+        Expr expr = new Expr(ctx.Expr().getText());
+        return new Binding(ident, expr);
+    }
+
+    @Override
+    public Table visitTableDef(YokohamaUnitParser.TableDefContext ctx) {
+        String name = ctx.TableName().getText();
+        List<String> header = visitHeader(ctx.header());
+        List<Row> rows = visitRows(ctx.rows());
+        return new Table(name, header, rows);
+    }
+
+    @Override
+    public List<String> visitHeader(YokohamaUnitParser.HeaderContext ctx) {
+        return ctx.Identifier().stream()
+                               .map(TerminalNode::getText)
+                               .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Row> visitRows(YokohamaUnitParser.RowsContext ctx) {
+        return ctx.row().stream()
+                        .map(this::visitRow)
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public Row visitRow(YokohamaUnitParser.RowContext ctx) {
+        List<Expr> exprs = ctx.Expr().stream()
+                                     .map(TerminalNode::getText)
+                                     .map(String::trim)
+                                     .map(Expr::new)
+                                     .collect(Collectors.toList());
+        return new Row(exprs);
+    }
+
+}

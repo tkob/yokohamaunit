@@ -1,0 +1,5 @@
+# Test: String.startsWith returns true if the prefix is empty
+
+Assert that `sut.startsWith(prefix)` is `true`
+      where sut    is `"hello world"`
+        and prefix is `""`.

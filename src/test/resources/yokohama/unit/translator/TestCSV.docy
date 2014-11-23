@@ -1,0 +1,2 @@
+Test: String.startsWith
+Assert `sut.startsWith(prefix)` is `expected` according to CSV "TestCSV.csv".

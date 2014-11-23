@@ -1,0 +1,4 @@
+Test: Multiple propositions
+Assert that `1 + 1` is `2` 
+        and `1 + 1` is not `3`
+        and `1 / 0` throws `ArithmeticException`.

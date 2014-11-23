@@ -1,0 +1,9 @@
+# Test: String.startsWith
+
+Assert `sut.startsWith(prefix)` is `expected` according to Table "Test data for startsWith".
+
+Table: Test data for startsWith
+| sut           | prefix      | expected |
+| "hello world" | ""          | true     |
+| "hello world" | "hello"     | true     |
+| "hello world" | "world"     | false    |

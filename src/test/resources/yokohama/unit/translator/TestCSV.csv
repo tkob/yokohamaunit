@@ -1,0 +1,4 @@
+sut,prefix,expected
+"""hello world""","""""",true
+"""hello world""","""hello""",true
+"""hello world""","""world""",false
