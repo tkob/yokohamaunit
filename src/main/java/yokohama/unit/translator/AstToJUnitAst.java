@@ -16,6 +16,10 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
@@ -131,7 +135,7 @@ public class AstToJUnitAst {
             case TSV:
                 return parseCSV(name, CSVFormat.TDF.withHeader());
             case EXCEL:
-                throw new UnsupportedOperationException();
+                return parseExcel(name);
         }
         throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
 
@@ -167,4 +171,27 @@ public class AstToJUnitAst {
                     .collect(Collectors.toList());
         }
     }
+
+    List<List<Binding>> parseExcel(String fileName) {
+        try (InputStream in = getClass().getResourceAsStream(fileName)) {
+            final Workbook book = WorkbookFactory.create(in);
+            final Sheet sheet = book.getSheetAt(0);
+            final int top = sheet.getFirstRowNum();
+            final int left = sheet.getRow(top).getFirstCellNum();
+            List<String> names = StreamSupport.stream(sheet.getRow(top).spliterator(), false)
+                    .map(cell -> cell.getStringCellValue())
+                    .collect(Collectors.toList());
+            return StreamSupport.stream(sheet.spliterator(), false)
+                    .skip(1)
+                    .map(row -> 
+                        IntStream.range(0, names.size())
+                                .mapToObj(Integer::new)
+                                .map(i -> new Binding(names.get(i), row.getCell(left + i).getStringCellValue()))
+                                .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
+        } catch (InvalidFormatException | IOException e) {
+            throw new TranslationException(e);
+        }
+    }
+
 }
