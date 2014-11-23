@@ -62,6 +62,11 @@ public class TranslatorUtilsTest {
                     "TestCSV.java",
                     Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
             ),
+            new Fixture(
+                    "TestExcel.docy",
+                    "TestExcel.java",
+                    Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
+            ),
         };
 
         @Theory
