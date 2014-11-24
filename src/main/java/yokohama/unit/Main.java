@@ -2,6 +2,7 @@ package yokohama.unit;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,7 +70,16 @@ public class Main implements Command {
         try {
             CommandLine commandLine = new BasicParser().parse(options, args);
             if (commandLine.hasOption("help")) {
-                new HelpFormatter().printHelp("docyc", options);
+                new HelpFormatter().printHelp(
+                        new PrintWriter(err),
+                        80,
+                        "docy <options> <source files>",
+                        "",
+                        options,
+                        0,
+                        0,
+                        ""
+                );
                 return Command.EXIT_SUCCESS;
             }
             List<String> javacArgs =
