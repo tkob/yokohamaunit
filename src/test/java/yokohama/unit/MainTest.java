@@ -66,6 +66,17 @@ public class MainTest {
     }
 
     @Test
+    public void testRun0() {
+        String[] args = {};
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+        int actual = new Main().run(in, out, err, args);
+        int expected = Command.EXIT_SUCCESS;
+        assertThat(actual, is(expected));
+    }
+
+    @Test
     public void testRun1() {
         String[] args = { "-d" };
         InputStream in = mock(InputStream.class);

@@ -3,6 +3,8 @@ package yokohama.unit;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +17,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.io.FilenameUtils;
+import yokohama.unit.translator.TranslatorUtils;
 
 public class Main implements Command {
 
@@ -46,9 +50,9 @@ public class Main implements Command {
                 .create("target"));
         options.addOption(OptionBuilder
                 .hasArg()
-                .withArgName("package")
-                .withDescription("Package name for generated classes")
-                .create("p"));
+                .withArgName("directory")
+                .withDescription("Base directory for docy files")
+                .create("basedir"));
         return options;
     }
 
@@ -82,12 +86,25 @@ public class Main implements Command {
                 );
                 return Command.EXIT_SUCCESS;
             }
+            Path baseDir = Paths.get(commandLine.getOptionValue("baseDir"), "").toAbsolutePath();
             List<String> javacArgs =
                     extractOptions(
                             Arrays.asList(commandLine.getOptions()),
                             javacOptions);
             List<String> files = commandLine.getArgList();
-            throw new UnsupportedOperationException("unimplemented yet");
+            for (String file : files) {
+                String className = FilenameUtils.getBaseName(file);
+                Path path = Paths.get(file);
+                Path relativePath = baseDir.relativize(path);
+                String packageName = relativePath.toString().replace("/", ".");
+                boolean success = TranslatorUtils.compileDocy(
+                        null,
+                        className,
+                        packageName,
+                        javacArgs.toArray(new String[javacArgs.size()]));
+                if (!success) return Command.EXIT_FAILURE;
+            }
+            return Command.EXIT_SUCCESS;
         } catch (UnrecognizedOptionException e) {
             err.println("docy: invalid flag: " + e.getOption());
             err.println("Usage: docy <options> <source files>");
