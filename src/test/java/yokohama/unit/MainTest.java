@@ -1,7 +1,10 @@
 package yokohama.unit;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.BasicParser;
@@ -10,7 +13,12 @@ import org.apache.commons.cli.ParseException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import yokohama.unit.translator.DocyCompiler;
 
 public class MainTest {
     
@@ -57,10 +65,11 @@ public class MainTest {
     @Test
     public void testRun() {
         String[] args = { "-help" };
+        DocyCompiler compiler = mock(DocyCompiler.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main().run(in, out, err, args);
+        int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -68,10 +77,11 @@ public class MainTest {
     @Test
     public void testRun0() {
         String[] args = {};
+        DocyCompiler compiler = mock(DocyCompiler.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main().run(in, out, err, args);
+        int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -79,10 +89,11 @@ public class MainTest {
     @Test
     public void testRun1() {
         String[] args = { "-d" };
+        DocyCompiler compiler = mock(DocyCompiler.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main().run(in, out, err, args);
+        int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -90,12 +101,73 @@ public class MainTest {
     @Test
     public void testRun2() {
         String[] args = { "-xxxxxx" };
+        DocyCompiler compiler = mock(DocyCompiler.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main().run(in, out, err, args);
+        int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testRun3() throws IOException {
+        String[] args = { "-basedir", "E:\\src\\main", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
+        DocyCompiler compiler = mock(DocyCompiler.class);
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+                .thenReturn(true);
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+        int actual = new Main(compiler).run(in, out, err, args);
+        int expected = Command.EXIT_SUCCESS;
+        assertThat(actual, is(expected));
+        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+    }
+
+    @Test
+    public void testRun4() throws IOException {
+        String[] args = { "-basedir", "E:\\src\\main\\", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
+        DocyCompiler compiler = mock(DocyCompiler.class);
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+                .thenReturn(true);
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+        int actual = new Main(compiler).run(in, out, err, args);
+        int expected = Command.EXIT_SUCCESS;
+        assertThat(actual, is(expected));
+        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+    }
+
+    @Test
+    public void testRun5() throws IOException {
+        String[] args = { "-basedir", "/home/user/src/main", "/home/user/src/main/yokohama/unit/Foo.docy"};
+        DocyCompiler compiler = mock(DocyCompiler.class);
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+                .thenReturn(true);
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+        int actual = new Main(compiler).run(in, out, err, args);
+        int expected = Command.EXIT_SUCCESS;
+        assertThat(actual, is(expected));
+        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+    }
+
+    @Test
+    public void testRun6() throws IOException {
+        String[] args = { "-basedir", "/home/user/src/main/", "/home/user/src/main/yokohama/unit/Foo.docy"};
+        DocyCompiler compiler = mock(DocyCompiler.class);
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+                .thenReturn(true);
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+        int actual = new Main(compiler).run(in, out, err, args);
+        int expected = Command.EXIT_SUCCESS;
+        assertThat(actual, is(expected));
+        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
     }
 
 }

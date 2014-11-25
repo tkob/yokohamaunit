@@ -1,14 +1,16 @@
 package yokohama.unit;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.nio.file.Path;
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -18,9 +20,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
-import yokohama.unit.translator.TranslatorUtils;
+import org.apache.commons.lang3.StringUtils;
+import yokohama.unit.translator.DocyCompiler;
+import yokohama.unit.translator.DocyCompilerImpl;
 
+@AllArgsConstructor
 public class Main implements Command {
+    private final DocyCompiler compiler;
 
     static Options constructOptions() {
         Options options = new Options();
@@ -86,7 +92,7 @@ public class Main implements Command {
                 );
                 return Command.EXIT_SUCCESS;
             }
-            Path baseDir = Paths.get(commandLine.getOptionValue("baseDir"), "").toAbsolutePath();
+            URI baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
             List<String> javacArgs =
                     extractOptions(
                             Arrays.asList(commandLine.getOptions()),
@@ -94,14 +100,14 @@ public class Main implements Command {
             List<String> files = commandLine.getArgList();
             for (String file : files) {
                 String className = FilenameUtils.getBaseName(file);
-                Path path = Paths.get(file);
-                Path relativePath = baseDir.relativize(path);
-                String packageName = relativePath.toString().replace("/", ".");
-                boolean success = TranslatorUtils.compileDocy(
-                        null,
+                URI uri = Paths.get(file).toUri();
+                URI relativeUri = baseDir.relativize(uri).resolve(".");
+                String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
+                boolean success = compiler.compile(
+                        uri,
                         className,
                         packageName,
-                        javacArgs.toArray(new String[javacArgs.size()]));
+                        javacArgs);
                 if (!success) return Command.EXIT_FAILURE;
             }
             return Command.EXIT_SUCCESS;
@@ -110,7 +116,7 @@ public class Main implements Command {
             err.println("Usage: docy <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
-        } catch (ParseException e) {
+        } catch (ParseException|IOException e) {
             err.println("docy: " + e.getMessage());
             err.println("Usage: docy <options> <source files>");
             err.println("use -help for a list of possible options");
@@ -119,7 +125,8 @@ public class Main implements Command {
     }
 
     public static void main(String args[]) {
-        int status = new Main().run(System.in, System.out, System.err, args);
+        Main main = new Main(new DocyCompilerImpl());
+        int status = main.run(System.in, System.out, System.err, args);
         System.exit(status);
     }
     
