@@ -12,6 +12,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
@@ -112,6 +113,7 @@ public class MainTest {
 
     @Test
     public void testRun3() throws IOException {
+        assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
@@ -127,6 +129,7 @@ public class MainTest {
 
     @Test
     public void testRun4() throws IOException {
+        assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main\\", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
@@ -142,6 +145,7 @@ public class MainTest {
 
     @Test
     public void testRun5() throws IOException {
+        assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
@@ -157,6 +161,7 @@ public class MainTest {
 
     @Test
     public void testRun6() throws IOException {
+        assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main/", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
