@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.BasicParser;
@@ -15,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,7 +122,7 @@ public class MainTest {
         int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+        verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -140,7 +138,7 @@ public class MainTest {
         int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+        verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
