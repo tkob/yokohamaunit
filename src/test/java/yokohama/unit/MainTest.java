@@ -156,7 +156,7 @@ public class MainTest {
         int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+        verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -172,7 +172,7 @@ public class MainTest {
         int actual = new Main(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
+        verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
 }
