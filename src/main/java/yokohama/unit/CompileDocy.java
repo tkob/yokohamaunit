@@ -86,8 +86,8 @@ public class CompileDocy implements Command {
                         "docyc <options> <source files>",
                         "",
                         options,
-                        0,
-                        0,
+                        1,
+                        1,
                         "",
                         true
                 );
