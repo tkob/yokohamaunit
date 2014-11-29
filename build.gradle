@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'jacoco'
 apply plugin: 'me.champeau.gradle.antlr4'
 
@@ -13,8 +14,11 @@ compileTestJava {
     options.compilerArgs << "-Xlint:unchecked"
 }
 
+applicationName = 'yokohamaunit'
+mainClassName = 'yokohama.unit.Main'
+
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'yokohama.unit.Main'
+    ext.mainClass = mainClassName
 }
 
 repositories {
