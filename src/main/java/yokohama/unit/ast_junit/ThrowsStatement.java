@@ -18,6 +18,7 @@ public class ThrowsStatement implements TestStatement {
         return new TreeSet<ImportedName>(Arrays.asList(
                 new ImportClass("ognl.Ognl"),
                 new ImportClass("ognl.OgnlException"),
+                new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.junit.Assert.fail")
@@ -33,7 +34,7 @@ public class ThrowsStatement implements TestStatement {
         sb.unshift();
         sb.appendln("} catch (OgnlException e) {");
         sb.shift();
-            sb.appendln("assertThat(e.getReason(), is("+ complement +".class));");
+            sb.appendln("assertThat(e.getReason(), is(instanceOf("+ complement +".class)));");
         sb.unshift();
         sb.appendln("} catch (", complement, " e) {");
         sb.appendln("}");

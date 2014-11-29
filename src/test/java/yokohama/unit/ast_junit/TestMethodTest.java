@@ -74,6 +74,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("ognl.OgnlException"));
         expected.add(new ImportClass("org.junit.Assert.assertThat"));
         expected.add(new ImportClass("org.junit.Assert.fail"));
+        expected.add(new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
         Set<ImportedName> actual = instance.importedNames();
         assertThat(actual, is(expected));
