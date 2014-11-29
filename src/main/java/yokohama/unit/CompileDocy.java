@@ -40,6 +40,16 @@ public class CompileDocy implements Command {
                 .create("help"));
         options.addOption(OptionBuilder
                 .hasArg()
+                .withArgName("path")
+                .withDescription("Specify where to find user class files and annotation processors")
+                .create("classpath"));
+        options.addOption(OptionBuilder
+                .hasArg()
+                .withArgName("path")
+                .withDescription("Specify where to find user class files and annotation processors")
+                .create("cp"));
+        options.addOption(OptionBuilder
+                .hasArg()
                 .withArgName("encoding")
                 .withDescription("Specify character encoding used by source files")
                 .create("encoding"));
@@ -74,7 +84,7 @@ public class CompileDocy implements Command {
     public int run(InputStream in, PrintStream out, PrintStream err, String... args) {
         Options options = constructOptions();
         List<String> javacOptions =
-            Arrays.asList("nowarn", "verbose", "d", "target");
+            Arrays.asList("nowarn", "verbose", "classpath", "cp", "d", "target");
 
         try {
             CommandLine commandLine = new BasicParser().parse(options, args);
