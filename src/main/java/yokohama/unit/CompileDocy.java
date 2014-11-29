@@ -79,16 +79,19 @@ public class CompileDocy implements Command {
         try {
             CommandLine commandLine = new BasicParser().parse(options, args);
             if (commandLine.hasOption("help")) {
+                PrintWriter pw = new PrintWriter(err);
                 new HelpFormatter().printHelp(
-                        new PrintWriter(err),
+                        pw,
                         80,
                         "docyc <options> <source files>",
                         "",
                         options,
                         0,
                         0,
-                        ""
+                        "",
+                        true
                 );
+                pw.flush();
                 return Command.EXIT_SUCCESS;
             }
             URI baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
