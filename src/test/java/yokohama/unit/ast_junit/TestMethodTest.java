@@ -71,6 +71,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("org.junit.Test"));
         expected.add(new ImportClass("ognl.Ognl"));
         expected.add(new ImportClass("ognl.OgnlContext"));
+        expected.add(new ImportClass("ognl.OgnlException"));
         expected.add(new ImportClass("org.junit.Assert.assertThat"));
         expected.add(new ImportClass("org.junit.Assert.fail"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
