@@ -22,7 +22,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.translator.DocyCompiler;
-import yokohama.unit.translator.DocyCompilerImpl;
 
 @AllArgsConstructor
 public class CompileDocy implements Command {
@@ -83,7 +82,7 @@ public class CompileDocy implements Command {
                 new HelpFormatter().printHelp(
                         new PrintWriter(err),
                         80,
-                        "docy <options> <source files>",
+                        "docyc <options> <source files>",
                         "",
                         options,
                         0,
@@ -112,22 +111,16 @@ public class CompileDocy implements Command {
             }
             return Command.EXIT_SUCCESS;
         } catch (UnrecognizedOptionException e) {
-            err.println("docy: invalid flag: " + e.getOption());
-            err.println("Usage: docy <options> <source files>");
+            err.println("docyc: invalid flag: " + e.getOption());
+            err.println("Usage: docyc <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
         } catch (ParseException|IOException e) {
-            err.println("docy: " + e.getMessage());
+            err.println("docyc: " + e.getMessage());
             err.println("Usage: docy <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
         }
     }
 
-    public static void main(String args[]) {
-        CompileDocy main = new CompileDocy(new DocyCompilerImpl());
-        int status = main.run(System.in, System.out, System.err, args);
-        System.exit(status);
-    }
-    
 }
