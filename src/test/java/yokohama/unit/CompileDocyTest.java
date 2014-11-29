@@ -19,14 +19,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import yokohama.unit.translator.DocyCompiler;
 
-public class MainTest {
+public class CompileDocyTest {
     
     @Test
     public void testExtractOptions() throws ParseException {
         String[] args = {};
-        List<Option> options = Arrays.asList(new BasicParser().parse(Main.constructOptions(), args).getOptions());
+        List<Option> options = Arrays.asList(new BasicParser().parse(CompileDocy.constructOptions(), args).getOptions());
         List<String> delegatedOptions = Arrays.asList();
-        List<String> actual = Main.extractOptions(options, delegatedOptions);
+        List<String> actual = CompileDocy.extractOptions(options, delegatedOptions);
         List<String> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -34,9 +34,9 @@ public class MainTest {
     @Test
     public void testExtractOptions1() throws ParseException {
         String[] args = {"-d", ".", "-target", "1.8"};
-        List<Option> options = Arrays.asList(new BasicParser().parse(Main.constructOptions(), args).getOptions());
+        List<Option> options = Arrays.asList(new BasicParser().parse(CompileDocy.constructOptions(), args).getOptions());
         List<String> delegatedOptions = Arrays.asList();
-        List<String> actual = Main.extractOptions(options, delegatedOptions);
+        List<String> actual = CompileDocy.extractOptions(options, delegatedOptions);
         List<String> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -44,9 +44,9 @@ public class MainTest {
     @Test
     public void testExtractOptions2() throws ParseException {
         String[] args = {};
-        List<Option> options = Arrays.asList(new BasicParser().parse(Main.constructOptions(), args).getOptions());
+        List<Option> options = Arrays.asList(new BasicParser().parse(CompileDocy.constructOptions(), args).getOptions());
         List<String> delegatedOptions = Arrays.asList("d",  "target");
-        List<String> actual = Main.extractOptions(options, delegatedOptions);
+        List<String> actual = CompileDocy.extractOptions(options, delegatedOptions);
         List<String> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -54,9 +54,9 @@ public class MainTest {
     @Test
     public void testExtractOptions3() throws ParseException {
         String[] args = {"-d", ".", "-encoding", "UTF-8", "-nowarn", "-target", "1.8"};
-        List<Option> options = Arrays.asList(new BasicParser().parse(Main.constructOptions(), args).getOptions());
+        List<Option> options = Arrays.asList(new BasicParser().parse(CompileDocy.constructOptions(), args).getOptions());
         List<String> delegatedOptions = Arrays.asList("nowarn", "verbose", "d",  "target");
-        List<String> actual = Main.extractOptions(options, delegatedOptions);
+        List<String> actual = CompileDocy.extractOptions(options, delegatedOptions);
         List<String> expected = Arrays.asList("-d", ".", "-nowarn", "-target", "1.8");
         assertThat(actual, is(expected));
     }
@@ -68,7 +68,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -80,7 +80,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -92,7 +92,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -104,7 +104,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -119,7 +119,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
@@ -135,7 +135,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
@@ -151,7 +151,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
@@ -167,7 +167,7 @@ public class MainTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new Main(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());

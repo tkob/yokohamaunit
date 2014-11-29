@@ -25,7 +25,7 @@ import yokohama.unit.translator.DocyCompiler;
 import yokohama.unit.translator.DocyCompilerImpl;
 
 @AllArgsConstructor
-public class Main implements Command {
+public class CompileDocy implements Command {
     private final DocyCompiler compiler;
 
     static Options constructOptions() {
@@ -125,7 +125,7 @@ public class Main implements Command {
     }
 
     public static void main(String args[]) {
-        Main main = new Main(new DocyCompilerImpl());
+        CompileDocy main = new CompileDocy(new DocyCompilerImpl());
         int status = main.run(System.in, System.out, System.err, args);
         System.exit(status);
     }
