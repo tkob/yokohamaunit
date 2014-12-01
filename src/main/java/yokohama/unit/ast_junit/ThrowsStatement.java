@@ -39,4 +39,9 @@ public class ThrowsStatement implements TestStatement {
         sb.appendln("} catch (", complement, " e) {");
         sb.appendln("}");
     }
+
+    @Override
+    public <T> T accept(TestStatementVisitor<T> visitor) {
+        return visitor.visitThrowsStatement(this);
+    }
 }

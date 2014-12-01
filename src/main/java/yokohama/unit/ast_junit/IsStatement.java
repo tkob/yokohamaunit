@@ -32,4 +32,9 @@ public class IsStatement implements TestStatement {
         sb.unshift();
         sb.appendln("}");
     }
+
+    @Override
+    public <T> T accept(TestStatementVisitor<T> visitor) {
+        return visitor.visitIsStatement(this);
+    }
 }

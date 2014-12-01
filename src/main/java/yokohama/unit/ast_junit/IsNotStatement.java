@@ -33,4 +33,9 @@ public class IsNotStatement implements TestStatement {
         sb.unshift();
         sb.appendln("}");
     }
+
+    @Override
+    public <T> T accept(TestStatementVisitor<T> visitor) {
+        return visitor.visitIsNotStatement(this);
+    }
 }
