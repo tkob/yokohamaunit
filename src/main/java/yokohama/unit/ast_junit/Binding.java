@@ -9,7 +9,7 @@ public class Binding {
     private final String name;
     private final String value;
 
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("env.put(\"", escapeJava(name), "\", Ognl.getValue(\"", escapeJava(value), "\", env));");
     }
 }

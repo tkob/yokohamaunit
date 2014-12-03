@@ -84,7 +84,7 @@ public class TestMethodTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
-        instance.toString(actual);
+        instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@Test");
@@ -102,7 +102,7 @@ public class TestMethodTest {
                 "test",
                 Arrays.asList(),
                 Arrays.asList(new IsStatement("x", "y")));
-        instance.toString(actual);
+        instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@Test");

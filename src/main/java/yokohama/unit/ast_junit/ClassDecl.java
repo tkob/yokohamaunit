@@ -20,11 +20,11 @@ public class ClassDecl {
                 );
     }
 
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("public class ", name, " {");
         sb.shift();
         for (TestMethod testMethod : testMethods) {
-            testMethod.toString(sb);
+            testMethod.toString(sb, expressionStrategy);
         }
         sb.unshift();
         sb.appendln("}");

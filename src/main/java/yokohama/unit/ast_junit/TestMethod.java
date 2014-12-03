@@ -25,13 +25,13 @@ public class TestMethod {
                 );
     }
 
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("@Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
         sb.appendln("OgnlContext env = new OgnlContext();");
-        bindings.forEach(binding -> binding.toString(sb));
-        testStatements.forEach(testStatement -> testStatement.toString(sb));
+        bindings.forEach(binding -> binding.toString(sb, expressionStrategy));
+        testStatements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
         sb.unshift();
         sb.appendln("}");
     }

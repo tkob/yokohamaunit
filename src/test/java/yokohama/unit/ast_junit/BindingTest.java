@@ -12,7 +12,7 @@ public class BindingTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         Binding instance = new Binding("x", "y");
-        instance.toString(actual);
+        instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("env.put(\"x\", Ognl.getValue(\"y\", env));");

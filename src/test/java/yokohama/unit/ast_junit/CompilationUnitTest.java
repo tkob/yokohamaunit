@@ -20,7 +20,7 @@ public class CompilationUnitTest {
         String packageName = "yokohama.unit.example";
         ClassDecl classDecl = new ClassDecl("", Arrays.asList());
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText();
+        String actual = instance.getText(new OgnlExpressionStrategy());
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();
@@ -43,7 +43,7 @@ public class CompilationUnitTest {
             classDecl.importedNames(); result = importedNames;
         }};
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText();
+        String actual = instance.getText(new OgnlExpressionStrategy());
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();

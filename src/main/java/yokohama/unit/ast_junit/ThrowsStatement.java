@@ -26,7 +26,7 @@ public class ThrowsStatement implements TestStatement {
     }
 
     @Override
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("try {");
         sb.shift();
             sb.appendln("Ognl.getValue(\"", escapeJava(subject), "\", env);");

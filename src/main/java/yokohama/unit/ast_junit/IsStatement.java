@@ -23,7 +23,7 @@ public class IsStatement implements TestStatement {
     }
 
     @Override
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("{");
         sb.shift();
         sb.appendln("Object actual = Ognl.getValue(\"", escapeJava(subject), "\", env);");

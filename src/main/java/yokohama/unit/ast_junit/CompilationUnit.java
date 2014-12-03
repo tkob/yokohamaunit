@@ -20,19 +20,19 @@ public class CompilationUnit {
                 );
     }
 
-    public String getText() {
+    public String getText(ExpressionStrategy expressionStrategy) {
         final SBuilder sb = new SBuilder(4);
-        toString(sb);
+        toString(sb, expressionStrategy);
         return sb.toString();
     }
 
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
         for (ImportedName name : importedNames()) {
             name.toString(sb);
         }
         sb.appendln();
-        classDecl.toString(sb);
+        classDecl.toString(sb, expressionStrategy);
     }
 }
