@@ -17,7 +17,12 @@ public class TestMethod {
         Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("org.junit.Test"));
         importedNames.addAll(expressionStrategy.environmentImports());
-        importedNames.addAll(expressionStrategy.bindImports());
+        importedNames.addAll(
+                bindings.stream()
+                        .flatMap(binding ->
+                                expressionStrategy.bindImports().stream())
+                        .collect(Collectors.toSet())
+        );
         importedNames.addAll(
                 testStatements
                         .stream()
