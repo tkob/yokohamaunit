@@ -6,7 +6,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class CompilationUnit implements Stringifiable {
+public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
 
@@ -26,7 +26,6 @@ public class CompilationUnit implements Stringifiable {
         return sb.toString();
     }
 
-    @Override
     public void toString(SBuilder sb) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();

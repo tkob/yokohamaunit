@@ -8,7 +8,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class TestMethod implements Stringifiable {
+public class TestMethod {
     private final String name;
     private final List<Binding> bindings;
     private final List<TestStatement> testStatements;
@@ -25,7 +25,6 @@ public class TestMethod implements Stringifiable {
                 );
     }
 
-    @Override
     public void toString(SBuilder sb) {
         sb.appendln("@Test");
         sb.appendln("public void ", name, "() throws Exception {");

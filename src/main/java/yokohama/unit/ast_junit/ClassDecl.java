@@ -7,7 +7,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class ClassDecl implements Stringifiable {
+public class ClassDecl {
     private final String name;
     private final List<TestMethod> testMethods;
 
@@ -20,7 +20,6 @@ public class ClassDecl implements Stringifiable {
                 );
     }
 
-    @Override
     public void toString(SBuilder sb) {
         sb.appendln("public class ", name, " {");
         sb.shift();

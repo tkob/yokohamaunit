@@ -2,8 +2,11 @@ package yokohama.unit.ast_junit;
 
 import java.util.Set;
 import java.util.function.Function;
+import yokohama.unit.util.SBuilder;
 
-public interface TestStatement extends Stringifiable {
+public interface TestStatement {
+    void toString(SBuilder sb);
+
     Set<ImportedName> importedNames();
 
     <T> T accept(TestStatementVisitor<T> visitor);
