@@ -15,7 +15,7 @@ public class ClassDeclTest {
     public void testImportedNames() {
         ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
         Set<ImportedName> expected = new TreeSet<ImportedName>();
-        Set<ImportedName> actual = instance.importedNames();
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy());
         assertThat(actual, is(expected));
     }
 

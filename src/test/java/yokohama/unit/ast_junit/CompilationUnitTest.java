@@ -31,6 +31,7 @@ public class CompilationUnitTest {
     @Test
     public void testGetText1(@Mocked ClassDecl classDecl) {
         String packageName = "yokohama.unit.example";
+        ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
         Set<ImportedName> importedNames = new HashSet<ImportedName>();
         importedNames.add(new ImportClass("yokohama.unit.example.B"));
         importedNames.add(new ImportClass("yokohama.unit.example.G"));
@@ -40,10 +41,10 @@ public class CompilationUnitTest {
         importedNames.add(new ImportStatic("yokohama.unit.example.F.*"));
         importedNames.add(new ImportClass("yokohama.unit.example.A"));
         new Expectations() {{
-            classDecl.importedNames(); result = importedNames;
+            classDecl.importedNames(expressionStrategy); result = importedNames;
         }};
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText(new OgnlExpressionStrategy());
+        String actual = instance.getText(expressionStrategy);
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();

@@ -10,8 +10,8 @@ public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
 
-    public Set<ImportedName> importedNames() {
-        return classDecl.importedNames()
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+        return classDecl.importedNames(expressionStrategy)
                 .stream()
                 .collect(
                         () -> new TreeSet<ImportedName>(),
@@ -29,7 +29,7 @@ public class CompilationUnit {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
-        for (ImportedName name : importedNames()) {
+        for (ImportedName name : importedNames(expressionStrategy)) {
             name.toString(sb);
         }
         sb.appendln();
