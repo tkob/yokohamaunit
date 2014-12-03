@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import lombok.Value;
+import lombok.experimental.NonFinal;
 import yokohama.unit.util.SBuilder;
 
 @Value
+@NonFinal
 public class ClassDecl {
     private final String name;
     private final List<TestMethod> testMethods;
