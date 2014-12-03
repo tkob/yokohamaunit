@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.OgnlExpressionStrategy;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 
@@ -50,7 +51,7 @@ public class TranslatorUtils {
                 new AstToJUnitAst().translate(className, ast, packageName);
 
         // JUnit AST to string
-        return junit.getText();
+        return junit.getText(new OgnlExpressionStrategy());
     }
 
     public static boolean compileDocy(

@@ -1,6 +1,10 @@
 package yokohama.unit.ast_junit;
 
-public interface ImportedName extends Stringifiable, Comparable<ImportedName> {
+import yokohama.unit.util.SBuilder;
+
+public interface ImportedName extends Comparable<ImportedName> {
+    void toString(SBuilder sb);
+
     String getName();
 
     @Override

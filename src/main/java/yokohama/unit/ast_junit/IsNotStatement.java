@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import lombok.Value;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -14,21 +13,23 @@ public class IsNotStatement implements TestStatement {
     private String complement;
 
     @Override
-    public Set<ImportedName> importedNames() {
-        return new TreeSet<ImportedName>(Arrays.asList(
-                new ImportClass("ognl.Ognl"),
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+        Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
-                new ImportStatic("org.hamcrest.CoreMatchers.not")
-        ));
+                new ImportStatic("org.hamcrest.CoreMatchers.not")));
+        importedNames.addAll(expressionStrategy.getValueImports());
+        return importedNames;
     }
 
     @Override
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("{");
         sb.shift();
-        sb.appendln("Object actual = Ognl.getValue(\"", escapeJava(subject), "\", env);");
-        sb.appendln("Object unexpected = Ognl.getValue(\"", escapeJava(complement), "\", env);");
+        String actual = expressionStrategy.getValue(subject);
+        String unexpected = expressionStrategy.getValue(complement);
+        sb.appendln("Object actual = ", actual, ";");
+        sb.appendln("Object unexpected = ", unexpected, ";");
         sb.appendln("assertThat(actual, is(not(unexpected)));");
         sb.unshift();
         sb.appendln("}");

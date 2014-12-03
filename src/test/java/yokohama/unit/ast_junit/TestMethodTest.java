@@ -21,7 +21,7 @@ public class TestMethodTest {
         Set<ImportedName> expected = new HashSet<ImportedName>();
         expected.add(new ImportClass("org.junit.Test"));
         expected.add(new ImportClass("ognl.OgnlContext"));
-        Set<ImportedName> actual = instance.importedNames();
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy());
         assertThat(actual, is(expected));
     }
 
@@ -38,7 +38,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("ognl.OgnlContext"));
         expected.add(new ImportClass("org.junit.Assert.assertThat"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
-        Set<ImportedName> actual = instance.importedNames();
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy());
         assertThat(actual, is(expected));
     }
 
@@ -56,7 +56,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("org.junit.Assert.assertThat"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.not"));
-        Set<ImportedName> actual = instance.importedNames();
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy());
         assertThat(actual, is(expected));
     }
 
@@ -76,7 +76,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("org.junit.Assert.fail"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
-        Set<ImportedName> actual = instance.importedNames();
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy());
         assertThat(actual, is(expected));
     }
 
@@ -84,7 +84,7 @@ public class TestMethodTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
-        instance.toString(actual);
+        instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@Test");
@@ -102,7 +102,7 @@ public class TestMethodTest {
                 "test",
                 Arrays.asList(),
                 Arrays.asList(new IsStatement("x", "y")));
-        instance.toString(actual);
+        instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@Test");

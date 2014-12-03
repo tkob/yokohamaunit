@@ -1,14 +1,15 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
-import mockit.Expectations;
-import mockit.Mocked;
+import java.util.TreeSet;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -20,7 +21,7 @@ public class CompilationUnitTest {
         String packageName = "yokohama.unit.example";
         ClassDecl classDecl = new ClassDecl("", Arrays.asList());
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText();
+        String actual = instance.getText(new OgnlExpressionStrategy());
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();
@@ -29,9 +30,10 @@ public class CompilationUnitTest {
     }
 
     @Test
-    public void testGetText1(@Mocked ClassDecl classDecl) {
+    public void testGetText1() {
         String packageName = "yokohama.unit.example";
-        Set<ImportedName> importedNames = new HashSet<ImportedName>();
+        ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+        Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("yokohama.unit.example.B"));
         importedNames.add(new ImportClass("yokohama.unit.example.G"));
         importedNames.add(new ImportStatic("yokohama.unit.example.C.*"));
@@ -39,11 +41,10 @@ public class CompilationUnitTest {
         importedNames.add(new ImportClass("yokohama.unit.example.D"));
         importedNames.add(new ImportStatic("yokohama.unit.example.F.*"));
         importedNames.add(new ImportClass("yokohama.unit.example.A"));
-        new Expectations() {{
-            classDecl.importedNames(); result = importedNames;
-        }};
+        ClassDecl classDecl = mock(ClassDecl.class);
+        when(classDecl.importedNames(expressionStrategy)).thenReturn(importedNames);
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText();
+        String actual = instance.getText(expressionStrategy);
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();

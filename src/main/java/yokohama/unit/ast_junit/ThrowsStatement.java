@@ -14,28 +14,31 @@ public class ThrowsStatement implements TestStatement {
     private String complement;
 
     @Override
-    public Set<ImportedName> importedNames() {
-        return new TreeSet<ImportedName>(Arrays.asList(
-                new ImportClass("ognl.Ognl"),
-                new ImportClass("ognl.OgnlException"),
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+        Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
                 new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
                 new ImportStatic("org.junit.Assert.assertThat"),
-                new ImportStatic("org.junit.Assert.fail")
-                ));
+                new ImportStatic("org.junit.Assert.fail")));
+        importedNames.addAll(expressionStrategy.getValueImports());
+        importedNames.addAll(expressionStrategy.wrappingExceptionImports());
+        importedNames.addAll(expressionStrategy.wrappedExceptionImports());
+        return importedNames;
     }
 
     @Override
-    public void toString(SBuilder sb) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("try {");
         sb.shift();
             sb.appendln("Ognl.getValue(\"", escapeJava(subject), "\", env);");
             sb.appendln("fail(\"`", subject, "` was expected to throw ", complement, ".\");");
         sb.unshift();
-        sb.appendln("} catch (OgnlException e) {");
-        sb.shift();
-            sb.appendln("assertThat(e.getReason(), is(instanceOf("+ complement +".class)));");
-        sb.unshift();
+        if (expressionStrategy.wrappingException().isPresent()) {
+            sb.appendln("} catch (", expressionStrategy.wrappingException().get(), " e) {");
+            sb.shift();
+                sb.appendln("assertThat(", expressionStrategy.wrappedException("e"), ", is(instanceOf("+ complement +".class)));");
+            sb.unshift();
+        }
         sb.appendln("} catch (", complement, " e) {");
         sb.appendln("}");
     }
