@@ -1,14 +1,15 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import mockit.Expectations;
 import mockit.Mocked;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -32,7 +33,7 @@ public class CompilationUnitTest {
     public void testGetText1(@Mocked ClassDecl classDecl) {
         String packageName = "yokohama.unit.example";
         ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
-        Set<ImportedName> importedNames = new HashSet<ImportedName>();
+        Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("yokohama.unit.example.B"));
         importedNames.add(new ImportClass("yokohama.unit.example.G"));
         importedNames.add(new ImportStatic("yokohama.unit.example.C.*"));

@@ -1,6 +1,5 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,12 +17,7 @@ public class TestMethod {
         Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("org.junit.Test"));
         importedNames.addAll(expressionStrategy.environmentImports());
-        importedNames.addAll(
-                bindings.stream()
-                        .flatMap(binding ->
-                                expressionStrategy.bindImports(binding).stream())
-                        .collect(Collectors.toSet())
-        );
+        importedNames.addAll(expressionStrategy.bindImports());
         importedNames.addAll(
                 testStatements
                         .stream()

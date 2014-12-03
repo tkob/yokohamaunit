@@ -18,8 +18,7 @@ public class IsNotStatement implements TestStatement {
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
                 new ImportStatic("org.hamcrest.CoreMatchers.not")));
-        importedNames.addAll(expressionStrategy.getValueImports(subject));
-        importedNames.addAll(expressionStrategy.getValueImports(complement));
+        importedNames.addAll(expressionStrategy.getValueImports());
         return importedNames;
     }
 

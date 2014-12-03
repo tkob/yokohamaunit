@@ -17,8 +17,7 @@ public class IsStatement implements TestStatement {
         Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is")));
-        importedNames.addAll(expressionStrategy.getValueImports(subject));
-        importedNames.addAll(expressionStrategy.getValueImports(complement));
+        importedNames.addAll(expressionStrategy.getValueImports());
         return importedNames;
     }
 

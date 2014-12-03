@@ -11,8 +11,8 @@ public interface ExpressionStrategy {
     public String wrappedException(String e);
     
     public Set<ImportedName> environmentImports();
-    public Set<ImportedName> bindImports(Binding binding);
-    public Set<ImportedName> getValueImports(String expression);
+    public Set<ImportedName> bindImports();
+    public Set<ImportedName> getValueImports();
     public Set<ImportedName> wrappingExceptionImports();
-    public Set<ImportedName> wrappedExceptionImports(String e);
+    public Set<ImportedName> wrappedExceptionImports();
 }

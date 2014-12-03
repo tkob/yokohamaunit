@@ -26,7 +26,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Set<ImportedName> bindImports(Binding binding) {
+    public Set<ImportedName> bindImports() {
         return new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl")));
     }
 
@@ -36,7 +36,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Set<ImportedName> getValueImports(String expression) {
+    public Set<ImportedName> getValueImports() {
         return new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl")));
     }
 
@@ -56,7 +56,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Set<ImportedName> wrappedExceptionImports(String e) {
+    public Set<ImportedName> wrappedExceptionImports() {
         return new TreeSet<>();
     }
 }

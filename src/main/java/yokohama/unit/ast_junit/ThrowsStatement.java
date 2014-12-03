@@ -20,9 +20,9 @@ public class ThrowsStatement implements TestStatement {
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.junit.Assert.fail")));
-        importedNames.addAll(expressionStrategy.getValueImports(subject));
+        importedNames.addAll(expressionStrategy.getValueImports());
         importedNames.addAll(expressionStrategy.wrappingExceptionImports());
-        importedNames.addAll(expressionStrategy.wrappedExceptionImports("e"));
+        importedNames.addAll(expressionStrategy.wrappedExceptionImports());
         return importedNames;
     }
 

@@ -1,7 +1,6 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
@@ -11,13 +10,7 @@ public class CompilationUnit {
     private ClassDecl classDecl;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
-        return classDecl.importedNames(expressionStrategy)
-                .stream()
-                .collect(
-                        () -> new TreeSet<ImportedName>(),
-                        (set, e) -> set.add(e),
-                        (s1, s2) -> s1.addAll(s2)
-                );
+        return classDecl.importedNames(expressionStrategy);
     }
 
     public String getText(ExpressionStrategy expressionStrategy) {
