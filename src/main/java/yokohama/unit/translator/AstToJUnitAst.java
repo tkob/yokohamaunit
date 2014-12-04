@@ -45,23 +45,22 @@ public class AstToJUnitAst {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = extractTables(definitions);
         List<TestMethod> methods =
-                extractTests(definitions)
-                        .stream()
-                        .flatMap(test -> translateTest(test, tables).stream())
-                        .collect(Collectors.toList());
+                definitions.stream()
+                           .flatMap(definition -> definition.accept(
+                                   test -> translateTest(test, tables).stream(),
+                                   fourPhaseTest -> Stream.empty(), //TODO: implement translateFourPhaseTest
+                                   table -> Stream.empty()))
+                           .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, methods);
         return new CompilationUnit(packageName, classDecl);
     }
     
     List<Table> extractTables(List<Definition> definitions) {
         return definitions.stream()
-                          .flatMap(definition -> definition.accept(test -> Stream.empty(), table -> Stream.of(table)))
-                          .collect(Collectors.toList());
-    }
-
-    List<Test> extractTests(List<Definition> definitions) {
-        return definitions.stream()
-                          .flatMap(definition -> definition.accept(test -> Stream.of(test), table -> Stream.empty()))
+                          .flatMap(definition -> definition.accept(
+                                  test -> Stream.empty(),
+                                  fourPhaseTest -> Stream.empty(),
+                                  table -> Stream.of(table)))
                           .collect(Collectors.toList());
     }
 

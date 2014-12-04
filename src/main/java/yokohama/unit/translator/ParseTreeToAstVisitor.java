@@ -1,17 +1,24 @@
 package yokohama.unit.translator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import yokohama.unit.ast.Action;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
+import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.LetBinding;
+import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
@@ -166,6 +173,120 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                                      .map(Expr::new)
                                      .collect(Collectors.toList());
         return new Row(exprs);
+    }
+
+    @Override
+    public FourPhaseTest visitFourPhaseTest(YokohamaUnitParser.FourPhaseTestContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        String name = ctx.TestName().getText();
+        Optional<Phase> setup =
+                ctx.setup() == null ? Optional.empty()
+                                    : Optional.of(visitSetup(ctx.setup()));
+        Optional<Phase> exercise =
+                ctx.exercise() == null ? Optional.empty()
+                                       : Optional.of(visitExercise(ctx.exercise()));
+        Optional<Phase> verify =
+                ctx.verify() == null ? Optional.empty()
+                                     : Optional.of(visitVerify(ctx.verify()));
+        Optional<Phase> teardown =
+                ctx.teardown() == null ? Optional.empty()
+                                       : Optional.of(visitTeardown(ctx.teardown()));
+        return new FourPhaseTest(numHashes, name, setup, exercise, verify, teardown);
+    }
+
+    @Override
+    public Phase visitSetup(YokohamaUnitParser.SetupContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        Optional<String> description =
+                ctx.PhaseDescription() == null ? Optional.empty()
+                                               : Optional.of(ctx.PhaseDescription().getText());
+        List<Action> actions = ctx.setupStatement()
+                .stream()
+                .map(this::visitSetupStatement)
+                .collect(Collectors.toList());
+        return new Phase(numHashes, description, actions);
+    }
+
+    @Override
+    public Phase visitExercise(YokohamaUnitParser.ExerciseContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        Optional<String> description =
+                ctx.PhaseDescription() == null ? Optional.empty()
+                                               : Optional.of(ctx.PhaseDescription().getText());
+        List<Action> actions = ctx.exerciseStatement()
+                .stream()
+                .map(this::visitExerciseStatement)
+                .collect(Collectors.toList());
+        return new Phase(numHashes, description, actions);
+    }
+
+    @Override
+    public Phase visitVerify(YokohamaUnitParser.VerifyContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        Optional<String> description =
+                ctx.PhaseDescription() == null ? Optional.empty()
+                                               : Optional.of(ctx.PhaseDescription().getText());
+        List<Action> actions = ctx.verifyStatement()
+                .stream()
+                .map(this::visitVerifyStatement)
+                .collect(Collectors.toList());
+        return new Phase(numHashes, description, actions);
+    }
+
+    @Override
+    public Phase visitTeardown(YokohamaUnitParser.TeardownContext ctx) {
+        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
+        Optional<String> description =
+                ctx.PhaseDescription() == null ? Optional.empty()
+                                               : Optional.of(ctx.PhaseDescription().getText());
+        List<Action> actions = ctx.teardownStatement()
+                .stream()
+                .map(this::visitTeardownStatement)
+                .collect(Collectors.toList());
+        return new Phase(numHashes, description, actions);
+    }
+
+    @Override
+    public Action visitSetupStatement(YokohamaUnitParser.SetupStatementContext ctx) {
+        return (Action)visitChildren(ctx);
+    }
+
+    @Override
+    public Action visitExerciseStatement(YokohamaUnitParser.ExerciseStatementContext ctx) {
+        return (Action)visitChildren(ctx);
+    }
+
+    @Override
+    public Action visitVerifyStatement(YokohamaUnitParser.VerifyStatementContext ctx) {
+        return (Action)visitChildren(ctx);
+    }
+
+    @Override
+    public Action visitTeardownStatement(YokohamaUnitParser.TeardownStatementContext ctx) {
+        return (Action)visitChildren(ctx);
+    }
+
+    @Override
+    public LetBindings visitLetBindings(YokohamaUnitParser.LetBindingsContext ctx) {
+        return new LetBindings(
+                ctx.letBinding().stream()
+                        .map(this::visitLetBinding)
+                        .collect(Collectors.toList()));
+    }
+
+    @Override
+    public LetBinding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
+        return new LetBinding(
+                ctx.Identifier().getText(),
+                new Expr(ctx.Expr().getText()));
+    }
+
+    @Override
+    public Execution visitExecution(YokohamaUnitParser.ExecutionContext ctx) {
+        return new Execution(
+                ctx.Expr().stream()
+                        .map(expr -> new Expr(expr.getText()))
+                        .collect(Collectors.toList()));
     }
 
 }
