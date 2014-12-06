@@ -83,12 +83,12 @@ public class AstToJUnitAst {
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
         return assertion.getFixture().accept(
-                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), testStatements)),
+                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
                 tableRef -> {
                     List<List<Binding>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
-                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), testStatements))
+                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
                             .collect(Collectors.toList());
                 },
                 bindings -> Arrays.asList(new TestMethod(
@@ -97,7 +97,9 @@ public class AstToJUnitAst {
                                 .stream()
                                 .map(this::translateBinding)
                                 .collect(Collectors.toList()),
-                        testStatements
+                        Arrays.asList(),
+                        testStatements,
+                        Arrays.asList()
                 )));
     }
 
