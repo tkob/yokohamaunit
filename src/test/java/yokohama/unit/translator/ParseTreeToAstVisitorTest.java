@@ -36,6 +36,7 @@ import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
+import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 
@@ -326,9 +327,8 @@ public class ParseTreeToAstVisitorTest {
                 "Four phase test",
                 Optional.empty(),
                 Optional.empty(),
-                new Phase(
+                new VerifyPhase(
                         0,
-                        Optional.empty(),
                         Optional.empty(),
                         Arrays.asList(
                                 new Assertion(
@@ -360,10 +360,9 @@ public class ParseTreeToAstVisitorTest {
                         Optional.empty(),
                         Arrays.asList(new Execution(Arrays.asList(new Expr("that")))))
                 ),
-                new Phase(
+                new VerifyPhase(
                         2,
                         Optional.of("verification"),
-                        Optional.empty(),
                         Arrays.asList(
                                 new Assertion(
                                         Arrays.asList(
@@ -449,10 +448,9 @@ public class ParseTreeToAstVisitorTest {
         YokohamaUnitParser.VerifyContext ctx = parser("Verify\nAssert that `x` is `1`.").verify();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Phase expResult = null;
-        Phase actual = instance.visitVerify(ctx);
-        Phase expected = new Phase(
+        VerifyPhase actual = instance.visitVerify(ctx);
+        VerifyPhase expected = new VerifyPhase(
                 0,
-                Optional.empty(),
                 Optional.empty(),
                 Arrays.asList(
                         new Assertion(

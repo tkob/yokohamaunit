@@ -25,6 +25,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
 
@@ -185,7 +186,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<Phase> exercise =
                 ctx.exercise() == null ? Optional.empty()
                                        : Optional.of(visitExercise(ctx.exercise()));
-        Phase verify = visitVerify(ctx.verify());
+        VerifyPhase verify = visitVerify(ctx.verify());
         Optional<Phase> teardown =
                 ctx.teardown() == null ? Optional.empty()
                                        : Optional.of(visitTeardown(ctx.teardown()));
@@ -222,16 +223,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Phase visitVerify(YokohamaUnitParser.VerifyContext ctx) {
+    public VerifyPhase visitVerify(YokohamaUnitParser.VerifyContext ctx) {
         int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.assertion()
+        List<Assertion> assertions = ctx.assertion()
                 .stream()
                 .map(this::visitAssertion)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), actions);
+        return new VerifyPhase(numHashes, description, assertions);
     }
 
     @Override
