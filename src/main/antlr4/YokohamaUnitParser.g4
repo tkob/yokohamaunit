@@ -34,7 +34,7 @@ tableType: UTABLE | CSV | TSV | EXCEL ;
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) Expr ;
 
-fourPhaseTest: hash? TEST TestName setup? exercise? verify? teardown? ;
+fourPhaseTest: hash? TEST TestName setup? exercise? verify teardown? ;
 
 setup: hash? SETUP PhaseDescription? (letBindings execution* | execution+) ;
 exercise: hash? EXERCISE PhaseDescription? execution+ ;

@@ -9,7 +9,7 @@ public class FourPhaseTest implements Definition {
     private String name;
     private Optional<Phase> setup;
     private Optional<Phase> exercise;
-    private Optional<Phase> verify;
+    private Phase verify;
     private Optional<Phase> teardown;
 
     @Override

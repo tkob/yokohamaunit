@@ -318,7 +318,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitFourPhaseTest() throws IOException {
-        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\n").fourPhaseTest();
+        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\nVerify\nAssert `1` is `1`.").fourPhaseTest();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
         FourPhaseTest expected = new FourPhaseTest(
@@ -326,7 +326,15 @@ public class ParseTreeToAstVisitorTest {
                 "Four phase test",
                 Optional.empty(),
                 Optional.empty(),
-                Optional.empty(),
+                new Phase(
+                        0,
+                        Optional.empty(),
+                        Optional.empty(),
+                        Arrays.asList(
+                                new Assertion(
+                                        Arrays.asList(
+                                                new Proposition(new Expr("x"), Copula.IS, new Expr("1"))), Fixture.none()))
+                ),
                 Optional.empty()
         );
         assertThat(actual, is(expected));
@@ -352,14 +360,14 @@ public class ParseTreeToAstVisitorTest {
                         Optional.empty(),
                         Arrays.asList(new Execution(Arrays.asList(new Expr("that")))))
                 ),
-                Optional.of(new Phase(
+                new Phase(
                         2,
                         Optional.of("verification"),
                         Optional.empty(),
                         Arrays.asList(
                                 new Assertion(
                                         Arrays.asList(
-                                                new Proposition(new Expr("x"), Copula.IS, new Expr("1"))), Fixture.none())))
+                                                new Proposition(new Expr("x"), Copula.IS, new Expr("1"))), Fixture.none()))
                 ),
                 Optional.of(new Phase(
                         2,

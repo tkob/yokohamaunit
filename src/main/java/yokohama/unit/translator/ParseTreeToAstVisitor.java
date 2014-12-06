@@ -185,9 +185,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<Phase> exercise =
                 ctx.exercise() == null ? Optional.empty()
                                        : Optional.of(visitExercise(ctx.exercise()));
-        Optional<Phase> verify =
-                ctx.verify() == null ? Optional.empty()
-                                     : Optional.of(visitVerify(ctx.verify()));
+        Phase verify = visitVerify(ctx.verify());
         Optional<Phase> teardown =
                 ctx.teardown() == null ? Optional.empty()
                                        : Optional.of(visitTeardown(ctx.teardown()));
