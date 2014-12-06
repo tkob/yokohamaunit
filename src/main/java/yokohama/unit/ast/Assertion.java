@@ -4,12 +4,7 @@ import java.util.List;
 import lombok.Value;
 
 @Value
-public class Assertion implements Action {
+public class Assertion {
     private List<Proposition> propositions;
     private Fixture fixture;
-
-    @Override
-    public <T> T accept(ActionVisitor<T> visitor) {
-        return visitor.visitAssertion(this);
-    }
 }
