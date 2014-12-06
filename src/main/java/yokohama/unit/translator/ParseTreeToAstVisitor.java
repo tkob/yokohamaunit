@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import yokohama.unit.ast.Action;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
@@ -202,11 +201,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<LetBindings> letBindings =
                 ctx.letBindings() == null ? Optional.empty()
                                           : Optional.of(visitLetBindings(ctx.letBindings()));
-        List<Action> actions = ctx.execution()
+        List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, letBindings, actions);
+        return new Phase(numHashes, description, letBindings, executions);
     }
 
     @Override
@@ -215,11 +214,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.execution()
+        List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), actions);
+        return new Phase(numHashes, description, Optional.empty(), executions);
     }
 
     @Override
@@ -241,11 +240,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.execution()
+        List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), actions);
+        return new Phase(numHashes, description, Optional.empty(), executions);
     }
 
     @Override
