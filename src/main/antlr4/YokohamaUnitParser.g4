@@ -36,15 +36,10 @@ binding: Identifier (EQ | IS) Expr ;
 
 fourPhaseTest: hash? TEST TestName setup? exercise? verify? teardown? ;
 
-setup: hash? SETUP PhaseDescription? setupStatement+ ;
-exercise: hash? EXERCISE PhaseDescription? exerciseStatement+ ;
-verify: hash? VERIFY PhaseDescription? verifyStatement+ ;
-teardown: hash? TEARDOWN PhaseDescription? teardownStatement+ ;
-
-setupStatement: letBindings | execution ;
-exerciseStatement: letBindings | execution ;
-verifyStatement: assertion ;
-teardownStatement: execution ;
+setup: hash? SETUP PhaseDescription? (letBindings execution* | execution+) ;
+exercise: hash? EXERCISE PhaseDescription? execution+ ;
+verify: hash? VERIFY PhaseDescription? assertion+ ;
+teardown: hash? TEARDOWN PhaseDescription? execution+ ;
 
 letBindings: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) Expr ;

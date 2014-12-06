@@ -4,12 +4,6 @@ import java.util.List;
 import lombok.Value;
 
 @Value
-public class LetBindings implements Action {
+public class LetBindings {
     private List<LetBinding> bindings;
-
-    @Override
-    public <T> T accept(ActionVisitor<T> visitor) {
-        return visitor.visitLetBindings(this);
-    }
-    
 }

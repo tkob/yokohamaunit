@@ -4,7 +4,7 @@
  * <pre>
  * Group ::= Definition*
  * 
- * Definition ::= Test | Table
+ * Definition ::= Test | FourPhaseTest | Table
  * 
  * Test ::= Assertion*
  * 
@@ -21,6 +21,14 @@
  * TableType :: INLINE | CSV | TSV | EXCEL
  * 
  * Bindings ::= Binding*
+ * 
+ * FourPhaseTest ::= Phase Phase Phase Phase
+ * 
+ * Phase ::= LetBindings? Action?
+ * 
+ * Action ::= Execution | Assertion
+ * 
+ * Execution ::= Expr*
  * 
  * Table ::= Row*
  * 

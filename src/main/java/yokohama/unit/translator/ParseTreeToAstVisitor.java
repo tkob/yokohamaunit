@@ -200,11 +200,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.setupStatement()
+        Optional<LetBindings> letBindings =
+                ctx.letBindings() == null ? Optional.empty()
+                                          : Optional.of(visitLetBindings(ctx.letBindings()));
+        List<Action> actions = ctx.execution()
                 .stream()
-                .map(this::visitSetupStatement)
+                .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, actions);
+        return new Phase(numHashes, description, letBindings, actions);
     }
 
     @Override
@@ -213,11 +216,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.exerciseStatement()
+        List<Action> actions = ctx.execution()
                 .stream()
-                .map(this::visitExerciseStatement)
+                .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, actions);
+        return new Phase(numHashes, description, Optional.empty(), actions);
     }
 
     @Override
@@ -226,11 +229,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.verifyStatement()
+        List<Action> actions = ctx.assertion()
                 .stream()
-                .map(this::visitVerifyStatement)
+                .map(this::visitAssertion)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, actions);
+        return new Phase(numHashes, description, Optional.empty(), actions);
     }
 
     @Override
@@ -239,31 +242,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        List<Action> actions = ctx.teardownStatement()
+        List<Action> actions = ctx.execution()
                 .stream()
-                .map(this::visitTeardownStatement)
+                .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, actions);
-    }
-
-    @Override
-    public Action visitSetupStatement(YokohamaUnitParser.SetupStatementContext ctx) {
-        return (Action)visitChildren(ctx);
-    }
-
-    @Override
-    public Action visitExerciseStatement(YokohamaUnitParser.ExerciseStatementContext ctx) {
-        return (Action)visitChildren(ctx);
-    }
-
-    @Override
-    public Action visitVerifyStatement(YokohamaUnitParser.VerifyStatementContext ctx) {
-        return (Action)visitChildren(ctx);
-    }
-
-    @Override
-    public Action visitTeardownStatement(YokohamaUnitParser.TeardownStatementContext ctx) {
-        return (Action)visitChildren(ctx);
+        return new Phase(numHashes, description, Optional.empty(), actions);
     }
 
     @Override
