@@ -8,5 +8,5 @@ import lombok.Value;
 public class VerifyPhase {
     private int numHashes;
     private Optional<String> description;
-    private List<Assertion> actions; 
+    private List<Assertion> assertions; 
 }
