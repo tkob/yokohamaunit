@@ -319,7 +319,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitFourPhaseTest() throws IOException {
-        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\nVerify\nAssert `1` is `1`.").fourPhaseTest();
+        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\nVerify\nAssert `x` is `1`.").fourPhaseTest();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
         FourPhaseTest expected = new FourPhaseTest(
