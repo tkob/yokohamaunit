@@ -24,12 +24,16 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.Binding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -48,7 +52,7 @@ public class AstToJUnitAst {
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
                                    test -> translateTest(test, tables).stream(),
-                                   fourPhaseTest -> Stream.empty(), //TODO: implement translateFourPhaseTest
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, methods);
@@ -194,5 +198,37 @@ public class AstToJUnitAst {
             throw new TranslationException(e);
         }
     }
+    List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
+        String name = fourPhaseTest.getName();
+        List<Binding> bindings;
+        if (fourPhaseTest.getSetup().isPresent()) {
+            Phase setup = fourPhaseTest.getSetup().get();
+            if (setup.getLetBindings().isPresent()) {
+                LetBindings letBindings = setup.getLetBindings().get();
+                bindings = letBindings.getBindings()
+                        .stream()
+                        .map(binding -> new Binding(binding.getName(), binding.getValue().getText()))
+                        .collect(Collectors.toList());
+            } else {
+                bindings = Arrays.asList();
+            }
+        } else {
+            bindings = Arrays.asList();
+        }
 
+        List<ActionStatement> actionsBefore = Arrays.asList(); // TODO: unimplemented
+
+        List<TestStatement> testStatements = fourPhaseTest.getVerify().getAssertions()
+                .stream()
+                .flatMap(assertion ->
+                        assertion.getPropositions()
+                                .stream()
+                                .map(this::translateProposition)
+                )
+                .collect(Collectors.toList());
+
+        List<ActionStatement> actionsAfter = Arrays.asList(); // TODO: unimplemented
+
+        return Arrays.asList(new TestMethod(name, bindings, actionsBefore, testStatements, actionsAfter));
+    }
 }
