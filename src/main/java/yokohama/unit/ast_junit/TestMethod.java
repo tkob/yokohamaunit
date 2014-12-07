@@ -26,6 +26,13 @@ public class TestMethod {
                         .collect(Collectors.toSet())
         );
         importedNames.addAll(
+                actionsBefore
+                        .stream()
+                        .flatMap(testStatement ->
+                                testStatement.importedNames(expressionStrategy).stream())
+                        .collect(Collectors.toSet())
+        );
+        importedNames.addAll(
                 testStatements
                         .stream()
                         .flatMap(testStatement ->
@@ -41,6 +48,7 @@ public class TestMethod {
         sb.shift();
         sb.appendln(expressionStrategy.environment());
         bindings.forEach(binding -> sb.appendln(expressionStrategy.bind(binding)));
+        actionsBefore.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
         testStatements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
         sb.unshift();
         sb.appendln("}");

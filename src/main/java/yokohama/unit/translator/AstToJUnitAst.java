@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,6 +24,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
@@ -198,8 +200,9 @@ public class AstToJUnitAst {
             throw new TranslationException(e);
         }
     }
+
     List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
-        String name = fourPhaseTest.getName();
+        String testName = SUtils.toIdent(fourPhaseTest.getName());
         List<Binding> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
@@ -216,7 +219,18 @@ public class AstToJUnitAst {
             bindings = Arrays.asList();
         }
 
-        List<ActionStatement> actionsBefore = Arrays.asList(); // TODO: unimplemented
+        Optional<Stream<ActionStatement>> setupActions =
+                fourPhaseTest.getSetup()
+                        .map(Phase::getExecutions)
+                        .map(this::translateExecutions);
+        Optional<Stream<ActionStatement>> exerciseActions =
+                fourPhaseTest.getExercise()
+                        .map(Phase::getExecutions)
+                        .map(this::translateExecutions);
+        List<ActionStatement> actionsBefore = Stream.concat(
+                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
+                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
+        ).collect(Collectors.toList());
 
         List<TestStatement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
@@ -227,8 +241,22 @@ public class AstToJUnitAst {
                 )
                 .collect(Collectors.toList());
 
-        List<ActionStatement> actionsAfter = Arrays.asList(); // TODO: unimplemented
+        List<ActionStatement> actionsAfter;
+        if (fourPhaseTest.getTeardown().isPresent()) {
+            Phase teardown = fourPhaseTest.getTeardown().get();
+            actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
+        } else {
+            actionsAfter = Arrays.asList();
+        }
 
-        return Arrays.asList(new TestMethod(name, bindings, actionsBefore, testStatements, actionsAfter));
+        return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
+    }
+
+    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
+        return executions.stream()
+                .flatMap(execution ->
+                        execution.getExpressions()
+                                .stream()
+                                .map(expression -> new ActionStatement(expression.getText())));
     }
 }
