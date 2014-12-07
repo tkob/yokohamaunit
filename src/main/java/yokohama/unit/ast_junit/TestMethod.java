@@ -39,6 +39,13 @@ public class TestMethod {
                                 testStatement.importedNames(expressionStrategy).stream())
                         .collect(Collectors.toSet())
         );
+        importedNames.addAll(
+                actionsAfter
+                        .stream()
+                        .flatMap(testStatement ->
+                                testStatement.importedNames(expressionStrategy).stream())
+                        .collect(Collectors.toSet())
+        );
         return importedNames;
     }
 
@@ -47,9 +54,21 @@ public class TestMethod {
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
         sb.appendln(expressionStrategy.environment());
+        if (actionsAfter.size() > 0) {
+            sb.appendln("try {");
+            sb.shift();
+        }
         bindings.forEach(binding -> sb.appendln(expressionStrategy.bind(binding)));
         actionsBefore.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
         testStatements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
+        if (actionsAfter.size() > 0) {
+            sb.unshift();
+            sb.appendln("} finally {");
+            sb.shift();
+            actionsAfter.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
+            sb.unshift();
+            sb.appendln("}");
+        }
         sb.unshift();
         sb.appendln("}");
     }
