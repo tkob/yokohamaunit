@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,13 +24,18 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.Binding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -45,23 +51,22 @@ public class AstToJUnitAst {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = extractTables(definitions);
         List<TestMethod> methods =
-                extractTests(definitions)
-                        .stream()
-                        .flatMap(test -> translateTest(test, tables).stream())
-                        .collect(Collectors.toList());
+                definitions.stream()
+                           .flatMap(definition -> definition.accept(
+                                   test -> translateTest(test, tables).stream(),
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables).stream(),
+                                   table -> Stream.empty()))
+                           .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, methods);
         return new CompilationUnit(packageName, classDecl);
     }
     
     List<Table> extractTables(List<Definition> definitions) {
         return definitions.stream()
-                          .flatMap(definition -> definition.accept(test -> Stream.empty(), table -> Stream.of(table)))
-                          .collect(Collectors.toList());
-    }
-
-    List<Test> extractTests(List<Definition> definitions) {
-        return definitions.stream()
-                          .flatMap(definition -> definition.accept(test -> Stream.of(test), table -> Stream.empty()))
+                          .flatMap(definition -> definition.accept(
+                                  test -> Stream.empty(),
+                                  fourPhaseTest -> Stream.empty(),
+                                  table -> Stream.of(table)))
                           .collect(Collectors.toList());
     }
 
@@ -84,12 +89,12 @@ public class AstToJUnitAst {
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
         return assertion.getFixture().accept(
-                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), testStatements)),
+                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
                 tableRef -> {
                     List<List<Binding>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
-                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), testStatements))
+                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
                             .collect(Collectors.toList());
                 },
                 bindings -> Arrays.asList(new TestMethod(
@@ -98,7 +103,9 @@ public class AstToJUnitAst {
                                 .stream()
                                 .map(this::translateBinding)
                                 .collect(Collectors.toList()),
-                        testStatements
+                        Arrays.asList(),
+                        testStatements,
+                        Arrays.asList()
                 )));
     }
 
@@ -194,4 +201,62 @@ public class AstToJUnitAst {
         }
     }
 
+    List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
+        String testName = SUtils.toIdent(fourPhaseTest.getName());
+        List<Binding> bindings;
+        if (fourPhaseTest.getSetup().isPresent()) {
+            Phase setup = fourPhaseTest.getSetup().get();
+            if (setup.getLetBindings().isPresent()) {
+                LetBindings letBindings = setup.getLetBindings().get();
+                bindings = letBindings.getBindings()
+                        .stream()
+                        .map(binding -> new Binding(binding.getName(), binding.getValue().getText()))
+                        .collect(Collectors.toList());
+            } else {
+                bindings = Arrays.asList();
+            }
+        } else {
+            bindings = Arrays.asList();
+        }
+
+        Optional<Stream<ActionStatement>> setupActions =
+                fourPhaseTest.getSetup()
+                        .map(Phase::getExecutions)
+                        .map(this::translateExecutions);
+        Optional<Stream<ActionStatement>> exerciseActions =
+                fourPhaseTest.getExercise()
+                        .map(Phase::getExecutions)
+                        .map(this::translateExecutions);
+        List<ActionStatement> actionsBefore = Stream.concat(
+                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
+                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
+        ).collect(Collectors.toList());
+
+        List<TestStatement> testStatements = fourPhaseTest.getVerify().getAssertions()
+                .stream()
+                .flatMap(assertion ->
+                        assertion.getPropositions()
+                                .stream()
+                                .map(this::translateProposition)
+                )
+                .collect(Collectors.toList());
+
+        List<ActionStatement> actionsAfter;
+        if (fourPhaseTest.getTeardown().isPresent()) {
+            Phase teardown = fourPhaseTest.getTeardown().get();
+            actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
+        } else {
+            actionsAfter = Arrays.asList();
+        }
+
+        return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
+    }
+
+    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
+        return executions.stream()
+                .flatMap(execution ->
+                        execution.getExpressions()
+                                .stream()
+                                .map(expression -> new ActionStatement(expression.getText())));
+    }
 }

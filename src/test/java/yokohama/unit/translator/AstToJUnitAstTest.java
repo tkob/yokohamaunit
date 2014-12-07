@@ -49,21 +49,6 @@ public class AstToJUnitAstTest {
     }
 
     @Test
-    public void testExtractTests() {
-        List<Definition> definitions = Arrays.asList(
-                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList()))),
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0),
-                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList())))
-        );
-        AstToJUnitAst instance = new AstToJUnitAst();
-        List<yokohama.unit.ast.Test> actual = instance.extractTests(definitions);
-        List<yokohama.unit.ast.Test> expected = Arrays.asList(
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0)
-        );
-        assertThat(actual, is(expected));
-    }
-
-    @Test
     public void testTranslate() {
         String name = "TestGroup";
         Group group = new Group(Arrays.asList());
@@ -94,7 +79,7 @@ public class AstToJUnitAstTest {
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst();
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
-        List<TestMethod> expected = Arrays.asList(new TestMethod("test_0", Arrays.asList(), Arrays.asList()));
+        List<TestMethod> expected = Arrays.asList(new TestMethod("test_0", Arrays.asList(), Arrays.asList(), Arrays.asList(), Arrays.asList()));
         assertThat(actual, is(expected));
     }
 

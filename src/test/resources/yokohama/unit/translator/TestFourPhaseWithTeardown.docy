@@ -1,0 +1,9 @@
+# Test: The size of a new temporary file is zero
+## Setup
+Let temp be `@java.io.File@createTempFile("prefix", null)`
+
+## Verify
+Assert `temp.length()` is `0L`
+
+## Teardown
+Do `temp.delete()`

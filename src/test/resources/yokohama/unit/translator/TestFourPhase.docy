@@ -1,0 +1,9 @@
+# Test: AtomicInteger.incrementAndGet increments the content
+## Setup
+Let i be `new java.util.concurrent.atomic.AtomicInteger(0)`.
+
+## Exercise
+Do `i.incrementAndGet()`.
+
+## Verify
+Assert `i.get()` is `1`.

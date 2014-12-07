@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,14 +23,20 @@ import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
+import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.LetBinding;
+import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
+import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 
@@ -58,7 +65,7 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitDefinition1() throws IOException {
+    public void testVisitDefinition() throws IOException {
         YokohamaUnitParser.DefinitionContext ctx = parser("Test: test name\n Assert `a` is `b`.").definition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Definition result = instance.visitDefinition(ctx);
@@ -85,7 +92,25 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitAssertion1() throws IOException {
+    public void testVisitHash() throws IOException {
+        YokohamaUnitParser.HashContext ctx = parser("#").hash();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Integer actual = instance.visitHash(ctx);
+        Integer expected = 1;
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitHash2() throws IOException {
+        YokohamaUnitParser.HashContext ctx = parser("######").hash();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Integer actual = instance.visitHash(ctx);
+        Integer expected = 6;
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitAssertion() throws IOException {
         YokohamaUnitParser.AssertionContext ctx = parser("Assert `a` is `b`.").assertion();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Assertion actual = instance.visitAssertion(ctx);
@@ -137,7 +162,7 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitBindings1() throws IOException {
+    public void testVisitBindings() throws IOException {
         YokohamaUnitParser.BindingsContext ctx = parser("where a = `1`").bindings();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Bindings result = instance.visitBindings(ctx);
@@ -161,7 +186,7 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitCondition1() throws IOException {
+    public void testVisitCondition() throws IOException {
         YokohamaUnitParser.ConditionContext ctx = parser("according to Table \"table 1\"").condition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Fixture result = instance.visitCondition(ctx);
@@ -226,7 +251,7 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitPropositions1() throws IOException {
+    public void testVisitPropositions() throws IOException {
         YokohamaUnitParser.PropositionsContext ctx = parser("`a` is `b`").propositions();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         List<Proposition> result = instance.visitPropositions(ctx);
@@ -289,6 +314,221 @@ public class ParseTreeToAstVisitorTest {
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Row actual = instance.visitRow(ctx);
         Row expected = new Row(Arrays.asList(new Expr("a"), new Expr("b")));
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitFourPhaseTest() throws IOException {
+        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\nVerify\nAssert `x` is `1`.").fourPhaseTest();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
+        FourPhaseTest expected = new FourPhaseTest(
+                0,
+                "Four phase test",
+                Optional.empty(),
+                Optional.empty(),
+                new VerifyPhase(
+                        0,
+                        Optional.empty(),
+                        Arrays.asList(
+                                new Assertion(
+                                        Arrays.asList(
+                                                new Proposition(new Expr("x"), Copula.IS, new Expr("1"))), Fixture.none()))
+                ),
+                Optional.empty()
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitFourPhaseTest2() throws IOException {
+        YokohamaUnitParser.FourPhaseTestContext ctx = parser("# Test: Four phase test\n## Setup\nLet x be `1`.\n## Exercise\nDo `that`.\n## Verify: verification\nAssert that `x` is `1`.\n## Teardown: do that\nDo `this`. Do `that`. ").fourPhaseTest();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
+        FourPhaseTest expected = new FourPhaseTest(
+                1,
+                "Four phase test",
+                Optional.of(new Phase(
+                        2,
+                        Optional.empty(),
+                        Optional.of(new LetBindings(Arrays.asList(new LetBinding("x", new Expr("1"))))),
+                        Arrays.asList())
+                ),
+                Optional.of(new Phase(
+                        2,
+                        Optional.empty(),
+                        Optional.empty(),
+                        Arrays.asList(new Execution(Arrays.asList(new Expr("that")))))
+                ),
+                new VerifyPhase(
+                        2,
+                        Optional.of("verification"),
+                        Arrays.asList(
+                                new Assertion(
+                                        Arrays.asList(
+                                                new Proposition(new Expr("x"), Copula.IS, new Expr("1"))), Fixture.none()))
+                ),
+                Optional.of(new Phase(
+                        2,
+                        Optional.of("do that"),
+                        Optional.empty(),
+                        Arrays.asList(
+                                new Execution(Arrays.asList(new Expr("this"))),
+                                new Execution(Arrays.asList(new Expr("that")))
+                        ))
+                )
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitSetup() throws IOException {
+        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x be `1`.").setup();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitSetup(ctx);
+        Phase expected = new Phase(
+                0,
+                Optional.empty(),
+                Optional.of(new LetBindings(Arrays.asList(new LetBinding("x", new Expr("1"))))),
+                Arrays.asList()
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitSetup2() throws IOException {
+        YokohamaUnitParser.SetupContext ctx = parser("## Setup: x = 1\nDo `this`. Do `that`.").setup();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitSetup(ctx);
+        Phase expected = new Phase(
+                2,
+                Optional.of("x = 1"),
+                Optional.empty(),
+                Arrays.asList(
+                        new Execution(Arrays.asList(new Expr("this"))),
+                        new Execution(Arrays.asList(new Expr("that")))
+                )
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitSetup3() throws IOException {
+        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x = `1`\nDo `that`.").setup();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitSetup(ctx);
+        Phase expected = new Phase(
+                0,
+                Optional.empty(),
+                Optional.of(new LetBindings(Arrays.asList(new LetBinding("x", new Expr("1"))))),
+                Arrays.asList(new Execution(Arrays.asList(new Expr("that"))))
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitExercise() throws IOException {
+        YokohamaUnitParser.ExerciseContext ctx = parser("Exercise: x = 1\nDo `this`. Do `that`.").exercise();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitExercise(ctx);
+        Phase expected = new Phase(
+                0,
+                Optional.of("x = 1"),
+                Optional.empty(),
+                Arrays.asList(
+                        new Execution(Arrays.asList(new Expr("this"))),
+                        new Execution(Arrays.asList(new Expr("that")))
+                )
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitVerify() throws IOException {
+        YokohamaUnitParser.VerifyContext ctx = parser("Verify\nAssert that `x` is `1`.").verify();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase expResult = null;
+        VerifyPhase actual = instance.visitVerify(ctx);
+        VerifyPhase expected = new VerifyPhase(
+                0,
+                Optional.empty(),
+                Arrays.asList(
+                        new Assertion(
+                                Arrays.asList(new Proposition(new Expr("x"), Copula.IS, new Expr("1"))),
+                                Fixture.none()))
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitTeardown() throws IOException {
+        YokohamaUnitParser.TeardownContext ctx = parser("## Teardown: do that\nDo `this`. Do `that`.").teardown();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitTeardown(ctx);
+        Phase expected = new Phase(
+                2,
+                Optional.of("do that"),
+                Optional.empty(),
+                Arrays.asList(
+                        new Execution(Arrays.asList(new Expr("this"))),
+                        new Execution(Arrays.asList(new Expr("that")))
+                )
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitTeardown2() throws IOException {
+        YokohamaUnitParser.TeardownContext ctx = parser("Teardown\nDo `this`.").teardown();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Phase actual = instance.visitTeardown(ctx);
+        Phase expected = new Phase(
+                0,
+                Optional.empty(),
+                Optional.empty(),
+                Arrays.asList(
+                        new Execution(Arrays.asList(new Expr("this")))
+                )
+        );
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitLetBindings() throws IOException {
+        YokohamaUnitParser.LetBindingsContext ctx = parser("Let x be `1` and y = `2`.").letBindings();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        LetBindings actual = instance.visitLetBindings(ctx);
+        LetBindings expected = new LetBindings(Arrays.asList(
+                new LetBinding("x", new Expr("1")),
+                new LetBinding("y", new Expr("2"))
+                ));
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitLetBinding() throws IOException {
+        YokohamaUnitParser.LetBindingContext ctx = parser("x = `1`").letBinding();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        LetBinding actual = instance.visitLetBinding(ctx);
+        LetBinding expected = new LetBinding("x", new Expr("1"));
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitExecution() throws IOException {
+        YokohamaUnitParser.ExecutionContext ctx = parser("Do `System.out.println(\"test\")`.").execution();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Execution actual = instance.visitExecution(ctx);
+        Execution expected = new Execution(Arrays.asList(new Expr("System.out.println(\"test\")")));
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitExecution2() throws IOException {
+        YokohamaUnitParser.ExecutionContext ctx = parser("Do `this` and `that`.").execution();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
+        Execution actual = instance.visitExecution(ctx);
+        Execution expected = new Execution(Arrays.asList(new Expr("this"), new Expr("that")));
         assertThat(actual, is(expected));
     }
 }

@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= Binding* TestStateMent*
+ * TestMethod ::= Binding* ActionStatement* TestStateMent* ActionStatement*
  * 
  * TestStatement ::= IsStatement
  *                 | IsNotStatement

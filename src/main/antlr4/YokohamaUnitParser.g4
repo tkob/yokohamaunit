@@ -5,6 +5,7 @@ options { tokenVocab=YokohamaUnitLexer; }
 group: definition* ;
 
 definition: test
+          | fourPhaseTest
           | tableDef
           ;
 
@@ -32,6 +33,17 @@ tableType: UTABLE | CSV | TSV | EXCEL ;
 
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) Expr ;
+
+fourPhaseTest: hash? TEST TestName setup? exercise? verify teardown? ;
+
+setup: hash? SETUP PhaseDescription? (letBindings execution* | execution+) ;
+exercise: hash? EXERCISE PhaseDescription? execution+ ;
+verify: hash? VERIFY PhaseDescription? assertion+ ;
+teardown: hash? TEARDOWN PhaseDescription? execution+ ;
+
+letBindings: LET letBinding (AND letBinding)* STOP ;
+letBinding: Identifier (EQ | BE) Expr ;
+execution: DO Expr (AND Expr)* STOP ;
 
 tableDef: TABLE TableName header HBAR? rows ;
 

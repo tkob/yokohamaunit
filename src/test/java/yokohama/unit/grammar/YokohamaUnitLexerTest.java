@@ -34,8 +34,17 @@ public class YokohamaUnitLexerTest {
     @DataPoints
     public static Fixture[] PARAMs = {
         new Fixture("Test: Simple Test\n", Arrays.asList("Test:", "Simple Test")),
+        new Fixture("Table: Test Fixture\n", Arrays.asList("Table:", "Test Fixture")),
+        new Fixture("Setup \t\nLet", Arrays.asList("Setup", "Let")),
+        new Fixture("Setup: make a mock\nLet", Arrays.asList("Setup", "make a mock", "Let")),
+        new Fixture("Exercise \t\nDo", Arrays.asList("Exercise", "Do")),
+        new Fixture("Exercise: call xxx method\nDo", Arrays.asList("Exercise", "call xxx method", "Do")),
+        new Fixture("Verify \t\nAssert", Arrays.asList("Verify", "Assert")),
+        new Fixture("Verify: get result\nAssert", Arrays.asList("Verify", "get result", "Assert")),
+        new Fixture("Teardown \t\nDo", Arrays.asList("Teardown", "Do")),
+        new Fixture("Teardown: clean directory\nDo", Arrays.asList("Teardown", "clean directory", "Do")),
         new Fixture("Table Assert", Arrays.asList("Table", "Assert")),
-        new Fixture("that and using where", Arrays.asList("that", "and", "using", "where")),
+        new Fixture("that and using where be", Arrays.asList("that", "and", "using", "where", "be")),
         new Fixture(".=", Arrays.asList(".", "=")),
         new Fixture("is throws", Arrays.asList("is", "throws")),
         new Fixture("table CSV TSV Excel", Arrays.asList("table", "CSV", "TSV", "Excel")),

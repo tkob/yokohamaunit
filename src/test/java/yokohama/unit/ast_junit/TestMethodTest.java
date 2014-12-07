@@ -16,6 +16,8 @@ public class TestMethodTest {
     public void testImportedNames() {
         TestMethod instance = new TestMethod("test", 
                 Arrays.asList(),
+                Arrays.asList(),
+                Arrays.asList(),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new HashSet<ImportedName>();
@@ -30,7 +32,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test name",
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", ""))
+                Arrays.asList(),
+                Arrays.asList(new IsStatement("", "")),
+                Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
         expected.add(new ImportClass("org.junit.Test"));
@@ -47,7 +51,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test name",
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", ""), new IsNotStatement("", ""))
+                Arrays.asList(),
+                Arrays.asList(new IsStatement("", ""), new IsNotStatement("", "")),
+                Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
         expected.add(new ImportClass("org.junit.Test"));
@@ -65,7 +71,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test name",
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", ""), new ThrowsStatement("", ""))
+                Arrays.asList(),
+                Arrays.asList(new IsStatement("", ""), new ThrowsStatement("", "")),
+                Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
         expected.add(new ImportClass("org.junit.Test"));
@@ -83,7 +91,7 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
+        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList(), Arrays.asList(), Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();
@@ -101,7 +109,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test",
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("x", "y")));
+                Arrays.asList(),
+                Arrays.asList(new IsStatement("x", "y")),
+                Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy());
 
         StrBuilder expected = new StrBuilder();

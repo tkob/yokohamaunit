@@ -67,6 +67,16 @@ public class TranslatorUtilsTest {
                     "TestExcel.java",
                     Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
             ),
+            new Fixture(
+                    "TestFourPhase.docy",
+                    "TestFourPhase.java",
+                    Arrays.asList("AtomicInteger_incrementAndGet_increments_the_content")
+            ),
+            new Fixture(
+                    "TestFourPhaseWithTeardown.docy",
+                    "TestFourPhaseWithTeardown.java",
+                    Arrays.asList("The_size_of_a_new_temporary_file_is_zero")
+            ),
         };
 
         @Theory
