@@ -1,2 +1,2 @@
 Test: String.startsWith
-Assert `sut.startsWith(prefix)` is `expected` according to Excel "TestExcel.xlsx".
+Assert `sut.startsWith(prefix)` is `expected` for all rules in Excel "TestExcel.xlsx".

@@ -28,7 +28,7 @@ condition: tableRef
          | bindings
          ;
 
-tableRef: ACCORDING TO tableType Quoted ;
+tableRef: FOR ALL RULES IN tableType Quoted ;
 tableType: UTABLE | CSV | TSV | EXCEL ;
 
 bindings: WHERE binding (AND binding)* ;
