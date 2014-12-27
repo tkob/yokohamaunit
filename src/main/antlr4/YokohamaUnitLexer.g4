@@ -35,6 +35,11 @@ EQ: '=' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 LET: 'Let' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 BE: 'be' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 DO: 'Do' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+A: 'a' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+STUB: 'stub' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+OF: 'of' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+SUCHTHAT: 'such' [ \t\r\n]+ 'that' -> mode(AFTER_SUCHTHAT) ;
+RETURNS: 'returns' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
@@ -64,6 +69,11 @@ EQ2: '=' -> type(EQ) ;
 LET2: 'Let' -> type(LET) ;
 BE2: 'be' -> type(BE) ;
 DO2: 'Do' -> type(DO) ;
+A2: 'a' -> type(A) ;
+STUB2: 'stub' -> type(STUB) ;
+OF2: 'of' -> type(OF) ;
+SUCHTHAT2: 'such' [ \t\r\n]+ 'that' -> type(SUCHTHAT), mode(AFTER_SUCHTHAT) ;
+RETURNS2: 'returns' -> type(RETURNS) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE2: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
@@ -117,6 +127,29 @@ BARONSET: '|' -> type(BAR), mode(IN_TABLE_CELL) ;
 HBAR: '-'+ '\r'? '\n' ;
 SPACETAB2: [ \t]+ -> skip ;
 NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
+
+mode AFTER_SUCHTHAT;
+OPENBACKTICK3: '`' -> skip, mode(METHOD_PATTERN) ;
+SPACETABNEWLINE: [ \t\r\n]+ -> skip ;
+
+mode METHOD_PATTERN;
+BOOLEAN: 'boolean' ;
+BYTE: 'byte' ;
+SHORT: 'short' ;
+INT: 'int' ;
+LONG: 'long' ;
+FLOAT: 'float' ;
+DOUBLE: 'double' ;
+COMMA: ',' ;
+THREEDOTS: '...' ;
+DOT: '.' ;
+LPAREN: '(' ;
+RPAREN: ')' ;
+LBRACKET: '[' ;
+RBRACKET: ']' ;
+Identifier3 : IdentStart IdentPart* -> type(Identifier);
+SPACETABNEWLINE2: [ \t\r\n]+ -> skip ;
+CLOSEBACKTICK2: '`' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]

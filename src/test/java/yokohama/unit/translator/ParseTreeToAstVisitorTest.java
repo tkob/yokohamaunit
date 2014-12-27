@@ -122,12 +122,12 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitAssertion2() throws IOException {
-        YokohamaUnitParser.AssertionContext ctx = parser("Assert `a` is `b` where a = `1`.").assertion();
+        YokohamaUnitParser.AssertionContext ctx = parser("Assert `x` is `y` where x = `1`.").assertion();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Assertion actual = instance.visitAssertion(ctx);
         Assertion expected = new Assertion(
-                Arrays.asList(new Proposition(new Expr("a"), Copula.IS, new Expr("b"))),
-                new Bindings(Arrays.asList(new Binding("a", new Expr("1")))));
+                Arrays.asList(new Proposition(new Expr("x"), Copula.IS, new Expr("y"))),
+                new Bindings(Arrays.asList(new Binding("x", new Expr("1")))));
         assertThat(actual, is(expected));
     }
 
@@ -163,7 +163,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitBindings() throws IOException {
-        YokohamaUnitParser.BindingsContext ctx = parser("where a = `1`").bindings();
+        YokohamaUnitParser.BindingsContext ctx = parser("where x = `1`").bindings();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Bindings result = instance.visitBindings(ctx);
         assertThat(result.getBindings().size(), is(1));
@@ -171,7 +171,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitBindings2() throws IOException {
-        YokohamaUnitParser.BindingsContext ctx = parser("where a = `1` and b = `2`").bindings();
+        YokohamaUnitParser.BindingsContext ctx = parser("where x = `1` and y = `2`").bindings();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Bindings result = instance.visitBindings(ctx);
         assertThat(result.getBindings().size(), is(2));
@@ -179,10 +179,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitBinding() throws IOException {
-        YokohamaUnitParser.BindingContext ctx = parser("a = `1`").binding();
+        YokohamaUnitParser.BindingContext ctx = parser("x = `1`").binding();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Binding result = instance.visitBinding(ctx);
-        assertThat(result, is(new Binding("a", new Expr("1"))));
+        assertThat(result, is(new Binding("x", new Expr("1"))));
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitCondition2() throws IOException {
-        YokohamaUnitParser.ConditionContext ctx = parser("where a = `1`").condition();
+        YokohamaUnitParser.ConditionContext ctx = parser("where x = `1`").condition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Fixture result = instance.visitCondition(ctx);
         assertThat(result, is(instanceOf(Bindings.class)));
