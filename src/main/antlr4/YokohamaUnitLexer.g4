@@ -138,6 +138,7 @@ BYTE: 'byte' ;
 SHORT: 'short' ;
 INT: 'int' ;
 LONG: 'long' ;
+CHAR: 'char' ;
 FLOAT: 'float' ;
 DOUBLE: 'double' ;
 COMMA: ',' ;
