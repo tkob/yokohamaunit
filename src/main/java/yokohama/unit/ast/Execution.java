@@ -5,5 +5,5 @@ import lombok.Value;
 
 @Value
 public class Execution {
-    private List<Expr> expressions;
+    private List<QuotedExpr> expressions;
 }

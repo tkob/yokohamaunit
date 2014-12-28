@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
+import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.Execution;
@@ -17,13 +18,21 @@ import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.MethodPattern;
+import yokohama.unit.ast.NonArrayType;
 import yokohama.unit.ast.Phase;
+import yokohama.unit.ast.PrimitiveType;
+import yokohama.unit.ast.PrimitiveType.Kind;
 import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StubBehavior;
+import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
@@ -80,9 +89,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
-        Expr subject = new Expr(ctx.Expr(0).getText());
+        QuotedExpr subject = new QuotedExpr(ctx.Expr(0).getText());
         Copula copula = visitCopula(ctx.copula());
-        Expr complement = new Expr(ctx.Expr(1).getText());
+        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText());
         return new Proposition(subject, copula, complement);
     }
 
@@ -139,7 +148,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Binding visitBinding(YokohamaUnitParser.BindingContext ctx) {
         String ident = ctx.Identifier().getText();
-        Expr expr = new Expr(ctx.Expr().getText());
+        Expr expr = visitExpr(ctx.expr());
         return new Binding(ident, expr);
     }
 
@@ -170,7 +179,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         List<Expr> exprs = ctx.Expr().stream()
                                      .map(TerminalNode::getText)
                                      .map(String::trim)
-                                     .map(Expr::new)
+                                     .map(QuotedExpr::new)
                                      .collect(Collectors.toList());
         return new Row(exprs);
     }
@@ -259,15 +268,92 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public LetBinding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
         return new LetBinding(
                 ctx.Identifier().getText(),
-                new Expr(ctx.Expr().getText()));
+                visitExpr(ctx.expr()));
     }
 
     @Override
     public Execution visitExecution(YokohamaUnitParser.ExecutionContext ctx) {
         return new Execution(
                 ctx.Expr().stream()
-                        .map(expr -> new Expr(expr.getText()))
+                        .map(expr -> new QuotedExpr(expr.getText()))
                         .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Expr visitExpr(YokohamaUnitParser.ExprContext ctx) {
+        return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText())
+                                  : visitStubExpr(ctx.stubExpr());
+    }
+
+    @Override
+    public StubExpr visitStubExpr(YokohamaUnitParser.StubExprContext ctx) {
+        QuotedExpr classToStub = new QuotedExpr(ctx.Expr().getText());
+        List<StubBehavior> behavior =
+                ctx.stubBehavior().stream()
+                                  .map(this::visitStubBehavior)
+                                  .collect(Collectors.toList());
+        return new StubExpr(classToStub, behavior);
+    }
+
+    @Override
+    public StubBehavior visitStubBehavior(YokohamaUnitParser.StubBehaviorContext ctx) {
+        MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
+        Expr toBeReturned = visitExpr(ctx.expr());
+        return new StubBehavior(methodPattern, toBeReturned);
+    }
+
+    @Override
+    public MethodPattern visitMethodPattern(YokohamaUnitParser.MethodPatternContext ctx) {
+        String name = ctx.Identifier().getText();
+        List<Type> argumentTypes = ctx.type().stream().map(this::visitType).collect(Collectors.toList());
+        boolean varArg = ctx.THREEDOTS() != null;
+        return new MethodPattern(name, argumentTypes, varArg);
+    }
+
+    @Override
+    public Type visitType(YokohamaUnitParser.TypeContext ctx) {
+        NonArrayType nonArrayType = visitNonArrayType(ctx.nonArrayType());
+        int dims = ctx.LBRACKET().size();
+        return new Type(nonArrayType, dims);
+    }
+
+    @Override
+    public NonArrayType visitNonArrayType(YokohamaUnitParser.NonArrayTypeContext ctx) {
+        return (NonArrayType)visitChildren(ctx);
+    }
+
+    @Override
+    public PrimitiveType visitPrimitiveType(YokohamaUnitParser.PrimitiveTypeContext ctx) {
+        if (ctx.BOOLEAN() != null) {
+            return new PrimitiveType(Kind.BOOLEAN);
+        } else if (ctx.BYTE() != null) {
+            return new PrimitiveType(Kind.BYTE);
+        } else if (ctx.SHORT() != null) {
+            return new PrimitiveType(Kind.SHORT);
+        } else if (ctx.INT() != null) {
+            return new PrimitiveType(Kind.INT);
+        } else if (ctx.LONG() != null) {
+            return new PrimitiveType(Kind.LONG);
+        } else if (ctx.CHAR() != null) {
+            return new PrimitiveType(Kind.CHAR);
+        } else if (ctx.FLOAT() != null) {
+            return new PrimitiveType(Kind.FLOAT);
+        } else if (ctx.DOUBLE() != null) {
+            return new PrimitiveType(Kind.DOUBLE);
+        } else {
+            throw new RuntimeException("Shuld not reach here");
+        }
+    }
+
+    @Override
+    public ClassType visitClassType(YokohamaUnitParser.ClassTypeContext ctx) {
+        String name = String.join(
+                ".",
+                ctx.Identifier().stream()
+                                .map(TerminalNode::getText)
+                                .collect(Collectors.toList())
+        );
+        return new ClassType(name);
     }
 
 }

@@ -4,7 +4,7 @@ import lombok.Value;
 
 @Value
 public class Proposition {
-    private Expr subject;
+    private QuotedExpr subject;
     private Copula copula;
-    private Expr complement;
+    private QuotedExpr complement;
 }

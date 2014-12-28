@@ -26,6 +26,7 @@ import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.LetBindings;
@@ -125,7 +126,16 @@ public class AstToJUnitAst {
     }
 
     Binding translateBinding(yokohama.unit.ast.Binding binding) {
-        return new Binding(binding.getName(), binding.getValue().getText());
+        String name = binding.getName();
+        String value = translateExpr(binding.getValue());
+        return new Binding(name, value);
+    }
+
+    String translateExpr(Expr expr) {
+        return expr.accept(
+                quotedExpr -> quotedExpr.getText(),
+                stubExpr -> null // TODO:
+        );
     }
 
     List<List<Binding>> translateTableRef(TableRef tableRef, List<Table> tables) {
@@ -160,7 +170,7 @@ public class AstToJUnitAst {
         fj.data.List<String> names = Java.<String>JUList_List().f(header);
         fj.data.List<Expr> cells = Java.<Expr>JUList_List().f(row.getExprs());
         fj.data.List<Binding> bindings =
-                names.zipWith(cells, (name, expr) -> new Binding(name, expr.getText()));
+                names.zipWith(cells, (name, expr) -> new Binding(name, translateExpr(expr)));
         return Java.<Binding>List_ArrayList().f(bindings);
     }
 
@@ -210,7 +220,7 @@ public class AstToJUnitAst {
                 LetBindings letBindings = setup.getLetBindings().get();
                 bindings = letBindings.getBindings()
                         .stream()
-                        .map(binding -> new Binding(binding.getName(), binding.getValue().getText()))
+                        .map(binding -> new Binding(binding.getName(), translateExpr(binding.getValue())))
                         .collect(Collectors.toList());
             } else {
                 bindings = Arrays.asList();
