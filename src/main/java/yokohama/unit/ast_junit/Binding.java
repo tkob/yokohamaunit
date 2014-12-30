@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class Binding {
     private final String name;
-    private final String value;
+    private final Expr value;
 }

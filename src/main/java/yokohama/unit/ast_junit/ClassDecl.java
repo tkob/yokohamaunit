@@ -22,11 +22,15 @@ public class ClassDecl {
                 );
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(
+            SBuilder sb,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         sb.appendln("public class ", name, " {");
         sb.shift();
         for (TestMethod testMethod : testMethods) {
-            testMethod.toString(sb, expressionStrategy);
+            testMethod.toString(sb, expressionStrategy, mockStrategy);
         }
         sb.unshift();
         sb.appendln("}");

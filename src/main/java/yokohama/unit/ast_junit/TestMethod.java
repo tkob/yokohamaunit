@@ -49,7 +49,11 @@ public class TestMethod {
         return importedNames;
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(
+            SBuilder sb,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         sb.appendln("@Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
@@ -58,7 +62,7 @@ public class TestMethod {
             sb.appendln("try {");
             sb.shift();
         }
-        bindings.forEach(binding -> sb.appendln(expressionStrategy.bind(binding)));
+        bindings.forEach(binding -> expressionStrategy.bind(sb, binding, mockStrategy));
         actionsBefore.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
         testStatements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
         if (actionsAfter.size() > 0) {

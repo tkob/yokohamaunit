@@ -25,8 +25,6 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.Execution;
-import yokohama.unit.ast.Expr;
-import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.LetBindings;
@@ -39,12 +37,21 @@ import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.Binding;
 import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.Expr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
+import yokohama.unit.ast_junit.MethodPattern;
+import yokohama.unit.ast_junit.NonArrayType;
+import yokohama.unit.ast_junit.PrimitiveType;
+import yokohama.unit.ast_junit.QuotedExpr;
+import yokohama.unit.ast_junit.StubBehavior;
+import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.TestStatement;
 import yokohama.unit.ast_junit.ThrowsStatement;
+import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.SUtils;
 
 public class AstToJUnitAst {
@@ -127,14 +134,51 @@ public class AstToJUnitAst {
 
     Binding translateBinding(yokohama.unit.ast.Binding binding) {
         String name = binding.getName();
-        String value = translateExpr(binding.getValue());
+        Expr value = translateExpr(binding.getValue());
         return new Binding(name, value);
     }
 
-    String translateExpr(Expr expr) {
+    Expr translateExpr(yokohama.unit.ast.Expr expr) {
         return expr.accept(
-                quotedExpr -> quotedExpr.getText(),
-                stubExpr -> null // TODO:
+                quotedExpr -> new QuotedExpr(quotedExpr.getText()),
+                stubExpr ->
+                        new StubExpr(
+                                new QuotedExpr(
+                                        stubExpr.getClassToStub().getText()
+                                ),
+                                stubExpr.getBehavior()
+                                        .stream()
+                                        .map(this::translateStubBehavior)
+                                        .collect(Collectors.toList())
+                        )
+        );
+    }
+
+    StubBehavior translateStubBehavior(yokohama.unit.ast.StubBehavior stubBehavior) {
+        return new StubBehavior(
+                translateMethodPattern(stubBehavior.getMethodPattern()),
+                translateExpr(stubBehavior.getToBeReturned()));
+    }
+
+    MethodPattern translateMethodPattern(yokohama.unit.ast.MethodPattern methodPattern) {
+        return new MethodPattern(
+                methodPattern.getName(),
+                methodPattern.getArgumentTypes().stream()
+                                                .map(this::translateType)
+                                                .collect(Collectors.toList()),
+                methodPattern.isVarArg()
+        );
+    }
+
+    Type translateType(yokohama.unit.ast.Type type) {
+        return new Type(
+                translateNonArrayType(type.getNonArrayType()), type.getDims());
+    }
+
+    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
+        return nonArrayType.accept(
+                primitiveType -> new PrimitiveType(primitiveType.getKind()),
+                classType -> new ClassType(classType.getName())
         );
     }
 
@@ -168,7 +212,7 @@ public class AstToJUnitAst {
     List<Binding> translateRow(Row row, List<String> header) {
         // Since vanilla Java has no zip method...
         fj.data.List<String> names = Java.<String>JUList_List().f(header);
-        fj.data.List<Expr> cells = Java.<Expr>JUList_List().f(row.getExprs());
+        fj.data.List<yokohama.unit.ast.Expr> cells = Java.<yokohama.unit.ast.Expr>JUList_List().f(row.getExprs());
         fj.data.List<Binding> bindings =
                 names.zipWith(cells, (name, expr) -> new Binding(name, translateExpr(expr)));
         return Java.<Binding>List_ArrayList().f(bindings);
@@ -183,7 +227,7 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
-                                    .map(name -> new Binding(name, record.get(name)))
+                                    .map(name -> new Binding(name, new QuotedExpr(record.get(name))))
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         }
@@ -203,7 +247,9 @@ public class AstToJUnitAst {
                     .map(row -> 
                         IntStream.range(0, names.size())
                                 .mapToObj(Integer::new)
-                                .map(i -> new Binding(names.get(i), row.getCell(left + i).getStringCellValue()))
+                                .map(i -> new Binding(
+                                        names.get(i),
+                                        new QuotedExpr(row.getCell(left + i).getStringCellValue())))
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         } catch (InvalidFormatException | IOException e) {

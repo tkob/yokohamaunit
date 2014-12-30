@@ -13,19 +13,26 @@ public class CompilationUnit {
         return classDecl.importedNames(expressionStrategy);
     }
 
-    public String getText(ExpressionStrategy expressionStrategy) {
+    public String getText(
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         final SBuilder sb = new SBuilder(4);
-        toString(sb, expressionStrategy);
+        toString(sb, expressionStrategy, mockStrategy);
         return sb.toString();
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(
+            SBuilder sb,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
         for (ImportedName name : importedNames(expressionStrategy)) {
             name.toString(sb);
         }
         sb.appendln();
-        classDecl.toString(sb, expressionStrategy);
+        classDecl.toString(sb, expressionStrategy, mockStrategy);
     }
 }

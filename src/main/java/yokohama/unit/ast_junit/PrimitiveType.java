@@ -1,6 +1,7 @@
-package yokohama.unit.ast;
+package yokohama.unit.ast_junit;
 
 import lombok.Value;
+import yokohama.unit.ast.Kind;
 
 @Value
 public class PrimitiveType implements NonArrayType {

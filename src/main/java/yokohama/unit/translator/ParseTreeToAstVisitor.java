@@ -22,7 +22,7 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NonArrayType;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
-import yokohama.unit.ast.PrimitiveType.Kind;
+import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
