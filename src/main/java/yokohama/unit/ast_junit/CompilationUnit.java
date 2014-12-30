@@ -9,8 +9,8 @@ public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
-        return classDecl.importedNames(expressionStrategy);
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+        return classDecl.importedNames(expressionStrategy, mockStrategy);
     }
 
     public String getText(
@@ -29,7 +29,7 @@ public class CompilationUnit {
     ) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
-        for (ImportedName name : importedNames(expressionStrategy)) {
+        for (ImportedName name : importedNames(expressionStrategy, mockStrategy)) {
             name.toString(sb);
         }
         sb.appendln();

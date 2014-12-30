@@ -13,11 +13,11 @@ public class ClassDecl {
     private final String name;
     private final List<TestMethod> testMethods;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return testMethods.stream()
                 .collect(
                         () -> new TreeSet<ImportedName>(),
-                        (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy)),
+                        (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy, mockStrategy)),
                         (s1, s2) -> s1.addAll(s2)
                 );
     }

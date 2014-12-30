@@ -15,14 +15,14 @@ public class TestMethod {
     private final List<TestStatement> testStatements;
     private final List<ActionStatement> actionsAfter;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("org.junit.Test"));
         importedNames.addAll(expressionStrategy.environmentImports());
         importedNames.addAll(
                 bindings.stream()
                         .flatMap(binding ->
-                                expressionStrategy.bindImports().stream())
+                                expressionStrategy.bindImports(binding, mockStrategy).stream())
                         .collect(Collectors.toSet())
         );
         importedNames.addAll(

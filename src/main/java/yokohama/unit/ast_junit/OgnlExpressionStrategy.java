@@ -40,8 +40,12 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Set<ImportedName> bindImports() {
-        return new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl")));
+    public Set<ImportedName> bindImports(Binding binding, MockStrategy mockStrategy) {
+        return binding.getValue().<Set<ImportedName>>accept(
+                quotedExpr ->
+                    new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl"))),
+                stubExpr -> mockStrategy.stubImports(stubExpr, this)
+        );
     }
 
     @Override

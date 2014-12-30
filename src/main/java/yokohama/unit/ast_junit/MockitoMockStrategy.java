@@ -1,11 +1,15 @@
 package yokohama.unit.ast_junit;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.util.SBuilder;
 
 public class MockitoMockStrategy implements MockStrategy {
+
     private String mapArgumentType(Type argumentType) {
         int dims = argumentType.getDims();
         if (dims == 0) {
@@ -46,6 +50,29 @@ public class MockitoMockStrategy implements MockStrategy {
         }
     }
 
+    private Set<ImportedName> argumentTypeImports(Type argumentType) {
+        if (argumentType.getDims() > 0) {
+            return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.isA")));
+        } else {
+            return argumentType.getNonArrayType().accept(
+                    primitiveType -> {
+                        switch (primitiveType.getKind()) {
+                            case BOOLEAN: return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyBoolean")));
+                            case BYTE:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyByte")));
+                            case SHORT:   return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyShort")));
+                            case INT:     return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyInt")));
+                            case LONG:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyLong")));
+                            case CHAR:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyChar")));
+                            case FLOAT:   return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyFloat")));
+                            case DOUBLE:  return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyDouble")));
+                        }
+                        throw new RuntimeException("should not reach here");
+                    },
+                    classType -> new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.isA")))
+            );
+        }
+    }
+
     @Override
     public void stub(SBuilder sb, String name, StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
         String classToStub = stubExpr.getClassToStub().getText();
@@ -82,6 +109,45 @@ public class MockitoMockStrategy implements MockStrategy {
                     }
             );
         }
+    }
+
+    @Override
+    public Set<ImportedName> stubImports(StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
+        return stubExpr.getBehavior()
+                .stream()
+                .collect(
+                        () -> new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.mock"))),
+                        (set, behavior) -> {
+                            MethodPattern methodPattern = behavior.getMethodPattern();
+                            boolean isVarArg = methodPattern.isVarArg();
+                            List<Type> argumentTypes = methodPattern.getArgumentTypes();
+                            Expr toBeReturned = behavior.getToBeReturned();
+
+                            if (isVarArg) {
+                                set.add(new ImportStatic("org.mockito.Mocikto.anyVararg"));
+                            } else {
+                                set.addAll(argumentTypes.stream()
+                                        .collect(
+                                                () -> new TreeSet<>(),
+                                                (set_, type) -> set_.addAll(argumentTypeImports(type)),
+                                                (s1, s2) -> s1.addAll(s2)));
+                            }
+
+                            set.add(new ImportStatic("org.mockito.Mockito.when"));
+                            toBeReturned.<Void>accept(
+                                    quotedExpr -> {
+                                        set.addAll(expressionStrategy.getValueImports());
+                                        return null;
+                                    },
+                                    (StubExpr stubExpr_) -> {
+                                        set.addAll(stubImports(stubExpr, expressionStrategy));
+                                        return null;
+                                    }
+                            );
+
+                        },
+                        (s1, s2) -> s1.addAll(s2)
+                );
     }
     
 }

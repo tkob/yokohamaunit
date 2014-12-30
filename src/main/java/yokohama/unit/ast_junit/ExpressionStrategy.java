@@ -12,7 +12,7 @@ public interface ExpressionStrategy {
     public String wrappedException(String e);
     
     public Set<ImportedName> environmentImports();
-    public Set<ImportedName> bindImports();
+    public Set<ImportedName> bindImports(Binding binding, MockStrategy mockStrategy);
     public Set<ImportedName> getValueImports();
     public Set<ImportedName> wrappingExceptionImports();
     public Set<ImportedName> wrappedExceptionImports();

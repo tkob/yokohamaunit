@@ -43,7 +43,7 @@ public class CompilationUnitTest {
         importedNames.add(new ImportStatic("yokohama.unit.example.F.*"));
         importedNames.add(new ImportClass("yokohama.unit.example.A"));
         ClassDecl classDecl = mock(ClassDecl.class);
-        when(classDecl.importedNames(expressionStrategy)).thenReturn(importedNames);
+        when(classDecl.importedNames(expressionStrategy, mockStrategy)).thenReturn(importedNames);
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
         String actual = instance.getText(expressionStrategy, mockStrategy);
         StrBuilder sb = new StrBuilder();
