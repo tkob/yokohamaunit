@@ -49,7 +49,7 @@ public class MockitoMockStrategy implements MockStrategy {
     @Override
     public void stub(SBuilder sb, String name, StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
         String classToStub = stubExpr.getClassToStub().getText();
-        sb.appendln(classToStub, " ", name, "= mock(", classToStub, ".class);");
+        sb.appendln(classToStub, " ", name, " = mock(", classToStub, ".class);");
         for (StubBehavior behavior : stubExpr.getBehavior()) {
             MethodPattern methodPattern = behavior.getMethodPattern();
             String methodName = methodPattern.getName();
@@ -60,7 +60,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                             .stream()
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "))
-                               + ", anyVararg()"
+                               + (argumentTypes.size() > 1 ? ", anyVararg()" : "anyVararg()")
                              : argumentTypes.stream()
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "));
