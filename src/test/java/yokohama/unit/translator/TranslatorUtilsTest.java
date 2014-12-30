@@ -77,6 +77,11 @@ public class TranslatorUtilsTest {
                     "TestFourPhaseWithTeardown.java",
                     Arrays.asList("The_size_of_a_new_temporary_file_is_zero")
             ),
+            new Fixture(
+                    "TestStub.docy",
+                    "TestStub.java",
+                    Arrays.asList("Submit_a_task_and_get_the_result_1")
+            ),
         };
 
         @Theory
