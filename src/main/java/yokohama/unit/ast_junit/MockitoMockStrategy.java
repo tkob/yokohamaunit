@@ -94,7 +94,7 @@ public class MockitoMockStrategy implements MockStrategy {
             behavior.getToBeReturned().<Void>accept(
                     quotedExpr -> {
                         String toBeReturned = expressionStrategy.getValue(quotedExpr.getText());
-                        sb.appendln("when(", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");
+                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");
                         return null;
                     },
                     stubExpr2 -> {
@@ -102,7 +102,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         sb.appendln("{");
                         sb.shift();
                         stub(sb, name2, stubExpr2, expressionStrategy);
-                        sb.appendln("when(", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
+                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         sb.unshift();
                         sb.appendln("}");
                         return null;

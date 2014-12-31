@@ -16,7 +16,7 @@ public class TestStub {
         env.put("exec", Ognl.getValue("@java.util.concurrent.Executors@newSingleThreadExecutor()", env));
         {
             java.util.concurrent.Callable stub = mock(java.util.concurrent.Callable.class);
-            when(stub.call()).thenReturn(Ognl.getValue("42", env));
+            when((Object)stub.call()).thenReturn(Ognl.getValue("42", env));
             env.put("task", stub);
         }
         {
@@ -30,7 +30,7 @@ public class TestStub {
         OgnlContext env = new OgnlContext();
         {
             java.util.Map stub = mock(java.util.Map.class);
-            when(stub.get(isA(java.lang.Object.class))).thenReturn(Ognl.getValue("42", env));
+            when((Object)stub.get(isA(java.lang.Object.class))).thenReturn(Ognl.getValue("42", env));
             env.put("map", stub);
         }
         env.put("unmodifiableMap", Ognl.getValue("@java.util.Collections@unmodifiableMap(map)", env));
