@@ -80,7 +80,7 @@ public class TranslatorUtilsTest {
             new Fixture(
                     "TestStub.docy",
                     "TestStub.java",
-                    Arrays.asList("Submit_a_task_and_get_the_result_1")
+                    Arrays.asList("Submit_a_task_and_get_the_result_1", "Collections_unmodifiableMap_preserves_lookup_1")
             ),
         };
 
