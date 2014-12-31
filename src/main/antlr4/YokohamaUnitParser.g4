@@ -54,8 +54,8 @@ row: BAR (Expr BAR)* Expr? NEWLINE  ;
 
 expr: Expr | stubExpr ;
 
-stubExpr: A STUB OF Expr ( SUCHTHAT stubBehavior (AND stubBehavior)* )? ;
-stubBehavior: methodPattern RETURNS expr ;
+stubExpr: A STUB OF Expr ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
+stubBehavior: METHOD methodPattern RETURNS expr ;
 
 methodPattern: Identifier LPAREN (type COMMA)* (type THREEDOTS?)? RPAREN ;
 

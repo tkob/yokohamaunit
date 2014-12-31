@@ -38,7 +38,8 @@ DO: 'Do' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 A: 'a' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 STUB: 'stub' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 OF: 'of' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-SUCHTHAT: 'such' [ \t\r\n]+ 'that' -> mode(AFTER_SUCHTHAT) ;
+SUCH: 'such' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+METHOD: 'method' -> mode(AFTER_METHOD) ;
 RETURNS: 'returns' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
@@ -72,7 +73,8 @@ DO2: 'Do' -> type(DO) ;
 A2: 'a' -> type(A) ;
 STUB2: 'stub' -> type(STUB) ;
 OF2: 'of' -> type(OF) ;
-SUCHTHAT2: 'such' [ \t\r\n]+ 'that' -> type(SUCHTHAT), mode(AFTER_SUCHTHAT) ;
+SUCH2: 'such' -> type(SUCH) ;
+METHOD2: 'method' -> type(METHOD), mode(AFTER_METHOD) ;
 RETURNS2: 'returns' -> type(RETURNS) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
@@ -128,7 +130,7 @@ HBAR: '-'+ '\r'? '\n' ;
 SPACETAB2: [ \t]+ -> skip ;
 NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
 
-mode AFTER_SUCHTHAT;
+mode AFTER_METHOD;
 OPENBACKTICK3: '`' -> skip, mode(METHOD_PATTERN) ;
 SPACETABNEWLINE: [ \t\r\n]+ -> skip ;
 

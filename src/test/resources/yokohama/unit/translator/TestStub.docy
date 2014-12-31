@@ -3,11 +3,11 @@
 Assert `exec.submit(task).get()` is `42`
  where exec is `@java.util.concurrent.Executors@newSingleThreadExecutor()`
    and task is a stub of `java.util.concurrent.Callable`
-               such that `call()` returns `42`.
+               such that method `call()` returns `42`.
 
 # Test: Collections.unmodifiableMap preserves lookup
 
 Assert `unmodifiableMap.get("answer")` is `42`
  where map is a stub of `java.util.Map`
-              such that `get(java.lang.Object)` returns `42`
+              such that method `get(java.lang.Object)` returns `42`
    and unmodifiableMap is `@java.util.Collections@unmodifiableMap(map)`.
