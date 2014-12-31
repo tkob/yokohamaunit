@@ -11,3 +11,20 @@ Assert `unmodifiableMap.get("answer")` is `42`
  where map is a stub of `java.util.Map`
               such that method `get(java.lang.Object)` returns `42`
    and unmodifiableMap is `@java.util.Collections@unmodifiableMap(map)`.
+
+# Test: StringBuilder.append(CharSequence, int, int) calls CharSequence.charAt
+
+## Setup
+
+Let seq be a stub of `java.lang.CharSequence`
+           such that method `charAt(int)` returns `'a'`
+                 and method `length()` returns `13`
+and sb  be `new java.lang.StringBuilder()`.
+
+## Exercise
+
+Do `sb.append(seq, 10, 13)`.
+
+## Verify
+
+Assert `sb.toString()` is `"aaa"`.

@@ -5,6 +5,7 @@ import ognl.OgnlContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,23 @@ public class TestStub {
         {
             Object actual = Ognl.getValue("unmodifiableMap.get(\"answer\")", env);
             Object expected = Ognl.getValue("42", env);
+            assertThat(actual, is(expected));
+        }
+    }
+    @Test
+    public void StringBuilder_append_CharSequence_int_int_calls_CharSequence_charAt() throws Exception {
+        OgnlContext env = new OgnlContext();
+        {
+            java.lang.CharSequence stub = mock(java.lang.CharSequence.class);
+            when((Object)stub.charAt(anyInt())).thenReturn(Ognl.getValue("'a'", env));
+            when((Object)stub.length()).thenReturn(Ognl.getValue("13", env));
+            env.put("seq", stub);
+        }
+        env.put("sb", Ognl.getValue("new java.lang.StringBuilder()", env));
+        Ognl.getValue("sb.append(seq, 10, 13)", env);
+        {
+            Object actual = Ognl.getValue("sb.toString()", env);
+            Object expected = Ognl.getValue("\"aaa\"", env);
             assertThat(actual, is(expected));
         }
     }
