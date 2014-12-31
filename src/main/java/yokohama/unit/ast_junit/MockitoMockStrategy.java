@@ -125,6 +125,11 @@ public class MockitoMockStrategy implements MockStrategy {
 
                             if (isVarArg) {
                                 set.add(new ImportStatic("org.mockito.Mockito.anyVararg"));
+                                set.addAll(argumentTypes.subList(0, argumentTypes.size() - 1).stream()
+                                        .collect(
+                                                () -> new TreeSet<>(),
+                                                (set_, type) -> set_.addAll(argumentTypeImports(type)),
+                                                (s1, s2) -> s1.addAll(s2)));
                             } else {
                                 set.addAll(argumentTypes.stream()
                                         .collect(
