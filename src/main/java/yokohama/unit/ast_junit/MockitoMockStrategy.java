@@ -124,7 +124,7 @@ public class MockitoMockStrategy implements MockStrategy {
                             Expr toBeReturned = behavior.getToBeReturned();
 
                             if (isVarArg) {
-                                set.add(new ImportStatic("org.mockito.Mocikto.anyVararg"));
+                                set.add(new ImportStatic("org.mockito.Mockito.anyVararg"));
                             } else {
                                 set.addAll(argumentTypes.stream()
                                         .collect(
