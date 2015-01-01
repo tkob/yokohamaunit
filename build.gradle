@@ -86,11 +86,19 @@ task console(dependsOn: 'classes', type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
 }
 
-/*
-test {
-    jacoco {
-        excludes += [ "yokohama.unit.grammar.*" ]
-    }
-}
-*/
+def generatedSources = [ 'yokohama/unit/grammar/**' ]
 
+test {
+     jacoco {
+          excludes += generatedSources
+     }
+}
+
+jacocoTestReport {
+     doFirst {
+          classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(generatedSources)
+     }
+     reports {
+          xml.enabled true
+     }
+}
