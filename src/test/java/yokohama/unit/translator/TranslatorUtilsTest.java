@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
@@ -86,10 +88,18 @@ public class TranslatorUtilsTest {
                             "StringBuilder_append_CharSequence_int_int_calls_CharSequence_charAt"
                     )
             ),
+            new Fixture(
+                    "TestStubVariations.docy",
+                    null,
+                    Arrays.asList(
+                            "Variations_of_stubbing_1"
+                    )
+            ),
         };
 
         @Theory
         public void testDocyToJava(final Fixture fixture) throws Exception {
+            assumeThat(fixture.java, is(not(nullValue())));
             try (   InputStream docyIn = getClass().getResourceAsStream(fixture.docy);
                     InputStream javaIn = getClass().getResourceAsStream(fixture.java)) {
                 String docy = IOUtils.toString(docyIn, "UTF-8");
