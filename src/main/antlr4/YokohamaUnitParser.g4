@@ -32,7 +32,7 @@ tableRef: FOR ALL RULES IN tableType Quoted ;
 tableType: UTABLE | CSV | TSV | EXCEL ;
 
 bindings: WHERE binding (AND binding)* ;
-binding: Identifier (EQ | IS) Expr ;
+binding: Identifier (EQ | IS) expr ;
 
 fourPhaseTest: hash? TEST TestName setup? exercise? verify teardown? ;
 
@@ -42,7 +42,7 @@ verify: hash? VERIFY PhaseDescription? assertion+ ;
 teardown: hash? TEARDOWN PhaseDescription? execution+ ;
 
 letBindings: LET letBinding (AND letBinding)* STOP ;
-letBinding: Identifier (EQ | BE) Expr ;
+letBinding: Identifier (EQ | BE) expr ;
 execution: DO Expr (AND Expr)* STOP ;
 
 tableDef: TABLE TableName header HBAR? rows ;
@@ -51,3 +51,16 @@ header: BAR (Identifier BAR)* Identifier? NEWLINE;
 
 rows: row+ ;
 row: BAR (Expr BAR)* Expr? NEWLINE  ;
+
+expr: Expr | stubExpr ;
+
+stubExpr: A STUB OF Expr ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
+stubBehavior: METHOD methodPattern RETURNS expr ;
+
+methodPattern: Identifier LPAREN (type COMMA)* (type THREEDOTS?)? RPAREN ;
+
+type : nonArrayType (LBRACKET RBRACKET)* ;
+nonArrayType: primitiveType | classType ;
+primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
+classType: Identifier (DOT Identifier)* ;
+

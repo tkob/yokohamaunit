@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import yokohama.unit.util.SBuilder;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
 
@@ -19,15 +20,32 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public String bind(Binding binding) {
+    public void bind(SBuilder sb, Binding binding, MockStrategy mockStrategy) {
         String name = binding.getName();
-        String value = binding.getValue();
-        return "env.put(\"" + escapeJava(name) + "\", Ognl.getValue(\"" + escapeJava(value) + "\", env));";
+        binding.getValue().<Void>accept(
+                quotedExpr -> {
+                    sb.appendln("env.put(\"" + escapeJava(name) + "\", Ognl.getValue(\"", escapeJava(quotedExpr.getText()), "\", env));");
+                    return null;
+                },
+                stubExpr -> {
+                    sb.appendln("{");
+                    sb.shift();
+                    mockStrategy.stub(sb, "stub", stubExpr, this);
+                    sb.appendln("env.put(\"" + escapeJava(name) + "\", stub);");
+                    sb.unshift();
+                    sb.appendln("}");
+                    return null;
+                }
+        );
     }
 
     @Override
-    public Set<ImportedName> bindImports() {
-        return new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl")));
+    public Set<ImportedName> bindImports(Binding binding, MockStrategy mockStrategy) {
+        return binding.getValue().<Set<ImportedName>>accept(
+                quotedExpr ->
+                    new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl"))),
+                stubExpr -> mockStrategy.stubImports(stubExpr, this)
+        );
     }
 
     @Override

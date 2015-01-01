@@ -8,7 +8,7 @@ import org.junit.Test;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
-import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Proposition;
@@ -85,7 +85,7 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateProposition() {
-        Proposition proposition = new Proposition(new Expr("a"), Copula.IS, new Expr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.IS, new QuotedExpr("b"));
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsStatement("a", "b");
@@ -94,7 +94,7 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition1() {
-        Proposition proposition = new Proposition(new Expr("a"), Copula.IS_NOT, new Expr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.IS_NOT, new QuotedExpr("b"));
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsNotStatement("a", "b");
@@ -103,7 +103,7 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition2() {
-        Proposition proposition = new Proposition(new Expr("a"), Copula.THROWS, new Expr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.THROWS, new QuotedExpr("b"));
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new ThrowsStatement("a", "b");

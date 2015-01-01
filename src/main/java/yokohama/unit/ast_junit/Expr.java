@@ -1,4 +1,4 @@
-package yokohama.unit.ast;
+package yokohama.unit.ast_junit;
 
 import java.util.function.Function;
 

@@ -13,20 +13,24 @@ public class ClassDecl {
     private final String name;
     private final List<TestMethod> testMethods;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return testMethods.stream()
                 .collect(
                         () -> new TreeSet<ImportedName>(),
-                        (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy)),
+                        (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy, mockStrategy)),
                         (s1, s2) -> s1.addAll(s2)
                 );
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(
+            SBuilder sb,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         sb.appendln("public class ", name, " {");
         sb.shift();
         for (TestMethod testMethod : testMethods) {
-            testMethod.toString(sb, expressionStrategy);
+            testMethod.toString(sb, expressionStrategy, mockStrategy);
         }
         sb.unshift();
         sb.appendln("}");

@@ -9,23 +9,30 @@ public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
-        return classDecl.importedNames(expressionStrategy);
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+        return classDecl.importedNames(expressionStrategy, mockStrategy);
     }
 
-    public String getText(ExpressionStrategy expressionStrategy) {
+    public String getText(
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         final SBuilder sb = new SBuilder(4);
-        toString(sb, expressionStrategy);
+        toString(sb, expressionStrategy, mockStrategy);
         return sb.toString();
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(
+            SBuilder sb,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy
+    ) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
-        for (ImportedName name : importedNames(expressionStrategy)) {
+        for (ImportedName name : importedNames(expressionStrategy, mockStrategy)) {
             name.toString(sb);
         }
         sb.appendln();
-        classDecl.toString(sb, expressionStrategy);
+        classDecl.toString(sb, expressionStrategy, mockStrategy);
     }
 }

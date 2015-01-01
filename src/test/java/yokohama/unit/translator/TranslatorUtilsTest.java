@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
@@ -77,10 +79,27 @@ public class TranslatorUtilsTest {
                     "TestFourPhaseWithTeardown.java",
                     Arrays.asList("The_size_of_a_new_temporary_file_is_zero")
             ),
+            new Fixture(
+                    "TestStub.docy",
+                    "TestStub.java",
+                    Arrays.asList(
+                            "Submit_a_task_and_get_the_result_1",
+                            "Collections_unmodifiableMap_preserves_lookup_1",
+                            "StringBuilder_append_CharSequence_int_int_calls_CharSequence_charAt"
+                    )
+            ),
+            new Fixture(
+                    "TestStubVariations.docy",
+                    null,
+                    Arrays.asList(
+                            "Variations_of_stubbing_1"
+                    )
+            ),
         };
 
         @Theory
         public void testDocyToJava(final Fixture fixture) throws Exception {
+            assumeThat(fixture.java, is(not(nullValue())));
             try (   InputStream docyIn = getClass().getResourceAsStream(fixture.docy);
                     InputStream javaIn = getClass().getResourceAsStream(fixture.java)) {
                 String docy = IOUtils.toString(docyIn, "UTF-8");
