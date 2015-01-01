@@ -24,14 +24,16 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
-import org.junit.runner.notification.RunNotifier;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 import org.junit.runners.JUnit4;
 import org.junit.runners.model.FrameworkMethod;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 public class TranslatorUtilsTest {
@@ -155,14 +157,23 @@ public class TranslatorUtilsTest {
                     assertThat(actual, is(expected));
                 }
 
-                RunNotifier notifier = mock(RunNotifier.class);
-                runner.run(notifier);
+                JUnitCore junit = new JUnitCore();
+                RunListener listener = new RunListener() {
+                    @Override
+                    public void testFailure(Failure failure) {
+                        System.err.println(failure.getTestHeader());
+                        System.err.println(failure.getTrace());
+                    }
+                };
+                RunListener listenerSpy = spy(listener);
+                junit.addListener(listenerSpy);
+                junit.run(klass);
 
-                verify(notifier, atLeastOnce()).fireTestStarted(anyObject());
-                verify(notifier, never()).fireTestFailure(anyObject());
-                verify(notifier, never()).fireTestAssumptionFailed(anyObject());
-                verify(notifier, never()).fireTestIgnored(anyObject());
-                verify(notifier, atLeastOnce()).fireTestFinished(anyObject());
+                verify(listenerSpy, atLeastOnce()).testStarted(anyObject());
+                verify(listenerSpy, never()).testFailure(anyObject());
+                verify(listenerSpy, never()).testAssumptionFailure(anyObject());
+                verify(listenerSpy, never()).testIgnored(anyObject());
+                verify(listenerSpy, atLeastOnce()).testFinished(anyObject());
             }
         }
 
