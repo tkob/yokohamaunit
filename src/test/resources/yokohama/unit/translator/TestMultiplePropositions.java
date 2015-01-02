@@ -11,6 +11,18 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class TestMultiplePropositions {
+    private Object eval(String expression, OgnlContext env, int startLine, int startCol, int endLine, int endCol) throws OgnlException {
+        try {
+            return Ognl.getValue(expression, env);
+        } catch (OgnlException e) {
+            Throwable reason = e.getReason();
+            String pos = "dummy" + ":" + startLine + "." + startCol + "-" + endLine + "." + endCol;
+            OgnlException e2 = reason == null ? new OgnlException(pos + " " + e.getMessage(), e) : new OgnlException(pos + " " + reason.getMessage(), reason);
+            StackTraceElement[] st = { new StackTraceElement("", "", "dummy", startLine) };
+            e2.setStackTrace(st);
+            throw e2;
+        }
+    }
     @Test
     public void Multiple_propositions_1() throws Exception {
         OgnlContext env = new OgnlContext();
