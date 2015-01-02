@@ -3,6 +3,8 @@ package yokohama.unit.translator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import yokohama.unit.ast.Assertion;
@@ -23,9 +25,11 @@ import yokohama.unit.ast.NonArrayType;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.Table;
@@ -39,6 +43,21 @@ import yokohama.unit.grammar.YokohamaUnitParserVisitor;
 
 public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> implements YokohamaUnitParserVisitor<Object> 
 {
+    public Span getSpan(ParserRuleContext ctx) {
+        Token startToken = ctx.getStart();
+        Token stopToken = ctx.getStop();
+        Position startPosition = new Position(startToken.getLine(), startToken.getCharPositionInLine());
+        Position endPosition = new Position(stopToken.getLine(), stopToken.getCharPositionInLine() + stopToken.getText().length());
+        Span span = new Span(startPosition, endPosition);
+        return span;
+    }
+    public Span nodeSpan(TerminalNode terminalNode) {
+        Token token = terminalNode.getSymbol();
+        Position startPosition = new Position(token.getLine(), token.getCharPositionInLine());
+        Position endPosition = new Position(token.getLine(), token.getCharPositionInLine() + token.getText().length());
+        Span span = new Span(startPosition, endPosition);
+        return span;
+    }
 
     @Override
     public Group visitGroup(YokohamaUnitParser.GroupContext ctx) {
@@ -46,7 +65,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 ctx.definition().stream()
                                 .map(this::visitDefinition)
                                 .collect(Collectors.toList());
-        return new Group(definitions);
+        return new Group(definitions, getSpan(ctx));
     }
 
     @Override
@@ -62,7 +81,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 ctx.assertion().stream()
                                .map(this::visitAssertion)
                                .collect(Collectors.toList());
-        return new Test(name, assertions, numHashes);
+        return new Test(name, assertions, numHashes, getSpan(ctx));
     }
 
     @Override
@@ -77,7 +96,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Fixture fixture =
                 conditionCtx == null ? Fixture.none()
                                      : visitCondition(ctx.condition());
-        return new Assertion(propositions, fixture);
+        return new Assertion(propositions, fixture, getSpan(ctx));
     }
 
     @Override
@@ -89,10 +108,10 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
-        QuotedExpr subject = new QuotedExpr(ctx.Expr(0).getText());
+        QuotedExpr subject = new QuotedExpr(ctx.Expr(0).getText(), nodeSpan(ctx.Expr(0)));
         Copula copula = visitCopula(ctx.copula());
-        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText());
-        return new Proposition(subject, copula, complement);
+        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText(), nodeSpan(ctx.Expr(0)));
+        return new Proposition(subject, copula, complement, getSpan(ctx));
     }
 
     @Override
@@ -118,7 +137,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public TableRef visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
         TableType tableType = visitTableType(ctx.tableType());
         String name = ctx.Quoted().getText();
-        return new TableRef(tableType, name);
+        return new TableRef(tableType, name, getSpan(ctx));
     }
 
     @Override
@@ -142,14 +161,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         List<Binding> bindings = ctx.binding().stream()
                                               .map(this::visitBinding)
                                               .collect(Collectors.toList());
-	return new Bindings(bindings);
+	return new Bindings(bindings, getSpan(ctx));
    }
 
     @Override
     public Binding visitBinding(YokohamaUnitParser.BindingContext ctx) {
         String ident = ctx.Identifier().getText();
         Expr expr = visitExpr(ctx.expr());
-        return new Binding(ident, expr);
+        return new Binding(ident, expr, getSpan(ctx));
     }
 
     @Override
@@ -157,7 +176,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         String name = ctx.TableName().getText();
         List<String> header = visitHeader(ctx.header());
         List<Row> rows = visitRows(ctx.rows());
-        return new Table(name, header, rows);
+        return new Table(name, header, rows, getSpan(ctx));
     }
 
     @Override
@@ -176,12 +195,12 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Row visitRow(YokohamaUnitParser.RowContext ctx) {
-        List<Expr> exprs = ctx.Expr().stream()
-                                     .map(TerminalNode::getText)
-                                     .map(String::trim)
-                                     .map(QuotedExpr::new)
-                                     .collect(Collectors.toList());
-        return new Row(exprs);
+        List<Expr> exprs =
+                ctx.Expr().stream()
+                          .map(cell ->
+                                  new QuotedExpr(cell.getText().trim(), nodeSpan(cell)))
+                          .collect(Collectors.toList());
+        return new Row(exprs, getSpan(ctx));
     }
 
     @Override
@@ -198,7 +217,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<Phase> teardown =
                 ctx.teardown() == null ? Optional.empty()
                                        : Optional.of(visitTeardown(ctx.teardown()));
-        return new FourPhaseTest(numHashes, name, setup, exercise, verify, teardown);
+        return new FourPhaseTest(numHashes, name, setup, exercise, verify, teardown, getSpan(ctx));
     }
 
     @Override
@@ -214,7 +233,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, letBindings, executions);
+        return new Phase(numHashes, description, letBindings, executions, getSpan(ctx));
     }
 
     @Override
@@ -227,7 +246,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), executions);
+        return new Phase(numHashes, description, Optional.empty(), executions, getSpan(ctx));
     }
 
     @Override
@@ -240,7 +259,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitAssertion)
                 .collect(Collectors.toList());
-        return new VerifyPhase(numHashes, description, assertions);
+        return new VerifyPhase(numHashes, description, assertions, getSpan(ctx));
     }
 
     @Override
@@ -253,7 +272,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), executions);
+        return new Phase(numHashes, description, Optional.empty(), executions, getSpan(ctx));
     }
 
     @Override
@@ -261,45 +280,47 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         return new LetBindings(
                 ctx.letBinding().stream()
                         .map(this::visitLetBinding)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()), getSpan(ctx));
     }
 
     @Override
     public LetBinding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
         return new LetBinding(
                 ctx.Identifier().getText(),
-                visitExpr(ctx.expr()));
+                visitExpr(ctx.expr()),
+                getSpan(ctx));
     }
 
     @Override
     public Execution visitExecution(YokohamaUnitParser.ExecutionContext ctx) {
         return new Execution(
                 ctx.Expr().stream()
-                        .map(expr -> new QuotedExpr(expr.getText()))
-                        .collect(Collectors.toList()));
+                        .map(expr -> new QuotedExpr(expr.getText(), nodeSpan(expr)))
+                        .collect(Collectors.toList()),
+                getSpan(ctx));
     }
 
     @Override
     public Expr visitExpr(YokohamaUnitParser.ExprContext ctx) {
-        return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText())
+        return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
                                   : visitStubExpr(ctx.stubExpr());
     }
 
     @Override
     public StubExpr visitStubExpr(YokohamaUnitParser.StubExprContext ctx) {
-        QuotedExpr classToStub = new QuotedExpr(ctx.Expr().getText());
+        QuotedExpr classToStub = new QuotedExpr(ctx.Expr().getText(), getSpan(ctx));
         List<StubBehavior> behavior =
                 ctx.stubBehavior().stream()
                                   .map(this::visitStubBehavior)
                                   .collect(Collectors.toList());
-        return new StubExpr(classToStub, behavior);
+        return new StubExpr(classToStub, behavior, getSpan(ctx));
     }
 
     @Override
     public StubBehavior visitStubBehavior(YokohamaUnitParser.StubBehaviorContext ctx) {
         MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
         Expr toBeReturned = visitExpr(ctx.expr());
-        return new StubBehavior(methodPattern, toBeReturned);
+        return new StubBehavior(methodPattern, toBeReturned, getSpan(ctx));
     }
 
     @Override
@@ -307,14 +328,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         String name = ctx.Identifier().getText();
         List<Type> argumentTypes = ctx.type().stream().map(this::visitType).collect(Collectors.toList());
         boolean varArg = ctx.THREEDOTS() != null;
-        return new MethodPattern(name, argumentTypes, varArg);
+        return new MethodPattern(name, argumentTypes, varArg, getSpan(ctx));
     }
 
     @Override
     public Type visitType(YokohamaUnitParser.TypeContext ctx) {
         NonArrayType nonArrayType = visitNonArrayType(ctx.nonArrayType());
         int dims = ctx.LBRACKET().size();
-        return new Type(nonArrayType, dims);
+        return new Type(nonArrayType, dims, getSpan(ctx));
     }
 
     @Override
@@ -325,21 +346,21 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public PrimitiveType visitPrimitiveType(YokohamaUnitParser.PrimitiveTypeContext ctx) {
         if (ctx.BOOLEAN() != null) {
-            return new PrimitiveType(Kind.BOOLEAN);
+            return new PrimitiveType(Kind.BOOLEAN, getSpan(ctx));
         } else if (ctx.BYTE() != null) {
-            return new PrimitiveType(Kind.BYTE);
+            return new PrimitiveType(Kind.BYTE, getSpan(ctx));
         } else if (ctx.SHORT() != null) {
-            return new PrimitiveType(Kind.SHORT);
+            return new PrimitiveType(Kind.SHORT, getSpan(ctx));
         } else if (ctx.INT() != null) {
-            return new PrimitiveType(Kind.INT);
+            return new PrimitiveType(Kind.INT, getSpan(ctx));
         } else if (ctx.LONG() != null) {
-            return new PrimitiveType(Kind.LONG);
+            return new PrimitiveType(Kind.LONG, getSpan(ctx));
         } else if (ctx.CHAR() != null) {
-            return new PrimitiveType(Kind.CHAR);
+            return new PrimitiveType(Kind.CHAR, getSpan(ctx));
         } else if (ctx.FLOAT() != null) {
-            return new PrimitiveType(Kind.FLOAT);
+            return new PrimitiveType(Kind.FLOAT, getSpan(ctx));
         } else if (ctx.DOUBLE() != null) {
-            return new PrimitiveType(Kind.DOUBLE);
+            return new PrimitiveType(Kind.DOUBLE, getSpan(ctx));
         } else {
             throw new RuntimeException("Shuld not reach here");
         }
@@ -353,7 +374,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                                 .map(TerminalNode::getText)
                                 .collect(Collectors.toList())
         );
-        return new ClassType(name);
+        return new ClassType(name, getSpan(ctx));
     }
 
 }

@@ -13,6 +13,7 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -35,15 +36,15 @@ public class AstToJUnitAstTest {
     @Test
     public void testExtractTables1() {
         List<Definition> definitions = Arrays.asList(
-                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList()))),
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0),
-                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList())))
+                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), Span.dummySpan())), Span.dummySpan()),
+                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0, Span.dummySpan()),
+                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), Span.dummySpan())), Span.dummySpan())
         );
         AstToJUnitAst instance = new AstToJUnitAst();
         List<Table> actual = instance.extractTables(definitions);
         List<Table> expected = Arrays.asList(
-                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList()))),
-                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList())))
+                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), Span.dummySpan())), Span.dummySpan()),
+                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), Span.dummySpan())), Span.dummySpan())
         );
         assertThat(actual, is(expected));
     }
@@ -51,7 +52,7 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslate() {
         String name = "TestGroup";
-        Group group = new Group(Arrays.asList());
+        Group group = new Group(Arrays.asList(), Span.dummySpan());
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst();
         CompilationUnit actual = instance.translate(name, group, packageName);
@@ -61,7 +62,7 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateTest() {
-        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0);
+        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, Span.dummySpan());
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst();
         List<TestMethod> actual = instance.translateTest(test, tables);
@@ -74,7 +75,7 @@ public class AstToJUnitAstTest {
      */
     @Test
     public void testTranslateAssertion() {
-        Assertion assertion = new Assertion(Arrays.asList(), Fixture.none());
+        Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), Span.dummySpan());
         String testName = "test";
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst();
@@ -85,7 +86,7 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateProposition() {
-        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.IS, new QuotedExpr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a", Span.dummySpan()), Copula.IS, new QuotedExpr("b", Span.dummySpan()), Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsStatement("a", "b");
@@ -94,7 +95,7 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition1() {
-        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.IS_NOT, new QuotedExpr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a", Span.dummySpan()), Copula.IS_NOT, new QuotedExpr("b", Span.dummySpan()), Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsNotStatement("a", "b");
@@ -103,7 +104,7 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition2() {
-        Proposition proposition = new Proposition(new QuotedExpr("a"), Copula.THROWS, new QuotedExpr("b"));
+        Proposition proposition = new Proposition(new QuotedExpr("a", Span.dummySpan()), Copula.THROWS, new QuotedExpr("b", Span.dummySpan()), Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst();
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new ThrowsStatement("a", "b");

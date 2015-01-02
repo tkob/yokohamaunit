@@ -1,9 +1,18 @@
 package yokohama.unit.ast;
 
 import java.util.Optional;
-import lombok.Value;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
-@Value
+@ToString
+@EqualsAndHashCode(exclude={"span"})
+@AllArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Getter
 public class FourPhaseTest implements Definition {
     private int numHashes;
     private String name;
@@ -11,6 +20,7 @@ public class FourPhaseTest implements Definition {
     private Optional<Phase> exercise;
     private VerifyPhase verify;
     private Optional<Phase> teardown;
+    private Span span;
 
     @Override
     public <T> T accept(DefinitionVisitor<T> visitor) {
