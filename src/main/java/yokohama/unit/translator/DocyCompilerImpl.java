@@ -15,6 +15,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             List<String> javacArgs
     ) throws IOException {
         return TranslatorUtils.compileDocy(
+                Optional.of(docy),
                 IOUtils.toString(docy.toUri()),
                 className,
                 packageName,

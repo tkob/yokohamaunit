@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
@@ -69,6 +71,7 @@ public class TranslatorUtils {
     }
 
     public static String docyToJava(
+            final Optional<Path> path,
             final String docy,
             final String className,
             final String packageName) {
@@ -84,21 +87,21 @@ public class TranslatorUtils {
     }
 
     public static boolean compileDocy(
+            final Optional<Path> path,
             final String docy,
             final String className,
             final String packageName,
             final String... options) {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-        JavaFileObject source = new SimpleJavaFileObject(
+        final URI uri = path.map(Path::toUri).orElseGet(() ->
                 URI.create("string:///"
                         + packageName.replace('.','/') + "/" + className
-                        + Kind.SOURCE.extension),
-                Kind.SOURCE
-        ) {
+                        + Kind.SOURCE.extension));
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        
+        JavaFileObject source = new SimpleJavaFileObject(uri, Kind.SOURCE) {
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-                return docyToJava(docy, className, packageName);
+                return docyToJava(path, docy, className, packageName);
             }
         };
 
