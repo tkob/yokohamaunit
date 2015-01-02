@@ -42,7 +42,6 @@ public class TranslatorUtilsTest {
     public static class DocyToJava {
         @DataPoints
         public static Fixture[] PARAMs = {
-            new Fixture("TestBlank.docy", "TestBlank.java", Arrays.asList()),
             new Fixture("TestIs.docy", "TestIs.java", Arrays.asList("Simple_Arithmetic_1")),
             new Fixture("TestThrows.docy", "TestThrows.java", Arrays.asList("Division_by_zero_1")),
             new Fixture("TestMultiplePropositions.docy", "TestMultiplePropositions.java", Arrays.asList("Multiple_propositions_1")),
