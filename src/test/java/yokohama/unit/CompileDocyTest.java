@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.BasicParser;
@@ -122,7 +123,7 @@ public class CompileDocyTest {
         int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -138,7 +139,7 @@ public class CompileDocyTest {
         int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(URI.create("file:///E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -154,7 +155,7 @@ public class CompileDocyTest {
         int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -170,7 +171,7 @@ public class CompileDocyTest {
         int actual = new CompileDocy(compiler).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(URI.create("file:///home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
     }
 
 }
