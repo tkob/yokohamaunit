@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
@@ -54,7 +56,10 @@ import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.SUtils;
 
+@AllArgsConstructor
 public class AstToJUnitAst {
+    private final Optional<Path> docyPath;
+
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = extractTables(definitions);

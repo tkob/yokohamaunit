@@ -71,7 +71,7 @@ public class TranslatorUtils {
     }
 
     public static String docyToJava(
-            final Optional<Path> path,
+            final Optional<Path> docyPath,
             final String docy,
             final String className,
             final String packageName) {
@@ -80,7 +80,7 @@ public class TranslatorUtils {
 
         // AST to JUnit AST
         CompilationUnit junit =
-                new AstToJUnitAst().translate(className, ast, packageName);
+                new AstToJUnitAst(docyPath).translate(className, ast, packageName);
 
         // JUnit AST to string
         return junit.getText(new OgnlExpressionStrategy("dummy"), new MockitoMockStrategy());
