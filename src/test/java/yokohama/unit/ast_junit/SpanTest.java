@@ -48,4 +48,29 @@ public class SpanTest {
             public String string;
         }
     }
+    @RunWith(Theories.class)
+    public static class GetFileName {
+        @DataPoints
+        public static Fixture[] PARAMs = {
+            new Fixture(new Span(Optional.empty(), new Position(-1, -1), new Position(-1, -1)), "?"),
+            new Fixture(new Span(Optional.of(Paths.get("/")), new Position(-1, -1), new Position(-1, -1)), "?"),
+            new Fixture(new Span(Optional.of(Paths.get("")), new Position(-1, -1), new Position(-1, -1)), "?"),
+            new Fixture(new Span(Optional.of(Paths.get("/file")), new Position(-1, -1), new Position(-1, -1)), "file"),
+            new Fixture(new Span(Optional.of(Paths.get("/dir/file")), new Position(-1, -1), new Position(-1, -1)), "file"),
+            new Fixture(new Span(Optional.of(Paths.get("file")), new Position(-1, -1), new Position(-1, -1)), "file"),
+            new Fixture(new Span(Optional.of(Paths.get("dir/file")), new Position(-1, -1), new Position(-1, -1)), "file"),
+        };
+        @Theory
+        public void testGetFileName(final Fixture fixture) {
+            Span instance = fixture.span;
+            String actual = instance.getFileName();
+            String expected = fixture.string;
+            assertThat(actual, is(expected));
+        }
+        @AllArgsConstructor
+        public static class Fixture {
+            public Span span;
+            public String string;
+        }
+    }
 }

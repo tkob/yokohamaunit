@@ -11,6 +11,19 @@ public class Span {
     private final Position start;
     private final Position end;
 
+    public String getFileName() {
+        if (!sourcePath.isPresent()) return "?";
+
+        Path path = sourcePath.get();
+        int nameCount = path.getNameCount();
+
+        if (nameCount == 0) return "?";
+
+        String fileName = path.getName(nameCount -1).toString();
+
+        return fileName.equals("") ? "?" : fileName;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(sourcePath.isPresent() ? sourcePath.get().toString() : "?");
