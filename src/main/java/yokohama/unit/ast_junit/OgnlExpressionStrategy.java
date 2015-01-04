@@ -4,10 +4,41 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import lombok.AllArgsConstructor;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
+    @Override
+    public void auxMethods(SBuilder sb) {
+        sb.appendln("private Object eval(String expression, OgnlContext env, String fileName, int startLine, String span) throws OgnlException {");
+        sb.shift();
+            sb.appendln("try {");
+            sb.shift();
+                sb.appendln("return Ognl.getValue(expression, env);");
+            sb.unshift();
+            sb.appendln("} catch (OgnlException e) {");
+            sb.shift();
+                sb.appendln("Throwable reason = e.getReason();");
+                sb.appendln("OgnlException e2 = reason == null ? new OgnlException(span + \" \" + e.getMessage(), e)",
+                                                             " : new OgnlException(span + \" \" + reason.getMessage(), reason);");
+                sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", fileName, startLine) };");
+                sb.appendln("e2.setStackTrace(st);");
+                sb.appendln("throw e2;");
+            sb.unshift();
+            sb.appendln("}");
+        sb.unshift();
+        sb.appendln("}");
+    }
+
+    @Override
+    public Set<ImportedName> auxMethodsImports() {
+        return new TreeSet<>(Arrays.asList(
+                new ImportClass("ognl.Ognl"),
+                new ImportClass("ognl.OgnlContext"),
+                new ImportClass("ognl.OgnlException")
+        ));
+    }
 
     @Override
     public String environment() {
@@ -24,7 +55,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         String name = binding.getName();
         binding.getValue().<Void>accept(
                 quotedExpr -> {
-                    sb.appendln("env.put(\"" + escapeJava(name) + "\", Ognl.getValue(\"", escapeJava(quotedExpr.getText()), "\", env));");
+                    sb.appendln(
+                            "env.put(\"", escapeJava(name), "\", ",
+                            "eval(\"", escapeJava(quotedExpr.getText()), "\", env, ",
+                            "\"", escapeJava(quotedExpr.getSpan().getFileName()),  "\", ",
+                            quotedExpr.getSpan().getStart().getLine(), ", ",
+                            "\"", quotedExpr.getSpan().toString(), "\"));"
+                    );
                     return null;
                 },
                 stubExpr -> {

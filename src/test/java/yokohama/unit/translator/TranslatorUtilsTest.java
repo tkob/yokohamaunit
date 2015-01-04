@@ -2,10 +2,13 @@ package yokohama.unit.translator;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -42,7 +45,6 @@ public class TranslatorUtilsTest {
     public static class DocyToJava {
         @DataPoints
         public static Fixture[] PARAMs = {
-            new Fixture("TestBlank.docy", "TestBlank.java", Arrays.asList()),
             new Fixture("TestIs.docy", "TestIs.java", Arrays.asList("Simple_Arithmetic_1")),
             new Fixture("TestThrows.docy", "TestThrows.java", Arrays.asList("Division_by_zero_1")),
             new Fixture("TestMultiplePropositions.docy", "TestMultiplePropositions.java", Arrays.asList("Multiple_propositions_1")),
@@ -107,7 +109,7 @@ public class TranslatorUtilsTest {
                 String docy = IOUtils.toString(docyIn, "UTF-8");
                 String className = FilenameUtils.removeExtension(fixture.docy);
                 String packageName = "yokohama.unit.translator";
-                String actual = TranslatorUtils.docyToJava(docy, className, packageName);
+                String actual = TranslatorUtils.docyToJava(Optional.of(Paths.get(fixture.docy)), docy, className, packageName);
                 String expected = IOUtils.toString(javaIn, "UTF-8").replace("\r\n", IOUtils.LINE_SEPARATOR);
                 assertThat(actual, is(expected));
             }
@@ -127,6 +129,7 @@ public class TranslatorUtilsTest {
                 {
                     boolean actual =
                             TranslatorUtils.compileDocy(
+                                    Optional.of(Paths.get(fixture.docy)),
                                     docy,
                                     className, 
                                     packageName,

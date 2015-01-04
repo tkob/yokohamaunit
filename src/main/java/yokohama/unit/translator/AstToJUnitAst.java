@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
@@ -29,6 +32,7 @@ import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Phase;
+import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
@@ -46,6 +50,7 @@ import yokohama.unit.ast_junit.MethodPattern;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
+import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
@@ -54,7 +59,10 @@ import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.SUtils;
 
+@AllArgsConstructor
 public class AstToJUnitAst {
+    private final Optional<Path> docyPath;
+
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = extractTables(definitions);
@@ -140,11 +148,20 @@ public class AstToJUnitAst {
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
         return expr.accept(
-                quotedExpr -> new QuotedExpr(quotedExpr.getText()),
+                quotedExpr -> new QuotedExpr(
+                        quotedExpr.getText(),
+                        new Span(
+                                docyPath,
+                                quotedExpr.getSpan().getStart(),
+                                quotedExpr.getSpan().getEnd())),
                 stubExpr ->
                         new StubExpr(
                                 new QuotedExpr(
-                                        stubExpr.getClassToStub().getText()
+                                        stubExpr.getClassToStub().getText(),
+                                        new Span(
+                                                docyPath,
+                                                stubExpr.getClassToStub().getSpan().getStart(),
+                                                stubExpr.getClassToStub().getSpan().getEnd())
                                 ),
                                 stubExpr.getBehavior()
                                         .stream()
@@ -227,7 +244,15 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
-                                    .map(name -> new Binding(name, new QuotedExpr(record.get(name))))
+                                    .map(name ->
+                                            new Binding(
+                                                    name,
+                                                    new QuotedExpr(
+                                                            record.get(name),
+                                                            new Span(
+                                                                    Optional.of(Paths.get(fileName)), 
+                                                                    new Position((int)parser.getCurrentLineNumber(), -1),
+                                                                    new Position(-1, -1)))))
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         }
@@ -249,7 +274,12 @@ public class AstToJUnitAst {
                                 .mapToObj(Integer::new)
                                 .map(i -> new Binding(
                                         names.get(i),
-                                        new QuotedExpr(row.getCell(left + i).getStringCellValue())))
+                                        new QuotedExpr(
+                                                row.getCell(left + i).getStringCellValue(),
+                                                new Span(
+                                                        Optional.of(Paths.get(fileName)), 
+                                                        new Position(row.getRowNum() + 1, left + i + 1),
+                                                        new Position(-1, -1)))))
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         } catch (InvalidFormatException | IOException e) {

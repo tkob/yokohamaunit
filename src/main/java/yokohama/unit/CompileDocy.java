@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -112,11 +113,12 @@ public class CompileDocy implements Command {
             List<String> files = commandLine.getArgList();
             for (String file : files) {
                 String className = FilenameUtils.getBaseName(file);
-                URI uri = Paths.get(file).toUri();
+                Path path = Paths.get(file).toAbsolutePath();
+                URI uri = path.toUri();
                 URI relativeUri = baseDir.relativize(uri).resolve(".");
                 String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
                 boolean success = compiler.compile(
-                        uri,
+                        path,
                         className,
                         packageName,
                         javacArgs);

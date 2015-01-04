@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,7 +17,8 @@ public class ClassDecl {
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return testMethods.stream()
                 .collect(
-                        () -> new TreeSet<ImportedName>(),
+                        () -> testMethods.size() > 0 ? expressionStrategy.auxMethodsImports()
+                                                     : new TreeSet<ImportedName>(Arrays.asList()),
                         (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy, mockStrategy)),
                         (s1, s2) -> s1.addAll(s2)
                 );
@@ -29,6 +31,9 @@ public class ClassDecl {
     ) {
         sb.appendln("public class ", name, " {");
         sb.shift();
+        if (testMethods.size() > 0) {
+            expressionStrategy.auxMethods(sb);
+        }
         for (TestMethod testMethod : testMethods) {
             testMethod.toString(sb, expressionStrategy, mockStrategy);
         }

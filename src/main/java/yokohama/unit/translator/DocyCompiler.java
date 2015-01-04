@@ -1,12 +1,12 @@
 package yokohama.unit.translator;
 
 import java.io.IOException;
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.List;
 
 public interface DocyCompiler {
     boolean compile(
-            URI docy,
+            Path docy,
             String className,
             String packageName,
             List<String> javacArgs
