@@ -46,15 +46,15 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public Span getSpan(ParserRuleContext ctx) {
         Token startToken = ctx.getStart();
         Token stopToken = ctx.getStop();
-        Position startPosition = new Position(startToken.getLine(), startToken.getCharPositionInLine());
-        Position endPosition = new Position(stopToken.getLine(), stopToken.getCharPositionInLine() + stopToken.getText().length());
+        Position startPosition = new Position(startToken.getLine(), startToken.getCharPositionInLine() + 1);
+        Position endPosition = new Position(stopToken.getLine(), stopToken.getCharPositionInLine() + stopToken.getText().length() + 1);
         Span span = new Span(startPosition, endPosition);
         return span;
     }
     public Span nodeSpan(TerminalNode terminalNode) {
         Token token = terminalNode.getSymbol();
-        Position startPosition = new Position(token.getLine(), token.getCharPositionInLine());
-        Position endPosition = new Position(token.getLine(), token.getCharPositionInLine() + token.getText().length());
+        Position startPosition = new Position(token.getLine(), token.getCharPositionInLine() + 1);
+        Position endPosition = new Position(token.getLine(), token.getCharPositionInLine() + token.getText().length() + 1);
         Span span = new Span(startPosition, endPosition);
         return span;
     }

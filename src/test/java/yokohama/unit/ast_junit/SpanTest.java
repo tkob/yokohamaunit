@@ -17,9 +17,9 @@ public class SpanTest {
         /*
         sourcePath: Optional.empty(), Optional.of(Paths.get("dummy"))
         startLine: -1, 1
-        startColumn: -1, 0
+        startColumn: -1, 1
         endLine: -1, 1
-        endColumn: -1, 0
+        endColumn: -1, 1
         IF [startLine] = -1 THEN [startColumn] = -1;
         IF [startLine] = -1 THEN [endLine] = -1;
         IF [startLine] = -1 THEN [endColumn] = -1;
@@ -27,11 +27,11 @@ public class SpanTest {
          */
         @DataPoints
         public static Fixture[] PARAMs = {
-            new Fixture(new Span(Optional.empty(), new Position(1, 0), new Position(-1, -1)), "?:1.0"),
-            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, -1), new Position(1, 0)), "dummy:1-1.0"),
-            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, 0), new Position(1, -1)), "dummy:1.0-1"),
-            new Fixture(new Span(Optional.empty(), new Position(1, -1), new Position(1, 0)), "?:1-1.0"),
-            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, 0), new Position(1, 0)), "dummy:1.0-1.0"),
+            new Fixture(new Span(Optional.empty(), new Position(1, 1), new Position(-1, -1)), "?:1.1"),
+            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, -1), new Position(1, 1)), "dummy:1-1.1"),
+            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, 1), new Position(1, -1)), "dummy:1.1-1"),
+            new Fixture(new Span(Optional.empty(), new Position(1, -1), new Position(1, 1)), "?:1-1.1"),
+            new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(1, 1), new Position(1, 1)), "dummy:1.1-1.1"),
             new Fixture(new Span(Optional.of(Paths.get("dummy")), new Position(-1, -1), new Position(-1, -1)), "dummy:?"),
             new Fixture(new Span(Optional.empty(), new Position(-1, -1), new Position(-1, -1)), "?:?"),
         };
