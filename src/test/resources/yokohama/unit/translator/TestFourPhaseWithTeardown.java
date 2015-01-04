@@ -23,7 +23,7 @@ public class TestFourPhaseWithTeardown {
     public void The_size_of_a_new_temporary_file_is_zero() throws Exception {
         OgnlContext env = new OgnlContext();
         try {
-            env.put("temp", Ognl.getValue("@java.io.File@createTempFile(\"prefix\", null)", env));
+            env.put("temp", eval("@java.io.File@createTempFile(\"prefix\", null)", env, "TestFourPhaseWithTeardown.docy", 3, "TestFourPhaseWithTeardown.docy:3.14-3.58"));
             {
                 Object actual = Ognl.getValue("temp.length()", env);
                 Object expected = Ognl.getValue("0L", env);

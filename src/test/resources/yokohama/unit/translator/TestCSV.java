@@ -22,9 +22,9 @@ public class TestCSV {
     @Test
     public void String_startsWith_1_1() throws Exception {
         OgnlContext env = new OgnlContext();
-        env.put("sut", Ognl.getValue("\"hello world\"", env));
-        env.put("prefix", Ognl.getValue("\"\"", env));
-        env.put("expected", Ognl.getValue("true", env));
+        env.put("sut", eval("\"hello world\"", env, "TestCSV.csv", 2, "TestCSV.csv:2"));
+        env.put("prefix", eval("\"\"", env, "TestCSV.csv", 2, "TestCSV.csv:2"));
+        env.put("expected", eval("true", env, "TestCSV.csv", 2, "TestCSV.csv:2"));
         {
             Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
             Object expected = Ognl.getValue("expected", env);
@@ -34,9 +34,9 @@ public class TestCSV {
     @Test
     public void String_startsWith_1_2() throws Exception {
         OgnlContext env = new OgnlContext();
-        env.put("sut", Ognl.getValue("\"hello world\"", env));
-        env.put("prefix", Ognl.getValue("\"hello\"", env));
-        env.put("expected", Ognl.getValue("true", env));
+        env.put("sut", eval("\"hello world\"", env, "TestCSV.csv", 3, "TestCSV.csv:3"));
+        env.put("prefix", eval("\"hello\"", env, "TestCSV.csv", 3, "TestCSV.csv:3"));
+        env.put("expected", eval("true", env, "TestCSV.csv", 3, "TestCSV.csv:3"));
         {
             Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
             Object expected = Ognl.getValue("expected", env);
@@ -46,9 +46,9 @@ public class TestCSV {
     @Test
     public void String_startsWith_1_3() throws Exception {
         OgnlContext env = new OgnlContext();
-        env.put("sut", Ognl.getValue("\"hello world\"", env));
-        env.put("prefix", Ognl.getValue("\"world\"", env));
-        env.put("expected", Ognl.getValue("false", env));
+        env.put("sut", eval("\"hello world\"", env, "TestCSV.csv", 4, "TestCSV.csv:4"));
+        env.put("prefix", eval("\"world\"", env, "TestCSV.csv", 4, "TestCSV.csv:4"));
+        env.put("expected", eval("false", env, "TestCSV.csv", 4, "TestCSV.csv:4"));
         {
             Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
             Object expected = Ognl.getValue("expected", env);

@@ -58,7 +58,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         String name = binding.getName();
         binding.getValue().<Void>accept(
                 quotedExpr -> {
-                    sb.appendln("env.put(\"" + escapeJava(name) + "\", Ognl.getValue(\"", escapeJava(quotedExpr.getText()), "\", env));");
+                    sb.appendln(
+                            "env.put(\"", escapeJava(name), "\", ",
+                            "eval(\"", escapeJava(quotedExpr.getText()), "\", env, ",
+                            "\"", escapeJava(quotedExpr.getSpan().getFileName()),  "\", ",
+                            quotedExpr.getSpan().getStart().getLine(), ", ",
+                            "\"", quotedExpr.getSpan().toString(), "\"));"
+                    );
                     return null;
                 },
                 stubExpr -> {

@@ -22,8 +22,8 @@ public class TestBindings {
     @Test
     public void String_startsWith_returns_true_if_the_prefix_is_empty_1() throws Exception {
         OgnlContext env = new OgnlContext();
-        env.put("sut", Ognl.getValue("\"hello world\"", env));
-        env.put("prefix", Ognl.getValue("\"\"", env));
+        env.put("sut", eval("\"hello world\"", env, "TestBindings.docy", 4, "TestBindings.docy:4.24-4.37"));
+        env.put("prefix", eval("\"\"", env, "TestBindings.docy", 5, "TestBindings.docy:5.24-5.26"));
         {
             Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
             Object expected = Ognl.getValue("true", env);
