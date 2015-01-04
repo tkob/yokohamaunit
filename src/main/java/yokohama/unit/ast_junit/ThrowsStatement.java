@@ -10,8 +10,8 @@ import yokohama.unit.util.SBuilder;
 
 @Value    
 public class ThrowsStatement implements TestStatement {
-    private String subject;
-    private String complement;
+    private QuotedExpr subject;
+    private QuotedExpr complement;
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
@@ -30,16 +30,16 @@ public class ThrowsStatement implements TestStatement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("try {");
         sb.shift();
-            sb.appendln("Ognl.getValue(\"", escapeJava(subject), "\", env);");
-            sb.appendln("fail(\"`", subject, "` was expected to throw ", complement, ".\");");
+            sb.appendln("Ognl.getValue(\"", escapeJava(subject.getText()), "\", env);");
+            sb.appendln("fail(\"`", subject.getText(), "` was expected to throw ", complement.getText(), ".\");");
         sb.unshift();
         if (expressionStrategy.wrappingException().isPresent()) {
             sb.appendln("} catch (", expressionStrategy.wrappingException().get(), " e) {");
             sb.shift();
-                sb.appendln("assertThat(", expressionStrategy.wrappedException("e"), ", is(instanceOf("+ complement +".class)));");
+                sb.appendln("assertThat(", expressionStrategy.wrappedException("e"), ", is(instanceOf(", complement.getText(), ".class)));");
             sb.unshift();
         }
-        sb.appendln("} catch (", complement, " e) {");
+        sb.appendln("} catch (", complement.getText(), " e) {");
         sb.appendln("}");
     }
 

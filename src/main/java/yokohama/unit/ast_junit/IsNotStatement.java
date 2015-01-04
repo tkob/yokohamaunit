@@ -9,8 +9,8 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class IsNotStatement implements TestStatement {
 
-    private String subject;
-    private String complement;
+    private QuotedExpr subject;
+    private QuotedExpr complement;
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
@@ -26,8 +26,8 @@ public class IsNotStatement implements TestStatement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("{");
         sb.shift();
-        String actual = expressionStrategy.getValue(subject);
-        String unexpected = expressionStrategy.getValue(complement);
+        String actual = expressionStrategy.getValue(subject.getText());
+        String unexpected = expressionStrategy.getValue(complement.getText());
         sb.appendln("Object actual = ", actual, ";");
         sb.appendln("Object unexpected = ", unexpected, ";");
         sb.appendln("assertThat(actual, is(not(unexpected)));");

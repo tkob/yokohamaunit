@@ -33,7 +33,7 @@ public class TestMethodTest {
                 "test name",
                 Arrays.asList(),
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", "")),
+                Arrays.asList(new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -52,7 +52,9 @@ public class TestMethodTest {
                 "test name",
                 Arrays.asList(),
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", ""), new IsNotStatement("", "")),
+                Arrays.asList(
+                        new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
+                        new IsNotStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -72,7 +74,9 @@ public class TestMethodTest {
                 "test name",
                 Arrays.asList(),
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("", ""), new ThrowsStatement("", "")),
+                Arrays.asList(
+                        new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
+                        new ThrowsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -110,7 +114,7 @@ public class TestMethodTest {
                 "test",
                 Arrays.asList(),
                 Arrays.asList(),
-                Arrays.asList(new IsStatement("x", "y")),
+                Arrays.asList(new IsStatement(new QuotedExpr("x", Span.dummySpan()), new QuotedExpr("y", Span.dummySpan()))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 

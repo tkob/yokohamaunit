@@ -126,8 +126,18 @@ public class AstToJUnitAst {
     }
 
     TestStatement translateProposition(Proposition proposition) {
-        String subject = proposition.getSubject().getText();
-        String complement = proposition.getComplement().getText();
+        QuotedExpr subject = new QuotedExpr(
+                proposition.getSubject().getText(),
+                new Span(
+                        docyPath,
+                        proposition.getSubject().getSpan().getStart(),
+                        proposition.getSubject().getSpan().getEnd()));
+        QuotedExpr complement = new QuotedExpr(
+                proposition.getComplement().getText(),
+                new Span(
+                        docyPath,
+                        proposition.getComplement().getSpan().getStart(),
+                        proposition.getComplement().getSpan().getEnd()));
         Copula copula = proposition.getCopula();
         switch(copula) {
             case IS:
@@ -343,6 +353,13 @@ public class AstToJUnitAst {
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
-                                .map(expression -> new ActionStatement(expression.getText())));
+                                .map(expression ->
+                                        new ActionStatement(
+                                                new QuotedExpr(
+                                                        expression.getText(),
+                                                        new Span(
+                                                                docyPath,
+                                                                expression.getSpan().getStart(),
+                                                                expression.getSpan().getEnd())))));
     }
 }

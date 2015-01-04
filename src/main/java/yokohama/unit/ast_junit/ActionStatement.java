@@ -7,13 +7,13 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class ActionStatement {
-    private String action;
+    private QuotedExpr action;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
         return expressionStrategy.getValueImports();
     }
 
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
-        sb.appendln("Ognl.getValue(\"" + escapeJava(action) + "\", env);");
+        sb.appendln("Ognl.getValue(\"" + escapeJava(action.getText()) + "\", env);");
     }
 }
