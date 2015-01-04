@@ -11,6 +11,30 @@ public class Span {
     private final Position start;
     private final Position end;
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(sourcePath.isPresent() ? sourcePath.get().toString() : "?");
+        sb.append(":");
+        if (start.getLine() < 0) {
+            sb.append("?");
+        } else {
+            sb.append(start.getLine());
+            if (start.getColumn() >= 0) {
+                sb.append(".");
+                sb.append(start.getColumn());
+            }
+            if (end.getLine() >= 0) {
+                sb.append("-");
+                sb.append(end.getLine());
+                if (end.getColumn() >= 0) {
+                    sb.append(".");
+                    sb.append(end.getColumn());
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     private static Span dummySpan =
             new Span(
                     Optional.empty(),
