@@ -92,7 +92,7 @@ public class MockitoMockStrategyTest {
             // Setup
             SBuilder sb = new SBuilder(4);
             String name = "stub";
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Exercise
@@ -107,7 +107,7 @@ public class MockitoMockStrategyTest {
         @Theory
         public void testStubImports(final Fixture fixture) {
             // Setup
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Verify
@@ -358,7 +358,7 @@ public class MockitoMockStrategyTest {
             // Setup
             SBuilder sb = new SBuilder(4);
             String name = "stub";
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Exercise
@@ -387,7 +387,7 @@ public class MockitoMockStrategyTest {
         @Theory
         public void testStubImports(final Fixture fixture) {
             // Setup
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Verify
@@ -437,7 +437,7 @@ public class MockitoMockStrategyTest {
             // Setup
             SBuilder sb = new SBuilder(4);
             String name = "stub";
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Exercise
@@ -469,7 +469,7 @@ public class MockitoMockStrategyTest {
         @Theory
         public void testStubImports_VarargOnly(final NonArrayType fixture) {
             // Setup
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Verify
@@ -500,7 +500,7 @@ public class MockitoMockStrategyTest {
             // Setup
             SBuilder sb = new SBuilder(4);
             String name = "stub";
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Exercise
@@ -533,7 +533,7 @@ public class MockitoMockStrategyTest {
         @Theory
         public void testStubImports_ThereIsPrecedingArg(final NonArrayType fixture) {
             // Setup
-            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+            ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
             MockitoMockStrategy instance = new MockitoMockStrategy();
 
             // Verify
