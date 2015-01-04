@@ -92,10 +92,10 @@ public class TranslatorUtils {
             final String className,
             final String packageName,
             final String... options) {
-        final URI uri = path.map(Path::toUri).orElseGet(() ->
+        final URI uri =
                 URI.create("string:///"
                         + packageName.replace('.','/') + "/" + className
-                        + Kind.SOURCE.extension));
+                        + Kind.SOURCE.extension);
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         
         JavaFileObject source = new SimpleJavaFileObject(uri, Kind.SOURCE) {
