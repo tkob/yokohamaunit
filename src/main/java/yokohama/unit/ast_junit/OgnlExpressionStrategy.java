@@ -14,7 +14,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public void auxMethods(SBuilder sb) {
-        sb.appendln("private Object eval(String expression, OgnlContext env, int startLine, int startCol, int endLine, int endCol) throws OgnlException {");
+        sb.appendln("private Object eval(String expression, OgnlContext env, String fileName, int startLine, String span) throws OgnlException {");
         sb.shift();
             sb.appendln("try {");
             sb.shift();
@@ -23,14 +23,9 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             sb.appendln("} catch (OgnlException e) {");
             sb.shift();
                 sb.appendln("Throwable reason = e.getReason();");
-                sb.appendln("String pos = \"",
-                        escapeJava(fileName),
-                        "\" + \":\" + startLine + \".\" + startCol + \"-\" + endLine + \".\" + endCol;");
-                sb.appendln("OgnlException e2 = reason == null ? new OgnlException(pos + \" \" + e.getMessage(), e)",
-                                                             " : new OgnlException(pos + \" \" + reason.getMessage(), reason);");
-                sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", \"",
-                        escapeJava(fileName),
-                        "\", startLine) };");
+                sb.appendln("OgnlException e2 = reason == null ? new OgnlException(span + \" \" + e.getMessage(), e)",
+                                                             " : new OgnlException(span + \" \" + reason.getMessage(), reason);");
+                sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", fileName, startLine) };");
                 sb.appendln("e2.setStackTrace(st);");
                 sb.appendln("throw e2;");
             sb.unshift();
