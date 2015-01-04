@@ -21,7 +21,7 @@ public class CompilationUnitTest {
         String packageName = "yokohama.unit.example";
         ClassDecl classDecl = new ClassDecl("", Arrays.asList());
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText(new OgnlExpressionStrategy("dummy"), new MockitoMockStrategy());
+        String actual = instance.getText(new OgnlExpressionStrategy(), new MockitoMockStrategy());
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();
@@ -32,7 +32,7 @@ public class CompilationUnitTest {
     @Test
     public void testGetText1() {
         String packageName = "yokohama.unit.example";
-        ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy("dummy");
+        ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
         MockStrategy mockStrategy = new MockitoMockStrategy();
         Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("yokohama.unit.example.B"));

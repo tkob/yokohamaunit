@@ -83,7 +83,7 @@ public class TranslatorUtils {
                 new AstToJUnitAst(docyPath).translate(className, ast, packageName);
 
         // JUnit AST to string
-        return junit.getText(new OgnlExpressionStrategy("dummy"), new MockitoMockStrategy());
+        return junit.getText(new OgnlExpressionStrategy(), new MockitoMockStrategy());
     }
 
     public static boolean compileDocy(

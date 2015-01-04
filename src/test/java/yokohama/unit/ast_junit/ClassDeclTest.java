@@ -15,7 +15,7 @@ public class ClassDeclTest {
     public void testImportedNames() {
         ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
         Set<ImportedName> expected = new TreeSet<ImportedName>();
-        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy("dummy"), new MockitoMockStrategy());
+        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy(), new MockitoMockStrategy());
         assertThat(actual, is(expected));
     }
 
@@ -23,7 +23,7 @@ public class ClassDeclTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
-        instance.toString(actual, new OgnlExpressionStrategy("dummy"), new MockitoMockStrategy());
+        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("public class TestClass {");

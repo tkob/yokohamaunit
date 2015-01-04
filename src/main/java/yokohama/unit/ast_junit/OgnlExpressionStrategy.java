@@ -8,10 +8,7 @@ import lombok.AllArgsConstructor;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
-@AllArgsConstructor
 public class OgnlExpressionStrategy implements ExpressionStrategy {
-    private final String fileName;
-
     @Override
     public void auxMethods(SBuilder sb) {
         sb.appendln("private Object eval(String expression, OgnlContext env, String fileName, int startLine, String span) throws OgnlException {");
