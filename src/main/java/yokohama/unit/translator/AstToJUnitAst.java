@@ -278,7 +278,7 @@ public class AstToJUnitAst {
                                                 row.getCell(left + i).getStringCellValue(),
                                                 new Span(
                                                         Optional.of(Paths.get(fileName)), 
-                                                        new Position(row.getRowNum(), i),
+                                                        new Position(row.getRowNum() + 1, left + i + 1),
                                                         new Position(-1, -1)))))
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
