@@ -8,7 +8,7 @@ public interface ExpressionStrategy {
     public void auxMethods(SBuilder sb);
     public String environment();
     public void bind(SBuilder sb, Binding binding, MockStrategy mockStrategy);
-    public String getValue(String expression);
+    public String getValue(QuotedExpr quotedExpr);
     public Optional<String> wrappingException();
     public String wrappedException(String e);
     

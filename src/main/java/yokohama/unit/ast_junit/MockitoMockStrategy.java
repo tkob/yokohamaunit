@@ -93,7 +93,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                             .collect(Collectors.joining(", "));
             behavior.getToBeReturned().<Void>accept(
                     quotedExpr -> {
-                        String toBeReturned = expressionStrategy.getValue(quotedExpr.getText());
+                        String toBeReturned = expressionStrategy.getValue(quotedExpr);
                         sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");
                         return null;
                     },

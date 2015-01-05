@@ -26,8 +26,8 @@ public class IsNotStatement implements TestStatement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("{");
         sb.shift();
-        String actual = expressionStrategy.getValue(subject.getText());
-        String unexpected = expressionStrategy.getValue(complement.getText());
+        String actual = expressionStrategy.getValue(subject);
+        String unexpected = expressionStrategy.getValue(complement);
         sb.appendln("Object actual = ", actual, ";");
         sb.appendln("Object unexpected = ", unexpected, ";");
         sb.appendln("assertThat(actual, is(not(unexpected)));");

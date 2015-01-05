@@ -25,8 +25,8 @@ public class IsStatement implements TestStatement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("{");
         sb.shift();
-        String actual = expressionStrategy.getValue(subject.getText());
-        String expected = expressionStrategy.getValue(complement.getText());
+        String actual = expressionStrategy.getValue(subject);
+        String expected = expressionStrategy.getValue(complement);
         sb.appendln("Object actual = ", actual, ";");
         sb.appendln("Object expected = ", expected, ";");
         sb.appendln("assertThat(actual, is(expected));");
