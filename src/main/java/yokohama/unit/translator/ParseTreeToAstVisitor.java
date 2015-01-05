@@ -110,7 +110,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
         QuotedExpr subject = new QuotedExpr(ctx.Expr(0).getText(), nodeSpan(ctx.Expr(0)));
         Copula copula = visitCopula(ctx.copula());
-        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText(), nodeSpan(ctx.Expr(0)));
+        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText(), nodeSpan(ctx.Expr(1)));
         return new Proposition(subject, copula, complement, getSpan(ctx));
     }
 
