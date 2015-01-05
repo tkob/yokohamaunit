@@ -25,7 +25,7 @@ public class TestThrows {
     public void Division_by_zero_1() throws Exception {
         OgnlContext env = new OgnlContext();
         try {
-            Ognl.getValue("1 / 0", env);
+            eval("1 / 0", env, "TestThrows.docy", 2, "TestThrows.docy:2.14-2.19");
             fail("`1 / 0` was expected to throw ArithmeticException.");
         } catch (OgnlException e) {
             assertThat(e.getReason(), is(instanceOf(ArithmeticException.class)));

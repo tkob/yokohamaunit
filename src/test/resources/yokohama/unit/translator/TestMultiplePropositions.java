@@ -26,17 +26,17 @@ public class TestMultiplePropositions {
     public void Multiple_propositions_1() throws Exception {
         OgnlContext env = new OgnlContext();
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object expected = Ognl.getValue("2", env);
+            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
+            Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
             assertThat(actual, is(expected));
         }
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object unexpected = Ognl.getValue("3", env);
+            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
+            Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");
             assertThat(actual, is(not(unexpected)));
         }
         try {
-            Ognl.getValue("1 / 0", env);
+            eval("1 / 0", env, "TestMultiplePropositions.docy", 4, "TestMultiplePropositions.docy:4.14-4.19");
             fail("`1 / 0` was expected to throw ArithmeticException.");
         } catch (OgnlException e) {
             assertThat(e.getReason(), is(instanceOf(ArithmeticException.class)));

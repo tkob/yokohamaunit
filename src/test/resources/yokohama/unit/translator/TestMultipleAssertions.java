@@ -24,8 +24,8 @@ public class TestMultipleAssertions {
     public void Multiple_assertions_1() throws Exception {
         OgnlContext env = new OgnlContext();
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object expected = Ognl.getValue("2", env);
+            Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 2, "TestMultipleAssertions.docy:2.14-2.19");
+            Object expected = eval("2", env, "TestMultipleAssertions.docy", 2, "TestMultipleAssertions.docy:2.25-2.26");
             assertThat(actual, is(expected));
         }
     }
@@ -33,8 +33,8 @@ public class TestMultipleAssertions {
     public void Multiple_assertions_2() throws Exception {
         OgnlContext env = new OgnlContext();
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object unexpected = Ognl.getValue("3", env);
+            Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.14-3.19");
+            Object unexpected = eval("3", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.29-3.30");
             assertThat(actual, is(not(unexpected)));
         }
     }

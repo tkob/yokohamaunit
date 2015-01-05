@@ -26,8 +26,8 @@ public class TestExcel {
         env.put("prefix", eval("\"\"", env, "TestExcel.xlsx", 4, "TestExcel.xlsx:4.4"));
         env.put("expected", eval("true", env, "TestExcel.xlsx", 4, "TestExcel.xlsx:4.5"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }
@@ -38,8 +38,8 @@ public class TestExcel {
         env.put("prefix", eval("\"hello\"", env, "TestExcel.xlsx", 5, "TestExcel.xlsx:5.4"));
         env.put("expected", eval("true", env, "TestExcel.xlsx", 5, "TestExcel.xlsx:5.5"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }
@@ -50,8 +50,8 @@ public class TestExcel {
         env.put("prefix", eval("\"world\"", env, "TestExcel.xlsx", 6, "TestExcel.xlsx:6.4"));
         env.put("expected", eval("false", env, "TestExcel.xlsx", 6, "TestExcel.xlsx:6.5"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }

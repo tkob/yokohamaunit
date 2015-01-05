@@ -29,12 +29,12 @@ public class TestStub {
         env.put("exec", eval("@java.util.concurrent.Executors@newSingleThreadExecutor()", env, "TestStub.docy", 4, "TestStub.docy:4.17-4.74"));
         {
             java.util.concurrent.Callable stub = mock(java.util.concurrent.Callable.class);
-            when((Object)stub.call()).thenReturn(Ognl.getValue("42", env));
+            when((Object)stub.call()).thenReturn(eval("42", env, "TestStub.docy", 6, "TestStub.docy:6.51-6.53"));
             env.put("task", stub);
         }
         {
-            Object actual = Ognl.getValue("exec.submit(task).get()", env);
-            Object expected = Ognl.getValue("42", env);
+            Object actual = eval("exec.submit(task).get()", env, "TestStub.docy", 3, "TestStub.docy:3.9-3.32");
+            Object expected = eval("42", env, "TestStub.docy", 3, "TestStub.docy:3.38-3.40");
             assertThat(actual, is(expected));
         }
     }
@@ -43,13 +43,13 @@ public class TestStub {
         OgnlContext env = new OgnlContext();
         {
             java.util.Map stub = mock(java.util.Map.class);
-            when((Object)stub.get(isA(java.lang.Object.class))).thenReturn(Ognl.getValue("42", env));
+            when((Object)stub.get(isA(java.lang.Object.class))).thenReturn(eval("42", env, "TestStub.docy", 12, "TestStub.docy:12.65-12.67"));
             env.put("map", stub);
         }
         env.put("unmodifiableMap", eval("@java.util.Collections@unmodifiableMap(map)", env, "TestStub.docy", 13, "TestStub.docy:13.28-13.71"));
         {
-            Object actual = Ognl.getValue("unmodifiableMap.get(\"answer\")", env);
-            Object expected = Ognl.getValue("42", env);
+            Object actual = eval("unmodifiableMap.get(\"answer\")", env, "TestStub.docy", 10, "TestStub.docy:10.9-10.38");
+            Object expected = eval("42", env, "TestStub.docy", 10, "TestStub.docy:10.44-10.46");
             assertThat(actual, is(expected));
         }
     }
@@ -58,15 +58,15 @@ public class TestStub {
         OgnlContext env = new OgnlContext();
         {
             java.lang.CharSequence stub = mock(java.lang.CharSequence.class);
-            when((Object)stub.charAt(anyInt())).thenReturn(Ognl.getValue("'a'", env));
-            when((Object)stub.length()).thenReturn(Ognl.getValue("13", env));
+            when((Object)stub.charAt(anyInt())).thenReturn(eval("'a'", env, "TestStub.docy", 20, "TestStub.docy:20.52-20.55"));
+            when((Object)stub.length()).thenReturn(eval("13", env, "TestStub.docy", 21, "TestStub.docy:21.49-21.51"));
             env.put("seq", stub);
         }
         env.put("sb", eval("new java.lang.StringBuilder()", env, "TestStub.docy", 22, "TestStub.docy:22.13-22.42"));
-        Ognl.getValue("sb.append(seq, 10, 13)", env);
+        eval("sb.append(seq, 10, 13)", env, "TestStub.docy", 26, "TestStub.docy:26.5-26.27");
         {
-            Object actual = Ognl.getValue("sb.toString()", env);
-            Object expected = Ognl.getValue("\"aaa\"", env);
+            Object actual = eval("sb.toString()", env, "TestStub.docy", 30, "TestStub.docy:30.9-30.22");
+            Object expected = eval("\"aaa\"", env, "TestStub.docy", 30, "TestStub.docy:30.28-30.33");
             assertThat(actual, is(expected));
         }
     }

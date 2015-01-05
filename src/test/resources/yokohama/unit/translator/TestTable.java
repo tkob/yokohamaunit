@@ -26,8 +26,8 @@ public class TestTable {
         env.put("prefix", eval("\"\"", env, "TestTable.docy", 7, "TestTable.docy:7.18-7.31"));
         env.put("expected", eval("true", env, "TestTable.docy", 7, "TestTable.docy:7.32-7.42"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
             assertThat(actual, is(expected));
         }
     }
@@ -38,8 +38,8 @@ public class TestTable {
         env.put("prefix", eval("\"hello\"", env, "TestTable.docy", 8, "TestTable.docy:8.18-8.31"));
         env.put("expected", eval("true", env, "TestTable.docy", 8, "TestTable.docy:8.32-8.42"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
             assertThat(actual, is(expected));
         }
     }
@@ -50,8 +50,8 @@ public class TestTable {
         env.put("prefix", eval("\"world\"", env, "TestTable.docy", 9, "TestTable.docy:9.18-9.31"));
         env.put("expected", eval("false", env, "TestTable.docy", 9, "TestTable.docy:9.32-9.42"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
             assertThat(actual, is(expected));
         }
     }

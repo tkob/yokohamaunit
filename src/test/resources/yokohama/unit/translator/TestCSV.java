@@ -26,8 +26,8 @@ public class TestCSV {
         env.put("prefix", eval("\"\"", env, "TestCSV.csv", 2, "TestCSV.csv:2"));
         env.put("expected", eval("true", env, "TestCSV.csv", 2, "TestCSV.csv:2"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }
@@ -38,8 +38,8 @@ public class TestCSV {
         env.put("prefix", eval("\"hello\"", env, "TestCSV.csv", 3, "TestCSV.csv:3"));
         env.put("expected", eval("true", env, "TestCSV.csv", 3, "TestCSV.csv:3"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }
@@ -50,8 +50,8 @@ public class TestCSV {
         env.put("prefix", eval("\"world\"", env, "TestCSV.csv", 4, "TestCSV.csv:4"));
         env.put("expected", eval("false", env, "TestCSV.csv", 4, "TestCSV.csv:4"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("expected", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
             assertThat(actual, is(expected));
         }
     }

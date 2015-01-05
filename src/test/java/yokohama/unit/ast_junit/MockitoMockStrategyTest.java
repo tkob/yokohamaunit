@@ -35,7 +35,7 @@ public class MockitoMockStrategyTest {
                                             new QuotedExpr("42", Span.dummySpan())))),
                     new SBuilder(4)
                             .appendln("java.util.concurrent.Callable stub = mock(java.util.concurrent.Callable.class);")
-                            .appendln("when((Object)stub.call()).thenReturn(Ognl.getValue(\"42\", env));")
+                            .appendln("when((Object)stub.call()).thenReturn(eval(\"42\", env, \"?\", -1, \"?:?\"));")
                             .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -56,7 +56,7 @@ public class MockitoMockStrategyTest {
                                             new QuotedExpr("0", Span.dummySpan())))),
                     new SBuilder(4)
                             .appendln("Comparable stub = mock(Comparable.class);")
-                            .appendln("when((Object)stub.compare(isA(Object.class))).thenReturn(Ognl.getValue(\"0\", env));")
+                            .appendln("when((Object)stub.compare(isA(Object.class))).thenReturn(eval(\"0\", env, \"?\", -1, \"?:?\"));")
                             .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -78,7 +78,7 @@ public class MockitoMockStrategyTest {
                                             new QuotedExpr("'a'", Span.dummySpan())))),
                     new SBuilder(4)
                             .appendln("CharSequence stub = mock(CharSequence.class);")
-                            .appendln("when((Object)stub.charAt(anyInt())).thenReturn(Ognl.getValue(\"'a'\", env));")
+                            .appendln("when((Object)stub.charAt(anyInt())).thenReturn(eval(\"'a'\", env, \"?\", -1, \"?:?\"));")
                             .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -131,7 +131,7 @@ public class MockitoMockStrategyTest {
             // non array types
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyBoolean())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyBoolean())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -142,7 +142,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.BYTE), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyByte())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyByte())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -153,7 +153,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.SHORT), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyShort())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyShort())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -164,7 +164,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.INT), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyInt())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyInt())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -175,7 +175,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.LONG), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyLong())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyLong())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -186,7 +186,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.CHAR), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyChar())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyChar())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -197,7 +197,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.FLOAT), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyFloat())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyFloat())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -208,7 +208,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.DOUBLE), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyDouble())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyDouble())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -219,7 +219,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new ClassType("Object"), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(Object.class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(Object.class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -231,7 +231,7 @@ public class MockitoMockStrategyTest {
             // array types
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(boolean[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(boolean[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -242,7 +242,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.BYTE), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(byte[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(byte[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -253,7 +253,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.SHORT), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(short[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(short[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -264,7 +264,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.INT), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(int[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(int[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -275,7 +275,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.LONG), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(long[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(long[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -286,7 +286,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.CHAR), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(char[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(char[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -297,7 +297,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.FLOAT), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(float[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(float[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -308,7 +308,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new PrimitiveType(Kind.DOUBLE), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(double[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(double[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -319,7 +319,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new ClassType("Object"), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(Object[].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(Object[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -331,7 +331,7 @@ public class MockitoMockStrategyTest {
             // array types 2D
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 2, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(boolean[][].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(boolean[][].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -342,7 +342,7 @@ public class MockitoMockStrategyTest {
             ),
             new Fixture(new ClassType("Object"), 2, new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(isA(Object[][].class))).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(isA(Object[][].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock"),
@@ -461,7 +461,7 @@ public class MockitoMockStrategyTest {
             String actual = sb.toString();
             String expected = new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyVararg())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyVararg())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString();
             assertThat(actual, is(expected));
         }
@@ -525,7 +525,7 @@ public class MockitoMockStrategyTest {
             String actual = sb.toString();
             String expected = new SBuilder(4)
                     .appendln("DummyClass stub = mock(DummyClass.class);")
-                    .appendln("when((Object)stub.dummyMethod(anyInt(), anyVararg())).thenReturn(Ognl.getValue(\"null\", env));")
+                    .appendln("when((Object)stub.dummyMethod(anyInt(), anyVararg())).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString();
             assertThat(actual, is(expected));
         }

@@ -25,8 +25,8 @@ public class TestBindings {
         env.put("sut", eval("\"hello world\"", env, "TestBindings.docy", 4, "TestBindings.docy:4.24-4.37"));
         env.put("prefix", eval("\"\"", env, "TestBindings.docy", 5, "TestBindings.docy:5.24-5.26"));
         {
-            Object actual = Ognl.getValue("sut.startsWith(prefix)", env);
-            Object expected = Ognl.getValue("true", env);
+            Object actual = eval("sut.startsWith(prefix)", env, "TestBindings.docy", 3, "TestBindings.docy:3.14-3.36");
+            Object expected = eval("true", env, "TestBindings.docy", 3, "TestBindings.docy:3.42-3.46");
             assertThat(actual, is(expected));
         }
     }

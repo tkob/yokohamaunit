@@ -24,8 +24,8 @@ public class TestIsNot {
     public void Simple_Arithmetic_1() throws Exception {
         OgnlContext env = new OgnlContext();
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object unexpected = Ognl.getValue("3", env);
+            Object actual = eval("1 + 1", env, "TestIsNot.docy", 2, "TestIsNot.docy:2.14-2.19");
+            Object unexpected = eval("3", env, "TestIsNot.docy", 2, "TestIsNot.docy:2.29-2.30");
             assertThat(actual, is(not(unexpected)));
         }
     }

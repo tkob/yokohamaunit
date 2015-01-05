@@ -23,8 +23,8 @@ public class TestIs {
     public void Simple_Arithmetic_1() throws Exception {
         OgnlContext env = new OgnlContext();
         {
-            Object actual = Ognl.getValue("1 + 1", env);
-            Object expected = Ognl.getValue("2", env);
+            Object actual = eval("1 + 1", env, "TestIs.docy", 2, "TestIs.docy:2.14-2.19");
+            Object expected = eval("2", env, "TestIs.docy", 2, "TestIs.docy:2.25-2.26");
             assertThat(actual, is(expected));
         }
     }

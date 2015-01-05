@@ -123,8 +123,8 @@ public class TestMethodTest {
         expected.appendln("public void test() throws Exception {");
         expected.appendln("    OgnlContext env = new OgnlContext();");
         expected.appendln("    {");
-        expected.appendln("        Object actual = Ognl.getValue(\"x\", env);");
-        expected.appendln("        Object expected = Ognl.getValue(\"y\", env);");
+        expected.appendln("        Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("        Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
         expected.appendln("        assertThat(actual, is(expected));");
         expected.appendln("    }");
         expected.appendln("}");
