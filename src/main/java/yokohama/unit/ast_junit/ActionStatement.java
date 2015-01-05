@@ -14,6 +14,6 @@ public class ActionStatement {
     }
 
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
-        sb.appendln("Ognl.getValue(\"" + escapeJava(action.getText()) + "\", env);");
+        sb.appendln(expressionStrategy.getValue(action), ";");
     }
 }

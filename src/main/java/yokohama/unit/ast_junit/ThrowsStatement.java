@@ -30,7 +30,7 @@ public class ThrowsStatement implements TestStatement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
         sb.appendln("try {");
         sb.shift();
-            sb.appendln("Ognl.getValue(\"", escapeJava(subject.getText()), "\", env);");
+            sb.appendln(expressionStrategy.getValue(subject), ";");
             sb.appendln("fail(\"`", subject.getText(), "` was expected to throw ", complement.getText(), ".\");");
         sb.unshift();
         if (expressionStrategy.wrappingException().isPresent()) {
