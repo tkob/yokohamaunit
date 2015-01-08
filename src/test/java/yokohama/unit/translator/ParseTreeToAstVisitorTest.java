@@ -23,11 +23,13 @@ import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Phase;
@@ -116,8 +118,11 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(
                         new Proposition(
                                 new QuotedExpr("a", Span.dummySpan()),
-                                Copula.IS,
-                                new QuotedExpr("b", Span.dummySpan()),
+                                new IsPredicate(
+                                        new EqualToMatcher(
+                                                new QuotedExpr("b", Span.dummySpan()),
+                                                Span.dummySpan()),
+                                        Span.dummySpan()),
                                 Span.dummySpan())),
                 Fixture.none(),
                 Span.dummySpan());
@@ -133,8 +138,11 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(
                         new Proposition(
                                 new QuotedExpr("x", Span.dummySpan()),
-                                Copula.IS,
-                                new QuotedExpr("y", Span.dummySpan()),
+                                new IsPredicate(
+                                        new EqualToMatcher(
+                                                new QuotedExpr("y", Span.dummySpan()),
+                                                Span.dummySpan()),
+                                        Span.dummySpan()),
                                 Span.dummySpan())),
                 new Bindings(
                         Arrays.asList(
@@ -145,36 +153,6 @@ public class ParseTreeToAstVisitorTest {
                         Span.dummySpan()),
                 Span.dummySpan());
         assertThat(actual, is(expected));
-    }
-
-    @Test
-    public void testVisitCopula() {
-        YokohamaUnitParser.CopulaContext ctx = mock(YokohamaUnitParser.CopulaContext.class);
-        when(ctx.getText()).thenReturn("is");
-        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Copula expResult = Copula.IS;
-        Copula result = instance.visitCopula(ctx);
-        assertEquals(expResult, result);
-    }
-
-    @Test
-    public void testVisitCopula2() {
-        YokohamaUnitParser.CopulaContext ctx = mock(YokohamaUnitParser.CopulaContext.class);
-        when(ctx.getText()).thenReturn("throws");
-        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Copula expResult = Copula.THROWS;
-        Copula result = instance.visitCopula(ctx);
-        assertEquals(expResult, result);
-    }
-
-    @Test
-    public void testVisitCopula3() {
-        YokohamaUnitParser.CopulaContext ctx = mock(YokohamaUnitParser.CopulaContext.class);
-        when(ctx.getText()).thenReturn("isnot");
-        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Copula expResult = Copula.IS_NOT;
-        Copula result = instance.visitCopula(ctx);
-        assertEquals(expResult, result);
     }
 
     @Test
@@ -290,8 +268,11 @@ public class ParseTreeToAstVisitorTest {
         Proposition expected =
                 new Proposition(
                         new QuotedExpr("a", Span.dummySpan()),
-                        Copula.IS,
-                        new QuotedExpr("b", Span.dummySpan()),
+                        new IsPredicate(
+                                new EqualToMatcher(
+                                        new QuotedExpr("b", Span.dummySpan()),
+                                        Span.dummySpan()),
+                                Span.dummySpan()),
                         Span.dummySpan());
         assertThat(actual, is(expected));
     }
@@ -374,8 +355,11 @@ public class ParseTreeToAstVisitorTest {
                                         Arrays.asList(
                                                 new Proposition(
                                                         new QuotedExpr("x", Span.dummySpan()),
-                                                        Copula.IS,
-                                                        new QuotedExpr("1", Span.dummySpan()),
+                                                        new IsPredicate(
+                                                                new EqualToMatcher(
+                                                                        new QuotedExpr("1", Span.dummySpan()),
+                                                                        Span.dummySpan()),
+                                                                Span.dummySpan()),
                                                         Span.dummySpan())),
                                         Fixture.none(),
                                         Span.dummySpan())),
@@ -426,8 +410,11 @@ public class ParseTreeToAstVisitorTest {
                                         Arrays.asList(
                                                 new Proposition(
                                                         new QuotedExpr("x", Span.dummySpan()),
-                                                        Copula.IS,
-                                                        new QuotedExpr("1", Span.dummySpan()),
+                                                        new IsPredicate(
+                                                                new EqualToMatcher(
+                                                                        new QuotedExpr("1", Span.dummySpan()),
+                                                                        Span.dummySpan()),
+                                                                Span.dummySpan()),
                                                         Span.dummySpan())),
                                 Fixture.none(),
                                 Span.dummySpan())),
@@ -555,8 +542,11 @@ public class ParseTreeToAstVisitorTest {
                                 Arrays.asList(
                                         new Proposition(
                                                 new QuotedExpr("x", Span.dummySpan()),
-                                                Copula.IS,
-                                                new QuotedExpr("1", Span.dummySpan()),
+                                                new IsPredicate(
+                                                        new EqualToMatcher(
+                                                                new QuotedExpr("1", Span.dummySpan()),
+                                                                Span.dummySpan()),
+                                                        Span.dummySpan()),
                                                 Span.dummySpan())),
                                 Fixture.none(),
                                 Span.dummySpan())),

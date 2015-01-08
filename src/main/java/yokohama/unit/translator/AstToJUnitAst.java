@@ -25,19 +25,25 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
-import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.MatcherVisitor;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
+import yokohama.unit.ast.PredicateVisitor;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.Binding;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -132,22 +138,67 @@ public class AstToJUnitAst {
                         docyPath,
                         proposition.getSubject().getSpan().getStart(),
                         proposition.getSubject().getSpan().getEnd()));
-        QuotedExpr complement = new QuotedExpr(
-                proposition.getComplement().getText(),
-                new Span(
-                        docyPath,
-                        proposition.getComplement().getSpan().getStart(),
-                        proposition.getComplement().getSpan().getEnd()));
-        Copula copula = proposition.getCopula();
-        switch(copula) {
-            case IS:
-                return new IsStatement(subject, complement);
-            case IS_NOT:
-                return new IsNotStatement(subject, complement);
-            case THROWS:
-                return new ThrowsStatement(subject, complement);
-        }
-        throw new IllegalArgumentException("'" + Objects.toString(copula) + "' is not a copula.");
+        return proposition.getPredicate().accept(
+                isPredicate ->
+                        new IsStatement(
+                                subject,
+                                isPredicate.getComplement().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                return
+                                                new QuotedExpr(
+                                                        equalTo.getExpr().getText(),
+                                                        new Span(
+                                                                docyPath,
+                                                                equalTo.getSpan().getStart(),
+                                                                equalTo.getSpan().getEnd()));
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                throw new RuntimeException();
+                                            }
+                                        })),
+                isNotPredicate ->
+                        new IsNotStatement(
+                                subject,
+                                isNotPredicate.getComplement().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                return
+                                                new QuotedExpr(
+                                                        equalTo.getExpr().getText(),
+                                                        new Span(
+                                                                docyPath,
+                                                                equalTo.getSpan().getStart(),
+                                                                equalTo.getSpan().getEnd()));
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                throw new RuntimeException();
+                                            }
+                                        })),
+                throwsPredicate ->
+                        new ThrowsStatement(
+                                subject,
+                                throwsPredicate.getThrowee().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                throw new RuntimeException();
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                return new QuotedExpr(
+                                                        instanceOf.getClazz().getName(),
+                                                        new Span(
+                                                                docyPath,
+                                                                instanceOf.getSpan().getStart(),
+                                                                instanceOf.getSpan().getEnd()));
+                                            }
+                                        }))
+        );
     }
 
     Binding translateBinding(yokohama.unit.ast.Binding binding) {

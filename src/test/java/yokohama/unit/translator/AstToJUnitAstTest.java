@@ -7,13 +7,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import yokohama.unit.ast.Assertion;
-import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.IsNotStatement;
@@ -87,7 +91,14 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateProposition() {
-        Proposition proposition = new Proposition(new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()), Copula.IS, new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()), yokohama.unit.ast.Span.dummySpan());
+        Proposition proposition = new Proposition(
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new IsPredicate(
+                        new EqualToMatcher(
+                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()),
+                                yokohama.unit.ast.Span.dummySpan()),
+                        yokohama.unit.ast.Span.dummySpan()),
+                yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsStatement(
@@ -98,7 +109,15 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition1() {
-        Proposition proposition = new Proposition(new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()), Copula.IS_NOT, new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()), yokohama.unit.ast.Span.dummySpan());
+        Proposition proposition = new Proposition(
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new IsNotPredicate(
+                        new EqualToMatcher(
+                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()),
+                                yokohama.unit.ast.Span.dummySpan()),
+                        yokohama.unit.ast.Span.dummySpan()),
+                yokohama.unit.ast.Span.dummySpan());
+
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new IsNotStatement(
@@ -109,7 +128,14 @@ public class AstToJUnitAstTest {
     
     @Test
     public void testTranslateProposition2() {
-        Proposition proposition = new Proposition(new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()), Copula.THROWS, new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()), yokohama.unit.ast.Span.dummySpan());
+        Proposition proposition = new Proposition(
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new ThrowsPredicate(
+                        new InstanceOfMatcher(
+                                new yokohama.unit.ast.ClassType("b", yokohama.unit.ast.Span.dummySpan()),
+                                yokohama.unit.ast.Span.dummySpan()),
+                        yokohama.unit.ast.Span.dummySpan()),
+                yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         TestStatement actual = instance.translateProposition(proposition);
         TestStatement expected = new ThrowsStatement(

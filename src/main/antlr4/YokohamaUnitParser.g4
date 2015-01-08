@@ -17,12 +17,18 @@ assertion: ASSERT THAT? propositions condition? STOP ;
 
 propositions: proposition (AND THAT? proposition)* ;
 
-proposition: Expr copula Expr ;
+proposition: subject predicate ;
 
-copula: IS
-      | IS NOT
-      | THROWS
-      ;
+subject: Expr ;
+
+predicate: isPredicate | isNotPredicate | throwsPredicate ;
+isPredicate: IS matcher ;
+isNotPredicate: IS NOT matcher ;
+throwsPredicate: THROWS matcher ;
+
+matcher: equalTo | instanceOf ;
+equalTo: Expr ;
+instanceOf: AN_INSTANCE_OF classType ;
 
 condition: tableRef
          | bindings
