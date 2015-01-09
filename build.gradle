@@ -102,3 +102,23 @@ jacocoTestReport {
           xml.enabled true
      }
 }
+
+task checkDocumentConsistency << {
+    // Check if all AST classes are documented in package-info.java
+    def packageInfo = file("src/main/java/yokohama/unit/ast/package-info.java").text
+    def missing = file("src/main/java/yokohama/unit/ast")
+        .list({ f, name ->
+            !name.endsWith("Visitor.java") &&
+            !name.equals("Span.java") &&
+            !name.equals("Position.java") &&
+            !name.equals("package-info.java")
+            } as FilenameFilter)
+        .grep({ name ->
+            def className = name.find(~/(\w+)\.java/) { _, className -> className }
+            !packageInfo.contains(className)
+            })
+    if (missing.size() > 0) {
+        ant.fail("These classes are missing in package-info.java: " + missing)
+    }
+}
+check.dependsOn checkDocumentConsistency
