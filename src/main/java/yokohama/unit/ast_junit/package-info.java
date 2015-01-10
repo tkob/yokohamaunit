@@ -6,9 +6,9 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= Binding* ActionStatement* TestStateMent* ActionStatement*
+ * TestMethod ::= TopBinding* ActionStatement* TestStateMent* ActionStatement*
  * 
- * Binding ::= Expr
+ * TopBinding ::= Expr
  * 
  * Expr ::= QuotedExpr | StubExpr
  * 

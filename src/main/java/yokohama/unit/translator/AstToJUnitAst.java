@@ -45,7 +45,7 @@ import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ActionStatement;
-import yokohama.unit.ast_junit.Binding;
+import yokohama.unit.ast_junit.TopBinding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -110,10 +110,9 @@ public class AstToJUnitAst {
                 propositions.stream()
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
-        return assertion.getFixture().accept(
-                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
+        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
                 tableRef -> {
-                    List<List<Binding>> table = translateTableRef(tableRef, tables);
+                    List<List<TopBinding>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
@@ -201,10 +200,10 @@ public class AstToJUnitAst {
         );
     }
 
-    Binding translateBinding(yokohama.unit.ast.Binding binding) {
+    TopBinding translateBinding(yokohama.unit.ast.Binding binding) {
         String name = binding.getName();
         Expr value = translateExpr(binding.getValue());
-        return new Binding(name, value);
+        return new TopBinding(name, value);
     }
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
@@ -260,7 +259,7 @@ public class AstToJUnitAst {
         );
     }
 
-    List<List<Binding>> translateTableRef(TableRef tableRef, List<Table> tables) {
+    List<List<TopBinding>> translateTableRef(TableRef tableRef, List<Table> tables) {
         String name = tableRef.getName();
         switch(tableRef.getType()) {
             case INLINE:
@@ -280,24 +279,24 @@ public class AstToJUnitAst {
 
     }
 
-    List<List<Binding>> translateTable(Table table) {
+    List<List<TopBinding>> translateTable(Table table) {
         return table.getRows()
                     .stream()
                     .map(row -> translateRow(row, table.getHeader()))
                     .collect(Collectors.toList());
     }
 
-    List<Binding> translateRow(Row row, List<String> header) {
+    List<TopBinding> translateRow(Row row, List<String> header) {
         // Since vanilla Java has no zip method...
         fj.data.List<String> names = Java.<String>JUList_List().f(header);
         fj.data.List<yokohama.unit.ast.Expr> cells = Java.<yokohama.unit.ast.Expr>JUList_List().f(row.getExprs());
-        fj.data.List<Binding> bindings =
-                names.zipWith(cells, (name, expr) -> new Binding(name, translateExpr(expr)));
-        return Java.<Binding>List_ArrayList().f(bindings);
+        fj.data.List<TopBinding> bindings =
+                names.zipWith(cells, (name, expr) -> new TopBinding(name, translateExpr(expr)));
+        return Java.<TopBinding>List_ArrayList().f(bindings);
     }
 
     @SneakyThrows(IOException.class)
-    List<List<Binding>> parseCSV(String fileName, CSVFormat format) {
+    List<List<TopBinding>> parseCSV(String fileName, CSVFormat format) {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -306,7 +305,7 @@ public class AstToJUnitAst {
                             parser.getHeaderMap().keySet()
                                     .stream()
                                     .map(name ->
-                                            new Binding(
+                                            new TopBinding(
                                                     name,
                                                     new QuotedExpr(
                                                             record.get(name),
@@ -319,7 +318,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<List<Binding>> parseExcel(String fileName) {
+    List<List<TopBinding>> parseExcel(String fileName) {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -333,7 +332,7 @@ public class AstToJUnitAst {
                     .map(row -> 
                         IntStream.range(0, names.size())
                                 .mapToObj(Integer::new)
-                                .map(i -> new Binding(
+                                .map(i -> new TopBinding(
                                         names.get(i),
                                         new QuotedExpr(
                                                 row.getCell(left + i).getStringCellValue(),
@@ -350,14 +349,14 @@ public class AstToJUnitAst {
 
     List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
         String testName = SUtils.toIdent(fourPhaseTest.getName());
-        List<Binding> bindings;
+        List<TopBinding> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
             if (setup.getLetBindings().isPresent()) {
                 LetBindings letBindings = setup.getLetBindings().get();
                 bindings = letBindings.getBindings()
                         .stream()
-                        .map(binding -> new Binding(binding.getName(), translateExpr(binding.getValue())))
+                        .map(binding -> new TopBinding(binding.getName(), translateExpr(binding.getValue())))
                         .collect(Collectors.toList());
             } else {
                 bindings = Arrays.asList();

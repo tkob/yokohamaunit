@@ -7,14 +7,14 @@ import yokohama.unit.util.SBuilder;
 public interface ExpressionStrategy {
     public void auxMethods(SBuilder sb);
     public String environment();
-    public void bind(SBuilder sb, Binding binding, MockStrategy mockStrategy);
+    public void bind(SBuilder sb, TopBinding binding, MockStrategy mockStrategy);
     public String getValue(QuotedExpr quotedExpr);
     public Optional<String> wrappingException();
     public String wrappedException(String e);
     
     public Set<ImportedName> auxMethodsImports();
     public Set<ImportedName> environmentImports();
-    public Set<ImportedName> bindImports(Binding binding, MockStrategy mockStrategy);
+    public Set<ImportedName> bindImports(TopBinding binding, MockStrategy mockStrategy);
     public Set<ImportedName> getValueImports();
     public Set<ImportedName> wrappingExceptionImports();
     public Set<ImportedName> wrappedExceptionImports();

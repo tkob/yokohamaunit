@@ -3,7 +3,7 @@ package yokohama.unit.ast_junit;
 import lombok.Value;
 
 @Value
-public class Binding {
+public class TopBinding {
     private final String name;
     private final Expr value;
 }
