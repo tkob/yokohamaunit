@@ -10,9 +10,30 @@
  * 
  * Assertion ::= Proposition* Fixture
  * 
- * Proposition ::= Expr Copula Expr
+ * Proposition ::= QuotedExpr Predicate
  * 
- * Copula ::= IS | IS_NOT | THROWS
+ * Predicate ::= IsPredicate | IsNotPredicate | ThrowsPredicate
+ * 
+ * IsPredicate ::= Matcher
+ * IsNotPredicate ::= Matcher
+ * ThrowsPredicate ::= Matcher
+ * 
+ * Matcher ::= EqualToMatcher | InstanceOfMatcher
+ * 
+ * EqualToMatcher ::= QuotedExpr
+ * InstanceOfMatcher ::= ClassType
+ * 
+ * Expr ::= QuotedExpr | StubExpr
+ * 
+ * StubExpr ::= QuotedExpr StubBehavior*
+ * 
+ * StubBehavior ::= MethodPattern Expr
+ * 
+ * MethodPattern ::= Type*
+ * 
+ * Type ::= NonArrayType
+ * NonArrayType ::= PrimitiveType | ClassType
+ * PrimitiveType ::= Kind
  * 
  * Fixture ::= | TableRef | Bindings
  * 
@@ -22,13 +43,12 @@
  * 
  * Bindings ::= Binding*
  * 
- * FourPhaseTest ::= Phase Phase Phase Phase
+ * FourPhaseTest ::= Phase? Phase? VerifyPhase Phase?
  * 
- * Phase ::= LetBindings? Action?
+ * Phase ::= LetBindings? Execution?
+ * VerifyPhase ::= Assertion+
  * 
- * Action ::= Execution | Assertion
- * 
- * Execution ::= Expr*
+ * Execution ::= QuotedExpr*
  * 
  * Table ::= Row*
  * 

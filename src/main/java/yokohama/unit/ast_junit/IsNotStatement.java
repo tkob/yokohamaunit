@@ -7,7 +7,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class IsNotStatement implements TestStatement {
+public class IsNotStatement implements Statement {
 
     private QuotedExpr subject;
     private QuotedExpr complement;
@@ -36,7 +36,7 @@ public class IsNotStatement implements TestStatement {
     }
 
     @Override
-    public <T> T accept(TestStatementVisitor<T> visitor) {
+    public <T> T accept(StatementVisitor<T> visitor) {
         return visitor.visitIsNotStatement(this);
     }
 }

@@ -106,6 +106,10 @@ public class MockitoMockStrategy implements MockStrategy {
                         sb.unshift();
                         sb.appendln("}");
                         return null;
+                    },
+                    varExpr -> {
+                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", varExpr.getName(), ");");
+                        return null;
                     }
             );
         }
@@ -147,7 +151,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                     (StubExpr stubExpr_) -> {
                                         set.addAll(stubImports(stubExpr, expressionStrategy));
                                         return null;
-                                    }
+                                    },
+                                    varExpr -> { return null; }
                             );
 
                         },

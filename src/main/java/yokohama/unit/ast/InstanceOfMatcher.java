@@ -12,8 +12,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
-public class Proposition {
-    private QuotedExpr subject;
-    private Predicate predicate;
+public class InstanceOfMatcher implements Matcher {
+    private ClassType clazz;
     private Span span;
+
+    @Override
+    public <T> T accept(MatcherVisitor<T> visitor) {
+        return visitor.visitInstanceOf(this);
+    }
+    
 }

@@ -8,7 +8,7 @@ import yokohama.unit.util.SBuilder;
 
 
 @Value
-public class IsStatement implements TestStatement {
+public class IsStatement implements Statement {
     private QuotedExpr subject;
     private QuotedExpr complement;
 
@@ -35,7 +35,7 @@ public class IsStatement implements TestStatement {
     }
 
     @Override
-    public <T> T accept(TestStatementVisitor<T> visitor) {
+    public <T> T accept(StatementVisitor<T> visitor) {
         return visitor.visitIsStatement(this);
     }
 }

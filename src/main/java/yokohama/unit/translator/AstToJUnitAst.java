@@ -25,21 +25,27 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
-import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.MatcherVisitor;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
+import yokohama.unit.ast.PredicateVisitor;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
-import yokohama.unit.ast_junit.ActionStatement;
-import yokohama.unit.ast_junit.Binding;
+import yokohama.unit.ast.ThrowsPredicate;
+import yokohama.unit.ast_junit.Action;
+import yokohama.unit.ast_junit.TopBinding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -54,7 +60,7 @@ import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
-import yokohama.unit.ast_junit.TestStatement;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.SUtils;
@@ -100,14 +106,13 @@ public class AstToJUnitAst {
     List<TestMethod> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
-        List<TestStatement> testStatements =
+        List<Statement> testStatements =
                 propositions.stream()
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
-        return assertion.getFixture().accept(
-                () -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
+        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
                 tableRef -> {
-                    List<List<Binding>> table = translateTableRef(tableRef, tables);
+                    List<List<TopBinding>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
@@ -125,35 +130,80 @@ public class AstToJUnitAst {
                 )));
     }
 
-    TestStatement translateProposition(Proposition proposition) {
+    Statement translateProposition(Proposition proposition) {
         QuotedExpr subject = new QuotedExpr(
                 proposition.getSubject().getText(),
                 new Span(
                         docyPath,
                         proposition.getSubject().getSpan().getStart(),
                         proposition.getSubject().getSpan().getEnd()));
-        QuotedExpr complement = new QuotedExpr(
-                proposition.getComplement().getText(),
-                new Span(
-                        docyPath,
-                        proposition.getComplement().getSpan().getStart(),
-                        proposition.getComplement().getSpan().getEnd()));
-        Copula copula = proposition.getCopula();
-        switch(copula) {
-            case IS:
-                return new IsStatement(subject, complement);
-            case IS_NOT:
-                return new IsNotStatement(subject, complement);
-            case THROWS:
-                return new ThrowsStatement(subject, complement);
-        }
-        throw new IllegalArgumentException("'" + Objects.toString(copula) + "' is not a copula.");
+        return proposition.getPredicate().accept(
+                isPredicate ->
+                        new IsStatement(
+                                subject,
+                                isPredicate.getComplement().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                return
+                                                new QuotedExpr(
+                                                        equalTo.getExpr().getText(),
+                                                        new Span(
+                                                                docyPath,
+                                                                equalTo.getSpan().getStart(),
+                                                                equalTo.getSpan().getEnd()));
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                        })),
+                isNotPredicate ->
+                        new IsNotStatement(
+                                subject,
+                                isNotPredicate.getComplement().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                return
+                                                new QuotedExpr(
+                                                        equalTo.getExpr().getText(),
+                                                        new Span(
+                                                                docyPath,
+                                                                equalTo.getSpan().getStart(),
+                                                                equalTo.getSpan().getEnd()));
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                        })),
+                throwsPredicate ->
+                        new ThrowsStatement(
+                                subject,
+                                throwsPredicate.getThrowee().accept(
+                                        new MatcherVisitor<QuotedExpr>() {
+                                            @Override
+                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
+                                                throw new UnsupportedOperationException("Not supported yet.");
+                                            }
+                                            @Override
+                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                                return new QuotedExpr(
+                                                        instanceOf.getClazz().getName(),
+                                                        new Span(
+                                                                docyPath,
+                                                                instanceOf.getSpan().getStart(),
+                                                                instanceOf.getSpan().getEnd()));
+                                            }
+                                        }))
+        );
     }
 
-    Binding translateBinding(yokohama.unit.ast.Binding binding) {
+    TopBinding translateBinding(yokohama.unit.ast.Binding binding) {
         String name = binding.getName();
         Expr value = translateExpr(binding.getValue());
-        return new Binding(name, value);
+        return new TopBinding(name, value);
     }
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
@@ -209,7 +259,7 @@ public class AstToJUnitAst {
         );
     }
 
-    List<List<Binding>> translateTableRef(TableRef tableRef, List<Table> tables) {
+    List<List<TopBinding>> translateTableRef(TableRef tableRef, List<Table> tables) {
         String name = tableRef.getName();
         switch(tableRef.getType()) {
             case INLINE:
@@ -229,24 +279,24 @@ public class AstToJUnitAst {
 
     }
 
-    List<List<Binding>> translateTable(Table table) {
+    List<List<TopBinding>> translateTable(Table table) {
         return table.getRows()
                     .stream()
                     .map(row -> translateRow(row, table.getHeader()))
                     .collect(Collectors.toList());
     }
 
-    List<Binding> translateRow(Row row, List<String> header) {
+    List<TopBinding> translateRow(Row row, List<String> header) {
         // Since vanilla Java has no zip method...
         fj.data.List<String> names = Java.<String>JUList_List().f(header);
         fj.data.List<yokohama.unit.ast.Expr> cells = Java.<yokohama.unit.ast.Expr>JUList_List().f(row.getExprs());
-        fj.data.List<Binding> bindings =
-                names.zipWith(cells, (name, expr) -> new Binding(name, translateExpr(expr)));
-        return Java.<Binding>List_ArrayList().f(bindings);
+        fj.data.List<TopBinding> bindings =
+                names.zipWith(cells, (name, expr) -> new TopBinding(name, translateExpr(expr)));
+        return Java.<TopBinding>List_ArrayList().f(bindings);
     }
 
     @SneakyThrows(IOException.class)
-    List<List<Binding>> parseCSV(String fileName, CSVFormat format) {
+    List<List<TopBinding>> parseCSV(String fileName, CSVFormat format) {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -255,7 +305,7 @@ public class AstToJUnitAst {
                             parser.getHeaderMap().keySet()
                                     .stream()
                                     .map(name ->
-                                            new Binding(
+                                            new TopBinding(
                                                     name,
                                                     new QuotedExpr(
                                                             record.get(name),
@@ -268,7 +318,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<List<Binding>> parseExcel(String fileName) {
+    List<List<TopBinding>> parseExcel(String fileName) {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -282,7 +332,7 @@ public class AstToJUnitAst {
                     .map(row -> 
                         IntStream.range(0, names.size())
                                 .mapToObj(Integer::new)
-                                .map(i -> new Binding(
+                                .map(i -> new TopBinding(
                                         names.get(i),
                                         new QuotedExpr(
                                                 row.getCell(left + i).getStringCellValue(),
@@ -299,14 +349,14 @@ public class AstToJUnitAst {
 
     List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
         String testName = SUtils.toIdent(fourPhaseTest.getName());
-        List<Binding> bindings;
+        List<TopBinding> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
             if (setup.getLetBindings().isPresent()) {
                 LetBindings letBindings = setup.getLetBindings().get();
                 bindings = letBindings.getBindings()
                         .stream()
-                        .map(binding -> new Binding(binding.getName(), translateExpr(binding.getValue())))
+                        .map(binding -> new TopBinding(binding.getName(), translateExpr(binding.getValue())))
                         .collect(Collectors.toList());
             } else {
                 bindings = Arrays.asList();
@@ -315,20 +365,20 @@ public class AstToJUnitAst {
             bindings = Arrays.asList();
         }
 
-        Optional<Stream<ActionStatement>> setupActions =
+        Optional<Stream<Action>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        Optional<Stream<ActionStatement>> exerciseActions =
+        Optional<Stream<Action>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        List<ActionStatement> actionsBefore = Stream.concat(
+        List<Action> actionsBefore = Stream.concat(
                 setupActions.isPresent() ? setupActions.get() : Stream.empty(),
                 exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
         ).collect(Collectors.toList());
 
-        List<TestStatement> testStatements = fourPhaseTest.getVerify().getAssertions()
+        List<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
                         assertion.getPropositions()
@@ -337,7 +387,7 @@ public class AstToJUnitAst {
                 )
                 .collect(Collectors.toList());
 
-        List<ActionStatement> actionsAfter;
+        List<Action> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
@@ -348,13 +398,13 @@ public class AstToJUnitAst {
         return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
     }
 
-    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
+    Stream<Action> translateExecutions(List<Execution> executions) {
         return executions.stream()
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
                                 .map(expression ->
-                                        new ActionStatement(
+                                        new Action(
                                                 new QuotedExpr(
                                                         expression.getText(),
                                                         new Span(

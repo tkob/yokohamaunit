@@ -4,12 +4,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import lombok.Value;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 
 @Value    
-public class ThrowsStatement implements TestStatement {
+public class ThrowsStatement implements Statement {
     private QuotedExpr subject;
     private QuotedExpr complement;
 
@@ -44,7 +43,7 @@ public class ThrowsStatement implements TestStatement {
     }
 
     @Override
-    public <T> T accept(TestStatementVisitor<T> visitor) {
+    public <T> T accept(StatementVisitor<T> visitor) {
         return visitor.visitThrowsStatement(this);
     }
 }

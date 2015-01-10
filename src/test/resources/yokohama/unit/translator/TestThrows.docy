@@ -1,2 +1,2 @@
 Test: Division by zero
-Assert that `1 / 0` throws `ArithmeticException`.
+Assert that `1 / 0` throws an instance of `ArithmeticException`.

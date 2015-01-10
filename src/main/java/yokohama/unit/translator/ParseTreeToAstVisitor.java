@@ -11,13 +11,16 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.ClassType;
-import yokohama.unit.ast.Copula;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.MethodPattern;
@@ -25,7 +28,9 @@ import yokohama.unit.ast.NonArrayType;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.Position;
+import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
@@ -36,6 +41,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
@@ -108,24 +114,49 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
-        QuotedExpr subject = new QuotedExpr(ctx.Expr(0).getText(), nodeSpan(ctx.Expr(0)));
-        Copula copula = visitCopula(ctx.copula());
-        QuotedExpr complement = new QuotedExpr(ctx.Expr(1).getText(), nodeSpan(ctx.Expr(1)));
-        return new Proposition(subject, copula, complement, getSpan(ctx));
+        QuotedExpr subject = visitSubject(ctx.subject());
+        Predicate predicate = visitPredicate(ctx.predicate());
+        return new Proposition(subject, predicate, getSpan(ctx));
     }
 
     @Override
-    public Copula visitCopula(YokohamaUnitParser.CopulaContext ctx) {
-        String copulaText = ctx.getText();
-        switch (copulaText) {
-            case "is":
-                return Copula.IS;
-            case "isnot":
-                return Copula.IS_NOT;
-            case "throws":
-                return Copula.THROWS;
-        }
-        throw new IllegalArgumentException("'" + copulaText + "' is not a copula.");
+    public QuotedExpr visitSubject(YokohamaUnitParser.SubjectContext ctx) {
+        return new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()));
+    }
+
+    @Override
+    public Predicate visitPredicate(YokohamaUnitParser.PredicateContext ctx) {
+        return (Predicate)visitChildren(ctx);
+    }
+
+    @Override
+    public IsPredicate visitIsPredicate(YokohamaUnitParser.IsPredicateContext ctx) {
+        return new IsPredicate(visitMatcher(ctx.matcher()), getSpan(ctx));
+    }
+
+    @Override
+    public IsNotPredicate visitIsNotPredicate(YokohamaUnitParser.IsNotPredicateContext ctx) {
+        return new IsNotPredicate(visitMatcher(ctx.matcher()), getSpan(ctx));
+    }
+
+    @Override
+    public ThrowsPredicate visitThrowsPredicate(YokohamaUnitParser.ThrowsPredicateContext ctx) {
+        return new ThrowsPredicate(visitMatcher(ctx.matcher()), getSpan(ctx));
+    }
+
+    @Override
+    public Matcher visitMatcher(YokohamaUnitParser.MatcherContext ctx) {
+        return (Matcher)visitChildren(ctx);
+    }
+
+    @Override
+    public Matcher visitEqualTo(YokohamaUnitParser.EqualToContext ctx) {
+        return new EqualToMatcher(new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr())), getSpan(ctx));
+    }
+
+    @Override
+    public Matcher visitInstanceOf(YokohamaUnitParser.InstanceOfContext ctx) {
+        return new InstanceOfMatcher(visitClassType(ctx.classType()), getSpan(ctx));
     }
 
     @Override
