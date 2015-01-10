@@ -9,14 +9,14 @@ public interface Statement {
 
     Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy);
 
-    <T> T accept(TestStatementVisitor<T> visitor);
+    <T> T accept(StatementVisitor<T> visitor);
 
     default <T> T accept(
             Function<IsStatement, T> visitIsStatement_,
             Function<IsNotStatement, T> visitIsNotStatement_,
             Function<ThrowsStatement, T> visitThrowsStatement_
     ) {
-        return accept(new TestStatementVisitor<T>() {
+        return accept(new StatementVisitor<T>() {
             @Override
             public T visitIsStatement(IsStatement isStatement) {
                 return visitIsStatement_.apply(isStatement);

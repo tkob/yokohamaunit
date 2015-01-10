@@ -36,7 +36,7 @@ public class IsNotStatement implements Statement {
     }
 
     @Override
-    public <T> T accept(TestStatementVisitor<T> visitor) {
+    public <T> T accept(StatementVisitor<T> visitor) {
         return visitor.visitIsNotStatement(this);
     }
 }
