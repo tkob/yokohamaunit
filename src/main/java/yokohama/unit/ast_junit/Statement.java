@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.function.Function;
 import yokohama.unit.util.SBuilder;
 
-public interface TestStatement {
+public interface Statement {
     void toString(SBuilder sb, ExpressionStrategy expressionStrategy);
 
     Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy);

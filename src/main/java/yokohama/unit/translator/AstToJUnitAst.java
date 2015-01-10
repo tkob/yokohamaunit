@@ -60,7 +60,7 @@ import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
-import yokohama.unit.ast_junit.TestStatement;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.SUtils;
@@ -106,7 +106,7 @@ public class AstToJUnitAst {
     List<TestMethod> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
-        List<TestStatement> testStatements =
+        List<Statement> testStatements =
                 propositions.stream()
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
@@ -130,7 +130,7 @@ public class AstToJUnitAst {
                 )));
     }
 
-    TestStatement translateProposition(Proposition proposition) {
+    Statement translateProposition(Proposition proposition) {
         QuotedExpr subject = new QuotedExpr(
                 proposition.getSubject().getText(),
                 new Span(
@@ -378,7 +378,7 @@ public class AstToJUnitAst {
                 exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
         ).collect(Collectors.toList());
 
-        List<TestStatement> testStatements = fourPhaseTest.getVerify().getAssertions()
+        List<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
                         assertion.getPropositions()

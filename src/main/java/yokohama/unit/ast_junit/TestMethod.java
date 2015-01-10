@@ -12,7 +12,7 @@ public class TestMethod {
     private final String name;
     private final List<TopBinding> bindings;
     private final List<Action> actionsBefore;
-    private final List<TestStatement> testStatements;
+    private final List<Statement> testStatements;
     private final List<Action> actionsAfter;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {

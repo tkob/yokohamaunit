@@ -8,7 +8,7 @@ import yokohama.unit.util.SBuilder;
 
 
 @Value    
-public class ThrowsStatement implements TestStatement {
+public class ThrowsStatement implements Statement {
     private QuotedExpr subject;
     private QuotedExpr complement;
 

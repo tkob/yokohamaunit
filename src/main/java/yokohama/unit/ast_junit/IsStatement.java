@@ -8,7 +8,7 @@ import yokohama.unit.util.SBuilder;
 
 
 @Value
-public class IsStatement implements TestStatement {
+public class IsStatement implements Statement {
     private QuotedExpr subject;
     private QuotedExpr complement;
 

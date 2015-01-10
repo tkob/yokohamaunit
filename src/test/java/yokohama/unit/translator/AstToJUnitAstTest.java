@@ -25,7 +25,7 @@ import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
-import yokohama.unit.ast_junit.TestStatement;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.ThrowsStatement;
 
 public class AstToJUnitAstTest {
@@ -100,8 +100,8 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        TestStatement actual = instance.translateProposition(proposition);
-        TestStatement expected = new IsStatement(
+        Statement actual = instance.translateProposition(proposition);
+        Statement expected = new IsStatement(
                 new QuotedExpr("a", Span.dummySpan()),
                 new QuotedExpr("b", Span.dummySpan()));
         assertThat(actual, is(expected));
@@ -119,8 +119,8 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        TestStatement actual = instance.translateProposition(proposition);
-        TestStatement expected = new IsNotStatement(
+        Statement actual = instance.translateProposition(proposition);
+        Statement expected = new IsNotStatement(
                 new QuotedExpr("a", Span.dummySpan()),
                 new QuotedExpr("b", Span.dummySpan()));
         assertThat(actual, is(expected));
@@ -137,8 +137,8 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        TestStatement actual = instance.translateProposition(proposition);
-        TestStatement expected = new ThrowsStatement(
+        Statement actual = instance.translateProposition(proposition);
+        Statement expected = new ThrowsStatement(
                 new QuotedExpr("a", Span.dummySpan()),
                 new QuotedExpr("b", Span.dummySpan()));
         assertThat(actual, is(expected));

@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= TopBinding* Action* TestStateMent* Action*
+ * TestMethod ::= TopBinding* Action* Statement* Action*
  * 
  * TopBinding ::= Expr
  * 
@@ -21,9 +21,9 @@
  * 
  * Action ::= QuotedExpr
  * 
- * TestStatement ::= IsStatement
- *                 | IsNotStatement
- *                 | ThrowsStatement
+ * Statement ::= IsStatement
+ *             | IsNotStatement
+ *             | ThrowsStatement
  * 
  * IsStatement ::= QuotedExpr QuotedExpr
  * IsNotStatement ::= QuotedExpr QuotedExpr

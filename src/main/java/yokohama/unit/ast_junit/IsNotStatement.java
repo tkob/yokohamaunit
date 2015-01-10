@@ -7,7 +7,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class IsNotStatement implements TestStatement {
+public class IsNotStatement implements Statement {
 
     private QuotedExpr subject;
     private QuotedExpr complement;
