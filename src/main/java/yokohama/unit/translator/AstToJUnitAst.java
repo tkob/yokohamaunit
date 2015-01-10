@@ -44,7 +44,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
-import yokohama.unit.ast_junit.ActionStatement;
+import yokohama.unit.ast_junit.Action;
 import yokohama.unit.ast_junit.TopBinding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -365,15 +365,15 @@ public class AstToJUnitAst {
             bindings = Arrays.asList();
         }
 
-        Optional<Stream<ActionStatement>> setupActions =
+        Optional<Stream<Action>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        Optional<Stream<ActionStatement>> exerciseActions =
+        Optional<Stream<Action>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        List<ActionStatement> actionsBefore = Stream.concat(
+        List<Action> actionsBefore = Stream.concat(
                 setupActions.isPresent() ? setupActions.get() : Stream.empty(),
                 exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
         ).collect(Collectors.toList());
@@ -387,7 +387,7 @@ public class AstToJUnitAst {
                 )
                 .collect(Collectors.toList());
 
-        List<ActionStatement> actionsAfter;
+        List<Action> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
@@ -398,13 +398,13 @@ public class AstToJUnitAst {
         return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
     }
 
-    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
+    Stream<Action> translateExecutions(List<Execution> executions) {
         return executions.stream()
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
                                 .map(expression ->
-                                        new ActionStatement(
+                                        new Action(
                                                 new QuotedExpr(
                                                         expression.getText(),
                                                         new Span(

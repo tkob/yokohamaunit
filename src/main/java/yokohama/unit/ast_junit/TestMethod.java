@@ -11,9 +11,9 @@ import yokohama.unit.util.SBuilder;
 public class TestMethod {
     private final String name;
     private final List<TopBinding> bindings;
-    private final List<ActionStatement> actionsBefore;
+    private final List<Action> actionsBefore;
     private final List<TestStatement> testStatements;
-    private final List<ActionStatement> actionsAfter;
+    private final List<Action> actionsAfter;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<>();

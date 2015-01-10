@@ -5,7 +5,7 @@ import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class ActionStatement {
+public class Action {
     private QuotedExpr action;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
