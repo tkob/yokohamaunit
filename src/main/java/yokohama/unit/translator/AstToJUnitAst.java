@@ -155,7 +155,7 @@ public class AstToJUnitAst {
                                             }
                                             @Override
                                             public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new RuntimeException();
+                                                throw new UnsupportedOperationException("Not supported yet.");
                                             }
                                         })),
                 isNotPredicate ->
@@ -175,7 +175,7 @@ public class AstToJUnitAst {
                                             }
                                             @Override
                                             public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new RuntimeException();
+                                                throw new UnsupportedOperationException("Not supported yet.");
                                             }
                                         })),
                 throwsPredicate ->
@@ -185,7 +185,7 @@ public class AstToJUnitAst {
                                         new MatcherVisitor<QuotedExpr>() {
                                             @Override
                                             public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                throw new RuntimeException();
+                                                throw new UnsupportedOperationException("Not supported yet.");
                                             }
                                             @Override
                                             public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
