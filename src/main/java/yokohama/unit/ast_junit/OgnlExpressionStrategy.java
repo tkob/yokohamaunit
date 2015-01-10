@@ -71,6 +71,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                     sb.unshift();
                     sb.appendln("}");
                     return null;
+                },
+                varExpr -> {
+                    sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
+                    return null;
                 }
         );
     }
@@ -80,7 +84,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         return binding.getValue().<Set<ImportedName>>accept(
                 quotedExpr ->
                     new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl"))),
-                stubExpr -> mockStrategy.stubImports(stubExpr, this)
+                stubExpr -> mockStrategy.stubImports(stubExpr, this),
+                varExpr -> new TreeSet<>()
         );
     }
 

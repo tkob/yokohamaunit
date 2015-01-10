@@ -10,7 +10,7 @@
  * 
  * TopBinding ::= Expr
  * 
- * Expr ::= QuotedExpr | StubExpr
+ * Expr ::= QuotedExpr | StubExpr | VarExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr
