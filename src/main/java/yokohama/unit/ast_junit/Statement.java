@@ -14,7 +14,8 @@ public interface Statement {
     default <T> T accept(
             Function<IsStatement, T> visitIsStatement_,
             Function<IsNotStatement, T> visitIsNotStatement_,
-            Function<ThrowsStatement, T> visitThrowsStatement_
+            Function<ThrowsStatement, T> visitThrowsStatement_,
+            Function<ActionStatement, T> visitActionStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -30,6 +31,11 @@ public interface Statement {
             @Override
             public T visitThrowsStatement(ThrowsStatement throwsStatement) {
                 return visitThrowsStatement_.apply(throwsStatement);
+            }
+
+            @Override
+            public T visitActionStatement(ActionStatement actionStatement) {
+                return visitActionStatement_.apply(actionStatement);
             }
         });
     }

@@ -44,7 +44,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
-import yokohama.unit.ast_junit.Action;
+import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.TopBinding;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -110,12 +110,12 @@ public class AstToJUnitAst {
                 propositions.stream()
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
-        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
+        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), testStatements, Arrays.asList())),
                 tableRef -> {
                     List<List<TopBinding>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
-                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
+                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), testStatements, Arrays.asList()))
                             .collect(Collectors.toList());
                 },
                 bindings -> Arrays.asList(new TestMethod(
@@ -124,7 +124,6 @@ public class AstToJUnitAst {
                                 .stream()
                                 .map(this::translateBinding)
                                 .collect(Collectors.toList()),
-                        Arrays.asList(),
                         testStatements,
                         Arrays.asList()
                 )));
@@ -365,29 +364,32 @@ public class AstToJUnitAst {
             bindings = Arrays.asList();
         }
 
-        Optional<Stream<Action>> setupActions =
+        Optional<Stream<ActionStatement>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        Optional<Stream<Action>> exerciseActions =
+        Optional<Stream<ActionStatement>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        List<Action> actionsBefore = Stream.concat(
-                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
-                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
-        ).collect(Collectors.toList());
-
-        List<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
+        Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
                         assertion.getPropositions()
                                 .stream()
                                 .map(this::translateProposition)
-                )
-                .collect(Collectors.toList());
+                );
 
-        List<Action> actionsAfter;
+        List<Statement> statements =
+                Stream.concat(
+                        Stream.concat(
+                                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
+                                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()),
+                        testStatements
+        ).collect(Collectors.toList());
+
+
+        List<ActionStatement> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
@@ -395,16 +397,16 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
+        return Arrays.asList(new TestMethod(testName, bindings, statements, actionsAfter));
     }
 
-    Stream<Action> translateExecutions(List<Execution> executions) {
+    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
         return executions.stream()
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
                                 .map(expression ->
-                                        new Action(
+                                        new ActionStatement(
                                                 new QuotedExpr(
                                                         expression.getText(),
                                                         new Span(

@@ -11,9 +11,8 @@ import yokohama.unit.util.SBuilder;
 public class TestMethod {
     private final String name;
     private final List<TopBinding> bindings;
-    private final List<Action> actionsBefore;
-    private final List<Statement> testStatements;
-    private final List<Action> actionsAfter;
+    private final List<Statement> statements;
+    private final List<ActionStatement> actionsAfter;
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<>();
@@ -25,15 +24,7 @@ public class TestMethod {
                                 expressionStrategy.bindImports(binding, mockStrategy).stream())
                         .collect(Collectors.toSet())
         );
-        importedNames.addAll(
-                actionsBefore
-                        .stream()
-                        .flatMap(testStatement ->
-                                testStatement.importedNames(expressionStrategy).stream())
-                        .collect(Collectors.toSet())
-        );
-        importedNames.addAll(
-                testStatements
+        importedNames.addAll(statements
                         .stream()
                         .flatMap(testStatement ->
                                 testStatement.importedNames(expressionStrategy).stream())
@@ -63,8 +54,7 @@ public class TestMethod {
             sb.shift();
         }
         bindings.forEach(binding -> expressionStrategy.bind(sb, binding, mockStrategy));
-        actionsBefore.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
-        testStatements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
+        statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
         if (actionsAfter.size() > 0) {
             sb.unshift();
             sb.appendln("} finally {");

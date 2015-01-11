@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= TopBinding* Action* Statement* Action*
+ * TestMethod ::= TopBinding* Statement* ActionStatement*
  * 
  * TopBinding ::= Expr
  * 
@@ -19,15 +19,15 @@
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
  * 
- * Action ::= QuotedExpr
- * 
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | ThrowsStatement
+ *             | ActionStatement
  * 
  * IsStatement ::= QuotedExpr QuotedExpr
  * IsNotStatement ::= QuotedExpr QuotedExpr
  * ThrowsStatement ::= QuotedExpr QuotedExpr
+ * ActionStatement ::= QuotedExpr
  * 
  * </pre>
  * 
