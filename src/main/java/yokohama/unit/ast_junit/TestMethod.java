@@ -54,12 +54,12 @@ public class TestMethod {
             sb.shift();
         }
         bindings.forEach(binding -> expressionStrategy.bind(sb, binding, mockStrategy));
-        statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy));
+        statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy, mockStrategy));
         if (actionsAfter.size() > 0) {
             sb.unshift();
             sb.appendln("} finally {");
             sb.shift();
-            actionsAfter.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy));
+            actionsAfter.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy, mockStrategy));
             sb.unshift();
             sb.appendln("}");
         }

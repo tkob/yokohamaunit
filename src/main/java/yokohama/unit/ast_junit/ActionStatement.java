@@ -12,7 +12,7 @@ public class ActionStatement implements Statement {
         return expressionStrategy.getValueImports();
     }
 
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln(expressionStrategy.getValue(action), ";");
     }
 

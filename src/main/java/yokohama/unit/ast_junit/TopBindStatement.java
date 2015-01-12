@@ -10,7 +10,7 @@ public class TopBindStatement implements Statement {
     private final Expr value;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

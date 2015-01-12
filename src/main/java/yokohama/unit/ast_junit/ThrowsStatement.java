@@ -26,7 +26,7 @@ public class ThrowsStatement implements Statement {
     }
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("try {");
         sb.shift();
             sb.appendln(expressionStrategy.getValue(subject), ";");

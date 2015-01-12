@@ -5,7 +5,7 @@ import java.util.function.Function;
 import yokohama.unit.util.SBuilder;
 
 public interface Statement {
-    void toString(SBuilder sb, ExpressionStrategy expressionStrategy);
+    void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy);
 
     Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy);
 

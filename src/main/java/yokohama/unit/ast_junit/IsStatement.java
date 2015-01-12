@@ -22,7 +22,7 @@ public class IsStatement implements Statement {
     }
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("{");
         sb.shift();
         String actual = expressionStrategy.getValue(subject);
