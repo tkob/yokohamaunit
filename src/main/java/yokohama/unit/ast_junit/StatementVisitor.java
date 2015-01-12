@@ -6,4 +6,5 @@ interface StatementVisitor<T> {
     T visitThrowsStatement(ThrowsStatement throwsStatement);
     T visitActionStatement(ActionStatement actionStatement);
     T visitTopBindStatement(TopBindStatement topBindStatement);
+    T visitVarDeclStatement(VarDeclStatement varDeclStatement);
 }

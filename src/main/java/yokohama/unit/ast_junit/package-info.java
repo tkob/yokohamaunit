@@ -22,12 +22,14 @@
  *             | ThrowsStatement
  *             | ActionStatement
  *             | TopBindStatement
+ *             | VarDeclStatement
  * 
  * IsStatement ::= QuotedExpr QuotedExpr
  * IsNotStatement ::= QuotedExpr QuotedExpr
  * ThrowsStatement ::= QuotedExpr QuotedExpr
  * ActionStatement ::= QuotedExpr
  * TopBindStatement ::= Expr
+ * VarDeclStatement ::= Expr
  * 
  * </pre>
  * 
