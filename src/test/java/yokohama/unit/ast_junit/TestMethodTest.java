@@ -16,7 +16,6 @@ public class TestMethodTest {
     public void testImportedNames() {
         TestMethod instance = new TestMethod("test", 
                 Arrays.asList(),
-                Arrays.asList(),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new HashSet<ImportedName>();
@@ -30,7 +29,6 @@ public class TestMethodTest {
     public void testImportedNames1() {
         TestMethod instance = new TestMethod(
                 "test name",
-                Arrays.asList(),
                 Arrays.asList(new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
@@ -48,7 +46,6 @@ public class TestMethodTest {
     public void testImportedNames2() {
         TestMethod instance = new TestMethod(
                 "test name",
-                Arrays.asList(),
                 Arrays.asList(
                         new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
                         new IsNotStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
@@ -69,7 +66,6 @@ public class TestMethodTest {
     public void testImportedNames3() {
         TestMethod instance = new TestMethod(
                 "test name",
-                Arrays.asList(),
                 Arrays.asList(
                         new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
                         new ThrowsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
@@ -91,7 +87,7 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList(), Arrays.asList());
+        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
@@ -108,7 +104,6 @@ public class TestMethodTest {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod(
                 "test",
-                Arrays.asList(),
                 Arrays.asList(new IsStatement(new QuotedExpr("x", Span.dummySpan()), new QuotedExpr("y", Span.dummySpan()))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());

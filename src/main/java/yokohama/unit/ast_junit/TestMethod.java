@@ -10,7 +10,6 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TestMethod {
     private final String name;
-    private final List<TopBindStatement> bindings;
     private final List<Statement> statements;
     private final List<ActionStatement> actionsAfter;
 
@@ -18,12 +17,6 @@ public class TestMethod {
         Set<ImportedName> importedNames = new TreeSet<>();
         importedNames.add(new ImportClass("org.junit.Test"));
         importedNames.addAll(expressionStrategy.environmentImports());
-        importedNames.addAll(
-                bindings.stream()
-                        .flatMap(binding ->
-                                expressionStrategy.bindImports(binding, mockStrategy).stream())
-                        .collect(Collectors.toSet())
-        );
         importedNames.addAll(statements
                         .stream()
                         .flatMap(testStatement ->
@@ -53,7 +46,6 @@ public class TestMethod {
             sb.appendln("try {");
             sb.shift();
         }
-        bindings.forEach(binding -> expressionStrategy.bind(sb, binding, mockStrategy));
         statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy, mockStrategy));
         if (actionsAfter.size() > 0) {
             sb.unshift();

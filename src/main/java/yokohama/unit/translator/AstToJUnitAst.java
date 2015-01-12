@@ -18,6 +18,7 @@ import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -110,21 +111,26 @@ public class AstToJUnitAst {
                 propositions.stream()
                             .map(this::translateProposition)
                             .collect(Collectors.toList());
-        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), testStatements, Arrays.asList())),
+        return assertion.getFixture().accept(
+                () -> Arrays.asList(new TestMethod(methodName, testStatements, Arrays.asList())),
                 tableRef -> {
                     List<List<TopBindStatement>> table = translateTableRef(tableRef, tables);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
-                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), testStatements, Arrays.asList()))
+                            .map(i -> new TestMethod(
+                                    methodName + "_" + (i + 1),
+                                    ListUtils.union(table.get(i), testStatements),
+                                    Arrays.asList()))
                             .collect(Collectors.toList());
                 },
                 bindings -> Arrays.asList(new TestMethod(
                         methodName,
-                        bindings.getBindings()
-                                .stream()
-                                .map(this::translateBinding)
-                                .collect(Collectors.toList()),
-                        testStatements,
+                        ListUtils.union(
+                                bindings.getBindings()
+                                        .stream()
+                                        .map(this::translateBinding)
+                                        .collect(Collectors.toList()),
+                                testStatements),
                         Arrays.asList()
                 )));
     }
@@ -348,20 +354,19 @@ public class AstToJUnitAst {
 
     List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
         String testName = SUtils.toIdent(fourPhaseTest.getName());
-        List<TopBindStatement> bindings;
+        Stream<TopBindStatement> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
             if (setup.getLetBindings().isPresent()) {
                 LetBindings letBindings = setup.getLetBindings().get();
                 bindings = letBindings.getBindings()
                         .stream()
-                        .map(binding -> new TopBindStatement(binding.getName(), translateExpr(binding.getValue())))
-                        .collect(Collectors.toList());
+                        .map(binding -> new TopBindStatement(binding.getName(), translateExpr(binding.getValue())));
             } else {
-                bindings = Arrays.asList();
+                bindings = Stream.empty();
             }
         } else {
-            bindings = Arrays.asList();
+            bindings = Stream.empty();
         }
 
         Optional<Stream<ActionStatement>> setupActions =
@@ -382,11 +387,13 @@ public class AstToJUnitAst {
 
         List<Statement> statements =
                 Stream.concat(
+                        bindings,
                         Stream.concat(
-                                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
-                                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()),
-                        testStatements
-        ).collect(Collectors.toList());
+                                Stream.concat(
+                                        setupActions.isPresent() ? setupActions.get() : Stream.empty(),
+                                        exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()),
+                                testStatements)
+                ).collect(Collectors.toList());
 
 
         List<ActionStatement> actionsAfter;
@@ -397,7 +404,7 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(new TestMethod(testName, bindings, statements, actionsAfter));
+        return Arrays.asList(new TestMethod(testName, statements, actionsAfter));
     }
 
     Stream<ActionStatement> translateExecutions(List<Execution> executions) {

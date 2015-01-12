@@ -11,16 +11,16 @@ public class TopBindStatement implements Statement {
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        expressionStrategy.bind(sb, this, mockStrategy);
     }
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return expressionStrategy.bindImports(this, mockStrategy);
     }
 
     @Override
     public <T> T accept(StatementVisitor<T> visitor) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return visitor.visitTopBindStatement(this);
     }
 }
