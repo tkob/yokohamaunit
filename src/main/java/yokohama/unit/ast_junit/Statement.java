@@ -7,7 +7,7 @@ import yokohama.unit.util.SBuilder;
 public interface Statement {
     void toString(SBuilder sb, ExpressionStrategy expressionStrategy);
 
-    Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy);
+    Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy);
 
     <T> T accept(StatementVisitor<T> visitor);
 

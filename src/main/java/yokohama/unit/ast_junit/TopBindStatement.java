@@ -15,7 +15,7 @@ public class TopBindStatement implements Statement {
     }
 
     @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -27,14 +27,14 @@ public class TestMethod {
         importedNames.addAll(statements
                         .stream()
                         .flatMap(testStatement ->
-                                testStatement.importedNames(expressionStrategy).stream())
+                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
                         .collect(Collectors.toSet())
         );
         importedNames.addAll(
                 actionsAfter
                         .stream()
                         .flatMap(testStatement ->
-                                testStatement.importedNames(expressionStrategy).stream())
+                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
                         .collect(Collectors.toSet())
         );
         return importedNames;

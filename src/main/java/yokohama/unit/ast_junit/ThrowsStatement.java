@@ -13,7 +13,7 @@ public class ThrowsStatement implements Statement {
     private QuotedExpr complement;
 
     @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
                 new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),

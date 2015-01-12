@@ -8,7 +8,7 @@ import yokohama.unit.util.SBuilder;
 public class ActionStatement implements Statement {
     private QuotedExpr action;
 
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return expressionStrategy.getValueImports();
     }
 
