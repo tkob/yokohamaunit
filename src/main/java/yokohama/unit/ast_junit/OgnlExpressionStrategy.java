@@ -50,7 +50,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public void bind(SBuilder sb, TopBinding binding, MockStrategy mockStrategy) {
+    public void bind(SBuilder sb, TopBindStatement binding, MockStrategy mockStrategy) {
         String name = binding.getName();
         binding.getValue().<Void>accept(
                 quotedExpr -> {
@@ -80,7 +80,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Set<ImportedName> bindImports(TopBinding binding, MockStrategy mockStrategy) {
+    public Set<ImportedName> bindImports(TopBindStatement binding, MockStrategy mockStrategy) {
         return binding.getValue().<Set<ImportedName>>accept(
                 quotedExpr ->
                     new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl"))),

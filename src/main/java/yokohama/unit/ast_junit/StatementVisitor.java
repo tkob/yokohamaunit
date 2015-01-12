@@ -5,4 +5,5 @@ interface StatementVisitor<T> {
     T visitIsNotStatement(IsNotStatement isNotStatement);
     T visitThrowsStatement(ThrowsStatement throwsStatement);
     T visitActionStatement(ActionStatement actionStatement);
+    T visitTopBindStatement(TopBindStatement topBindStatement);
 }

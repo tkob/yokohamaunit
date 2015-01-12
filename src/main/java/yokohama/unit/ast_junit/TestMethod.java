@@ -10,7 +10,7 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TestMethod {
     private final String name;
-    private final List<TopBinding> bindings;
+    private final List<TopBindStatement> bindings;
     private final List<Statement> statements;
     private final List<ActionStatement> actionsAfter;
 
