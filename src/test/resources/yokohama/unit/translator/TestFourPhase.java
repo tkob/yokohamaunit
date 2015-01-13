@@ -22,7 +22,8 @@ public class TestFourPhase {
     @Test
     public void AtomicInteger_incrementAndGet_increments_the_content() throws Exception {
         OgnlContext env = new OgnlContext();
-        env.put("i", eval("new java.util.concurrent.atomic.AtomicInteger(0)", env, "TestFourPhase.docy", 3, "TestFourPhase.docy:3.11-3.59"));
+        Object i = eval("new java.util.concurrent.atomic.AtomicInteger(0)", env, "TestFourPhase.docy", 3, "TestFourPhase.docy:3.11-3.59");
+        env.put("i", i);
         eval("i.incrementAndGet()", env, "TestFourPhase.docy", 6, "TestFourPhase.docy:6.5-6.24");
         {
             Object actual = eval("i.get()", env, "TestFourPhase.docy", 9, "TestFourPhase.docy:9.9-9.16");

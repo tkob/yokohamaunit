@@ -7,16 +7,16 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TopBindStatement implements Statement {
     private final String name;
-    private final Expr value;
+    private final VarExpr value;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        expressionStrategy.bind(sb, this, mockStrategy);
+        expressionStrategy.bind(sb, name, value);
     }
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return expressionStrategy.bindImports(this, mockStrategy);
+        return expressionStrategy.bindImports();
     }
 
     @Override

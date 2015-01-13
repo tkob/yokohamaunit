@@ -18,7 +18,8 @@ public class VarDeclStatement implements Statement {
                     return null;
                 },
                 stubExpr -> {
-                    throw new UnsupportedOperationException("Not supported yet.");
+                    mockStrategy.stub(sb, name, stubExpr, expressionStrategy);
+                    return null;
                 },
                 varExpr -> {
                     sb.appendln("Object ", name, " = ", varExpr.getName(), ";");
