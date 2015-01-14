@@ -125,9 +125,10 @@ public class AstToJUnitAstTest {
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new IsNotStatement(
-                new QuotedExpr("a", Span.dummySpan()),
-                new QuotedExpr("b", Span.dummySpan())));
+        List<Statement> expected = Arrays.asList(
+                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarDeclStatement("unexpected", new QuotedExpr("b", Span.dummySpan())),
+                new IsNotStatement(new VarExpr("actual"), new VarExpr("unexpected")));
         assertThat(actual, is(expected));
     }
     

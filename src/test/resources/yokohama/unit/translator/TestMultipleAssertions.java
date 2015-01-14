@@ -30,10 +30,8 @@ public class TestMultipleAssertions {
     @Test
     public void Multiple_assertions_2() throws Exception {
         OgnlContext env = new OgnlContext();
-        {
-            Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.14-3.19");
-            Object unexpected = eval("3", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.29-3.30");
-            assertThat(actual, is(not(unexpected)));
-        }
+        Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.14-3.19");
+        Object unexpected = eval("3", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.29-3.30");
+        assertThat(actual, is(not(unexpected)));
     }
 }

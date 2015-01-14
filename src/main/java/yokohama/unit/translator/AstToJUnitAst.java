@@ -179,26 +179,32 @@ public class AstToJUnitAst {
                                         }
                                     }));
                 },
-                isNotPredicate -> Stream.of(
-                        new IsNotStatement(
-                                subject,
-                                isNotPredicate.getComplement().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                return
-                                                new QuotedExpr(
-                                                        equalTo.getExpr().getText(),
-                                                        new Span(
-                                                                docyPath,
-                                                                equalTo.getSpan().getStart(),
-                                                                equalTo.getSpan().getEnd()));
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                        }))),
+                isNotPredicate -> {
+                    String actual = genSym.generate("actual");
+                    return Stream.concat(
+                            Stream.of(new VarDeclStatement(actual, subject)),
+                            isNotPredicate.getComplement().accept(
+                                    new MatcherVisitor<Stream<Statement>>() {
+                                        @Override
+                                        public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
+                                            String unexpected = genSym.generate("unexpected");
+                                            return Stream.of(
+                                                    new VarDeclStatement(
+                                                            unexpected,
+                                                            new QuotedExpr(
+                                                                    equalTo.getExpr().getText(),
+                                                                    new Span(
+                                                                            docyPath,
+                                                                            equalTo.getSpan().getStart(),
+                                                                            equalTo.getSpan().getEnd()))),
+                                                    new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
+                                        }
+                                        @Override
+                                        public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                            throw new UnsupportedOperationException("Not supported yet.");
+                                        }
+                                    }));
+                },
                 throwsPredicate -> Stream.of(
                         new ThrowsStatement(
                                 subject,

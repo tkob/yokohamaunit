@@ -53,7 +53,9 @@ public class TestMethodTest {
                         new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
                         new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
-                        new IsNotStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
+                        new VarDeclStatement("actual2", new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
+                        new IsNotStatement(new VarExpr("actual2"), new VarExpr("unexpected"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();

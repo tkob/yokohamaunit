@@ -28,11 +28,9 @@ public class TestMultiplePropositions {
         Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
         Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
         assertThat(actual, is(expected));
-        {
-            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
-            Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");
-            assertThat(actual, is(not(unexpected)));
-        }
+        Object actual2 = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
+        Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");
+        assertThat(actual2, is(not(unexpected)));
         try {
             eval("1 / 0", env, "TestMultiplePropositions.docy", 4, "TestMultiplePropositions.docy:4.14-4.19");
             fail("`1 / 0` was expected to throw ArithmeticException.");
