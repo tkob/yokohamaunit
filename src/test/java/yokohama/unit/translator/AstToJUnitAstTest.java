@@ -3,6 +3,7 @@ package yokohama.unit.translator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -27,6 +28,9 @@ import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.ThrowsStatement;
+import yokohama.unit.ast_junit.VarDeclStatement;
+import yokohama.unit.ast_junit.VarExpr;
+import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstTest {
 
@@ -100,10 +104,11 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        Statement actual = instance.translateProposition(proposition);
-        Statement expected = new IsStatement(
-                new QuotedExpr("a", Span.dummySpan()),
-                new QuotedExpr("b", Span.dummySpan()));
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> expected = Arrays.asList(
+                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarDeclStatement("expected", new QuotedExpr("b", Span.dummySpan())),
+                new IsStatement(new VarExpr("actual"), new VarExpr("expected")));
         assertThat(actual, is(expected));
     }
     
@@ -119,10 +124,10 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        Statement actual = instance.translateProposition(proposition);
-        Statement expected = new IsNotStatement(
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> expected = Arrays.asList(new IsNotStatement(
                 new QuotedExpr("a", Span.dummySpan()),
-                new QuotedExpr("b", Span.dummySpan()));
+                new QuotedExpr("b", Span.dummySpan())));
         assertThat(actual, is(expected));
     }
     
@@ -137,10 +142,10 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        Statement actual = instance.translateProposition(proposition);
-        Statement expected = new ThrowsStatement(
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> expected = Arrays.asList(new ThrowsStatement(
                 new QuotedExpr("a", Span.dummySpan()),
-                new QuotedExpr("b", Span.dummySpan()));
+                new QuotedExpr("b", Span.dummySpan())));
         assertThat(actual, is(expected));
     }
     

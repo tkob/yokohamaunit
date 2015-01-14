@@ -28,11 +28,9 @@ public class TestCSV {
         env.put("prefix", prefix);
         Object expected = eval("true", env, "TestCSV.csv", 2, "TestCSV.csv:2");
         env.put("expected", expected);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+        Object expected4 = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
+        assertThat(actual, is(expected4));
     }
     @Test
     public void String_startsWith_1_2() throws Exception {
@@ -43,11 +41,9 @@ public class TestCSV {
         env.put("prefix", prefix2);
         Object expected2 = eval("true", env, "TestCSV.csv", 3, "TestCSV.csv:3");
         env.put("expected", expected2);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual2 = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+        Object expected5 = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
+        assertThat(actual2, is(expected5));
     }
     @Test
     public void String_startsWith_1_3() throws Exception {
@@ -58,10 +54,8 @@ public class TestCSV {
         env.put("prefix", prefix3);
         Object expected3 = eval("false", env, "TestCSV.csv", 4, "TestCSV.csv:4");
         env.put("expected", expected3);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual3 = eval("sut.startsWith(prefix)", env, "TestCSV.docy", 2, "TestCSV.docy:2.9-2.31");
+        Object expected6 = eval("expected", env, "TestCSV.docy", 2, "TestCSV.docy:2.37-2.45");
+        assertThat(actual3, is(expected6));
     }
 }

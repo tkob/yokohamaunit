@@ -28,11 +28,9 @@ public class TestTable {
         env.put("prefix", prefix);
         Object expected = eval("true", env, "TestTable.docy", 7, "TestTable.docy:7.32-7.42");
         env.put("expected", expected);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+        Object expected4 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        assertThat(actual, is(expected4));
     }
     @Test
     public void String_startsWith_1_2() throws Exception {
@@ -43,11 +41,9 @@ public class TestTable {
         env.put("prefix", prefix2);
         Object expected2 = eval("true", env, "TestTable.docy", 8, "TestTable.docy:8.32-8.42");
         env.put("expected", expected2);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual2 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+        Object expected5 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        assertThat(actual2, is(expected5));
     }
     @Test
     public void String_startsWith_1_3() throws Exception {
@@ -58,10 +54,8 @@ public class TestTable {
         env.put("prefix", prefix3);
         Object expected3 = eval("false", env, "TestTable.docy", 9, "TestTable.docy:9.32-9.42");
         env.put("expected", expected3);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-            Object expected = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual3 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
+        Object expected6 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        assertThat(actual3, is(expected6));
     }
 }

@@ -25,11 +25,9 @@ public class TestMultiplePropositions {
     @Test
     public void Multiple_propositions_1() throws Exception {
         OgnlContext env = new OgnlContext();
-        {
-            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
-            Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
-            assertThat(actual, is(expected));
-        }
+        Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
+        Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
+        assertThat(actual, is(expected));
         {
             Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
             Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");

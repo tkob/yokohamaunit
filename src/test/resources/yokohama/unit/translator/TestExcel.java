@@ -28,11 +28,9 @@ public class TestExcel {
         env.put("prefix", prefix);
         Object expected = eval("true", env, "TestExcel.xlsx", 4, "TestExcel.xlsx:4.5");
         env.put("expected", expected);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+        Object expected4 = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
+        assertThat(actual, is(expected4));
     }
     @Test
     public void String_startsWith_1_2() throws Exception {
@@ -43,11 +41,9 @@ public class TestExcel {
         env.put("prefix", prefix2);
         Object expected2 = eval("true", env, "TestExcel.xlsx", 5, "TestExcel.xlsx:5.5");
         env.put("expected", expected2);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual2 = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+        Object expected5 = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
+        assertThat(actual2, is(expected5));
     }
     @Test
     public void String_startsWith_1_3() throws Exception {
@@ -58,10 +54,8 @@ public class TestExcel {
         env.put("prefix", prefix3);
         Object expected3 = eval("false", env, "TestExcel.xlsx", 6, "TestExcel.xlsx:6.5");
         env.put("expected", expected3);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
-            Object expected = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
-            assertThat(actual, is(expected));
-        }
+        Object actual3 = eval("sut.startsWith(prefix)", env, "TestExcel.docy", 2, "TestExcel.docy:2.9-2.31");
+        Object expected6 = eval("expected", env, "TestExcel.docy", 2, "TestExcel.docy:2.37-2.45");
+        assertThat(actual3, is(expected6));
     }
 }

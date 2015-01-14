@@ -106,10 +106,13 @@ public class AstToJUnitAst {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(
-                () -> Arrays.asList(new TestMethod(
-                        methodName,
-                        propositions.stream().map(this::translateProposition).collect(Collectors.toList()),
-                        Arrays.asList())),
+                () -> {
+                    GenSym genSym = new GenSym();
+                    return Arrays.asList(new TestMethod(
+                            methodName,
+                            propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym)).collect(Collectors.toList()),
+                            Arrays.asList()));
+                },
                 tableRef -> {
                     GenSym genSym = new GenSym();
                     List<List<Statement>> table = translateTableRef(tableRef, tables, genSym);
@@ -122,7 +125,7 @@ public class AstToJUnitAst {
                                                 table.get(i),
                                                 propositions
                                                         .stream()
-                                                        .map(this::translateProposition)
+                                                        .flatMap(proposition -> translateProposition(proposition, genSym))
                                                         .collect(Collectors.toList())),
                                         Arrays.asList());
                             })
@@ -136,41 +139,47 @@ public class AstToJUnitAst {
                                     bindings.getBindings()
                                             .stream()
                                             .flatMap(binding -> translateBinding(binding, genSym)),
-                                    propositions.stream().map(this::translateProposition))
+                                    propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym)))
                                     .collect(Collectors.toList()),
                             Arrays.asList()));
                 });
     }
 
-    Statement translateProposition(Proposition proposition) {
+    Stream<Statement> translateProposition(Proposition proposition, GenSym genSym) {
         QuotedExpr subject = new QuotedExpr(
                 proposition.getSubject().getText(),
                 new Span(
                         docyPath,
                         proposition.getSubject().getSpan().getStart(),
                         proposition.getSubject().getSpan().getEnd()));
-        return proposition.getPredicate().accept(
-                isPredicate ->
-                        new IsStatement(
-                                subject,
-                                isPredicate.getComplement().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                return
-                                                new QuotedExpr(
-                                                        equalTo.getExpr().getText(),
-                                                        new Span(
-                                                                docyPath,
-                                                                equalTo.getSpan().getStart(),
-                                                                equalTo.getSpan().getEnd()));
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                        })),
-                isNotPredicate ->
+        return proposition.getPredicate().<Stream<Statement>>accept(
+                isPredicate -> {
+                    String actual = genSym.generate("actual");
+                    return Stream.concat(
+                            Stream.of(new VarDeclStatement(actual, subject)),
+                            isPredicate.getComplement().accept(
+                                    new MatcherVisitor<Stream<Statement>>() {
+                                        @Override
+                                        public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
+                                            String expected = genSym.generate("expected");
+                                            return Stream.of(
+                                                    new VarDeclStatement(
+                                                            expected,
+                                                            new QuotedExpr(
+                                                                    equalTo.getExpr().getText(),
+                                                                    new Span(
+                                                                            docyPath,
+                                                                            equalTo.getSpan().getStart(),
+                                                                            equalTo.getSpan().getEnd()))),
+                                                    new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                                        }
+                                        @Override
+                                        public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
+                                            throw new UnsupportedOperationException("Not supported yet.");
+                                        }
+                                    }));
+                },
+                isNotPredicate -> Stream.of(
                         new IsNotStatement(
                                 subject,
                                 isNotPredicate.getComplement().accept(
@@ -189,8 +198,8 @@ public class AstToJUnitAst {
                                             public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
                                                 throw new UnsupportedOperationException("Not supported yet.");
                                             }
-                                        })),
-                throwsPredicate ->
+                                        }))),
+                throwsPredicate -> Stream.of(
                         new ThrowsStatement(
                                 subject,
                                 throwsPredicate.getThrowee().accept(
@@ -208,7 +217,7 @@ public class AstToJUnitAst {
                                                                 instanceOf.getSpan().getStart(),
                                                                 instanceOf.getSpan().getEnd()));
                                             }
-                                        }))
+                                        })))
         );
     }
 
@@ -411,7 +420,7 @@ public class AstToJUnitAst {
                 .flatMap(assertion ->
                         assertion.getPropositions()
                                 .stream()
-                                .map(this::translateProposition)
+                                .flatMap(proposition -> translateProposition(proposition, genSym))
                 );
 
         List<Statement> statements =

@@ -9,8 +9,8 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class IsStatement implements Statement {
-    private QuotedExpr subject;
-    private QuotedExpr complement;
+    private VarExpr subject;
+    private VarExpr complement;
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
@@ -23,15 +23,7 @@ public class IsStatement implements Statement {
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln("{");
-        sb.shift();
-        String actual = expressionStrategy.getValue(subject);
-        String expected = expressionStrategy.getValue(complement);
-        sb.appendln("Object actual = ", actual, ";");
-        sb.appendln("Object expected = ", expected, ";");
-        sb.appendln("assertThat(actual, is(expected));");
-        sb.unshift();
-        sb.appendln("}");
+        sb.appendln("assertThat(", subject.getName(), ", is(", complement.getName(), "));");
     }
 
     @Override

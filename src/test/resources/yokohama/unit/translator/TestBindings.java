@@ -26,10 +26,8 @@ public class TestBindings {
         env.put("sut", sut);
         Object prefix = eval("\"\"", env, "TestBindings.docy", 5, "TestBindings.docy:5.24-5.26");
         env.put("prefix", prefix);
-        {
-            Object actual = eval("sut.startsWith(prefix)", env, "TestBindings.docy", 3, "TestBindings.docy:3.14-3.36");
-            Object expected = eval("true", env, "TestBindings.docy", 3, "TestBindings.docy:3.42-3.46");
-            assertThat(actual, is(expected));
-        }
+        Object actual = eval("sut.startsWith(prefix)", env, "TestBindings.docy", 3, "TestBindings.docy:3.14-3.36");
+        Object expected = eval("true", env, "TestBindings.docy", 3, "TestBindings.docy:3.42-3.46");
+        assertThat(actual, is(expected));
     }
 }

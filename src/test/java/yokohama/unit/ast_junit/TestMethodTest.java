@@ -29,7 +29,10 @@ public class TestMethodTest {
     public void testImportedNames1() {
         TestMethod instance = new TestMethod(
                 "test name",
-                Arrays.asList(new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
+                Arrays.asList(
+                        new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
+                        new IsStatement(new VarExpr("actual"), new VarExpr("expected"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -47,7 +50,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test name",
                 Arrays.asList(
-                        new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
+                        new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
                         new IsNotStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
@@ -67,7 +72,9 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test name",
                 Arrays.asList(
-                        new IsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
+                        new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
                         new ThrowsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
                 Arrays.asList()
         );
@@ -104,7 +111,10 @@ public class TestMethodTest {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod(
                 "test",
-                Arrays.asList(new IsStatement(new QuotedExpr("x", Span.dummySpan()), new QuotedExpr("y", Span.dummySpan()))),
+                Arrays.asList(
+                        new VarDeclStatement("actual", new QuotedExpr("x", Span.dummySpan())),
+                        new VarDeclStatement("expected", new QuotedExpr("y", Span.dummySpan())),
+                        new IsStatement(new VarExpr("actual"), new VarExpr("expected"))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
@@ -112,11 +122,9 @@ public class TestMethodTest {
         expected.appendln("@Test");
         expected.appendln("public void test() throws Exception {");
         expected.appendln("    OgnlContext env = new OgnlContext();");
-        expected.appendln("    {");
-        expected.appendln("        Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
-        expected.appendln("        Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
-        expected.appendln("        assertThat(actual, is(expected));");
-        expected.appendln("    }");
+        expected.appendln("    Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("    Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("    assertThat(actual, is(expected));");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
