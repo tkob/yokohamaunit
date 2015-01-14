@@ -32,6 +32,7 @@ import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
@@ -155,55 +156,19 @@ public class AstToJUnitAst {
         return proposition.getPredicate().<Stream<Statement>>accept(
                 isPredicate -> {
                     String actual = genSym.generate("actual");
-                    return Stream.concat(
-                            Stream.of(new VarDeclStatement(actual, subject)),
-                            isPredicate.getComplement().accept(
-                                    new MatcherVisitor<Stream<Statement>>() {
-                                        @Override
-                                        public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
-                                            String expected = genSym.generate("expected");
-                                            return Stream.of(
-                                                    new VarDeclStatement(
-                                                            expected,
-                                                            new QuotedExpr(
-                                                                    equalTo.getExpr().getText(),
-                                                                    new Span(
-                                                                            docyPath,
-                                                                            equalTo.getSpan().getStart(),
-                                                                            equalTo.getSpan().getEnd()))),
-                                                    new IsStatement(new VarExpr(actual), new VarExpr(expected)));
-                                        }
-                                        @Override
-                                        public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                            throw new UnsupportedOperationException("Not supported yet.");
-                                        }
-                                    }));
+                    String expected = genSym.generate("expected");
+                    return Stream.of(
+                            new VarDeclStatement(actual, subject),
+                            translateMatcher(isPredicate.getComplement(), expected),
+                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
                 },
                 isNotPredicate -> {
                     String actual = genSym.generate("actual");
-                    return Stream.concat(
-                            Stream.of(new VarDeclStatement(actual, subject)),
-                            isNotPredicate.getComplement().accept(
-                                    new MatcherVisitor<Stream<Statement>>() {
-                                        @Override
-                                        public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
-                                            String unexpected = genSym.generate("unexpected");
-                                            return Stream.of(
-                                                    new VarDeclStatement(
-                                                            unexpected,
-                                                            new QuotedExpr(
-                                                                    equalTo.getExpr().getText(),
-                                                                    new Span(
-                                                                            docyPath,
-                                                                            equalTo.getSpan().getStart(),
-                                                                            equalTo.getSpan().getEnd()))),
-                                                    new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
-                                        }
-                                        @Override
-                                        public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                            throw new UnsupportedOperationException("Not supported yet.");
-                                        }
-                                    }));
+                    String unexpected = genSym.generate("unexpected");
+                    return Stream.of(
+                            new VarDeclStatement(actual, subject),
+                            translateMatcher(isNotPredicate.getComplement(), unexpected),
+                            new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
                 },
                 throwsPredicate -> Stream.of(
                         new ThrowsStatement(
@@ -225,6 +190,26 @@ public class AstToJUnitAst {
                                             }
                                         })))
         );
+    }
+
+    Statement translateMatcher(Matcher matcher, String varName) {
+        return matcher.accept(new MatcherVisitor<Statement>() {
+            @Override
+            public Statement visitEqualTo(EqualToMatcher equalTo) {
+                return new VarDeclStatement(
+                        varName,
+                        new QuotedExpr(
+                                equalTo.getExpr().getText(),
+                                new Span(
+                                        docyPath,
+                                        equalTo.getSpan().getStart(),
+                                        equalTo.getSpan().getEnd())));
+            }
+            @Override
+            public Statement visitInstanceOf(InstanceOfMatcher instanceOf) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
     }
 
     Stream<Statement> translateBinding(yokohama.unit.ast.Binding binding, GenSym genSym) {
