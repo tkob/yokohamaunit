@@ -19,8 +19,10 @@ import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.ThrowsPredicate;
+import yokohama.unit.ast_junit.BindThrownStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.QuotedExpr;
@@ -144,9 +146,10 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new ThrowsStatement(
-                new QuotedExpr("a", Span.dummySpan()),
-                new QuotedExpr("b", Span.dummySpan())));
+        List<Statement> expected = Arrays.asList(
+                new BindThrownStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarDeclStatement("expected", new InstanceOfMatcherExpr("b")),
+                new IsStatement(new VarExpr("actual"), new VarExpr("expected")));
         assertThat(actual, is(expected));
     }
     

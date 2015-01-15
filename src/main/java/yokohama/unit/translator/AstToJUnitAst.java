@@ -42,11 +42,13 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.ActionStatement;
+import yokohama.unit.ast_junit.BindThrownStatement;
 import yokohama.unit.ast_junit.TopBindStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.Expr;
+import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.MethodPattern;
@@ -58,7 +60,6 @@ import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarDeclStatement;
 import yokohama.unit.ast_junit.VarExpr;
@@ -170,25 +171,14 @@ public class AstToJUnitAst {
                             translateMatcher(isNotPredicate.getComplement(), unexpected),
                             new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
                 },
-                throwsPredicate -> Stream.of(
-                        new ThrowsStatement(
-                                subject,
-                                throwsPredicate.getThrowee().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                return new QuotedExpr(
-                                                        instanceOf.getClazz().getName(),
-                                                        new Span(
-                                                                docyPath,
-                                                                instanceOf.getSpan().getStart(),
-                                                                instanceOf.getSpan().getEnd()));
-                                            }
-                                        })))
+                throwsPredicate -> {
+                    String actual = genSym.generate("actual");
+                    String expected = genSym.generate("expected");
+                    return Stream.of(
+                            new BindThrownStatement(actual, subject),
+                            translateMatcher(throwsPredicate.getThrowee(), expected),
+                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                }
         );
     }
 
@@ -207,7 +197,9 @@ public class AstToJUnitAst {
             }
             @Override
             public Statement visitInstanceOf(InstanceOfMatcher instanceOf) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return new VarDeclStatement(
+                        varName,
+                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
             }
         });
     }
