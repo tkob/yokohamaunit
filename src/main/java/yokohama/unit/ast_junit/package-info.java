@@ -8,7 +8,7 @@
  * 
  * TestMethod ::= Statement* ActionStatement*
  * 
- * Expr ::= QuotedExpr | StubExpr | VarExpr
+ * Expr ::= QuotedExpr | StubExpr | VarExpr | MatcherExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr
@@ -16,6 +16,8 @@
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
+ * 
+ * MatcherExpr ::= InstanceOfMatcherExpr
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement

@@ -24,6 +24,10 @@ public class VarDeclStatement implements Statement {
                 varExpr -> {
                     sb.appendln("Object ", name, " = ", varExpr.getName(), ";");
                     return null;
+                },
+                matcherExpr -> {
+                    sb.appendln("Matcher ", name, " = ", matcherExpr.getExpr(), ";");
+                    return null;
                 });
     }
 
@@ -32,7 +36,13 @@ public class VarDeclStatement implements Statement {
         return value.accept(
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                varExpr -> new TreeSet<ImportedName>());
+                varExpr -> new TreeSet<ImportedName>(),
+                matcherExpr -> {
+                    Set<ImportedName> s = new TreeSet<>();
+                    s.addAll(matcherExpr.importedNames());
+                    s.add(new ImportClass("org.hamcrest.Matcher"));
+                    return s;
+                });
     }
 
     @Override
