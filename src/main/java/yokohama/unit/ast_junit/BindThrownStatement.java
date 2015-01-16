@@ -49,11 +49,15 @@ public class BindThrownStatement implements Statement {
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return value.accept(
+        Set<ImportedName> s = new TreeSet<>();
+        s.addAll(expressionStrategy.wrappingExceptionImports());
+        s.addAll(expressionStrategy.wrappedExceptionImports());
+        s.addAll(value.accept(
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
                 varExpr -> new TreeSet<ImportedName>(),
-                matcherExpr -> matcherExpr.importedNames());
+                matcherExpr -> matcherExpr.importedNames()));
+        return s;
     }
 
     @Override
