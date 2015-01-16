@@ -8,12 +8,11 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class IsNotStatement implements Statement {
-
-    private QuotedExpr subject;
-    private QuotedExpr complement;
+    private VarExpr subject;
+    private VarExpr complement;
 
     @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy) {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
                 new ImportStatic("org.junit.Assert.assertThat"),
                 new ImportStatic("org.hamcrest.CoreMatchers.is"),
@@ -23,16 +22,8 @@ public class IsNotStatement implements Statement {
     }
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy) {
-        sb.appendln("{");
-        sb.shift();
-        String actual = expressionStrategy.getValue(subject);
-        String unexpected = expressionStrategy.getValue(complement);
-        sb.appendln("Object actual = ", actual, ";");
-        sb.appendln("Object unexpected = ", unexpected, ";");
-        sb.appendln("assertThat(actual, is(not(unexpected)));");
-        sb.unshift();
-        sb.appendln("}");
+    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+        sb.appendln("assertThat(", subject.getName(), ", is(not(", complement.getName(), ")));");
     }
 
     @Override

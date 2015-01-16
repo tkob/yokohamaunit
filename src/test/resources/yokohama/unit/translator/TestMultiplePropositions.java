@@ -6,8 +6,8 @@ import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class TestMultiplePropositions {
@@ -25,22 +25,22 @@ public class TestMultiplePropositions {
     @Test
     public void Multiple_propositions_1() throws Exception {
         OgnlContext env = new OgnlContext();
-        {
-            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
-            Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
-            assertThat(actual, is(expected));
-        }
-        {
-            Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
-            Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");
-            assertThat(actual, is(not(unexpected)));
-        }
+        Object actual = eval("1 + 1", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.14-2.19");
+        Object expected = eval("2", env, "TestMultiplePropositions.docy", 2, "TestMultiplePropositions.docy:2.25-2.26");
+        assertThat(actual, is(expected));
+        Object actual2 = eval("1 + 1", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.14-3.19");
+        Object unexpected = eval("3", env, "TestMultiplePropositions.docy", 3, "TestMultiplePropositions.docy:3.29-3.30");
+        assertThat(actual2, is(not(unexpected)));
+        Throwable actual3;
         try {
             eval("1 / 0", env, "TestMultiplePropositions.docy", 4, "TestMultiplePropositions.docy:4.14-4.19");
-            fail("`1 / 0` was expected to throw ArithmeticException.");
+            actual3 = null;
         } catch (OgnlException e) {
-            assertThat(e.getReason(), is(instanceOf(ArithmeticException.class)));
-        } catch (ArithmeticException e) {
+            actual3 = e.getReason();
+        } catch (Throwable e) {
+            actual3 = e;
         }
+        Matcher expected2 = instanceOf(ArithmeticException.class);
+        assertThat(actual3, is(expected2));
     }
 }

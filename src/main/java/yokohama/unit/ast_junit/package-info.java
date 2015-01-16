@@ -6,11 +6,9 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= TopBinding* Action* Statement* Action*
+ * TestMethod ::= Statement* ActionStatement*
  * 
- * TopBinding ::= Expr
- * 
- * Expr ::= QuotedExpr | StubExpr | VarExpr
+ * Expr ::= QuotedExpr | StubExpr | VarExpr | MatcherExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr
@@ -19,16 +17,23 @@
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
  * 
- * Action ::= QuotedExpr
+ * MatcherExpr ::= InstanceOfMatcherExpr
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | ThrowsStatement
+ *             | ActionStatement
+ *             | TopBindStatement
+ *             | VarDeclStatement
+ *             | BindThrownStatement
  * 
  * IsStatement ::= QuotedExpr QuotedExpr
  * IsNotStatement ::= QuotedExpr QuotedExpr
  * ThrowsStatement ::= QuotedExpr QuotedExpr
- * 
+ * ActionStatement ::= QuotedExpr
+ * TopBindStatement ::= Expr
+ * VarDeclStatement ::= Expr
+ * BindThrownStatement ::= Expr
  * </pre>
  * 
  */

@@ -23,12 +23,11 @@ public class TestFourPhaseWithTeardown {
     public void The_size_of_a_new_temporary_file_is_zero() throws Exception {
         OgnlContext env = new OgnlContext();
         try {
-            env.put("temp", eval("@java.io.File@createTempFile(\"prefix\", null)", env, "TestFourPhaseWithTeardown.docy", 3, "TestFourPhaseWithTeardown.docy:3.14-3.58"));
-            {
-                Object actual = eval("temp.length()", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.9-6.22");
-                Object expected = eval("0L", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.28-6.30");
-                assertThat(actual, is(expected));
-            }
+            Object temp = eval("@java.io.File@createTempFile(\"prefix\", null)", env, "TestFourPhaseWithTeardown.docy", 3, "TestFourPhaseWithTeardown.docy:3.14-3.58");
+            env.put("temp", temp);
+            Object actual = eval("temp.length()", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.9-6.22");
+            Object expected = eval("0L", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.28-6.30");
+            assertThat(actual, is(expected));
         } finally {
             eval("temp.delete()", env, "TestFourPhaseWithTeardown.docy", 9, "TestFourPhaseWithTeardown.docy:9.5-9.18");
         }

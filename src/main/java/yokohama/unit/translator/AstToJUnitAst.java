@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import fj.data.Java;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +17,7 @@ import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -31,25 +31,24 @@ import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.InstanceOfMatcher;
-import yokohama.unit.ast.IsNotPredicate;
-import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
-import yokohama.unit.ast.PredicateVisitor;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
-import yokohama.unit.ast.ThrowsPredicate;
-import yokohama.unit.ast_junit.Action;
-import yokohama.unit.ast_junit.TopBinding;
+import yokohama.unit.ast_junit.ActionStatement;
+import yokohama.unit.ast_junit.BindThrownStatement;
+import yokohama.unit.ast_junit.TopBindStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.Expr;
+import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.MethodPattern;
@@ -61,8 +60,10 @@ import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.Type;
+import yokohama.unit.ast_junit.VarDeclStatement;
+import yokohama.unit.ast_junit.VarExpr;
+import yokohama.unit.util.GenSym;
 import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
@@ -76,7 +77,7 @@ public class AstToJUnitAst {
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
                                    test -> translateTest(test, tables).stream(),
-                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables).stream(),
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, new GenSym()).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, methods);
@@ -106,104 +107,110 @@ public class AstToJUnitAst {
     List<TestMethod> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
-        List<Statement> testStatements =
-                propositions.stream()
-                            .map(this::translateProposition)
-                            .collect(Collectors.toList());
-        return assertion.getFixture().accept(() -> Arrays.asList(new TestMethod(methodName, Arrays.asList(), Arrays.asList(), testStatements, Arrays.asList())),
+        return assertion.getFixture().accept(
+                () -> {
+                    GenSym genSym = new GenSym();
+                    return Arrays.asList(new TestMethod(
+                            methodName,
+                            propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym)).collect(Collectors.toList()),
+                            Arrays.asList()));
+                },
                 tableRef -> {
-                    List<List<TopBinding>> table = translateTableRef(tableRef, tables);
+                    GenSym genSym = new GenSym();
+                    List<List<Statement>> table = translateTableRef(tableRef, tables, genSym);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
-                            .map(i -> new TestMethod(methodName + "_" + (i + 1), table.get(i), Arrays.asList(), testStatements, Arrays.asList()))
+                            .map(i -> {
+                                return new TestMethod(
+                                        methodName + "_" + (i + 1),
+                                        ListUtils.union(
+                                                table.get(i),
+                                                propositions
+                                                        .stream()
+                                                        .flatMap(proposition -> translateProposition(proposition, genSym))
+                                                        .collect(Collectors.toList())),
+                                        Arrays.asList());
+                            })
                             .collect(Collectors.toList());
                 },
-                bindings -> Arrays.asList(new TestMethod(
-                        methodName,
-                        bindings.getBindings()
-                                .stream()
-                                .map(this::translateBinding)
-                                .collect(Collectors.toList()),
-                        Arrays.asList(),
-                        testStatements,
-                        Arrays.asList()
-                )));
+                bindings -> {
+                    GenSym genSym = new GenSym();
+                    return Arrays.asList(new TestMethod(
+                            methodName,
+                            Stream.concat(
+                                    bindings.getBindings()
+                                            .stream()
+                                            .flatMap(binding -> translateBinding(binding, genSym)),
+                                    propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym)))
+                                    .collect(Collectors.toList()),
+                            Arrays.asList()));
+                });
     }
 
-    Statement translateProposition(Proposition proposition) {
+    Stream<Statement> translateProposition(Proposition proposition, GenSym genSym) {
         QuotedExpr subject = new QuotedExpr(
                 proposition.getSubject().getText(),
                 new Span(
                         docyPath,
                         proposition.getSubject().getSpan().getStart(),
                         proposition.getSubject().getSpan().getEnd()));
-        return proposition.getPredicate().accept(
-                isPredicate ->
-                        new IsStatement(
-                                subject,
-                                isPredicate.getComplement().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                return
-                                                new QuotedExpr(
-                                                        equalTo.getExpr().getText(),
-                                                        new Span(
-                                                                docyPath,
-                                                                equalTo.getSpan().getStart(),
-                                                                equalTo.getSpan().getEnd()));
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                        })),
-                isNotPredicate ->
-                        new IsNotStatement(
-                                subject,
-                                isNotPredicate.getComplement().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                return
-                                                new QuotedExpr(
-                                                        equalTo.getExpr().getText(),
-                                                        new Span(
-                                                                docyPath,
-                                                                equalTo.getSpan().getStart(),
-                                                                equalTo.getSpan().getEnd()));
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                        })),
-                throwsPredicate ->
-                        new ThrowsStatement(
-                                subject,
-                                throwsPredicate.getThrowee().accept(
-                                        new MatcherVisitor<QuotedExpr>() {
-                                            @Override
-                                            public QuotedExpr visitEqualTo(EqualToMatcher equalTo) {
-                                                throw new UnsupportedOperationException("Not supported yet.");
-                                            }
-                                            @Override
-                                            public QuotedExpr visitInstanceOf(InstanceOfMatcher instanceOf) {
-                                                return new QuotedExpr(
-                                                        instanceOf.getClazz().getName(),
-                                                        new Span(
-                                                                docyPath,
-                                                                instanceOf.getSpan().getStart(),
-                                                                instanceOf.getSpan().getEnd()));
-                                            }
-                                        }))
+        return proposition.getPredicate().<Stream<Statement>>accept(
+                isPredicate -> {
+                    String actual = genSym.generate("actual");
+                    String expected = genSym.generate("expected");
+                    return Stream.of(
+                            new VarDeclStatement(actual, subject),
+                            translateMatcher(isPredicate.getComplement(), expected),
+                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                },
+                isNotPredicate -> {
+                    String actual = genSym.generate("actual");
+                    String unexpected = genSym.generate("unexpected");
+                    return Stream.of(
+                            new VarDeclStatement(actual, subject),
+                            translateMatcher(isNotPredicate.getComplement(), unexpected),
+                            new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
+                },
+                throwsPredicate -> {
+                    String actual = genSym.generate("actual");
+                    String expected = genSym.generate("expected");
+                    return Stream.of(
+                            new BindThrownStatement(actual, subject),
+                            translateMatcher(throwsPredicate.getThrowee(), expected),
+                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                }
         );
     }
 
-    TopBinding translateBinding(yokohama.unit.ast.Binding binding) {
+    Statement translateMatcher(Matcher matcher, String varName) {
+        return matcher.accept(new MatcherVisitor<Statement>() {
+            @Override
+            public Statement visitEqualTo(EqualToMatcher equalTo) {
+                return new VarDeclStatement(
+                        varName,
+                        new QuotedExpr(
+                                equalTo.getExpr().getText(),
+                                new Span(
+                                        docyPath,
+                                        equalTo.getSpan().getStart(),
+                                        equalTo.getSpan().getEnd())));
+            }
+            @Override
+            public Statement visitInstanceOf(InstanceOfMatcher instanceOf) {
+                return new VarDeclStatement(
+                        varName,
+                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
+            }
+        });
+    }
+
+    Stream<Statement> translateBinding(yokohama.unit.ast.Binding binding, GenSym genSym) {
         String name = binding.getName();
         Expr value = translateExpr(binding.getValue());
-        return new TopBinding(name, value);
+        String varName = genSym.generate(name);
+        return Stream.of(
+                new VarDeclStatement(varName, value),
+                new TopBindStatement(name, new VarExpr(varName)));
     }
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
@@ -259,44 +266,49 @@ public class AstToJUnitAst {
         );
     }
 
-    List<List<TopBinding>> translateTableRef(TableRef tableRef, List<Table> tables) {
+    List<List<Statement>> translateTableRef(TableRef tableRef, List<Table> tables, GenSym genSym) {
         String name = tableRef.getName();
         switch(tableRef.getType()) {
             case INLINE:
-                return translateTable(tables.stream()
+                return translateTable(
+                        tables.stream()
                               .filter(table -> table.getName().equals(name))
                               .findFirst()
-                              .get()
+                              .get(),
+                        genSym
                 );
             case CSV:
-                return parseCSV(name, CSVFormat.DEFAULT.withHeader());
+                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), genSym);
             case TSV:
-                return parseCSV(name, CSVFormat.TDF.withHeader());
+                return parseCSV(name, CSVFormat.TDF.withHeader(), genSym);
             case EXCEL:
-                return parseExcel(name);
+                return parseExcel(name, genSym);
         }
         throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
 
     }
 
-    List<List<TopBinding>> translateTable(Table table) {
+    List<List<Statement>> translateTable(Table table, GenSym genSym) {
         return table.getRows()
                     .stream()
-                    .map(row -> translateRow(row, table.getHeader()))
+                    .map(row -> translateRow(row, table.getHeader(), genSym))
                     .collect(Collectors.toList());
     }
 
-    List<TopBinding> translateRow(Row row, List<String> header) {
-        // Since vanilla Java has no zip method...
-        fj.data.List<String> names = Java.<String>JUList_List().f(header);
-        fj.data.List<yokohama.unit.ast.Expr> cells = Java.<yokohama.unit.ast.Expr>JUList_List().f(row.getExprs());
-        fj.data.List<TopBinding> bindings =
-                names.zipWith(cells, (name, expr) -> new TopBinding(name, translateExpr(expr)));
-        return Java.<TopBinding>List_ArrayList().f(bindings);
+    List<Statement> translateRow(Row row, List<String> header, GenSym genSym) {
+        return IntStream.range(0, header.size())
+                .mapToObj(Integer::new)
+                .flatMap(i -> {
+                    String varName = genSym.generate(header.get(i));
+                    return Stream.of(
+                            new VarDeclStatement(varName, translateExpr(row.getExprs().get(i))),
+                            new TopBindStatement(header.get(i), new VarExpr(varName)));
+                })
+                .collect(Collectors.toList());
     }
 
     @SneakyThrows(IOException.class)
-    List<List<TopBinding>> parseCSV(String fileName, CSVFormat format) {
+    List<List<Statement>> parseCSV(String fileName, CSVFormat format, GenSym genSym) {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -304,21 +316,25 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
-                                    .map(name ->
-                                            new TopBinding(
-                                                    name,
-                                                    new QuotedExpr(
-                                                            record.get(name),
-                                                            new Span(
-                                                                    Optional.of(Paths.get(fileName)), 
-                                                                    new Position((int)parser.getCurrentLineNumber(), -1),
-                                                                    new Position(-1, -1)))))
+                                    .flatMap(name -> {
+                                        String varName = genSym.generate(name);
+                                        return Stream.of(
+                                                new VarDeclStatement(
+                                                        varName,
+                                                        new QuotedExpr(
+                                                                record.get(name),
+                                                                new Span(
+                                                                        Optional.of(Paths.get(fileName)), 
+                                                                        new Position((int)parser.getCurrentLineNumber(), -1),
+                                                                        new Position(-1, -1)))),
+                                                new TopBindStatement(name, new VarExpr(varName)));
+                                    })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         }
     }
 
-    List<List<TopBinding>> parseExcel(String fileName) {
+    List<List<Statement>> parseExcel(String fileName, GenSym genSym) {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -332,14 +348,19 @@ public class AstToJUnitAst {
                     .map(row -> 
                         IntStream.range(0, names.size())
                                 .mapToObj(Integer::new)
-                                .map(i -> new TopBinding(
-                                        names.get(i),
-                                        new QuotedExpr(
-                                                row.getCell(left + i).getStringCellValue(),
-                                                new Span(
-                                                        Optional.of(Paths.get(fileName)), 
-                                                        new Position(row.getRowNum() + 1, left + i + 1),
-                                                        new Position(-1, -1)))))
+                                .flatMap(i -> {
+                                    String varName = genSym.generate(names.get(i));
+                                    return Stream.of(
+                                            new VarDeclStatement(
+                                                    varName,
+                                                    new QuotedExpr(
+                                                            row.getCell(left + i).getStringCellValue(),
+                                                            new Span(
+                                                                    Optional.of(Paths.get(fileName)), 
+                                                                    new Position(row.getRowNum() + 1, left + i + 1),
+                                                                    new Position(-1, -1)))),
+                                            new TopBindStatement(names.get(i), new VarExpr(varName)));
+                                })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         } catch (InvalidFormatException | IOException e) {
@@ -347,47 +368,56 @@ public class AstToJUnitAst {
         }
     }
 
-    List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
+    List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, GenSym genSym) {
         String testName = SUtils.toIdent(fourPhaseTest.getName());
-        List<TopBinding> bindings;
+        Stream<Statement> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
             if (setup.getLetBindings().isPresent()) {
                 LetBindings letBindings = setup.getLetBindings().get();
                 bindings = letBindings.getBindings()
                         .stream()
-                        .map(binding -> new TopBinding(binding.getName(), translateExpr(binding.getValue())))
-                        .collect(Collectors.toList());
+                        .flatMap(binding -> {
+                            String varName = genSym.generate(binding.getName());
+                            return Stream.of(
+                                    new VarDeclStatement(varName, translateExpr(binding.getValue())),
+                                    new TopBindStatement(binding.getName(), new VarExpr(varName)));
+                        });
             } else {
-                bindings = Arrays.asList();
+                bindings = Stream.empty();
             }
         } else {
-            bindings = Arrays.asList();
+            bindings = Stream.empty();
         }
 
-        Optional<Stream<Action>> setupActions =
+        Optional<Stream<ActionStatement>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        Optional<Stream<Action>> exerciseActions =
+        Optional<Stream<ActionStatement>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
                         .map(this::translateExecutions);
-        List<Action> actionsBefore = Stream.concat(
-                setupActions.isPresent() ? setupActions.get() : Stream.empty(),
-                exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()
-        ).collect(Collectors.toList());
-
-        List<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
+        Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
                         assertion.getPropositions()
                                 .stream()
-                                .map(this::translateProposition)
-                )
-                .collect(Collectors.toList());
+                                .flatMap(proposition -> translateProposition(proposition, genSym))
+                );
 
-        List<Action> actionsAfter;
+        List<Statement> statements =
+                Stream.concat(
+                        bindings,
+                        Stream.concat(
+                                Stream.concat(
+                                        setupActions.isPresent() ? setupActions.get() : Stream.empty(),
+                                        exerciseActions.isPresent() ? exerciseActions.get() : Stream.empty()),
+                                testStatements)
+                ).collect(Collectors.toList());
+
+
+        List<ActionStatement> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
@@ -395,16 +425,16 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(new TestMethod(testName, bindings, actionsBefore, testStatements, actionsAfter));
+        return Arrays.asList(new TestMethod(testName, statements, actionsAfter));
     }
 
-    Stream<Action> translateExecutions(List<Execution> executions) {
+    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
         return executions.stream()
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
                                 .map(expression ->
-                                        new Action(
+                                        new ActionStatement(
                                                 new QuotedExpr(
                                                         expression.getText(),
                                                         new Span(

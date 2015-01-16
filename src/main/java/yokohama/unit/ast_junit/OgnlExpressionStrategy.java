@@ -50,43 +50,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public void bind(SBuilder sb, TopBinding binding, MockStrategy mockStrategy) {
-        String name = binding.getName();
-        binding.getValue().<Void>accept(
-                quotedExpr -> {
-                    sb.appendln(
-                            "env.put(\"", escapeJava(name), "\", ",
-                            "eval(\"", escapeJava(quotedExpr.getText()), "\", env, ",
-                            "\"", escapeJava(quotedExpr.getSpan().getFileName()),  "\", ",
-                            quotedExpr.getSpan().getStart().getLine(), ", ",
-                            "\"", quotedExpr.getSpan().toString(), "\"));"
-                    );
-                    return null;
-                },
-                stubExpr -> {
-                    sb.appendln("{");
-                    sb.shift();
-                    mockStrategy.stub(sb, "stub", stubExpr, this);
-                    sb.appendln("env.put(\"" + escapeJava(name) + "\", stub);");
-                    sb.unshift();
-                    sb.appendln("}");
-                    return null;
-                },
-                varExpr -> {
-                    sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
-                    return null;
-                }
-        );
+    public void bind(SBuilder sb, String name, VarExpr varExpr) {
+        sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
     }
 
     @Override
-    public Set<ImportedName> bindImports(TopBinding binding, MockStrategy mockStrategy) {
-        return binding.getValue().<Set<ImportedName>>accept(
-                quotedExpr ->
-                    new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl"))),
-                stubExpr -> mockStrategy.stubImports(stubExpr, this),
-                varExpr -> new TreeSet<>()
-        );
+    public Set<ImportedName> bindImports() {
+        return new TreeSet<>();
     }
 
     @Override

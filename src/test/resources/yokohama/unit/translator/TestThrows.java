@@ -5,8 +5,8 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class TestThrows {
@@ -24,12 +24,16 @@ public class TestThrows {
     @Test
     public void Division_by_zero_1() throws Exception {
         OgnlContext env = new OgnlContext();
+        Throwable actual;
         try {
             eval("1 / 0", env, "TestThrows.docy", 2, "TestThrows.docy:2.14-2.19");
-            fail("`1 / 0` was expected to throw ArithmeticException.");
+            actual = null;
         } catch (OgnlException e) {
-            assertThat(e.getReason(), is(instanceOf(ArithmeticException.class)));
-        } catch (ArithmeticException e) {
+            actual = e.getReason();
+        } catch (Throwable e) {
+            actual = e;
         }
+        Matcher expected = instanceOf(ArithmeticException.class);
+        assertThat(actual, is(expected));
     }
 }
