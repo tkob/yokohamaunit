@@ -77,7 +77,9 @@ public class TestMethodTest {
                         new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
                         new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
-                        new ThrowsStatement(new QuotedExpr("", Span.dummySpan()), new QuotedExpr("", Span.dummySpan()))),
+                        new BindThrownStatement("actual2", new QuotedExpr("", Span.dummySpan())),
+                        new VarDeclStatement("expected2", new InstanceOfMatcherExpr("")),
+                        new IsStatement(new VarExpr("actual2"), new VarExpr("expected2"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -86,7 +88,7 @@ public class TestMethodTest {
         expected.add(new ImportClass("ognl.OgnlContext"));
         expected.add(new ImportClass("ognl.OgnlException"));
         expected.add(new ImportClass("org.junit.Assert.assertThat"));
-        expected.add(new ImportClass("org.junit.Assert.fail"));
+        expected.add(new ImportClass("org.hamcrest.Matcher"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"));
         expected.add(new ImportStatic("org.hamcrest.CoreMatchers.is"));
         Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy(), new MockitoMockStrategy());

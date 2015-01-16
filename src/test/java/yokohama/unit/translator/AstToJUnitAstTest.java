@@ -29,7 +29,6 @@ import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.ThrowsStatement;
 import yokohama.unit.ast_junit.VarDeclStatement;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
