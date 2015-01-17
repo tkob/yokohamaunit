@@ -8,8 +8,8 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class IsNotStatement implements Statement {
-    private VarExpr subject;
-    private VarExpr complement;
+    private Var subject;
+    private Var complement;
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {

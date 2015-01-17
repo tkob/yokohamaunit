@@ -8,7 +8,7 @@
  * 
  * TestMethod ::= Statement* ActionStatement*
  * 
- * Expr ::= QuotedExpr | StubExpr | VarExpr | MatcherExpr
+ * Expr ::= QuotedExpr | StubExpr | MatcherExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr
@@ -27,9 +27,8 @@
  *             | VarDeclStatement
  *             | BindThrownStatement
  * 
- * IsStatement ::= QuotedExpr QuotedExpr
- * IsNotStatement ::= QuotedExpr QuotedExpr
- * ThrowsStatement ::= QuotedExpr QuotedExpr
+ * IsStatement ::= Var Var
+ * IsNotStatement ::= Var Var
  * ActionStatement ::= QuotedExpr
  * TopBindStatement ::= Expr
  * VarDeclStatement ::= Expr

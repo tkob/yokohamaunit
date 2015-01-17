@@ -62,7 +62,7 @@ import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarDeclStatement;
-import yokohama.unit.ast_junit.VarExpr;
+import yokohama.unit.ast_junit.Var;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.SUtils;
 
@@ -154,30 +154,26 @@ public class AstToJUnitAst {
                         docyPath,
                         proposition.getSubject().getSpan().getStart(),
                         proposition.getSubject().getSpan().getEnd()));
-        return proposition.getPredicate().<Stream<Statement>>accept(
-                isPredicate -> {
+        return proposition.getPredicate().<Stream<Statement>>accept(isPredicate -> {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
-                    return Stream.of(
-                            new VarDeclStatement(actual, subject),
+                    return Stream.of(new VarDeclStatement(actual, subject),
                             translateMatcher(isPredicate.getComplement(), expected),
-                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                            new IsStatement(new Var(actual), new Var(expected)));
                 },
                 isNotPredicate -> {
                     String actual = genSym.generate("actual");
                     String unexpected = genSym.generate("unexpected");
-                    return Stream.of(
-                            new VarDeclStatement(actual, subject),
+                    return Stream.of(new VarDeclStatement(actual, subject),
                             translateMatcher(isNotPredicate.getComplement(), unexpected),
-                            new IsNotStatement(new VarExpr(actual), new VarExpr(unexpected)));
+                            new IsNotStatement(new Var(actual), new Var(unexpected)));
                 },
                 throwsPredicate -> {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
-                    return Stream.of(
-                            new BindThrownStatement(actual, subject),
+                    return Stream.of(new BindThrownStatement(actual, subject),
                             translateMatcher(throwsPredicate.getThrowee(), expected),
-                            new IsStatement(new VarExpr(actual), new VarExpr(expected)));
+                            new IsStatement(new Var(actual), new Var(expected)));
                 }
         );
     }
@@ -208,9 +204,8 @@ public class AstToJUnitAst {
         String name = binding.getName();
         Expr value = translateExpr(binding.getValue());
         String varName = genSym.generate(name);
-        return Stream.of(
-                new VarDeclStatement(varName, value),
-                new TopBindStatement(name, new VarExpr(varName)));
+        return Stream.of(new VarDeclStatement(varName, value),
+                new TopBindStatement(name, new Var(varName)));
     }
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
@@ -300,9 +295,8 @@ public class AstToJUnitAst {
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
-                    return Stream.of(
-                            new VarDeclStatement(varName, translateExpr(row.getExprs().get(i))),
-                            new TopBindStatement(header.get(i), new VarExpr(varName)));
+                    return Stream.of(new VarDeclStatement(varName, translateExpr(row.getExprs().get(i))),
+                            new TopBindStatement(header.get(i), new Var(varName)));
                 })
                 .collect(Collectors.toList());
     }
@@ -318,8 +312,7 @@ public class AstToJUnitAst {
                                     .stream()
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
-                                        return Stream.of(
-                                                new VarDeclStatement(
+                                        return Stream.of(new VarDeclStatement(
                                                         varName,
                                                         new QuotedExpr(
                                                                 record.get(name),
@@ -327,7 +320,7 @@ public class AstToJUnitAst {
                                                                         Optional.of(Paths.get(fileName)), 
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
                                                                         new Position(-1, -1)))),
-                                                new TopBindStatement(name, new VarExpr(varName)));
+                                                new TopBindStatement(name, new Var(varName)));
                                     })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -350,8 +343,7 @@ public class AstToJUnitAst {
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
-                                    return Stream.of(
-                                            new VarDeclStatement(
+                                    return Stream.of(new VarDeclStatement(
                                                     varName,
                                                     new QuotedExpr(
                                                             row.getCell(left + i).getStringCellValue(),
@@ -359,7 +351,7 @@ public class AstToJUnitAst {
                                                                     Optional.of(Paths.get(fileName)), 
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
                                                                     new Position(-1, -1)))),
-                                            new TopBindStatement(names.get(i), new VarExpr(varName)));
+                                            new TopBindStatement(names.get(i), new Var(varName)));
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -379,9 +371,8 @@ public class AstToJUnitAst {
                         .stream()
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
-                            return Stream.of(
-                                    new VarDeclStatement(varName, translateExpr(binding.getValue())),
-                                    new TopBindStatement(binding.getName(), new VarExpr(varName)));
+                            return Stream.of(new VarDeclStatement(varName, translateExpr(binding.getValue())),
+                                    new TopBindStatement(binding.getName(), new Var(varName)));
                         });
             } else {
                 bindings = Stream.empty();

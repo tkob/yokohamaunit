@@ -7,7 +7,7 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TopBindStatement implements Statement {
     private final String name;
-    private final VarExpr value;
+    private final Var value;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {

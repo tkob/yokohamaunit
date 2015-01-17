@@ -32,7 +32,7 @@ public class TestMethodTest {
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
-                        new IsStatement(new VarExpr("actual"), new VarExpr("expected"))),
+                        new IsStatement(new Var("actual"), new Var("expected"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -52,10 +52,10 @@ public class TestMethodTest {
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
-                        new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
+                        new IsStatement(new Var("actual"), new Var("expected")),
                         new VarDeclStatement("actual2", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
-                        new IsNotStatement(new VarExpr("actual2"), new VarExpr("unexpected"))),
+                        new IsNotStatement(new Var("actual2"), new Var("unexpected"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -76,10 +76,10 @@ public class TestMethodTest {
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("", Span.dummySpan())),
-                        new IsStatement(new VarExpr("actual"), new VarExpr("expected")),
+                        new IsStatement(new Var("actual"), new Var("expected")),
                         new BindThrownStatement("actual2", new QuotedExpr("", Span.dummySpan())),
                         new VarDeclStatement("expected2", new InstanceOfMatcherExpr("")),
-                        new IsStatement(new VarExpr("actual2"), new VarExpr("expected2"))),
+                        new IsStatement(new Var("actual2"), new Var("expected2"))),
                 Arrays.asList()
         );
         Set<ImportedName> expected = new TreeSet<ImportedName>();
@@ -118,7 +118,7 @@ public class TestMethodTest {
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("x", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("y", Span.dummySpan())),
-                        new IsStatement(new VarExpr("actual"), new VarExpr("expected"))),
+                        new IsStatement(new Var("actual"), new Var("expected"))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
