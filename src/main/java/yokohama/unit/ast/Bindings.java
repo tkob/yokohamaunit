@@ -9,7 +9,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @ToString
-@EqualsAndHashCode(exclude={"span"})
+@EqualsAndHashCode(exclude={"span"}, callSuper=false)
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
