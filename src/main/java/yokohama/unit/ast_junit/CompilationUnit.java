@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Set;
+import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
@@ -29,7 +30,7 @@ public class CompilationUnit {
     ) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
-        for (ImportedName name : importedNames(expressionStrategy, mockStrategy)) {
+        for (ImportedName name : new TreeSet<>(importedNames(expressionStrategy, mockStrategy))) {
             name.toString(sb);
         }
         sb.appendln();
