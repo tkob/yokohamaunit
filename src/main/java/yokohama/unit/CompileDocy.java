@@ -110,7 +110,7 @@ public class CompileDocy implements Command {
                     extractOptions(
                             Arrays.asList(commandLine.getOptions()),
                             javacOptions);
-            List<String> files = commandLine.getArgList();
+            @SuppressWarnings("unchecked") List<String> files = commandLine.getArgList();
             for (String file : files) {
                 String className = FilenameUtils.getBaseName(file);
                 Path path = Paths.get(file).toAbsolutePath();
