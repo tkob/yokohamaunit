@@ -1,12 +1,12 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.setOf;
 
 public class MockitoMockStrategy implements MockStrategy {
 
@@ -52,23 +52,23 @@ public class MockitoMockStrategy implements MockStrategy {
 
     private Set<ImportedName> argumentTypeImports(Type argumentType) {
         if (argumentType.getDims() > 0) {
-            return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.isA")));
+            return setOf(new ImportStatic("org.mockito.Mockito.isA"));
         } else {
             return argumentType.getNonArrayType().accept(
                     primitiveType -> {
                         switch (primitiveType.getKind()) {
-                            case BOOLEAN: return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyBoolean")));
-                            case BYTE:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyByte")));
-                            case SHORT:   return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyShort")));
-                            case INT:     return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyInt")));
-                            case LONG:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyLong")));
-                            case CHAR:    return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyChar")));
-                            case FLOAT:   return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyFloat")));
-                            case DOUBLE:  return new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.anyDouble")));
+                            case BOOLEAN: return setOf(new ImportStatic("org.mockito.Mockito.anyBoolean"));
+                            case BYTE:    return setOf(new ImportStatic("org.mockito.Mockito.anyByte"));
+                            case SHORT:   return setOf(new ImportStatic("org.mockito.Mockito.anyShort"));
+                            case INT:     return setOf(new ImportStatic("org.mockito.Mockito.anyInt"));
+                            case LONG:    return setOf(new ImportStatic("org.mockito.Mockito.anyLong"));
+                            case CHAR:    return setOf(new ImportStatic("org.mockito.Mockito.anyChar"));
+                            case FLOAT:   return setOf(new ImportStatic("org.mockito.Mockito.anyFloat"));
+                            case DOUBLE:  return setOf(new ImportStatic("org.mockito.Mockito.anyDouble"));
                         }
                         throw new RuntimeException("should not reach here");
                     },
-                    classType -> new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.isA")))
+                    classType -> setOf(new ImportStatic("org.mockito.Mockito.isA"))
             );
         }
     }
@@ -120,7 +120,7 @@ public class MockitoMockStrategy implements MockStrategy {
         return stubExpr.getBehavior()
                 .stream()
                 .collect(
-                        () -> new TreeSet<>(Arrays.asList(new ImportStatic("org.mockito.Mockito.mock"))),
+                        () -> setOf(new ImportStatic("org.mockito.Mockito.mock")),
                         (set, behavior) -> {
                             MethodPattern methodPattern = behavior.getMethodPattern();
                             boolean isVarArg = methodPattern.isVarArg();
@@ -162,5 +162,5 @@ public class MockitoMockStrategy implements MockStrategy {
                         (s1, s2) -> s1.addAll(s2)
                 );
     }
-    
+
 }

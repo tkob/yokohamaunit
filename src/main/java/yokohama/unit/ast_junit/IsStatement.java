@@ -1,10 +1,10 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.setOf;
+import static yokohama.unit.util.SetUtils.union;
 
 
 @Value
@@ -14,11 +14,11 @@ public class IsStatement implements Statement {
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        Set<ImportedName> importedNames = new TreeSet<ImportedName>(Arrays.asList(
-                new ImportStatic("org.junit.Assert.assertThat"),
-                new ImportStatic("org.hamcrest.CoreMatchers.is")));
-        importedNames.addAll(expressionStrategy.getValueImports());
-        return importedNames;
+        return union(
+                expressionStrategy.getValueImports(),
+                setOf(
+                        new ImportStatic("org.junit.Assert.assertThat"),
+                        new ImportStatic("org.hamcrest.CoreMatchers.is")));
     }
 
     @Override

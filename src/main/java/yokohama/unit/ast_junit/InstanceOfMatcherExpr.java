@@ -1,10 +1,9 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import static yokohama.unit.util.SetUtils.setOf;
 
 @Value
 @EqualsAndHashCode(callSuper=false)
@@ -18,7 +17,6 @@ public class InstanceOfMatcherExpr extends MatcherExpr {
 
     @Override
     public Set<ImportedName> importedNames() {
-        return new TreeSet<>(Arrays.asList(
-                new ImportStatic("org.hamcrest.CoreMatchers.instanceOf")));
+        return setOf(new ImportStatic("org.hamcrest.CoreMatchers.instanceOf"));
     }
 }

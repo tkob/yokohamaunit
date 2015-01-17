@@ -1,11 +1,11 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.setOf;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
@@ -32,11 +32,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Set<ImportedName> auxMethodsImports() {
-        return new TreeSet<>(Arrays.asList(
+        return setOf(
                 new ImportClass("ognl.Ognl"),
                 new ImportClass("ognl.OgnlContext"),
-                new ImportClass("ognl.OgnlException")
-        ));
+                new ImportClass("ognl.OgnlException"));
     }
 
     @Override
@@ -46,7 +45,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Set<ImportedName> environmentImports() {
-        return new TreeSet<>(Arrays.asList(new ImportClass("ognl.OgnlContext")));
+        return setOf(new ImportClass("ognl.OgnlContext"));
     }
 
     @Override
@@ -69,7 +68,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Set<ImportedName> getValueImports() {
-        return new TreeSet<>(Arrays.asList(new ImportClass("ognl.Ognl")));
+        return setOf(new ImportClass("ognl.Ognl"));
     }
 
     @Override
@@ -79,7 +78,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Set<ImportedName> wrappingExceptionImports() {
-        return new TreeSet<>(Arrays.asList(new ImportClass("ognl.OgnlException")));
+        return setOf(new ImportClass("ognl.OgnlException"));
     }
 
     @Override

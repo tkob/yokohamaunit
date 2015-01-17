@@ -1,9 +1,10 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.setOf;
+import static yokohama.unit.util.SetUtils.union;
 
 @Value
 public class VarDeclStatement implements Statement {
@@ -32,12 +33,9 @@ public class VarDeclStatement implements Statement {
         return value.accept(
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                matcherExpr -> {
-                    Set<ImportedName> s = new TreeSet<>();
-                    s.addAll(matcherExpr.importedNames());
-                    s.add(new ImportClass("org.hamcrest.Matcher"));
-                    return s;
-                });
+                matcherExpr -> union(
+                        matcherExpr.importedNames(),
+                        setOf(new ImportClass("org.hamcrest.Matcher"))));
     }
 
     @Override

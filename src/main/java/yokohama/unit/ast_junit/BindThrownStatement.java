@@ -1,9 +1,9 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.union;
 
 @Value
 public class BindThrownStatement implements Statement {
@@ -45,14 +45,14 @@ public class BindThrownStatement implements Statement {
 
     @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        Set<ImportedName> s = new TreeSet<>();
-        s.addAll(expressionStrategy.wrappingExceptionImports());
-        s.addAll(expressionStrategy.wrappedExceptionImports());
-        s.addAll(value.accept(
-                quotedExpr -> expressionStrategy.getValueImports(), 
-                stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                matcherExpr -> matcherExpr.importedNames()));
-        return s;
+        return union(
+                value.accept(
+                        quotedExpr -> expressionStrategy.getValueImports(), 
+                        stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
+                        matcherExpr -> matcherExpr.importedNames()),
+                union(
+                        expressionStrategy.wrappingExceptionImports(), 
+                        expressionStrategy.wrappedExceptionImports()));
     }
 
     @Override

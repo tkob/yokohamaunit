@@ -6,6 +6,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
+import static yokohama.unit.util.SetUtils.setOf;
+import static yokohama.unit.util.SetUtils.union;
 
 @Value
 public class TestMethod {
@@ -15,22 +17,19 @@ public class TestMethod {
 
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         Set<ImportedName> importedNames = new TreeSet<>();
-        importedNames.add(new ImportClass("org.junit.Test"));
-        importedNames.addAll(expressionStrategy.environmentImports());
-        importedNames.addAll(statements
-                        .stream()
-                        .flatMap(testStatement ->
-                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
-                        .collect(Collectors.toSet())
-        );
-        importedNames.addAll(
-                actionsAfter
-                        .stream()
-                        .flatMap(testStatement ->
-                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
-                        .collect(Collectors.toSet())
-        );
-        return importedNames;
+        return union(
+                setOf(new ImportClass("org.junit.Test")),
+                union(
+                        expressionStrategy.environmentImports(),
+                        union(
+                                statements.stream()
+                                        .flatMap(testStatement ->
+                                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
+                                        .collect(Collectors.toSet()), 
+                                actionsAfter.stream()
+                                        .flatMap(testStatement ->
+                                                testStatement.importedNames(expressionStrategy, mockStrategy).stream())
+                                        .collect(Collectors.toSet()))));
     }
 
     public void toString(
