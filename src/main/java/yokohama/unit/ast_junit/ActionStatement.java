@@ -8,10 +8,12 @@ import yokohama.unit.util.SBuilder;
 public class ActionStatement implements Statement {
     private QuotedExpr action;
 
+    @Override
     public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return expressionStrategy.getValueImports();
     }
 
+    @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln(expressionStrategy.getValue(action), ";");
     }
