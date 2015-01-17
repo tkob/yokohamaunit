@@ -24,6 +24,7 @@ public class Span {
         return fileName.equals("") ? "?" : fileName;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(sourcePath.isPresent() ? sourcePath.get().toString() : "?");
