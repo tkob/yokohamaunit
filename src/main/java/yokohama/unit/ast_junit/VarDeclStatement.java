@@ -21,10 +21,6 @@ public class VarDeclStatement implements Statement {
                     mockStrategy.stub(sb, name, stubExpr, expressionStrategy);
                     return null;
                 },
-                varExpr -> {
-                    sb.appendln("Object ", name, " = ", varExpr.getName(), ";");
-                    return null;
-                },
                 matcherExpr -> {
                     sb.appendln("Matcher ", name, " = ", matcherExpr.getExpr(), ";");
                     return null;
@@ -36,7 +32,6 @@ public class VarDeclStatement implements Statement {
         return value.accept(
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                varExpr -> new TreeSet<ImportedName>(),
                 matcherExpr -> {
                     Set<ImportedName> s = new TreeSet<>();
                     s.addAll(matcherExpr.importedNames());

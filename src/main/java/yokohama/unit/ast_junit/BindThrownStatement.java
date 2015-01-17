@@ -24,10 +24,6 @@ public class BindThrownStatement implements Statement {
                         mockStrategy.stub(sb, name, stubExpr, expressionStrategy);
                         return null;
                     },
-                    varExpr -> {
-                        sb.appendln(varExpr.getName(), ";");
-                        return null;
-                    },
                     matcherExpr -> {
                         sb.appendln(matcherExpr.getExpr(), ";");
                         return null;
@@ -55,7 +51,6 @@ public class BindThrownStatement implements Statement {
         s.addAll(value.accept(
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                varExpr -> new TreeSet<ImportedName>(),
                 matcherExpr -> matcherExpr.importedNames()));
         return s;
     }
