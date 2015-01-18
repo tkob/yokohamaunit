@@ -478,7 +478,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitSetup3() throws IOException {
-        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x = `1`\nDo `that`.").setup();
+        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x = `1`.\nDo `that`.").setup();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Phase actual = instance.visitSetup(ctx);
         Phase expected = new Phase(
