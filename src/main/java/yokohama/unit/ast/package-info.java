@@ -18,7 +18,7 @@
  * IsNotPredicate ::= Matcher
  * ThrowsPredicate ::= Matcher
  * 
- * Matcher ::= EqualToMatcher | InstanceOfMatcher
+ * Matcher ::= EqualToMatcher | InstanceOfMatcher | NullValueMatcher
  * 
  * EqualToMatcher ::= QuotedExpr
  * InstanceOfMatcher ::= ClassType
