@@ -29,7 +29,7 @@ throwsPredicate: THROWS matcher ;
 matcher: equalTo | instanceOf | nullValue ;
 equalTo: Expr ;
 instanceOf: AN_INSTANCE_OF classType ;
-nullValue: NULL ;
+nullValue: NULL | NOTHING ;
 
 condition: tableRef
          | bindings

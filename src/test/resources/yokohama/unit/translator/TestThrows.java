@@ -5,6 +5,7 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -34,6 +35,21 @@ public class TestThrows {
             actual = e;
         }
         Matcher expected = instanceOf(ArithmeticException.class);
+        assertThat(actual, is(expected));
+    }
+    @Test
+    public void No_exception_1() throws Exception {
+        OgnlContext env = new OgnlContext();
+        Throwable actual;
+        try {
+            eval("1 + 1", env, "TestThrows.docy", 5, "TestThrows.docy:5.14-5.19");
+            actual = null;
+        } catch (OgnlException e) {
+            actual = e.getReason();
+        } catch (Throwable e) {
+            actual = e;
+        }
+        Matcher expected = nullValue();
         assertThat(actual, is(expected));
     }
 }
