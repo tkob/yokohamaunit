@@ -7,7 +7,8 @@ public interface Matcher {
 
     default <T> T accept(
             Function<EqualToMatcher, T> visitEqualTo_,
-            Function<InstanceOfMatcher, T> visitInstanceOf_
+            Function<InstanceOfMatcher, T> visitInstanceOf_,
+            Function<NullValueMatcher, T> visitNullValue_
     ) {
         return accept(new MatcherVisitor<T>() {
             @Override
@@ -17,6 +18,10 @@ public interface Matcher {
             @Override
             public T visitInstanceOf(InstanceOfMatcher instanceOf) {
                 return visitInstanceOf_.apply(instanceOf);
+            }
+            @Override
+            public T visitNullValue(NullValueMatcher nullValue) {
+                return visitNullValue_.apply(nullValue);
             }
         });
     }

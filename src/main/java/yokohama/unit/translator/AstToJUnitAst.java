@@ -34,6 +34,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
+import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Proposition;
@@ -53,6 +54,7 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.MethodPattern;
 import yokohama.unit.ast_junit.NonArrayType;
+import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
@@ -196,6 +198,10 @@ public class AstToJUnitAst {
                 return new VarDeclStatement(
                         varName,
                         new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
+            }
+            @Override
+            public Statement visitNullValue(NullValueMatcher nullValue) {
+                return new VarDeclStatement(varName, new NullValueMatcherExpr());
             }
         });
     }
