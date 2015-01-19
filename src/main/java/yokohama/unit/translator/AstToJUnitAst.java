@@ -54,6 +54,7 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.MethodPattern;
 import yokohama.unit.ast_junit.NonArrayType;
+import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
@@ -200,7 +201,7 @@ public class AstToJUnitAst {
             }
             @Override
             public Statement visitNullValue(NullValueMatcher nullValue) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return new VarDeclStatement(varName, new NullValueMatcherExpr());
             }
         });
     }
