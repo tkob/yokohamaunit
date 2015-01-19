@@ -34,6 +34,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
+import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Proposition;
@@ -196,6 +197,10 @@ public class AstToJUnitAst {
                 return new VarDeclStatement(
                         varName,
                         new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
+            }
+            @Override
+            public Statement visitNullValue(NullValueMatcher nullValue) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         });
     }

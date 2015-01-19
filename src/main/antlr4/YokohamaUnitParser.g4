@@ -26,9 +26,10 @@ isPredicate: IS matcher ;
 isNotPredicate: IS NOT matcher ;
 throwsPredicate: THROWS matcher ;
 
-matcher: equalTo | instanceOf ;
+matcher: equalTo | instanceOf | nullValue ;
 equalTo: Expr ;
 instanceOf: AN_INSTANCE_OF classType ;
+nullValue: NULL ;
 
 condition: tableRef
          | bindings

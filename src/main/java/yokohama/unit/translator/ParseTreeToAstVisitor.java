@@ -29,6 +29,7 @@ import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.Matcher;
+import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
@@ -157,6 +158,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Matcher visitInstanceOf(YokohamaUnitParser.InstanceOfContext ctx) {
         return new InstanceOfMatcher(visitClassType(ctx.classType()), getSpan(ctx));
+    }
+
+    @Override
+    public Matcher visitNullValue(YokohamaUnitParser.NullValueContext ctx) {
+        return new NullValueMatcher(getSpan(ctx));
     }
 
     @Override
