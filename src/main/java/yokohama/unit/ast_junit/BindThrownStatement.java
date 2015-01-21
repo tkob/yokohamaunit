@@ -21,7 +21,7 @@ public class BindThrownStatement implements Statement {
                         return null;
                     },
                     stubExpr -> {
-                        mockStrategy.stub(sb, name, stubExpr, expressionStrategy);
+                        mockStrategy.stub(sb, "_", stubExpr, expressionStrategy);
                         return null;
                     },
                     matcherExpr -> {
