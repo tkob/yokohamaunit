@@ -23,6 +23,16 @@ public class TestStub {
             throw e2;
         }
     }
+    private <T> T mock_(Class<T> classToMock, String fileName, int startLine, String span) {
+        try {
+            return mock(classToMock);
+        } catch (Exception e) {
+            RuntimeException e2 = new RuntimeException(span + " " + e.getMessage(), e);
+            StackTraceElement[] st = { new StackTraceElement("", "", fileName, startLine) };
+            e2.setStackTrace(st);
+            throw e2;
+        }
+    }
     @Test
     public void Submit_a_task_and_get_the_result_1() throws Exception {
         OgnlContext env = new OgnlContext();

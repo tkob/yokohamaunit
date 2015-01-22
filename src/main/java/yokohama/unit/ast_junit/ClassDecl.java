@@ -19,7 +19,9 @@ public class ClassDecl {
         return testMethods.stream()
                 .<Set<ImportedName>>collect(
                         () -> testMethods.size() > 0 ? union(expressionStrategy.auxMethodsImports(),
-                                                             mockStrategy.auxMethodsImports())
+                                                             new MockUsedVisitor(this).mockUsed()
+                                                                     ? mockStrategy.auxMethodsImports()
+                                                                     : new TreeSet<>())
                                                      : new TreeSet<>(Arrays.asList()),
                         (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy, mockStrategy)),
                         (s1, s2) -> s1.addAll(s2)
@@ -35,7 +37,9 @@ public class ClassDecl {
         sb.shift();
         if (testMethods.size() > 0) {
             expressionStrategy.auxMethods(sb);
-            mockStrategy.auxMethods(sb);
+            if (new MockUsedVisitor(this).mockUsed()) {
+                mockStrategy.auxMethods(sb);
+            }
         }
         for (TestMethod testMethod : testMethods) {
             testMethod.toString(sb, expressionStrategy, mockStrategy);
