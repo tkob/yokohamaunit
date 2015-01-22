@@ -163,4 +163,29 @@ public class MockitoMockStrategy implements MockStrategy {
                 );
     }
 
+    @Override
+    public void auxMethods(SBuilder sb) {
+        sb.appendln("private <T> T mock_(Class<T> classToMock, String fileName, int startLine, String span) {");
+        sb.shift();
+            sb.appendln("try {");
+            sb.shift();
+                sb.appendln("return mock(classToMock);");
+            sb.unshift();
+            sb.appendln("} catch (Exception e) {");
+            sb.shift();
+                sb.appendln("RuntimeException e2 = new RuntimeException(span + \" \" + e.getMessage(), e);");
+                sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", fileName, startLine) };");
+                sb.appendln("e2.setStackTrace(st);");
+                sb.appendln("throw e2;");
+            sb.unshift();
+            sb.appendln("}");
+        sb.unshift();
+        sb.appendln("}");
+    }
+
+    @Override
+    public Set<ImportedName> auxMethodsImports() {
+        return setOf(new ImportStatic("org.mockito.Mockito.mock"));
+    }
+
 }
