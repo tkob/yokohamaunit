@@ -38,7 +38,7 @@ public class TestStub {
         OgnlContext env = new OgnlContext();
         Object exec = eval("@java.util.concurrent.Executors@newSingleThreadExecutor()", env, "TestStub.docy", 4, "TestStub.docy:4.17-4.74");
         env.put("exec", exec);
-        java.util.concurrent.Callable task = mock(java.util.concurrent.Callable.class);
+        java.util.concurrent.Callable task = mock_(java.util.concurrent.Callable.class, "TestStub.docy", 5, "TestStub.docy:5.27-5.56");
         when((Object)task.call()).thenReturn(eval("42", env, "TestStub.docy", 6, "TestStub.docy:6.51-6.53"));
         env.put("task", task);
         Object actual = eval("exec.submit(task).get()", env, "TestStub.docy", 3, "TestStub.docy:3.9-3.32");
@@ -48,7 +48,7 @@ public class TestStub {
     @Test
     public void Collections_unmodifiableMap_preserves_lookup_1() throws Exception {
         OgnlContext env = new OgnlContext();
-        java.util.Map map = mock(java.util.Map.class);
+        java.util.Map map = mock_(java.util.Map.class, "TestStub.docy", 11, "TestStub.docy:11.26-11.39");
         when((Object)map.get(isA(java.lang.Object.class))).thenReturn(eval("42", env, "TestStub.docy", 12, "TestStub.docy:12.65-12.67"));
         env.put("map", map);
         Object unmodifiableMap = eval("@java.util.Collections@unmodifiableMap(map)", env, "TestStub.docy", 13, "TestStub.docy:13.28-13.71");
@@ -60,7 +60,7 @@ public class TestStub {
     @Test
     public void StringBuilder_append_CharSequence_int_int_calls_CharSequence_charAt() throws Exception {
         OgnlContext env = new OgnlContext();
-        java.lang.CharSequence seq = mock(java.lang.CharSequence.class);
+        java.lang.CharSequence seq = mock_(java.lang.CharSequence.class, "TestStub.docy", 19, "TestStub.docy:19.23-19.45");
         when((Object)seq.charAt(anyInt())).thenReturn(eval("'a'", env, "TestStub.docy", 20, "TestStub.docy:20.52-20.55"));
         when((Object)seq.length()).thenReturn(eval("13", env, "TestStub.docy", 21, "TestStub.docy:21.49-21.51"));
         env.put("seq", seq);

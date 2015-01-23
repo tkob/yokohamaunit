@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.util.SBuilder;
 import static yokohama.unit.util.SetUtils.setOf;
@@ -76,7 +77,13 @@ public class MockitoMockStrategy implements MockStrategy {
     @Override
     public void stub(SBuilder sb, String name, StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
         String classToStub = stubExpr.getClassToStub().getText();
-        sb.appendln(classToStub, " ", name, " = mock(", classToStub, ".class);");
+        String fileName = stubExpr.getClassToStub().getSpan().getFileName();
+        int startLine = stubExpr.getClassToStub().getSpan().getStart().getLine();
+        String span = stubExpr.getClassToStub().getSpan().toString();
+        sb.appendln(classToStub, " ", name, " = mock_(", classToStub, ".class",
+                ", \"", escapeJava(fileName), "\", ",
+                startLine,
+                ", \"", escapeJava(span), "\");");
         for (StubBehavior behavior : stubExpr.getBehavior()) {
             MethodPattern methodPattern = behavior.getMethodPattern();
             String methodName = methodPattern.getName();
