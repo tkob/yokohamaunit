@@ -11,10 +11,6 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- *
- * @author tkob
- */
 public class CompilationUnitTest {
     @Test
     public void testGetText() {
