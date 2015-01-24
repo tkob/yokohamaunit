@@ -225,7 +225,7 @@ public class AstToJUnitAst {
                 stubExpr ->
                         new StubExpr(
                                 new QuotedExpr(
-                                        stubExpr.getClassToStub().getText(),
+                                        stubExpr.getClassToStub().getName(),
                                         new Span(
                                                 docyPath,
                                                 stubExpr.getClassToStub().getSpan().getStart(),

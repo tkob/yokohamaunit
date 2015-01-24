@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
 public class StubExpr implements Expr {
-    private QuotedExpr classToStub;
+    private ClassType classToStub;
     private List<StubBehavior> behavior;
     private Span span;
 
