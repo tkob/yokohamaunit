@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.util.SBuilder;
 import static yokohama.unit.util.SetUtils.setOf;
@@ -75,8 +76,14 @@ public class MockitoMockStrategy implements MockStrategy {
 
     @Override
     public void stub(SBuilder sb, String name, StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
-        String classToStub = stubExpr.getClassToStub().getText();
-        sb.appendln(classToStub, " ", name, " = mock(", classToStub, ".class);");
+        String classToStub = stubExpr.getClassToStub().getName();
+        String fileName = stubExpr.getClassToStub().getSpan().getFileName();
+        int startLine = stubExpr.getClassToStub().getSpan().getStart().getLine();
+        String span = stubExpr.getClassToStub().getSpan().toString();
+        sb.appendln(classToStub, " ", name, " = mock_(", classToStub, ".class",
+                ", \"", escapeJava(fileName), "\", ",
+                startLine,
+                ", \"", escapeJava(span), "\");");
         for (StubBehavior behavior : stubExpr.getBehavior()) {
             MethodPattern methodPattern = behavior.getMethodPattern();
             String methodName = methodPattern.getName();
@@ -161,6 +168,31 @@ public class MockitoMockStrategy implements MockStrategy {
                         },
                         (s1, s2) -> s1.addAll(s2)
                 );
+    }
+
+    @Override
+    public void auxMethods(SBuilder sb) {
+        sb.appendln("private <T> T mock_(Class<T> classToMock, String fileName, int startLine, String span) {");
+        sb.shift();
+            sb.appendln("try {");
+            sb.shift();
+                sb.appendln("return mock(classToMock);");
+            sb.unshift();
+            sb.appendln("} catch (Exception e) {");
+            sb.shift();
+                sb.appendln("RuntimeException e2 = new RuntimeException(span + \" \" + e.getMessage(), e);");
+                sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", fileName, startLine) };");
+                sb.appendln("e2.setStackTrace(st);");
+                sb.appendln("throw e2;");
+            sb.unshift();
+            sb.appendln("}");
+        sb.unshift();
+        sb.appendln("}");
+    }
+
+    @Override
+    public Set<ImportedName> auxMethodsImports() {
+        return setOf(new ImportStatic("org.mockito.Mockito.mock"));
     }
 
 }

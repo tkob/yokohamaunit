@@ -345,7 +345,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public StubExpr visitStubExpr(YokohamaUnitParser.StubExprContext ctx) {
-        QuotedExpr classToStub = new QuotedExpr(ctx.Expr().getText(), getSpan(ctx));
+        ClassType classToStub = visitClassType(ctx.classType());
         List<StubBehavior> behavior =
                 ctx.stubBehavior().stream()
                                   .map(this::visitStubBehavior)

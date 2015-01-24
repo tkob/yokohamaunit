@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 public class StubExpr implements Expr {
-    private QuotedExpr classToStub;
+    private ClassType classToStub;
     private List<StubBehavior> behavior;
 
     @Override
