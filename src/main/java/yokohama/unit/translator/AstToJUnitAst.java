@@ -31,6 +31,7 @@ import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
@@ -198,6 +199,10 @@ public class AstToJUnitAst {
                 return new VarDeclStatement(
                         varName,
                         new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
+            }
+            @Override
+            public Statement visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
             @Override
             public Statement visitNullValue(NullValueMatcher nullValue) {

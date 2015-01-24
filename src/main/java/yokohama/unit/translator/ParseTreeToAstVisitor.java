@@ -161,6 +161,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitInstanceSuchThat(YokohamaUnitParser.InstanceSuchThatContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Matcher visitNullValue(YokohamaUnitParser.NullValueContext ctx) {
         return new NullValueMatcher(getSpan(ctx));
     }

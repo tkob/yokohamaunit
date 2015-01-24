@@ -38,6 +38,7 @@ SUCH: 'such' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 METHOD: 'method' -> mode(AFTER_METHOD) ;
 RETURNS: 'returns' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 AN_INSTANCE_OF: 'an' [ \t\r\n]+ 'instance' [ \t\r\n] 'of' -> mode(EXPECT_CLASS) ;
+AN_INSTANCE: 'an' [ \t\r\n]+ 'instance' -> mode(AFTER_AN_INSTANCE) ;
 NULL: 'null' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 NOTHING: 'nothing' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* ;
@@ -72,6 +73,7 @@ SUCH2: 'such' -> type(SUCH) ;
 METHOD2: 'method' -> type(METHOD), mode(AFTER_METHOD) ;
 RETURNS2: 'returns' -> type(RETURNS) ;
 AN_INSTANCE_OF2: 'an' [ \t\r\n]+ 'instance' [ \t\r\n] 'of' -> type(AN_INSTANCE_OF), mode(EXPECT_CLASS) ;
+AN_INSTANCE2: 'an' [ \t\r\n]+ 'instance' -> type(AN_INSTANCE), mode(AFTER_AN_INSTANCE) ;
 NULL2: 'null' -> type(NULL) ;
 NOTHING2: 'nothing' -> type(NOTHING) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
@@ -161,6 +163,12 @@ DOT2: '.' -> type(DOT) ;
 Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
 SPACETABNEWLINE4: [ \t\r\n]+ -> skip ;
 CLOSEBACKTICK3: '`' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode AFTER_AN_INSTANCE;
+OF: 'of' ;
+Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
+OPENBACKTICK5: '`' -> skip, mode(CLASS) ;
+SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]
