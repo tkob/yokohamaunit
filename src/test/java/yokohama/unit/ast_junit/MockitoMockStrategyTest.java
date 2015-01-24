@@ -50,7 +50,7 @@ public class MockitoMockStrategyTest {
                                             new MethodPattern(
                                                     "compare",
                                                     Arrays.asList(
-                                                            new Type(new ClassType("Object"), 0)
+                                                            new Type(new ClassType("Object", Span.dummySpan()), 0)
                                                     ),
                                                     false),
                                             new QuotedExpr("0", Span.dummySpan())))),
@@ -217,7 +217,7 @@ public class MockitoMockStrategyTest {
                             new ImportClass("ognl.Ognl")
                     ))
             ),
-            new Fixture(new ClassType("Object"), 0, new SBuilder(4)
+            new Fixture(new ClassType("Object", Span.dummySpan()), 0, new SBuilder(4)
                     .appendln("DummyClass stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
                     .appendln("when((Object)stub.dummyMethod(isA(Object.class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
@@ -317,7 +317,7 @@ public class MockitoMockStrategyTest {
                             new ImportClass("ognl.Ognl")
                     ))
             ),
-            new Fixture(new ClassType("Object"), 1, new SBuilder(4)
+            new Fixture(new ClassType("Object", Span.dummySpan()), 1, new SBuilder(4)
                     .appendln("DummyClass stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
                     .appendln("when((Object)stub.dummyMethod(isA(Object[].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
@@ -340,7 +340,7 @@ public class MockitoMockStrategyTest {
                             new ImportClass("ognl.Ognl")
                     ))
             ),
-            new Fixture(new ClassType("Object"), 2, new SBuilder(4)
+            new Fixture(new ClassType("Object", Span.dummySpan()), 2, new SBuilder(4)
                     .appendln("DummyClass stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
                     .appendln("when((Object)stub.dummyMethod(isA(Object[][].class))).thenReturn(eval(\"null\", env, \"?\", -1, \"?:?\"));")
                     .toString(),
@@ -429,7 +429,7 @@ public class MockitoMockStrategyTest {
             new PrimitiveType(Kind.CHAR),
             new PrimitiveType(Kind.FLOAT),
             new PrimitiveType(Kind.DOUBLE),
-            new ClassType("java.lang.Object")
+            new ClassType("java.lang.Object", Span.dummySpan())
         };
 
         @Theory

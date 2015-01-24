@@ -263,7 +263,12 @@ public class AstToJUnitAst {
     NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
         return nonArrayType.accept(
                 primitiveType -> new PrimitiveType(primitiveType.getKind()),
-                classType -> new ClassType(classType.getName())
+                classType -> new ClassType(
+                        classType.getName(),
+                        new Span(
+                                docyPath,
+                                classType.getSpan().getStart(),
+                                classType.getSpan().getEnd()))
         );
     }
 
