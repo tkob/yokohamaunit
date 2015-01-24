@@ -2,8 +2,8 @@ package yokohama.unit.util;
 
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class SBuilderTest {
     
