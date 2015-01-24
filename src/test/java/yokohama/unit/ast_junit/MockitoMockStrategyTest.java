@@ -21,14 +21,14 @@ public class MockitoMockStrategyTest {
         public static Fixture[] PARAMs = {
             // no method definition
             new Fixture(
-                    new StubExpr(new QuotedExpr("Object", Span.dummySpan()), Arrays.asList()),
+                    new StubExpr(new ClassType("Object", Span.dummySpan()), Arrays.asList()),
                     new SBuilder(4).appendln("Object stub = mock_(Object.class, \"?\", -1, \"?:?\");").toString(),
                     new TreeSet<>(Arrays.asList(
                             new ImportStatic("org.mockito.Mockito.mock")))),
             // no arguments
             new Fixture(
                     new StubExpr(
-                            new QuotedExpr("java.util.concurrent.Callable", Span.dummySpan()),
+                            new ClassType("java.util.concurrent.Callable", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern("call", Arrays.asList(), false),
@@ -44,7 +44,7 @@ public class MockitoMockStrategyTest {
             // one argument: class type
             new Fixture(
                     new StubExpr(
-                            new QuotedExpr("Comparable", Span.dummySpan()),
+                            new ClassType("Comparable", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -66,7 +66,7 @@ public class MockitoMockStrategyTest {
             // one argument: primitive type
             new Fixture(
                     new StubExpr(
-                            new QuotedExpr("CharSequence", Span.dummySpan()),
+                            new ClassType("CharSequence", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -366,7 +366,7 @@ public class MockitoMockStrategyTest {
                     sb,
                     name,
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -393,7 +393,7 @@ public class MockitoMockStrategyTest {
             // Verify
             Set<ImportedName> actual = instance.stubImports(
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -445,7 +445,7 @@ public class MockitoMockStrategyTest {
                     sb,
                     name,
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -475,7 +475,7 @@ public class MockitoMockStrategyTest {
             // Verify
             Set<ImportedName> actual = instance.stubImports(
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -508,7 +508,7 @@ public class MockitoMockStrategyTest {
                     sb,
                     name,
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(
@@ -539,7 +539,7 @@ public class MockitoMockStrategyTest {
             // Verify
             Set<ImportedName> actual = instance.stubImports(
                     new StubExpr(
-                            new QuotedExpr("DummyClass", Span.dummySpan()),
+                            new ClassType("DummyClass", Span.dummySpan()),
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern(

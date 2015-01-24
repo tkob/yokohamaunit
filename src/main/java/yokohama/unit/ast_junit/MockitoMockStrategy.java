@@ -76,7 +76,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
     @Override
     public void stub(SBuilder sb, String name, StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
-        String classToStub = stubExpr.getClassToStub().getText();
+        String classToStub = stubExpr.getClassToStub().getName();
         String fileName = stubExpr.getClassToStub().getSpan().getFileName();
         int startLine = stubExpr.getClassToStub().getSpan().getStart().getLine();
         String span = stubExpr.getClassToStub().getSpan().toString();
