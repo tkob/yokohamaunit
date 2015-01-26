@@ -160,53 +160,59 @@ public class AstToJUnitAst {
         return proposition.getPredicate().<Stream<Statement>>accept(isPredicate -> {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
-                    return Stream.of(new VarDeclStatement(actual, subject),
-                            translateMatcher(isPredicate.getComplement(), expected),
-                            new IsStatement(new Var(actual), new Var(expected)));
+                    return Stream.concat(
+                            Stream.of(new VarDeclStatement(actual, subject)),
+                            Stream.concat(
+                                    translateMatcher(isPredicate.getComplement(), expected),
+                                    Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
                 },
                 isNotPredicate -> {
                     String actual = genSym.generate("actual");
                     String unexpected = genSym.generate("unexpected");
-                    return Stream.of(new VarDeclStatement(actual, subject),
-                            translateMatcher(isNotPredicate.getComplement(), unexpected),
-                            new IsNotStatement(new Var(actual), new Var(unexpected)));
+                    return Stream.concat(
+                            Stream.of(new VarDeclStatement(actual, subject)),
+                            Stream.concat(
+                                    translateMatcher(isNotPredicate.getComplement(), unexpected),
+                                    Stream.of(new IsNotStatement(new Var(actual), new Var(unexpected)))));
                 },
                 throwsPredicate -> {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
-                    return Stream.of(new BindThrownStatement(actual, subject),
-                            translateMatcher(throwsPredicate.getThrowee(), expected),
-                            new IsStatement(new Var(actual), new Var(expected)));
+                    return Stream.concat(
+                            Stream.of(new BindThrownStatement(actual, subject)),
+                            Stream.concat(
+                                    translateMatcher(throwsPredicate.getThrowee(), expected),
+                                    Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
                 }
         );
     }
 
-    Statement translateMatcher(Matcher matcher, String varName) {
-        return matcher.accept(new MatcherVisitor<Statement>() {
+    Stream<Statement> translateMatcher(Matcher matcher, String varName) {
+        return matcher.accept(new MatcherVisitor<Stream<Statement>>() {
             @Override
-            public Statement visitEqualTo(EqualToMatcher equalTo) {
-                return new VarDeclStatement(
+            public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
+                return Stream.of(new VarDeclStatement(
                         varName,
                         new QuotedExpr(
                                 equalTo.getExpr().getText(),
                                 new Span(
                                         docyPath,
                                         equalTo.getSpan().getStart(),
-                                        equalTo.getSpan().getEnd())));
+                                        equalTo.getSpan().getEnd()))));
             }
             @Override
-            public Statement visitInstanceOf(InstanceOfMatcher instanceOf) {
-                return new VarDeclStatement(
+            public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
+                return Stream.of(new VarDeclStatement(
                         varName,
-                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName()));
+                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName())));
             }
             @Override
-            public Statement visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
+            public Stream<Statement> visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
             @Override
-            public Statement visitNullValue(NullValueMatcher nullValue) {
-                return new VarDeclStatement(varName, new NullValueMatcherExpr());
+            public Stream<Statement> visitNullValue(NullValueMatcher nullValue) {
+                return Stream.of(new VarDeclStatement(varName, new NullValueMatcherExpr()));
             }
         });
     }
