@@ -17,7 +17,9 @@
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
  * 
- * MatcherExpr ::= InstanceOfMatcherExpr | NullValueMatcherExpr
+ * MatcherExpr ::= InstanceOfMatcherExpr
+ *               | NullValueMatcherExpr
+ *               | ConjunctionMatcherExpr 
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
