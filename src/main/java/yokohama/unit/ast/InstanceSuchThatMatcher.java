@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
 public class InstanceSuchThatMatcher implements Matcher {
+    private String varName;
     private ClassType clazz;
     private List<Proposition> propositions;
     private Span span;
