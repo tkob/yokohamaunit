@@ -3,6 +3,7 @@ package yokohama.unit.ast_junit;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import yokohama.unit.util.SBuilder;
 import static yokohama.unit.util.SetUtils.setOf;
 
 @Value
@@ -11,8 +12,8 @@ public class InstanceOfMatcherExpr extends MatcherExpr {
     private String className;
 
     @Override
-    public String getExpr() {
-        return "instanceOf(" + className + ".class)";
+    public void getExpr(SBuilder sb, String varName) {
+        sb.appendln("Matcher ", varName, " = instanceOf(", className, ".class);");
     }
 
     @Override

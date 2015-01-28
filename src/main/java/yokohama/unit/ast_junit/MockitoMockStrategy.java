@@ -115,7 +115,9 @@ public class MockitoMockStrategy implements MockStrategy {
                         return null;
                     },
                     matcherExpr -> {
-                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", matcherExpr.getExpr(), ");");
+                        String name2 = name + "_";
+                        matcherExpr.getExpr(sb, name2);
+                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         return null;
                     }
             );

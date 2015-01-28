@@ -23,7 +23,7 @@ public class VarDeclStatement implements Statement {
                     return null;
                 },
                 matcherExpr -> {
-                    sb.appendln("Matcher ", name, " = ", matcherExpr.getExpr(), ";");
+                    matcherExpr.getExpr(sb, name);
                     return null;
                 });
     }
