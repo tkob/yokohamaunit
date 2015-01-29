@@ -14,7 +14,7 @@ public class ConjunctionMatcherExpr extends MatcherExpr {
     private final List<Var> matchers;
 
     @Override
-    public void getExpr(SBuilder sb, String varName) {
+    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy) {
         sb.appendln("Matcher ", varName, " = allOf(",
                 matchers.stream().map(Var::getName).collect(Collectors.joining(", ")),
                 ")");
