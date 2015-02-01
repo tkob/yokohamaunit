@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -26,7 +27,8 @@ public class TestFourPhaseWithTeardown {
             Object temp = eval("@java.io.File@createTempFile(\"prefix\", null)", env, "TestFourPhaseWithTeardown.docy", 3, "TestFourPhaseWithTeardown.docy:3.14-3.58");
             env.put("temp", temp);
             Object actual = eval("temp.length()", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.9-6.22");
-            Object expected = eval("0L", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.28-6.30");
+            Object obj = eval("0L", env, "TestFourPhaseWithTeardown.docy", 6, "TestFourPhaseWithTeardown.docy:6.28-6.30");
+            Matcher expected = is(obj);
             assertThat(actual, is(expected));
         } finally {
             eval("temp.delete()", env, "TestFourPhaseWithTeardown.docy", 9, "TestFourPhaseWithTeardown.docy:9.5-9.18");

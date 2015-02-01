@@ -49,6 +49,7 @@ import yokohama.unit.ast_junit.TopBindStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.Expr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
@@ -191,14 +192,19 @@ public class AstToJUnitAst {
         return matcher.accept(new MatcherVisitor<Stream<Statement>>() {
             @Override
             public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
-                return Stream.of(new VarDeclStatement(
-                        varName,
-                        new QuotedExpr(
-                                equalTo.getExpr().getText(),
-                                new Span(
-                                        docyPath,
-                                        equalTo.getSpan().getStart(),
-                                        equalTo.getSpan().getEnd()))));
+                Var objVar = new Var(genSym.generate("obj"));
+                return Stream.of(
+                        new VarDeclStatement(
+                                objVar.getName(),
+                                new QuotedExpr(
+                                        equalTo.getExpr().getText(),
+                                        new Span(
+                                                docyPath,
+                                                equalTo.getSpan().getStart(),
+                                                equalTo.getSpan().getEnd()))),
+                        new VarDeclStatement(
+                                varName,
+                                new EqualToMatcherExpr(objVar)));
             }
             @Override
             public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {

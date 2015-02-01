@@ -22,6 +22,7 @@ import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.BindThrownStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
@@ -106,8 +107,10 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarDeclStatement("expected", new QuotedExpr("b", Span.dummySpan())),
+        List<Statement> expected = Arrays.asList(
+                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarDeclStatement("expected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }
@@ -125,8 +128,10 @@ public class AstToJUnitAstTest {
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarDeclStatement("unexpected", new QuotedExpr("b", Span.dummySpan())),
+        List<Statement> expected = Arrays.asList(
+                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarDeclStatement("unexpected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsNotStatement(new Var("actual"), new Var("unexpected")));
         assertThat(actual, is(expected));
     }

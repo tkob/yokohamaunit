@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -29,7 +30,8 @@ public class TestTable {
         Object expected = eval("true", env, "TestTable.docy", 7, "TestTable.docy:7.32-7.42");
         env.put("expected", expected);
         Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-        Object expected4 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Object obj = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Matcher expected4 = is(obj);
         assertThat(actual, is(expected4));
     }
     @Test
@@ -42,7 +44,8 @@ public class TestTable {
         Object expected2 = eval("true", env, "TestTable.docy", 8, "TestTable.docy:8.32-8.42");
         env.put("expected", expected2);
         Object actual2 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-        Object expected5 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Object obj2 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Matcher expected5 = is(obj2);
         assertThat(actual2, is(expected5));
     }
     @Test
@@ -55,7 +58,8 @@ public class TestTable {
         Object expected3 = eval("false", env, "TestTable.docy", 9, "TestTable.docy:9.32-9.42");
         env.put("expected", expected3);
         Object actual3 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
-        Object expected6 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Object obj3 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
+        Matcher expected6 = is(obj3);
         assertThat(actual3, is(expected6));
     }
 }
