@@ -163,7 +163,7 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             Stream.of(new VarDeclStatement(actual, subject)),
                             Stream.concat(
-                                    translateMatcher(isPredicate.getComplement(), expected),
+                                    translateMatcher(isPredicate.getComplement(), expected, genSym),
                                     Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
                 },
                 isNotPredicate -> {
@@ -172,7 +172,7 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             Stream.of(new VarDeclStatement(actual, subject)),
                             Stream.concat(
-                                    translateMatcher(isNotPredicate.getComplement(), unexpected),
+                                    translateMatcher(isNotPredicate.getComplement(), unexpected, genSym),
                                     Stream.of(new IsNotStatement(new Var(actual), new Var(unexpected)))));
                 },
                 throwsPredicate -> {
@@ -181,13 +181,13 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             Stream.of(new BindThrownStatement(actual, subject)),
                             Stream.concat(
-                                    translateMatcher(throwsPredicate.getThrowee(), expected),
+                                    translateMatcher(throwsPredicate.getThrowee(), expected, genSym),
                                     Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
                 }
         );
     }
 
-    Stream<Statement> translateMatcher(Matcher matcher, String varName) {
+    Stream<Statement> translateMatcher(Matcher matcher, String varName, GenSym genSym) {
         return matcher.accept(new MatcherVisitor<Stream<Statement>>() {
             @Override
             public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
