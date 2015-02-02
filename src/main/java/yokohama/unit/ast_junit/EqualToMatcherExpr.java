@@ -12,7 +12,7 @@ public class EqualToMatcherExpr extends MatcherExpr {
     private Var operand;
 
     @Override
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy) {
+    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("Matcher ", varName, " = is(", operand.getName(), ");");
     }
 

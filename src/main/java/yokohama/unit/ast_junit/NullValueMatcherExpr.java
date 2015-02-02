@@ -10,7 +10,7 @@ import static yokohama.unit.util.SetUtils.setOf;
 @EqualsAndHashCode(callSuper=false)
 public class NullValueMatcherExpr extends MatcherExpr {
     @Override
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy) {
+    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("Matcher ", varName, " = nullValue();");
     }
 

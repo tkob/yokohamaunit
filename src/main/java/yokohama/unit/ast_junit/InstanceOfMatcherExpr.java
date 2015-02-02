@@ -12,7 +12,7 @@ public class InstanceOfMatcherExpr extends MatcherExpr {
     private String className;
 
     @Override
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy) {
+    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("Matcher ", varName, " = instanceOf(", className, ".class);");
     }
 
