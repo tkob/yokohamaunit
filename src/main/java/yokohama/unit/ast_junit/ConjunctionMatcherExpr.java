@@ -17,7 +17,7 @@ public class ConjunctionMatcherExpr extends MatcherExpr {
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("Matcher ", varName, " = allOf(",
                 matchers.stream().map(Var::getName).collect(Collectors.joining(", ")),
-                ")");
+                ");");
     }
 
     @Override
