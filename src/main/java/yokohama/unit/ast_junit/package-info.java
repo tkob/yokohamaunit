@@ -20,6 +20,7 @@
  * MatcherExpr ::= InstanceOfMatcherExpr
  *               | NullValueMatcherExpr
  *               | ConjunctionMatcherExpr 
+ *               | EqualToMatcherExpr
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
