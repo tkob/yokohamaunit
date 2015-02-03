@@ -21,6 +21,7 @@
  *               | NullValueMatcherExpr
  *               | ConjunctionMatcherExpr 
  *               | EqualToMatcherExpr
+ *               | SuchThatMatcherExpr 
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
