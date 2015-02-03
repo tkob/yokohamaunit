@@ -30,6 +30,8 @@
  *             | TopBindStatement
  *             | VarDeclStatement
  *             | BindThrownStatement
+ *             | ReturnIsStatement
+ *             | ReturnIsNotStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var

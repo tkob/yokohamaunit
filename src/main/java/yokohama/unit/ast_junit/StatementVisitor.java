@@ -7,4 +7,6 @@ public interface StatementVisitor<T> {
     T visitTopBindStatement(TopBindStatement topBindStatement);
     T visitVarDeclStatement(VarDeclStatement varDeclStatement);
     T visitBindThrownStatement(BindThrownStatement bindThrownStatement);
+    T visitReturnIsStatement(ReturnIsStatement returnIsStatement);
+    T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement);
 }
