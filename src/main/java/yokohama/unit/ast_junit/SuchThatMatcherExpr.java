@@ -24,12 +24,17 @@ public class SuchThatMatcherExpr extends MatcherExpr {
             }
             sb.unshift();
             sb.appendln("}");
+            sb.appendln("@Override");
+            sb.appendln("public void describeTo(Description description) {");
+            sb.appendln("}");
         sb.unshift();
         sb.appendln("};");
     }
 
     @Override
     public Set<ImportedName> importedNames() {
-        return setOf(new ImportClass("org.hamcrest.BaseMatcher"));
+        return setOf(
+                new ImportClass("org.hamcrest.BaseMatcher"),
+                new ImportClass("org.hamcrest.Description"));
     }
 }
