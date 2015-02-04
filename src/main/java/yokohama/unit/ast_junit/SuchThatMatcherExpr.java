@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 import static yokohama.unit.util.SetUtils.setOf;
 
@@ -11,6 +12,7 @@ import static yokohama.unit.util.SetUtils.setOf;
 @EqualsAndHashCode(callSuper=false)
 public class SuchThatMatcherExpr extends MatcherExpr {
     private List<Statement> statements;
+    private String description;
 
     @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
@@ -34,6 +36,9 @@ public class SuchThatMatcherExpr extends MatcherExpr {
             sb.appendln("}");
             sb.appendln("@Override");
             sb.appendln("public void describeTo(Description description) {");
+            sb.shift();
+                sb.appendln("description.appendText(\"",  escapeJava(description), "\");");
+            sb.unshift();
             sb.appendln("}");
         sb.unshift();
         sb.appendln("};");
