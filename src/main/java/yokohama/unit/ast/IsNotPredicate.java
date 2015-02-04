@@ -20,5 +20,10 @@ public class IsNotPredicate implements Predicate {
     public <T> T accept(PredicateVisitor<T> visitor) {
         return visitor.visitIsNotPredicate(this);
     }
+
+    @Override
+    public String getDesctiption() {
+        return "is not " + complement.getDesctiption();
+    }
     
 }

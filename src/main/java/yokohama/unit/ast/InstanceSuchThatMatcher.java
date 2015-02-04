@@ -1,6 +1,7 @@
 package yokohama.unit.ast;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,5 +23,10 @@ public class InstanceSuchThatMatcher implements Matcher {
     @Override
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitInstanceSuchThat(this);
+    }
+
+    @Override
+    public String getDesctiption() {
+        return "an instance of " + clazz.getName() + " s.t. ...";
     }
 }

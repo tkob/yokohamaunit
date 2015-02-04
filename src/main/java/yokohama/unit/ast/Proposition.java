@@ -12,8 +12,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
-public class Proposition {
+public class Proposition implements Describable {
     private QuotedExpr subject;
     private Predicate predicate;
     private Span span;
+
+    @Override
+    public String getDesctiption() {
+        return "`" + subject.getText() + "` " + predicate.getDesctiption();
+    }
 }

@@ -20,4 +20,9 @@ public class IsPredicate implements Predicate {
     public <T> T accept(PredicateVisitor<T> visitor) {
         return visitor.visitIsPredicate(this);
     }
+
+    @Override
+    public String getDesctiption() {
+        return "is " + complement.getDesctiption();
+    }
 }

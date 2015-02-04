@@ -2,7 +2,7 @@ package yokohama.unit.ast;
 
 import java.util.function.Function;
 
-public interface Matcher {
+public interface Matcher extends Describable {
     <T> T accept(MatcherVisitor<T> visitor);
 
     default <T> T accept(

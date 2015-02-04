@@ -20,5 +20,10 @@ public class EqualToMatcher implements Matcher {
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitEqualTo(this);
     }
+
+    @Override
+    public String getDesctiption() {
+        return "`" + expr.getText() + "`";
+    }
     
 }
