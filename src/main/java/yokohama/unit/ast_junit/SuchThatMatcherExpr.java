@@ -19,9 +19,17 @@ public class SuchThatMatcherExpr extends MatcherExpr {
             sb.appendln("@Override");
             sb.appendln("public boolean matches(Object obj) {");
             sb.shift();
-            for (Statement statement : statements) {
-                statement.toString(sb, expressionStrategy, mockStrategy);
-            }
+                sb.appendln("try {");
+                sb.shift();
+                for (Statement statement : statements) {
+                    statement.toString(sb, expressionStrategy, mockStrategy);
+                }
+                sb.unshift();
+                sb.appendln("} catch (Exception e) {");
+                sb.shift();
+                    sb.appendln("throw new RuntimeException(e);");
+                sb.unshift();
+                sb.appendln("}");
             sb.unshift();
             sb.appendln("}");
             sb.appendln("@Override");
