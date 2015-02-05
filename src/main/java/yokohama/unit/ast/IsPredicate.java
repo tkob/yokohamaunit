@@ -22,7 +22,7 @@ public class IsPredicate implements Predicate {
     }
 
     @Override
-    public String getDesctiption() {
-        return "is " + complement.getDesctiption();
+    public String getDescription() {
+        return "is " + complement.getDescription();
     }
 }

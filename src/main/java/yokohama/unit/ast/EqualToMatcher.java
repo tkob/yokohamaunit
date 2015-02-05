@@ -22,7 +22,7 @@ public class EqualToMatcher implements Matcher {
     }
 
     @Override
-    public String getDesctiption() {
+    public String getDescription() {
         return "`" + expr.getText() + "`";
     }
     

@@ -22,8 +22,8 @@ public class ThrowsPredicate implements Predicate {
     }
 
     @Override
-    public String getDesctiption() {
-        return "throws " + throwee.getDesctiption();
+    public String getDescription() {
+        return "throws " + throwee.getDescription();
     }
     
 }

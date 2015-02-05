@@ -18,7 +18,7 @@ public class Proposition implements Describable {
     private Span span;
 
     @Override
-    public String getDesctiption() {
-        return "`" + subject.getText() + "` " + predicate.getDesctiption();
+    public String getDescription() {
+        return "`" + subject.getText() + "` " + predicate.getDescription();
     }
 }

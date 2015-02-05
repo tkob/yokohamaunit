@@ -21,7 +21,7 @@ public class NullValueMatcher implements Matcher {
     }
 
     @Override
-    public String getDesctiption() {
+    public String getDescription() {
         return "null";
     }
 }

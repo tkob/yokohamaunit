@@ -22,8 +22,8 @@ public class IsNotPredicate implements Predicate {
     }
 
     @Override
-    public String getDesctiption() {
-        return "is not " + complement.getDesctiption();
+    public String getDescription() {
+        return "is not " + complement.getDescription();
     }
     
 }

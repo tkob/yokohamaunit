@@ -26,7 +26,7 @@ public class InstanceSuchThatMatcher implements Matcher {
     }
 
     @Override
-    public String getDesctiption() {
+    public String getDescription() {
         return "an instance of " + clazz.getName() + " s.t. ...";
     }
 }
