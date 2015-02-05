@@ -27,6 +27,7 @@ public class InstanceSuchThatMatcher implements Matcher {
 
     @Override
     public String getDescription() {
-        return "an instance of " + clazz.getName() + " s.t. ...";
+        return "an instance " + varName + " of " + clazz.getName() + " s.t. " +
+                propositions.stream().map(Proposition::getDescription).collect(Collectors.joining(" and "));
     }
 }
