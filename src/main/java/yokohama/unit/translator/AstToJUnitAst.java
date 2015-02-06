@@ -38,6 +38,7 @@ import yokohama.unit.ast.MatcherVisitor;
 import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
+import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
@@ -49,6 +50,7 @@ import yokohama.unit.ast_junit.TopBindStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.ConjunctionMatcherExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.Expr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
@@ -59,15 +61,18 @@ import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
+import yokohama.unit.ast_junit.ReturnIsStatement;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.StubBehavior;
 import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.SuchThatMatcherExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarDeclStatement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.util.GenSym;
+import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
@@ -213,8 +218,58 @@ public class AstToJUnitAst {
                         new InstanceOfMatcherExpr(instanceOf.getClazz().getName())));
             }
             @Override
-            public Stream<Statement> visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
-                throw new UnsupportedOperationException("Not supported yet.");
+           public Stream<Statement> visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
+                String bindVarName = instanceSuchThat.getVarName();
+                String instanceOfVarName = genSym.generate("instanceOfMatcher");
+                VarDeclStatement instanceOfStatement = new VarDeclStatement(
+                        instanceOfVarName,
+                        new InstanceOfMatcherExpr(instanceSuchThat.getClazz().getName()));
+                List<Pair<Var, Stream<Statement>>> suchThats =
+                        instanceSuchThat.getPropositions().stream().map(proposition -> {
+                            Var suchThatVar = new Var(genSym.generate("suchThat"));
+                            Var predVar = new Var(genSym.generate("pred"));
+                            yokohama.unit.ast.QuotedExpr subject = proposition.getSubject();
+                            Predicate pred = proposition.getPredicate();
+                            Stream<Statement> predStatements = pred.accept(
+                                    isPredicate ->
+                                            translateMatcher(isPredicate.getComplement(), predVar.getName(), genSym),
+                                    isNotPredicate ->
+                                            translateMatcher(isNotPredicate.getComplement(), predVar.getName(), genSym),
+                                    throwsPredicate ->
+                                            translateMatcher(throwsPredicate.getThrowee(), predVar.getName(), genSym));
+                            return new Pair<Var, Stream<Statement>>(
+                                    suchThatVar,
+                                    Stream.concat(
+                                            predStatements,
+                                            Stream.of(new VarDeclStatement(
+                                                    suchThatVar.getName(),
+                                                    new SuchThatMatcherExpr(Arrays.asList(
+                                                            new TopBindStatement(bindVarName, new Var("obj")),
+                                                            new VarDeclStatement(
+                                                                    "actual",
+                                                                    new QuotedExpr(
+                                                                            subject.getText(),
+                                                                            new Span(
+                                                                                    docyPath,
+                                                                                    subject.getSpan().getStart(),
+                                                                                    subject.getSpan().getEnd()))),
+                                                            new ReturnIsStatement(new Var("actual"), predVar)),
+                                                            proposition.getDescription())))));
+                        }).collect(Collectors.toList());
+                Stream<Var> suchThatVars = suchThats.stream().map(Pair::getFirst);
+                Stream<Statement> suchThatStatements = suchThats.stream().flatMap(Pair::getSecond);
+                VarDeclStatement allOfStatement = new VarDeclStatement(
+                        varName,
+                        new ConjunctionMatcherExpr(
+                                Stream.concat(
+                                        Stream.of(new Var(instanceOfVarName)),
+                                        suchThatVars
+                                ).collect(Collectors.toList())));
+                return Stream.concat(
+                        Stream.of(instanceOfStatement),
+                        Stream.concat(
+                                suchThatStatements,
+                                Stream.of(allOfStatement)));
             }
             @Override
             public Stream<Statement> visitNullValue(NullValueMatcher nullValue) {
