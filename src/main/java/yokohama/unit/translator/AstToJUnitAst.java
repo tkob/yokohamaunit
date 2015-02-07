@@ -32,6 +32,8 @@ import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MatcherVisitor;
@@ -39,11 +41,13 @@ import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Position;
 import yokohama.unit.ast.Predicate;
+import yokohama.unit.ast.PredicateVisitor;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.BindThrownStatement;
 import yokohama.unit.ast_junit.TopBindStatement;
@@ -230,31 +234,41 @@ public class AstToJUnitAst {
                             Var predVar = new Var(genSym.generate("pred"));
                             yokohama.unit.ast.QuotedExpr subject = proposition.getSubject();
                             Predicate pred = proposition.getPredicate();
-                            Stream<Statement> predStatements = pred.accept(
-                                    isPredicate ->
-                                            translateMatcher(isPredicate.getComplement(), predVar.getName(), genSym),
-                                    isNotPredicate ->
-                                            translateMatcher(isNotPredicate.getComplement(), predVar.getName(), genSym),
-                                    throwsPredicate ->
-                                            translateMatcher(throwsPredicate.getThrowee(), predVar.getName(), genSym));
-                            return new Pair<Var, Stream<Statement>>(
-                                    suchThatVar,
-                                    Stream.concat(
-                                            predStatements,
-                                            Stream.of(new VarDeclStatement(
-                                                    suchThatVar.getName(),
-                                                    new SuchThatMatcherExpr(Arrays.asList(
-                                                            new TopBindStatement(bindVarName, new Var("obj")),
-                                                            new VarDeclStatement(
-                                                                    "actual",
-                                                                    new QuotedExpr(
-                                                                            subject.getText(),
-                                                                            new Span(
-                                                                                    docyPath,
-                                                                                    subject.getSpan().getStart(),
-                                                                                    subject.getSpan().getEnd()))),
-                                                            new ReturnIsStatement(new Var("actual"), predVar)),
-                                                            proposition.getDescription())))));
+                            return pred.accept(new PredicateVisitor<Pair<Var, Stream<Statement>>>() {
+                                @Override
+                                public Pair<Var, Stream<Statement>> visitIsPredicate(IsPredicate isPredicate) {
+                                    Stream<Statement> predStatements =
+                                            translateMatcher(isPredicate.getComplement(), predVar.getName(), genSym);
+                                    Stream<Statement> s =
+                                            Stream.concat(
+                                                    predStatements,
+                                                    Stream.of(new VarDeclStatement(
+                                                            suchThatVar.getName(),
+                                                            new SuchThatMatcherExpr(Arrays.asList(
+                                                                    new TopBindStatement(bindVarName, new Var("obj")),
+                                                                    new VarDeclStatement(
+                                                                            "actual",
+                                                                            new QuotedExpr(
+                                                                                    subject.getText(),
+                                                                                    new Span(
+                                                                                            docyPath,
+                                                                                            subject.getSpan().getStart(),
+                                                                                            subject.getSpan().getEnd()))),
+                                                                    new ReturnIsStatement(new Var("actual"), predVar)),
+                                                                    proposition.getDescription()))));
+                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
+                                }
+                                @Override
+                                public Pair<Var, Stream<Statement>> visitIsNotPredicate(IsNotPredicate isNotPredicate) {
+                                    translateMatcher(isNotPredicate.getComplement(), predVar.getName(), genSym);
+                                    throw new UnsupportedOperationException("Not supported yet.");
+                                }
+                                @Override
+                                public Pair<Var, Stream<Statement>> visitThrowsPredicate(ThrowsPredicate throwsPredicate) {
+                                    translateMatcher(throwsPredicate.getThrowee(), predVar.getName(), genSym);
+                                    throw new UnsupportedOperationException("Not supported yet.");
+                                }
+                            });
                         }).collect(Collectors.toList());
                 Stream<Var> suchThatVars = suchThats.stream().map(Pair::getFirst);
                 Stream<Statement> suchThatStatements = suchThats.stream().flatMap(Pair::getSecond);
