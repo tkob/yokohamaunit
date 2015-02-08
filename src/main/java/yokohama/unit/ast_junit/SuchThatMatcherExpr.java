@@ -13,13 +13,14 @@ import static yokohama.unit.util.SetUtils.setOf;
 public class SuchThatMatcherExpr extends MatcherExpr {
     private List<Statement> statements;
     private String description;
+    private Var argVar;
 
     @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln("Matcher ", varName, " = new BaseMatcher() {");
         sb.shift();
             sb.appendln("@Override");
-            sb.appendln("public boolean matches(Object obj) {");
+            sb.appendln("public boolean matches(Object ", argVar.getName(), ") {");
             sb.shift();
                 sb.appendln("try {");
                 sb.shift();
