@@ -65,6 +65,7 @@ import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
+import yokohama.unit.ast_junit.ReturnIsNotStatement;
 import yokohama.unit.ast_junit.ReturnIsStatement;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.StubBehavior;
@@ -260,13 +261,49 @@ public class AstToJUnitAst {
                                 }
                                 @Override
                                 public Pair<Var, Stream<Statement>> visitIsNotPredicate(IsNotPredicate isNotPredicate) {
-                                    translateMatcher(isNotPredicate.getComplement(), predVar.getName(), genSym);
-                                    throw new UnsupportedOperationException("Not supported yet.");
+                                    Stream<Statement> predStatements =
+                                            translateMatcher(isNotPredicate.getComplement(), predVar.getName(), genSym);
+                                    Stream<Statement> s =
+                                            Stream.concat(
+                                                    predStatements,
+                                                    Stream.of(new VarDeclStatement(
+                                                            suchThatVar.getName(),
+                                                            new SuchThatMatcherExpr(Arrays.asList(
+                                                                    new TopBindStatement(bindVarName, new Var("obj")),
+                                                                    new VarDeclStatement(
+                                                                            "actual",
+                                                                            new QuotedExpr(
+                                                                                    subject.getText(),
+                                                                                    new Span(
+                                                                                            docyPath,
+                                                                                            subject.getSpan().getStart(),
+                                                                                            subject.getSpan().getEnd()))),
+                                                                    new ReturnIsNotStatement(new Var("actual"), predVar)),
+                                                                    proposition.getDescription()))));
+                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
                                 }
                                 @Override
                                 public Pair<Var, Stream<Statement>> visitThrowsPredicate(ThrowsPredicate throwsPredicate) {
-                                    translateMatcher(throwsPredicate.getThrowee(), predVar.getName(), genSym);
-                                    throw new UnsupportedOperationException("Not supported yet.");
+                                    Stream<Statement> predStatements =
+                                            translateMatcher(throwsPredicate.getThrowee(), predVar.getName(), genSym);
+                                    Stream<Statement> s =
+                                            Stream.concat(
+                                                    predStatements,
+                                                    Stream.of(new VarDeclStatement(
+                                                            suchThatVar.getName(),
+                                                            new SuchThatMatcherExpr(Arrays.asList(
+                                                                    new TopBindStatement(bindVarName, new Var("obj")),
+                                                                    new BindThrownStatement(
+                                                                            "actual",
+                                                                            new QuotedExpr(
+                                                                                    subject.getText(),
+                                                                                    new Span(
+                                                                                            docyPath,
+                                                                                            subject.getSpan().getStart(),
+                                                                                            subject.getSpan().getEnd()))),
+                                                                    new ReturnIsStatement(new Var("actual"), predVar)),
+                                                                    proposition.getDescription()))));
+                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
                                 }
                             });
                         }).collect(Collectors.toList());
