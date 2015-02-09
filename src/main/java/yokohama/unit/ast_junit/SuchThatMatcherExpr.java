@@ -46,7 +46,7 @@ public class SuchThatMatcherExpr extends MatcherExpr {
     }
 
     @Override
-    public Set<ImportedName> importedNames() {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return setOf(
                 new ImportClass("org.hamcrest.BaseMatcher"),
                 new ImportClass("org.hamcrest.Description"));

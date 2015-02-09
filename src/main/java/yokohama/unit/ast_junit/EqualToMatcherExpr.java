@@ -17,7 +17,7 @@ public class EqualToMatcherExpr extends MatcherExpr {
     }
 
     @Override
-    public Set<ImportedName> importedNames() {
+    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         return setOf(new ImportStatic("org.hamcrest.CoreMatchers.is"));
     }
 }

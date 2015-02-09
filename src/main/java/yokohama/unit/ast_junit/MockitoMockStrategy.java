@@ -162,7 +162,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                         return null;
                                     },
                                     matcherExpr -> {
-                                        set.addAll(matcherExpr.importedNames());
+                                        set.addAll(matcherExpr.importedNames(expressionStrategy, this));
                                         return null;
                                     }
                             );
