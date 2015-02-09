@@ -63,7 +63,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         return "eval(\"" + escapeJava(quotedExpr.getText()) + "\", env, " +
                 "\"" + escapeJava(quotedExpr.getSpan().getFileName()) +  "\", " +
                 quotedExpr.getSpan().getStart().getLine() + ", " +
-                "\"" + quotedExpr.getSpan().toString() + "\")";
+                "\"" + escapeJava(quotedExpr.getSpan().toString()) + "\")";
     }
 
     @Override
