@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
 public class TableRef extends Fixture {
+    private List<Ident> idents;
     private TableType type;
     private String name;
     private Span span;

@@ -18,6 +18,7 @@ import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IsNotPredicate;
@@ -182,9 +183,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public TableRef visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
+        List<Ident> idents = visitVars(ctx.vars());
         TableType tableType = visitTableType(ctx.tableType());
         String name = ctx.Quoted().getText();
-        return new TableRef(tableType, name, getSpan(ctx));
+        return new TableRef(idents, tableType, name, getSpan(ctx));
+    }
+
+    @Override
+    public List<Ident> visitVars(YokohamaUnitParser.VarsContext ctx) {
+        return ctx.Identifier().stream()
+                .map(TerminalNode::getSymbol)
+                .map(Token::getText)
+                .map(Ident::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -201,11 +212,6 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 return TableType.EXCEL;
        }
         throw new IllegalArgumentException("'" + text + "' is not a table type.");
-    }
-
-    @Override
-    public Object visitVars(YokohamaUnitParser.VarsContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
