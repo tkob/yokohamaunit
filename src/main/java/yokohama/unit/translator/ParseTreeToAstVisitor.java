@@ -204,6 +204,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitVars(YokohamaUnitParser.VarsContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Bindings visitBindings(YokohamaUnitParser.BindingsContext ctx) {
         List<Binding> bindings = ctx.binding().stream()
                                               .map(this::visitBinding)

@@ -36,8 +36,9 @@ condition: tableRef
          | bindings
          ;
 
-tableRef: FOR ALL RULES IN tableType Quoted ;
+tableRef: FOR ALL vars IN tableType Quoted ;
 tableType: UTABLE | CSV | TSV | EXCEL ;
+vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
 
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) expr ;

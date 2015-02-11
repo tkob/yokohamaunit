@@ -1,6 +1,7 @@
 # Test: String.startsWith
 
-Assert `sut.startsWith(prefix)` is `expected` for all rules in Table "Test data for startsWith".
+Assert `sut.startsWith(prefix)` is `expected`
+for all sut, prefix and expected in Table "Test data for startsWith".
 
 Table: Test data for startsWith
 | sut           | prefix      | expected |
