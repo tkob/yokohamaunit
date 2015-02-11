@@ -19,6 +19,7 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.InstanceOfMatcher;
+import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -158,6 +159,15 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Matcher visitInstanceOf(YokohamaUnitParser.InstanceOfContext ctx) {
         return new InstanceOfMatcher(visitClassType(ctx.classType()), getSpan(ctx));
+    }
+
+    @Override
+    public Matcher visitInstanceSuchThat(YokohamaUnitParser.InstanceSuchThatContext ctx) {
+        return new InstanceSuchThatMatcher(
+                ctx.Identifier().getText(),
+                visitClassType(ctx.classType()),
+                ctx.proposition().stream().map(this::visitProposition).collect(Collectors.toList()),
+                getSpan(ctx));
     }
 
     @Override

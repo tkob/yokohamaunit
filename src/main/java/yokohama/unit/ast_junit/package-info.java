@@ -17,7 +17,11 @@
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
  * 
- * MatcherExpr ::= InstanceOfMatcherExpr | NullValueMatcherExpr
+ * MatcherExpr ::= InstanceOfMatcherExpr
+ *               | NullValueMatcherExpr
+ *               | ConjunctionMatcherExpr 
+ *               | EqualToMatcherExpr
+ *               | SuchThatMatcherExpr 
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
@@ -26,6 +30,8 @@
  *             | TopBindStatement
  *             | VarDeclStatement
  *             | BindThrownStatement
+ *             | ReturnIsStatement
+ *             | ReturnIsNotStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var

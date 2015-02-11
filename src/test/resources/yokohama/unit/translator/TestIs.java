@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -23,7 +24,8 @@ public class TestIs {
     public void Simple_Arithmetic_1() throws Exception {
         OgnlContext env = new OgnlContext();
         Object actual = eval("1 + 1", env, "TestIs.docy", 2, "TestIs.docy:2.14-2.19");
-        Object expected = eval("2", env, "TestIs.docy", 2, "TestIs.docy:2.25-2.26");
+        Object obj = eval("2", env, "TestIs.docy", 2, "TestIs.docy:2.25-2.26");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
 }

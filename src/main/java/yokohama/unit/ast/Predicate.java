@@ -2,7 +2,7 @@ package yokohama.unit.ast;
 
 import java.util.function.Function;
 
-public interface Predicate {
+public interface Predicate extends Describable {
     <T> T accept(PredicateVisitor<T> visitor);
 
     default <T> T accept(

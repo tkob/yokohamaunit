@@ -100,6 +100,13 @@ public class TranslatorUtilsTest {
                             "Variations_of_stubbing_1"
                     )
             ),
+            new Fixture("TestInstanceSuchThat.docy", null, Arrays.asList(
+                    "instance_such_that_1",
+                    "instance_such_that_2",
+                    "instance_such_that_3",
+                    "instance_such_that_4",
+                    "instance_such_that_5"
+            ))
         };
 
         @Theory

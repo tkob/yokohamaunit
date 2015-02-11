@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -27,7 +28,8 @@ public class TestBindings {
         Object prefix = eval("\"\"", env, "TestBindings.docy", 5, "TestBindings.docy:5.24-5.26");
         env.put("prefix", prefix);
         Object actual = eval("sut.startsWith(prefix)", env, "TestBindings.docy", 3, "TestBindings.docy:3.14-3.36");
-        Object expected = eval("true", env, "TestBindings.docy", 3, "TestBindings.docy:3.42-3.46");
+        Object obj = eval("true", env, "TestBindings.docy", 3, "TestBindings.docy:3.42-3.46");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
 }

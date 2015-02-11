@@ -114,6 +114,7 @@ task checkDocumentConsistency << {
                     !name.endsWith(".original~") &&
                     !name.equals("Span.java") &&
                     !name.equals("Position.java") &&
+                    !name.equals("Describable.java") &&
                     !name.equals("package-info.java")
                 } as FilenameFilter)
             .grep({ name ->

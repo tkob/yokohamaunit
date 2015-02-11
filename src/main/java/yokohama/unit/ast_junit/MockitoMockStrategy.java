@@ -115,7 +115,9 @@ public class MockitoMockStrategy implements MockStrategy {
                         return null;
                     },
                     matcherExpr -> {
-                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", matcherExpr.getExpr(), ");");
+                        String name2 = name + "_";
+                        matcherExpr.getExpr(sb, name2, expressionStrategy, this);
+                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         return null;
                     }
             );
@@ -160,7 +162,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                         return null;
                                     },
                                     matcherExpr -> {
-                                        set.addAll(matcherExpr.importedNames());
+                                        set.addAll(matcherExpr.importedNames(expressionStrategy, this));
                                         return null;
                                     }
                             );

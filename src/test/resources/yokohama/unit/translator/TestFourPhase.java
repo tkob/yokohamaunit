@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -26,7 +27,8 @@ public class TestFourPhase {
         env.put("i", i);
         eval("i.incrementAndGet()", env, "TestFourPhase.docy", 6, "TestFourPhase.docy:6.5-6.24");
         Object actual = eval("i.get()", env, "TestFourPhase.docy", 9, "TestFourPhase.docy:9.9-9.16");
-        Object expected = eval("1", env, "TestFourPhase.docy", 9, "TestFourPhase.docy:9.22-9.23");
+        Object obj = eval("1", env, "TestFourPhase.docy", 9, "TestFourPhase.docy:9.22-9.23");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
 }

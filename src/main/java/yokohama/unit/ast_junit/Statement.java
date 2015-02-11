@@ -17,7 +17,9 @@ public interface Statement {
             Function<ActionStatement, T> visitActionStatement_,
             Function<TopBindStatement, T> visitTopBindStatement_,
             Function<VarDeclStatement, T> visitVarDeclStatement_,
-            Function<BindThrownStatement, T> visitBindThrownStatement_
+            Function<BindThrownStatement, T> visitBindThrownStatement_,
+            Function<ReturnIsStatement, T> visitReturnIsStatement_,
+            Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -48,6 +50,16 @@ public interface Statement {
             @Override
             public T visitBindThrownStatement(BindThrownStatement bindThrownStatement) {
                 return visitBindThrownStatement_.apply(bindThrownStatement);
+            }
+
+            @Override
+            public T visitReturnIsStatement(ReturnIsStatement returnIsStatement) {
+                return visitReturnIsStatement_.apply(returnIsStatement);
+            }
+
+            @Override
+            public T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement) {
+                return visitReturnIsNotStatement_.apply(returnIsNotStatement);
             }
         });
     }

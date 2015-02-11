@@ -4,6 +4,7 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import static org.mockito.Mockito.anyInt;
@@ -42,7 +43,8 @@ public class TestStub {
         when((Object)task.call()).thenReturn(eval("42", env, "TestStub.docy", 6, "TestStub.docy:6.51-6.53"));
         env.put("task", task);
         Object actual = eval("exec.submit(task).get()", env, "TestStub.docy", 3, "TestStub.docy:3.9-3.32");
-        Object expected = eval("42", env, "TestStub.docy", 3, "TestStub.docy:3.38-3.40");
+        Object obj = eval("42", env, "TestStub.docy", 3, "TestStub.docy:3.38-3.40");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
     @Test
@@ -54,7 +56,8 @@ public class TestStub {
         Object unmodifiableMap = eval("@java.util.Collections@unmodifiableMap(map)", env, "TestStub.docy", 13, "TestStub.docy:13.28-13.71");
         env.put("unmodifiableMap", unmodifiableMap);
         Object actual = eval("unmodifiableMap.get(\"answer\")", env, "TestStub.docy", 10, "TestStub.docy:10.9-10.38");
-        Object expected = eval("42", env, "TestStub.docy", 10, "TestStub.docy:10.44-10.46");
+        Object obj = eval("42", env, "TestStub.docy", 10, "TestStub.docy:10.44-10.46");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
     @Test
@@ -68,7 +71,8 @@ public class TestStub {
         env.put("sb", sb);
         eval("sb.append(seq, 10, 13)", env, "TestStub.docy", 26, "TestStub.docy:26.5-26.27");
         Object actual = eval("sb.toString()", env, "TestStub.docy", 30, "TestStub.docy:30.9-30.22");
-        Object expected = eval("\"aaa\"", env, "TestStub.docy", 30, "TestStub.docy:30.28-30.33");
+        Object obj = eval("\"aaa\"", env, "TestStub.docy", 30, "TestStub.docy:30.28-30.33");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
 }

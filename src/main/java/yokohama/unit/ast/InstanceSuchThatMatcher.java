@@ -1,5 +1,7 @@
 package yokohama.unit.ast;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,18 +14,20 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
-public class EqualToMatcher implements Matcher {
-    private QuotedExpr expr;
+public class InstanceSuchThatMatcher implements Matcher {
+    private String varName;
+    private ClassType clazz;
+    private List<Proposition> propositions;
     private Span span;
 
     @Override
     public <T> T accept(MatcherVisitor<T> visitor) {
-        return visitor.visitEqualTo(this);
+        return visitor.visitInstanceSuchThat(this);
     }
 
     @Override
     public String getDescription() {
-        return "`" + expr.getText() + "`";
+        return "an instance " + varName + " of " + clazz.getName() + " s.t. " +
+                propositions.stream().map(Proposition::getDescription).collect(Collectors.joining(" and "));
     }
-    
 }

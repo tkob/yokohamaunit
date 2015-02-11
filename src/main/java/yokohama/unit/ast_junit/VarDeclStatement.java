@@ -23,7 +23,7 @@ public class VarDeclStatement implements Statement {
                     return null;
                 },
                 matcherExpr -> {
-                    sb.appendln("Matcher ", name, " = ", matcherExpr.getExpr(), ";");
+                    matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
                     return null;
                 });
     }
@@ -34,7 +34,7 @@ public class VarDeclStatement implements Statement {
                 quotedExpr -> expressionStrategy.getValueImports(), 
                 stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
                 matcherExpr -> union(
-                        matcherExpr.importedNames(),
+                        matcherExpr.importedNames(expressionStrategy, mockStrategy),
                         setOf(new ImportClass("org.hamcrest.Matcher"))));
     }
 

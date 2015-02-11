@@ -5,6 +5,7 @@ import ognl.OgnlContext;
 import ognl.OgnlException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import org.hamcrest.Matcher;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -24,14 +25,16 @@ public class TestMultipleAssertions {
     public void Multiple_assertions_1() throws Exception {
         OgnlContext env = new OgnlContext();
         Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 2, "TestMultipleAssertions.docy:2.14-2.19");
-        Object expected = eval("2", env, "TestMultipleAssertions.docy", 2, "TestMultipleAssertions.docy:2.25-2.26");
+        Object obj = eval("2", env, "TestMultipleAssertions.docy", 2, "TestMultipleAssertions.docy:2.25-2.26");
+        Matcher expected = is(obj);
         assertThat(actual, is(expected));
     }
     @Test
     public void Multiple_assertions_2() throws Exception {
         OgnlContext env = new OgnlContext();
         Object actual = eval("1 + 1", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.14-3.19");
-        Object unexpected = eval("3", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.29-3.30");
+        Object obj = eval("3", env, "TestMultipleAssertions.docy", 3, "TestMultipleAssertions.docy:3.29-3.30");
+        Matcher unexpected = is(obj);
         assertThat(actual, is(not(unexpected)));
     }
 }

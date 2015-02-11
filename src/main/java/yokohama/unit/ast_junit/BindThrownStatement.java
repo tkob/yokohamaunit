@@ -25,7 +25,7 @@ public class BindThrownStatement implements Statement {
                         return null;
                     },
                     matcherExpr -> {
-                        sb.appendln(matcherExpr.getExpr(), ";");
+                        matcherExpr.getExpr(sb, "_", expressionStrategy, mockStrategy);
                         return null;
                     });
             sb.appendln(name, " = null;");
@@ -49,7 +49,7 @@ public class BindThrownStatement implements Statement {
                 value.accept(
                         quotedExpr -> expressionStrategy.getValueImports(), 
                         stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                        matcherExpr -> matcherExpr.importedNames()),
+                        matcherExpr -> matcherExpr.importedNames(expressionStrategy, mockStrategy)),
                 union(
                         expressionStrategy.wrappingExceptionImports(), 
                         expressionStrategy.wrappedExceptionImports()));
