@@ -4,7 +4,7 @@ Assert `sut.startsWith(prefix)` is `expected`
 for all sut, prefix and expected in Table "Test data for startsWith".
 
 Table: Test data for startsWith
-| sut           | prefix      | expected |
-| "hello world" | ""          | true     |
-| "hello world" | "hello"     | true     |
-| "hello world" | "world"     | false    |
+| sut           | prefix  | expected | dummy |
+| "hello world" | ""      | true     | 1     |
+| "hello world" | "hello" | true     | 2     |
+| "hello world" | "world" | false    | 3     |

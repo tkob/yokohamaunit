@@ -25,9 +25,9 @@ public class TestTable {
         OgnlContext env = new OgnlContext();
         Object sut = eval("\"hello world\"", env, "TestTable.docy", 8, "TestTable.docy:8.2-8.17");
         env.put("sut", sut);
-        Object prefix = eval("\"\"", env, "TestTable.docy", 8, "TestTable.docy:8.18-8.31");
+        Object prefix = eval("\"\"", env, "TestTable.docy", 8, "TestTable.docy:8.18-8.27");
         env.put("prefix", prefix);
-        Object expected = eval("true", env, "TestTable.docy", 8, "TestTable.docy:8.32-8.42");
+        Object expected = eval("true", env, "TestTable.docy", 8, "TestTable.docy:8.28-8.38");
         env.put("expected", expected);
         Object actual = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
         Object obj = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
@@ -39,9 +39,9 @@ public class TestTable {
         OgnlContext env = new OgnlContext();
         Object sut2 = eval("\"hello world\"", env, "TestTable.docy", 9, "TestTable.docy:9.2-9.17");
         env.put("sut", sut2);
-        Object prefix2 = eval("\"hello\"", env, "TestTable.docy", 9, "TestTable.docy:9.18-9.31");
+        Object prefix2 = eval("\"hello\"", env, "TestTable.docy", 9, "TestTable.docy:9.18-9.27");
         env.put("prefix", prefix2);
-        Object expected2 = eval("true", env, "TestTable.docy", 9, "TestTable.docy:9.32-9.42");
+        Object expected2 = eval("true", env, "TestTable.docy", 9, "TestTable.docy:9.28-9.38");
         env.put("expected", expected2);
         Object actual2 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
         Object obj2 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");
@@ -53,9 +53,9 @@ public class TestTable {
         OgnlContext env = new OgnlContext();
         Object sut3 = eval("\"hello world\"", env, "TestTable.docy", 10, "TestTable.docy:10.2-10.17");
         env.put("sut", sut3);
-        Object prefix3 = eval("\"world\"", env, "TestTable.docy", 10, "TestTable.docy:10.18-10.31");
+        Object prefix3 = eval("\"world\"", env, "TestTable.docy", 10, "TestTable.docy:10.18-10.27");
         env.put("prefix", prefix3);
-        Object expected3 = eval("false", env, "TestTable.docy", 10, "TestTable.docy:10.32-10.42");
+        Object expected3 = eval("false", env, "TestTable.docy", 10, "TestTable.docy:10.28-10.38");
         env.put("expected", expected3);
         Object actual3 = eval("sut.startsWith(prefix)", env, "TestTable.docy", 3, "TestTable.docy:3.9-3.31");
         Object obj3 = eval("expected", env, "TestTable.docy", 3, "TestTable.docy:3.37-3.45");

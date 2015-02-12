@@ -31,6 +31,7 @@ import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IsNotPredicate;
@@ -414,6 +415,10 @@ public class AstToJUnitAst {
                               .filter(table -> table.getName().equals(name))
                               .findFirst()
                               .get(),
+                        tableRef.getIdents()
+                                .stream()
+                                .map(Ident::getName)
+                                .collect(Collectors.toList()),
                         genSym
                 );
             case CSV:
@@ -427,15 +432,16 @@ public class AstToJUnitAst {
 
     }
 
-    List<List<Statement>> translateTable(Table table, GenSym genSym) {
+    List<List<Statement>> translateTable(Table table, List<String> idents, GenSym genSym) {
         return table.getRows()
                     .stream()
-                    .map(row -> translateRow(row, table.getHeader(), genSym))
+                    .map(row -> translateRow(row, table.getHeader(), idents, genSym))
                     .collect(Collectors.toList());
     }
 
-    List<Statement> translateRow(Row row, List<String> header, GenSym genSym) {
+    List<Statement> translateRow(Row row, List<String> header, List<String> idents, GenSym genSym) {
         return IntStream.range(0, header.size())
+                .filter(i -> idents.contains(header.get(i)))
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
