@@ -164,7 +164,7 @@ public class TranslatorUtilsTest {
                                     .stream()
                                     .map(FrameworkMethod::getName)
                                     .collect(Collectors.toSet());
-                    Set<String> expected = new TreeSet<String>(fixture.methods);
+                    Set<String> expected = new TreeSet<>(fixture.methods);
                     assertThat(actual, is(expected));
                 }
 

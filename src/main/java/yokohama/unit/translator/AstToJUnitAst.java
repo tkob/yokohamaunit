@@ -261,7 +261,7 @@ public class AstToJUnitAst {
                                                             }},
                                                             proposition.getDescription(),
                                                             matchesArg)));
-                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
+                                    return new Pair<>(suchThatVar, s);
                                 }
                                 @Override
                                 public Pair<Var, Stream<Statement>> visitIsNotPredicate(IsNotPredicate isNotPredicate) {
@@ -287,7 +287,7 @@ public class AstToJUnitAst {
                                                             }},
                                                             proposition.getDescription(),
                                                             matchesArg)));
-                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
+                                    return new Pair<>(suchThatVar, s);
                                 }
                                 @Override
                                 public Pair<Var, Stream<Statement>> visitThrowsPredicate(ThrowsPredicate throwsPredicate) {
@@ -313,7 +313,7 @@ public class AstToJUnitAst {
                                                             }},
                                                             proposition.getDescription(),
                                                             matchesArg)));
-                                    return new Pair<Var, Stream<Statement>>(suchThatVar, s);
+                                    return new Pair<>(suchThatVar, s);
                                 }
                             });
                         }).collect(Collectors.toList());
