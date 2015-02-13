@@ -41,7 +41,7 @@
  * 
  * Fixture ::= | TableRef | Bindings
  * 
- * TableRef ::= TableType
+ * TableRef ::= Ident+ TableType
  * 
  * TableType :: INLINE | CSV | TSV | EXCEL
  * 

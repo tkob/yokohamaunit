@@ -31,6 +31,7 @@ import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IsNotPredicate;
@@ -407,6 +408,10 @@ public class AstToJUnitAst {
 
     List<List<Statement>> translateTableRef(TableRef tableRef, List<Table> tables, GenSym genSym) {
         String name = tableRef.getName();
+        List<String> idents = tableRef.getIdents()
+                                      .stream()
+                                      .map(Ident::getName)
+                                      .collect(Collectors.toList());
         switch(tableRef.getType()) {
             case INLINE:
                 return translateTable(
@@ -414,28 +419,30 @@ public class AstToJUnitAst {
                               .filter(table -> table.getName().equals(name))
                               .findFirst()
                               .get(),
+                        idents,
                         genSym
                 );
             case CSV:
-                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), genSym);
+                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, genSym);
             case TSV:
-                return parseCSV(name, CSVFormat.TDF.withHeader(), genSym);
+                return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym);
             case EXCEL:
-                return parseExcel(name, genSym);
+                return parseExcel(name, idents, genSym);
         }
         throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
 
     }
 
-    List<List<Statement>> translateTable(Table table, GenSym genSym) {
+    List<List<Statement>> translateTable(Table table, List<String> idents, GenSym genSym) {
         return table.getRows()
                     .stream()
-                    .map(row -> translateRow(row, table.getHeader(), genSym))
+                    .map(row -> translateRow(row, table.getHeader(), idents, genSym))
                     .collect(Collectors.toList());
     }
 
-    List<Statement> translateRow(Row row, List<String> header, GenSym genSym) {
+    List<Statement> translateRow(Row row, List<String> header, List<String> idents, GenSym genSym) {
         return IntStream.range(0, header.size())
+                .filter(i -> idents.contains(header.get(i)))
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
@@ -446,7 +453,7 @@ public class AstToJUnitAst {
     }
 
     @SneakyThrows(IOException.class)
-    List<List<Statement>> parseCSV(String fileName, CSVFormat format, GenSym genSym) {
+    List<List<Statement>> parseCSV(String fileName, CSVFormat format, List<String> idents, GenSym genSym) {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -454,6 +461,7 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
+                                    .filter(key -> idents.contains(key))
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
                                         return Stream.of(new VarDeclStatement(
@@ -471,7 +479,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<List<Statement>> parseExcel(String fileName, GenSym genSym) {
+    List<List<Statement>> parseExcel(String fileName, List<String> idents, GenSym genSym) {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -484,6 +492,7 @@ public class AstToJUnitAst {
                     .skip(1)
                     .map(row -> 
                         IntStream.range(0, names.size())
+                                .filter(i -> idents.contains(names.get(i)))
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
