@@ -427,7 +427,7 @@ public class AstToJUnitAst {
             case TSV:
                 return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym);
             case EXCEL:
-                return parseExcel(name, genSym);
+                return parseExcel(name, idents, genSym);
         }
         throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
 
@@ -479,7 +479,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<List<Statement>> parseExcel(String fileName, GenSym genSym) {
+    List<List<Statement>> parseExcel(String fileName, List<String> idents, GenSym genSym) {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -492,6 +492,7 @@ public class AstToJUnitAst {
                     .skip(1)
                     .map(row -> 
                         IntStream.range(0, names.size())
+                                .filter(i -> idents.contains(names.get(i)))
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
