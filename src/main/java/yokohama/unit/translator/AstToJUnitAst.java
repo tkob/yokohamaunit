@@ -408,6 +408,10 @@ public class AstToJUnitAst {
 
     List<List<Statement>> translateTableRef(TableRef tableRef, List<Table> tables, GenSym genSym) {
         String name = tableRef.getName();
+        List<String> idents = tableRef.getIdents()
+                                      .stream()
+                                      .map(Ident::getName)
+                                      .collect(Collectors.toList());
         switch(tableRef.getType()) {
             case INLINE:
                 return translateTable(
@@ -415,16 +419,13 @@ public class AstToJUnitAst {
                               .filter(table -> table.getName().equals(name))
                               .findFirst()
                               .get(),
-                        tableRef.getIdents()
-                                .stream()
-                                .map(Ident::getName)
-                                .collect(Collectors.toList()),
+                        idents,
                         genSym
                 );
             case CSV:
-                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), genSym);
+                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, genSym);
             case TSV:
-                return parseCSV(name, CSVFormat.TDF.withHeader(), genSym);
+                return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym);
             case EXCEL:
                 return parseExcel(name, genSym);
         }
@@ -452,7 +453,7 @@ public class AstToJUnitAst {
     }
 
     @SneakyThrows(IOException.class)
-    List<List<Statement>> parseCSV(String fileName, CSVFormat format, GenSym genSym) {
+    List<List<Statement>> parseCSV(String fileName, CSVFormat format, List<String> idents, GenSym genSym) {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -460,6 +461,7 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
+                                    .filter(key -> idents.contains(key))
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
                                         return Stream.of(new VarDeclStatement(
