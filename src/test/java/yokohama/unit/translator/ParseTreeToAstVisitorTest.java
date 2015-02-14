@@ -15,8 +15,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
