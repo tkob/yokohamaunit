@@ -25,10 +25,10 @@ ALL: 'all' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 COMMA: ',' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 RULES: 'rules' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 IN: 'in' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-UTABLE: 'Table' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-CSV: 'CSV' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-TSV: 'TSV' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-EXCEL: 'Excel' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+UTABLE: 'Table' -> mode(AFTER_TABLE) ;
+CSV: 'CSV' -> mode(AFTER_CSV) ;
+TSV: 'TSV' -> mode(AFTER_CSV) ;
+EXCEL: 'Excel' -> mode(AFTER_EXCEL) ;
 WHERE: 'where' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 EQ: '=' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 LET: 'Let' -> mode(IN_THE_MIDDLE_OF_LINE) ;
@@ -61,10 +61,10 @@ ALL2: 'all' -> type(ALL) ;
 RULES2: 'rules' -> type(RULES) ;
 COMMA2: ',' -> type(COMMA);
 IN2: 'in' -> type(IN) ;
-UTABLE2: 'Table' -> type(UTABLE) ;
-CSV2: 'CSV' -> type(CSV) ;
-TSV2: 'TSV' -> type(TSV) ;
-EXCEL2: 'Excel' -> type(EXCEL) ;
+UTABLE2: 'Table' -> type(UTABLE), mode(AFTER_TABLE) ;
+CSV2: 'CSV' -> type(CSV), mode(AFTER_CSV) ;
+TSV2: 'TSV' -> type(TSV), mode(AFTER_CSV) ;
+EXCEL2: 'Excel' -> type(EXCEL), mode(AFTER_EXCEL) ;
 WHERE2: 'where' -> type(WHERE) ;
 EQ2: '=' -> type(EQ) ;
 LET2: 'Let' -> type(LET) ;
@@ -171,6 +171,30 @@ OF: 'of' ;
 Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
 OPENBACKTICK5: '`' -> skip, mode(CLASS) ;
 SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
+
+mode AFTER_TABLE;
+OPENSINGLEQUOTE: '\'' -> skip, mode(IN_TABLE_NAME) ;
+SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
+
+mode AFTER_CSV;
+OPENSINGLEQUOTE2: '\'' -> skip, mode(IN_FILE_NAME) ;
+SPACETABNEWLINE7: [ \t\r\n]+ -> skip ;
+
+mode AFTER_EXCEL;
+OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_BOOK_NAME) ;
+SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
+
+mode IN_TABLE_NAME;
+SingleQuoteName: (~['\r\n]|'\'\'')* ;
+CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode IN_FILE_NAME;
+SingleQuoteName2: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
+CLOSESINGLEQUOTE2: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode IN_BOOK_NAME;
+SingleQuoteName3: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
+CLOSESINGLEQUOTE3: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]

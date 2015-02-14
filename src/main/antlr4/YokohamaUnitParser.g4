@@ -32,13 +32,17 @@ instanceOf: AN_INSTANCE_OF classType ;
 instanceSuchThat: AN_INSTANCE Identifier OF classType SUCH THAT proposition (AND proposition)*;
 nullValue: NULL | NOTHING ;
 
-condition: tableRef
+condition: forAll
          | bindings
          ;
 
-tableRef: FOR ALL vars IN tableType Quoted ;
-tableType: UTABLE | CSV | TSV | EXCEL ;
+forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
+tableRef: UTABLE SingleQuoteName
+        | CSV SingleQuoteName
+        | TSV SingleQuoteName
+        | EXCEL SingleQuoteName
+        ;
 
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) expr ;

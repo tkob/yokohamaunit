@@ -49,6 +49,7 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
+import yokohama.unit.util.Pair;
 
 public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> implements YokohamaUnitParserVisitor<Object> 
 {
@@ -182,10 +183,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public TableRef visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
+    public TableRef visitForAll(YokohamaUnitParser.ForAllContext ctx) {
         List<Ident> idents = visitVars(ctx.vars());
-        TableType tableType = visitTableType(ctx.tableType());
-        String name = ctx.Quoted().getText();
+        Pair<TableType, String> typeAndName =  visitTableRef(ctx.tableRef());
+        TableType tableType = typeAndName.getFirst();
+        String name = typeAndName.getSecond();
         return new TableRef(idents, tableType, name, getSpan(ctx));
     }
 
@@ -199,19 +201,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public TableType visitTableType(YokohamaUnitParser.TableTypeContext ctx) {
-        String text = ctx.getText();
-        switch (text) {
-            case "Table":
-                return TableType.INLINE;
-            case "CSV":
-                return TableType.CSV;
-            case "TSV":
-                return TableType.TSV;
-            case "Excel":
-                return TableType.EXCEL;
-       }
-        throw new IllegalArgumentException("'" + text + "' is not a table type.");
+    public Pair<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
+        String name = ctx.SingleQuoteName().getText().replace("''", "'");
+        if (ctx.UTABLE() != null) {
+                return new Pair<>(TableType.INLINE, name);
+        } else if (ctx.CSV() != null) {
+                return new Pair<>(TableType.CSV, name);
+        } else if (ctx.TSV() != null) {
+                return new Pair<>(TableType.TSV, name);
+        } else if (ctx.EXCEL() != null) {
+                return new Pair<>(TableType.EXCEL, name);
+        } else {
+            throw new IllegalArgumentException("'" + ctx.getText() + "' is not a table reference.");
+        }
     }
 
     @Override

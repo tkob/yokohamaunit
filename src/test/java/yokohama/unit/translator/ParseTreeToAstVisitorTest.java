@@ -40,6 +40,7 @@ import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
+import yokohama.unit.util.Pair;
 
 public class ParseTreeToAstVisitorTest {
 
@@ -179,7 +180,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitCondition() throws IOException {
-        YokohamaUnitParser.ConditionContext ctx = parser("for all var in Table \"table 1\"").condition();
+        YokohamaUnitParser.ConditionContext ctx = parser("for all var in Table 'table 1'").condition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Fixture result = instance.visitCondition(ctx);
         assertThat(result, is(instanceOf(TableRef.class)));
@@ -194,52 +195,48 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitTableRef() throws IOException {
-        YokohamaUnitParser.TableRefContext ctx = parser("for all var in Table \"table name\"").tableRef();
+    public void testVisitForAll() throws IOException {
+        YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table 'table name'").forAll();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         //Object expResult = null;
-        TableRef result = instance.visitTableRef(ctx);
+        TableRef result = instance.visitForAll(ctx);
         assertEquals("table name", result.getName());
     }
 
     @Test
-    public void testVisitTableType() {
-        YokohamaUnitParser.TableTypeContext ctx = mock(YokohamaUnitParser.TableTypeContext.class);
-        when(ctx.getText()).thenReturn("Table");
+    public void testVisitTableRef() throws IOException {
+        YokohamaUnitParser.TableRefContext ctx = parser("Table 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Object expResult = TableType.INLINE;
-        Object result = instance.visitTableType(ctx);
-        assertEquals(expResult, result);
+        Pair<TableType, String> expected = new Pair<>(TableType.INLINE, "a'b");
+        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        assertThat(actual, is(expected));
     }
 
     @Test
-    public void testVisitTableType2() {
-        YokohamaUnitParser.TableTypeContext ctx = mock(YokohamaUnitParser.TableTypeContext.class);
-        when(ctx.getText()).thenReturn("CSV");
+    public void testVisitTableRef2() throws IOException {
+        YokohamaUnitParser.TableRefContext ctx = parser("CSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Object expResult = TableType.CSV;
-        Object result = instance.visitTableType(ctx);
-        assertEquals(expResult, result);
+        Pair<TableType, String> expected = new Pair<>(TableType.CSV, "a'b");
+        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        assertThat(actual, is(expected));
     }
 
     @Test
-    public void testVisitTableType3() {
-        YokohamaUnitParser.TableTypeContext ctx = mock(YokohamaUnitParser.TableTypeContext.class);
-        when(ctx.getText()).thenReturn("TSV");
+    public void testVisitTableRef3() throws IOException {
+        YokohamaUnitParser.TableRefContext ctx = parser("TSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Object expResult = TableType.TSV;
-        Object result = instance.visitTableType(ctx);
-        assertEquals(expResult, result);
+        Pair<TableType, String> expected = new Pair<>(TableType.TSV, "a'b");
+        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        assertThat(actual, is(expected));
     }
 
     @Test
-    public void testVisitTableType4() {
-        YokohamaUnitParser.TableTypeContext ctx = mock(YokohamaUnitParser.TableTypeContext.class);
-        when(ctx.getText()).thenReturn("Excel");
+    public void testVisitTableRef4() throws IOException {
+        YokohamaUnitParser.TableRefContext ctx = parser("Excel 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Object expResult = TableType.EXCEL;
-        Object result = instance.visitTableType(ctx);
-        assertEquals(expResult, result);
+        Pair<TableType, String> expected = new Pair<>(TableType.EXCEL, "a'b");
+        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        assertThat(actual, is(expected));
     }
 
     @Test
