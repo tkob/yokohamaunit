@@ -37,30 +37,6 @@ import yokohama.unit.util.GenSym;
 public class AstToJUnitAstTest {
 
     @Test
-    public void testExtractTables() {
-        List<Definition> definitions = Arrays.asList();
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        List<Table> result = instance.extractTables(definitions);
-        assertThat(result.size(), is(0));
-    }
-
-    @Test
-    public void testExtractTables1() {
-        List<Definition> definitions = Arrays.asList(
-                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan()),
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan()),
-                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan())
-        );
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty());
-        List<Table> actual = instance.extractTables(definitions);
-        List<Table> expected = Arrays.asList(
-                new Table("table 1", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan()),
-                new Table("table 2", Arrays.asList("a"), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan())
-        );
-        assertThat(actual, is(expected));
-    }
-
-    @Test
     public void testTranslate() {
         String name = "TestGroup";
         Group group = new Group(Arrays.asList(), yokohama.unit.ast.Span.dummySpan());

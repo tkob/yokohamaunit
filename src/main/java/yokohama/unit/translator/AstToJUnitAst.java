@@ -47,6 +47,7 @@ import yokohama.unit.ast.PredicateVisitor;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
@@ -82,13 +83,18 @@ import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
-@AllArgsConstructor
 public class AstToJUnitAst {
     private final Optional<Path> docyPath;
+    
+    AstToJUnitAst(Optional<Path> docyPath) {
+        this.docyPath = docyPath;
+    }
+
+    TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();
 
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
-        final List<Table> tables = extractTables(definitions);
+        final List<Table> tables = tableExtractVisitor.extractTables(group);
         List<TestMethod> methods =
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
@@ -98,15 +104,6 @@ public class AstToJUnitAst {
                            .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, methods);
         return new CompilationUnit(packageName, classDecl);
-    }
-    
-    List<Table> extractTables(List<Definition> definitions) {
-        return definitions.stream()
-                          .flatMap(definition -> definition.accept(
-                                  test -> Stream.empty(),
-                                  fourPhaseTest -> Stream.empty(),
-                                  table -> Stream.of(table)))
-                          .collect(Collectors.toList());
     }
 
     List<TestMethod> translateTest(Test test, final List<Table> tables) {
