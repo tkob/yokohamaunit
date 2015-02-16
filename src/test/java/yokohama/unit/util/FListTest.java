@@ -97,6 +97,20 @@ public class FListTest {
     }
 
     @Test
+    public void testReduce() {
+        FList<Integer> instance = FList.of();
+        int actual = instance.reduce(47, (Integer acc, Integer e) -> acc + e);
+        assertThat(actual, is(47));
+    }
+
+    @Test
+    public void testReduce1() {
+        FList<Integer> instance = FList.of(1, 2, 3);
+        int actual = instance.reduce(0, (Integer acc, Integer e) -> acc + e);
+        assertThat(actual, is(6));
+    }
+
+    @Test
     public void testEmpty() {
         assertThat(empty(), is(sameInstance(empty())));
     }
