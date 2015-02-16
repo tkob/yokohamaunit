@@ -1,5 +1,7 @@
 package yokohama.unit.util;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
@@ -82,9 +84,12 @@ public abstract class FList<E> {
                 (car, cdr) -> cons(car, append(cdr, l2)));
     }
     public static <E> FList<E> of(E... objs) {
+        return fromList(Arrays.asList(objs));
+    }
+    public static <E> FList<E> fromList(List<E> list) {
         FList<E> l = empty();
-        for (int i = objs.length - 1; i >= 0; i--) {
-            l = l.add(objs[i]);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            l = l.add(list.get(i));
         }
         return l;
     }

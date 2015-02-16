@@ -1,5 +1,6 @@
 package yokohama.unit.util;
 
+import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -127,6 +128,14 @@ public class FListTest {
     @Test
     public void testOf() {
         FList<Number> actual = FList.of(1, 3.14);
+        assertThat(actual.size(), is(2));
+        assertThat(actual.get(0), is(1));
+        assertThat(actual.get(1), is(3.14));
+    }
+
+    @Test
+    public void testFromList() {
+        FList<Number> actual = FList.fromList(Arrays.asList(1, 3.14));
         assertThat(actual.size(), is(2));
         assertThat(actual.get(0), is(1));
         assertThat(actual.get(1), is(3.14));
