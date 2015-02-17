@@ -48,6 +48,7 @@ import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
+import yokohama.unit.ast.TableHeaderCell;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
@@ -433,7 +434,15 @@ public class AstToJUnitAst {
     List<List<Statement>> translateTable(Table table, List<String> idents, GenSym genSym) {
         return table.getRows()
                     .stream()
-                    .map(row -> translateRow(row, table.getHeader(), idents, genSym))
+                    .map(row ->
+                            translateRow(
+                                    row,
+                                    table.getHeader()
+                                            .stream()
+                                            .map(TableHeaderCell::getLabel)
+                                            .collect(Collectors.toList()),
+                                    idents,
+                                    genSym))
                     .collect(Collectors.toList());
     }
 

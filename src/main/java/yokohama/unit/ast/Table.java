@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public class Table implements Definition {
     private String name;
-    private List<String> header;
+    private List<TableHeaderCell> header;
     private List<Row> rows;
     private Span span;
     

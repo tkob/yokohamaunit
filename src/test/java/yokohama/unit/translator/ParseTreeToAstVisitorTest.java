@@ -33,6 +33,7 @@ import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Span;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableHeaderCell;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.VerifyPhase;
@@ -277,7 +278,7 @@ public class ParseTreeToAstVisitorTest {
         Table actual = instance.visitTableDef(ctx);
         Table expected = new Table(
                 "table name",
-                Arrays.asList("a", "b"),
+                Arrays.asList(new TableHeaderCell("a", Span.dummySpan()), new TableHeaderCell("b", Span.dummySpan())),
                 Arrays.asList(
                         new Row(
                                 Arrays.asList(
@@ -292,8 +293,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitHeader() throws IOException {
         YokohamaUnitParser.HeaderContext ctx = parser("|a|b\n").header();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        List<String> actual = instance.visitHeader(ctx);
-        List<String> expected = Arrays.asList("a", "b");
+        List<TableHeaderCell> actual = instance.visitHeader(ctx);
+        List<TableHeaderCell> expected = Arrays.asList(new TableHeaderCell("a", Span.dummySpan()), new TableHeaderCell("b", Span.dummySpan()));
         assertThat(actual, is(expected));
     }
 

@@ -41,6 +41,7 @@ import yokohama.unit.ast.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableHeaderCell;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.Test;
@@ -234,15 +235,15 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Table visitTableDef(YokohamaUnitParser.TableDefContext ctx) {
         String name = ctx.TableName().getText();
-        List<String> header = visitHeader(ctx.header());
+        List<TableHeaderCell> header = visitHeader(ctx.header());
         List<Row> rows = visitRows(ctx.rows());
         return new Table(name, header, rows, getSpan(ctx));
     }
 
     @Override
-    public List<String> visitHeader(YokohamaUnitParser.HeaderContext ctx) {
+    public List<TableHeaderCell> visitHeader(YokohamaUnitParser.HeaderContext ctx) {
         return ctx.Identifier().stream()
-                               .map(TerminalNode::getText)
+                               .map(ident -> new TableHeaderCell(ident.getText(), nodeSpan(ident)))
                                .collect(Collectors.toList());
     }
 
