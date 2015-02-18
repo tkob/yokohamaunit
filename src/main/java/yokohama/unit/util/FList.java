@@ -1,6 +1,7 @@
 package yokohama.unit.util;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ public abstract class FList<E> {
     public abstract E get(int index);
     public FList<E> add(E obj) { return cons(obj, this); }
     public abstract <T> T reduce(T acc, BiFunction<T, ? super E, T> f);
+    public abstract List<E> toReverseList();
 
     @Value
     @EqualsAndHashCode(callSuper=false)
@@ -43,6 +45,10 @@ public abstract class FList<E> {
         @Override
         public <T> T reduce(T acc, BiFunction<T, ? super E, T> f) {
             return acc;
+        }
+        @Override
+        public List<E> toReverseList() {
+            return new LinkedList<E>();
         }
     }
     @Value
@@ -76,6 +82,12 @@ public abstract class FList<E> {
         @Override
         public <T> T reduce(T acc, BiFunction<T, ? super E, T> f) {
             return f.apply(cdr.reduce(acc, f), car);
+        }
+        @Override
+        public List<E> toReverseList() {
+            List<E> l = cdr.toReverseList();
+            l.add(car);
+            return l;
         }
     }
 

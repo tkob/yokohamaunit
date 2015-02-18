@@ -1,6 +1,9 @@
 package yokohama.unit.util;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -153,5 +156,37 @@ public class FListTest {
         assertThat(actual.size(), is(2));
         assertThat(actual.get(0), is(1));
         assertThat(actual.get(1), is(3.14));
+    }
+
+    @Test
+    public void testToReverseList() {
+        FList<Object> instance = FList.empty();
+        List<Object> actual = instance.toReverseList();
+        List<Object> expected = Arrays.asList();
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testToReverseList1() {
+        FList<Integer> instance = FList.of(47);
+        List<Integer> actual = instance.toReverseList();
+       List<Integer> expected = Arrays.asList(47);
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testToReverseList2() {
+        FList<Integer> instance = FList.of(47, 74);
+        List<Integer> actual = instance.toReverseList();
+       List<Integer> expected = Arrays.asList(74, 47);
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testToReverseList3() {
+        FList<Integer> instance = FList.of(47, 0, 74);
+        List<Integer> actual = instance.toReverseList();
+       List<Integer> expected = Arrays.asList(74, 0, 47);
+        assertThat(actual, is(expected));
     }
 }
