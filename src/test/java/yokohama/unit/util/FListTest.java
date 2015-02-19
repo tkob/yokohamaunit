@@ -100,17 +100,24 @@ public class FListTest {
     }
 
     @Test
-    public void testReduce() {
+    public void testFoldRight() {
         FList<Integer> instance = FList.of();
-        int actual = instance.reduce(47, (Integer acc, Integer e) -> acc + e);
+        int actual = instance.foldRight(47, (Integer acc, Integer e) -> acc + e);
         assertThat(actual, is(47));
     }
 
     @Test
-    public void testReduce1() {
+    public void testFoldRight1() {
         FList<Integer> instance = FList.of(1, 2, 3);
-        int actual = instance.reduce(0, (Integer acc, Integer e) -> acc + e);
+        int actual = instance.foldRight(0, (Integer acc, Integer e) -> acc + e);
         assertThat(actual, is(6));
+    }
+
+    @Test
+    public void testFoldRight2() {
+        FList<String> instance = FList.of("a", "b", "c");
+        String actual = instance.foldRight("", (acc, e) -> acc + e);
+        assertThat(actual, is("cba"));
     }
 
     @Test

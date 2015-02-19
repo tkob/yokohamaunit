@@ -16,7 +16,7 @@ public abstract class FList<E> {
     public abstract boolean contains(Object obj);
     public abstract E get(int index);
     public FList<E> add(E obj) { return cons(obj, this); }
-    public abstract <T> T reduce(T acc, BiFunction<T, ? super E, T> f);
+    public abstract <T> T foldRight(T acc, BiFunction<T, ? super E, T> f);
     public abstract List<E> toReverseList();
 
     @Value
@@ -43,7 +43,7 @@ public abstract class FList<E> {
             throw new IndexOutOfBoundsException();
         }
         @Override
-        public <T> T reduce(T acc, BiFunction<T, ? super E, T> f) {
+        public <T> T foldRight(T acc, BiFunction<T, ? super E, T> f) {
             return acc;
         }
         @Override
@@ -80,8 +80,8 @@ public abstract class FList<E> {
             else return cdr.get(index - 1);
         }
         @Override
-        public <T> T reduce(T acc, BiFunction<T, ? super E, T> f) {
-            return f.apply(cdr.reduce(acc, f), car);
+        public <T> T foldRight(T acc, BiFunction<T, ? super E, T> f) {
+            return f.apply(cdr.foldRight(acc, f), car);
         }
         @Override
         public List<E> toReverseList() {
