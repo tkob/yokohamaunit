@@ -121,6 +121,27 @@ public class FListTest {
     }
 
     @Test
+    public void testFoldLeft() {
+        FList<Integer> instance = FList.of();
+        int actual = instance.foldLeft(47, (Integer acc, Integer e) -> acc + e);
+        assertThat(actual, is(47));
+    }
+
+    @Test
+    public void testFoldLeft1() {
+        FList<Integer> instance = FList.of(1, 2, 3);
+        int actual = instance.foldLeft(0, (Integer acc, Integer e) -> acc + e);
+        assertThat(actual, is(6));
+    }
+
+    @Test
+    public void testFoldLeft2() {
+        FList<String> instance = FList.of("a", "b", "c");
+        String actual = instance.foldLeft("", (acc, e) -> acc + e);
+        assertThat(actual, is("abc"));
+    }
+
+    @Test
     public void testEmpty() {
         assertThat(empty(), is(sameInstance(empty())));
     }
