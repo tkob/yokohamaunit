@@ -195,9 +195,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public List<Ident> visitVars(YokohamaUnitParser.VarsContext ctx) {
         return ctx.Identifier().stream()
-                .map(TerminalNode::getSymbol)
-                .map(Token::getText)
-                .map(Ident::new)
+                .map(ident -> new Ident(ident.getText(), nodeSpan(ident)))
                 .collect(Collectors.toList());
     }
 
