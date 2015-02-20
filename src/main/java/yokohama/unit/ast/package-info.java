@@ -54,7 +54,7 @@
  * 
  * Execution ::= QuotedExpr*
  * 
- * Table ::= TableHeaderCell* Row*
+ * Table ::= Ident* Row*
  * 
  * Row ::= Expr*
  * </pre>

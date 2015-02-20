@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
@@ -48,7 +47,6 @@ import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
-import yokohama.unit.ast.TableHeaderCell;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
@@ -439,7 +437,7 @@ public class AstToJUnitAst {
                                     row,
                                     table.getHeader()
                                             .stream()
-                                            .map(TableHeaderCell::getLabel)
+                                            .map(Ident::getName)
                                             .collect(Collectors.toList()),
                                     idents,
                                     genSym))

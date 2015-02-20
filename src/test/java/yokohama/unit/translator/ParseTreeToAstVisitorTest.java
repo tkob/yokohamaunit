@@ -25,6 +25,7 @@ import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetBindings;
@@ -33,7 +34,6 @@ import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.Span;
 import yokohama.unit.ast.Table;
-import yokohama.unit.ast.TableHeaderCell;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.VerifyPhase;
@@ -278,7 +278,7 @@ public class ParseTreeToAstVisitorTest {
         Table actual = instance.visitTableDef(ctx);
         Table expected = new Table(
                 "table name",
-                Arrays.asList(new TableHeaderCell("a", Span.dummySpan()), new TableHeaderCell("b", Span.dummySpan())),
+                Arrays.asList(new Ident("a", Span.dummySpan()), new Ident("b", Span.dummySpan())),
                 Arrays.asList(
                         new Row(
                                 Arrays.asList(
@@ -293,8 +293,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitHeader() throws IOException {
         YokohamaUnitParser.HeaderContext ctx = parser("|a|b\n").header();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        List<TableHeaderCell> actual = instance.visitHeader(ctx);
-        List<TableHeaderCell> expected = Arrays.asList(new TableHeaderCell("a", Span.dummySpan()), new TableHeaderCell("b", Span.dummySpan()));
+        List<Ident> actual = instance.visitHeader(ctx);
+        List<Ident> expected = Arrays.asList(new Ident("a", Span.dummySpan()), new Ident("b", Span.dummySpan()));
         assertThat(actual, is(expected));
     }
 
