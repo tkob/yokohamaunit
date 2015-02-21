@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
 public class InstanceSuchThatMatcher implements Matcher {
-    private String varName;
+    private Ident var;
     private ClassType clazz;
     private List<Proposition> propositions;
     private Span span;
@@ -27,7 +27,7 @@ public class InstanceSuchThatMatcher implements Matcher {
 
     @Override
     public String getDescription() {
-        return "an instance " + varName + " of " + clazz.getName() + " s.t. " +
+        return "an instance " + var.getName() + " of " + clazz.getName() + " s.t. " +
                 propositions.stream().map(Proposition::getDescription).collect(Collectors.joining(" and "));
     }
 }

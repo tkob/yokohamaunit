@@ -166,7 +166,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Matcher visitInstanceSuchThat(YokohamaUnitParser.InstanceSuchThatContext ctx) {
         return new InstanceSuchThatMatcher(
-                ctx.Identifier().getText(),
+                new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitClassType(ctx.classType()),
                 ctx.proposition().stream().map(this::visitProposition).collect(Collectors.toList()),
                 getSpan(ctx));

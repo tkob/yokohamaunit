@@ -222,7 +222,7 @@ public class AstToJUnitAst {
             }
             @Override
            public Stream<Statement> visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
-                String bindVarName = instanceSuchThat.getVarName();
+                String bindVarName = instanceSuchThat.getVar().getName();
                 String instanceOfVarName = genSym.generate("instanceOfMatcher");
                 VarDeclStatement instanceOfStatement = new VarDeclStatement(
                         instanceOfVarName,
