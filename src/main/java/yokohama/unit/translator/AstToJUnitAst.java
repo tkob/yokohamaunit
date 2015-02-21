@@ -337,7 +337,7 @@ public class AstToJUnitAst {
     }
 
     Stream<Statement> translateBinding(yokohama.unit.ast.Binding binding, GenSym genSym) {
-        String name = binding.getName();
+        String name = binding.getName().getName();
         Expr value = translateExpr(binding.getValue());
         String varName = genSym.generate(name);
         return Stream.of(new VarDeclStatement(varName, value),

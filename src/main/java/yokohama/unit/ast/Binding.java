@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Getter
 public class Binding {
-    private String name;
+    private Ident name;
     private Expr value;
     private Span span;
 }

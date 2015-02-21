@@ -145,7 +145,7 @@ public class ParseTreeToAstVisitorTest {
                 new Bindings(
                         Arrays.asList(
                                 new Binding(
-                                        "x",
+                                        new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
                         Span.dummySpan()),
@@ -173,8 +173,11 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitBinding() throws IOException {
         YokohamaUnitParser.BindingContext ctx = parser("x = `1`").binding();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        Binding result = instance.visitBinding(ctx);
-        assertThat(result, is(new Binding("x", new QuotedExpr("1", Span.dummySpan()), Span.dummySpan())));
+        Binding actual = instance.visitBinding(ctx);
+        Binding expected = new Binding(
+                new Ident("x", Span.dummySpan()),
+                new QuotedExpr("1", Span.dummySpan()), Span.dummySpan());
+        assertThat(actual, is(expected));
     }
 
     @Test

@@ -224,7 +224,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Binding visitBinding(YokohamaUnitParser.BindingContext ctx) {
-        String ident = ctx.Identifier().getText();
+        Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
         Expr expr = visitExpr(ctx.expr());
         return new Binding(ident, expr, getSpan(ctx));
     }
