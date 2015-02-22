@@ -9,14 +9,14 @@ import org.apache.commons.io.IOUtils;
 public class DocyCompilerImpl implements DocyCompiler {
     @Override
     public boolean compile(
-            Path docy,
+            Path docyPath,
             String className,
             String packageName,
             List<String> javacArgs
     ) throws IOException {
         return TranslatorUtils.compileDocy(
-                Optional.of(docy),
-                IOUtils.toString(docy.toUri()),
+                Optional.of(docyPath),
+                IOUtils.toString(docyPath.toUri()),
                 className,
                 packageName,
                 javacArgs.toArray(new String[javacArgs.size()]));

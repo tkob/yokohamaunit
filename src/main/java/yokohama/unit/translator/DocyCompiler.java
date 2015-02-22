@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DocyCompiler {
     boolean compile(
-            Path docy,
+            Path docyPath,
             String className,
             String packageName,
             List<String> javacArgs
