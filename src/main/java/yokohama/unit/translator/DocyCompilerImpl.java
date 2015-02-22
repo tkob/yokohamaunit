@@ -79,6 +79,15 @@ public class DocyCompilerImpl implements DocyCompiler {
         // ANTLR parse tree to AST
         Group ast = parseTreeToAstVisitor.visitGroup(ctx);
 
+        // Check AST
+        List<ErrorMessage> errorMessages = variableCheckVisitor.check(ast);
+        if (errorMessages.size() > 0) {
+            for (ErrorMessage errorMessage : errorMessages) {
+                System.err.println(errorMessage.getSpan() + ": " + errorMessage.getMessage());
+            }
+            return false;
+        }
+
         // AST to JUnit AST
         CompilationUnit junit = astToJUnitAstFactory.create(Optional.of(docyPath))
                 .translate(className, ast, packageName);
