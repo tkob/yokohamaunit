@@ -363,8 +363,8 @@ public class VariableCheckVisitorTest {
     public void testCheck(final Fixture fixture) {
         String source = fixture.source;
         Group group = parseDocy(source);
-        VariableCheckVisitor instance = new VariableCheckVisitor(group);
-        List<ErrorMessage> actual = instance.check();
+        VariableCheckVisitor instance = new VariableCheckVisitor();
+        List<ErrorMessage> actual = instance.check(group);
         List<ErrorMessage> expected =
                 fixture.errors.stream()
                         .map(var ->

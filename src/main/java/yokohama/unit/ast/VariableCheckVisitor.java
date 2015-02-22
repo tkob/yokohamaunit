@@ -9,20 +9,11 @@ import static yokohama.unit.util.Optionals.match;
 import yokohama.unit.util.Pair;
 
 public class VariableCheckVisitor {
-    private final Group group;
-    private final List<Table> tables;
-    private final TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();
-
-    public VariableCheckVisitor(Group group) {
-        this.group = group;
-        this.tables = tableExtractVisitor.extractTables(group);
-    }
-
     static ErrorMessage mkErr(String var, Span span) {
         return new ErrorMessage("variable " + var + " is already defined", span);
     }
 
-    public List<ErrorMessage> check() {
+    public List<ErrorMessage> check(Group group) {
         FList<String> env = FList.empty();
         return checkGroup(group, env).collect(Collectors.toList());
     }
