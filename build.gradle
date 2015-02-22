@@ -115,6 +115,7 @@ task checkDocumentConsistency << {
                     !name.equals("Span.java") &&
                     !name.equals("Position.java") &&
                     !name.equals("Describable.java") &&
+                    !name.equals("ErrorMessage.java") &&
                     !name.equals("package-info.java")
                 } as FilenameFilter)
             .grep({ name ->
