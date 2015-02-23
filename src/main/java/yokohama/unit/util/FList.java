@@ -113,6 +113,7 @@ public abstract class FList<E> {
                 () -> l2,
                 (car, cdr) -> cons(car, append(cdr, l2)));
     }
+    @SuppressWarnings("unchecked")
     public static <E> FList<E> of(E... objs) {
         return fromList(Arrays.asList(objs));
     }
