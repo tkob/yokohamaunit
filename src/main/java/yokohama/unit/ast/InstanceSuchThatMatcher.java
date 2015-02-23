@@ -2,18 +2,11 @@ package yokohama.unit.ast;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.FieldDefaults;
+import lombok.Value;
 
-@ToString
+@Value
 @EqualsAndHashCode(exclude={"span"})
-@AllArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@Getter
 public class InstanceSuchThatMatcher implements Matcher {
     private Ident var;
     private ClassType clazz;
