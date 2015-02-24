@@ -3,6 +3,7 @@ package yokohama.unit.translator;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -102,7 +103,11 @@ public class DocyCompilerImpl implements DocyCompiler {
                 null, /* DiagnosticListener<? super JavaFileObject> diagnosticListener */
                 javacArgs,
                 null, /* Iterable<String> classes */
-                Arrays.asList(new SimpleJavaFileObject(docyPath.toUri(), Kind.SOURCE) {
+                Arrays.asList(new SimpleJavaFileObject(
+                        URI.create("string:///"
+                                + packageName.replace('.','/') + "/" + className
+                                + Kind.SOURCE.extension),
+                        Kind.SOURCE) {
                     @Override
                     public CharSequence getCharContent(boolean ignoreEncodingErrors) {
                         return javaCode;
