@@ -129,3 +129,27 @@ task checkDocumentConsistency << {
     }
 }
 check.dependsOn checkDocumentConsistency
+
+task compileDocy(type:Exec) {
+    ext.classpath = configurations.testCompile.join(File.pathSeparator)
+    ext.classesDir = sourceSets.test.output.classesDir
+    ext.baseDir = "$projectDir/src/test/docy"
+    ext.sourceSet = fileTree(dir: ext.baseDir, include: '**/*.docy')
+    ext.command = [
+        "$projectDir/build/install/yokohamaunit/bin/yokohamaunit"
+        + (System.getProperty("os.name").contains("Windows") ? ".bat" : ""),
+        'docyc',
+        '-cp', ext.classpath,
+        '-d', ext.classesDir,
+        '-basedir', ext.baseDir
+        ]
+    ext.command += ext.sourceSet.getFiles()
+
+    if (!ext.classesDir.exists()) {
+        ext.classesDir.mkdirs()
+    }
+    commandLine ext.command
+}
+compileDocy.dependsOn installApp
+compileDocy.dependsOn compileTestJava
+test.dependsOn compileDocy
