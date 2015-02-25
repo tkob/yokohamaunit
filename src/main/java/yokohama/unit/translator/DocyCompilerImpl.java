@@ -97,6 +97,11 @@ public class DocyCompilerImpl implements DocyCompiler {
         String javaCode = junit.getText(expressionStrategy, mockStrategy);
 
         // Compile Java code
+        if (compiler == null) {
+            System.err.println("Could not get the system Java compiler. Probably either JAVA_HOME variable is not set or it does not point to JDK directory.");
+            return false;
+        }
+
         CompilationTask task = compiler.getTask(
                 null, /* Writer out */
                 null, /* JavaFileManager fileManager */
