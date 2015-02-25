@@ -1,43 +1,14 @@
 package yokohama.unit.util;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 public class SUtilsTest {
-    
-    public static class Unlines {
-        @Test
-        public void testUnlines() {
-            String[] ss = {};
-            String actual = SUtils.unlines(ss);
-            String expected = "";
-            assertThat(actual, is(expected));
-        }
-
-        @Test
-        public void testUnlines1() {
-            String[] ss = { "line" };
-            String actual = SUtils.unlines(ss);
-            String expected = new StrBuilder().appendln("line").toString();
-            assertThat(actual, is(expected));
-        }
-
-        @Test
-        public void testUnlines2() {
-            String[] ss = { "line1", "line2" };
-            String actual = SUtils.unlines(ss);
-            String expected = new StrBuilder().appendln("line1").appendln("line2").toString();
-            assertThat(actual, is(expected));
-        }
-    }
-
     @RunWith(Theories.class)
     public static class ToIdent {
         @DataPoints

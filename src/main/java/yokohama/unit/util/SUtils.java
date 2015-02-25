@@ -3,18 +3,8 @@ package yokohama.unit.util;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import javax.lang.model.SourceVersion;
-import org.apache.commons.lang3.text.StrBuilder;
 
 public class SUtils {
-
-    public static final String unlines(String... ss) {
-        StrBuilder sb = new StrBuilder();
-        for (String s : ss) {
-            sb.appendln(s);
-        }
-        return sb.toString();
-    }
-
     public static final String toIdent(final String text) {
         final StringBuilder sb = new StringBuilder(text.length() + 1);
 
