@@ -1,0 +1,16 @@
+# Test: Test SUtils.toIdent
+
+Assert `@yokohama.unit.util.SUtils@toIdent(before)` is `after`
+for all before and after in Table 'Fixture'.
+
+Table: Fixture
+|before   |after  |
+|""       |""     |
+|"ident"  |"ident"|
+|"123"    |"_123" |
+|"a,b,,c,"|"a_b_c"|
+|"3.14"   |"_3_14"|
+|"__"     |"__"   |
+|"if"     |"if_"  |
+|"int"    |"int_" |
+|"true"   |"true_"|
