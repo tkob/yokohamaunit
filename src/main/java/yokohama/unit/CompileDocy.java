@@ -120,7 +120,7 @@ public class CompileDocy implements Command {
                 String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
                 boolean success = compiler.compile(
                         path,
-                        fileInputStreamFactory.create(path.toFile()),
+                        fileInputStreamFactory.create(path),
                         className,
                         packageName,
                         javacArgs);
