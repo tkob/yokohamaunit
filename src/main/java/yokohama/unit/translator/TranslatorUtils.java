@@ -3,16 +3,9 @@ package yokohama.unit.translator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.ToolProvider;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -91,28 +84,12 @@ public class TranslatorUtils {
             final String docy,
             final String className,
             final String packageName,
-            final String... options) {
-        final URI uri =
-                URI.create("string:///"
-                        + packageName.replace('.','/') + "/" + className
-                        + Kind.SOURCE.extension);
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        
-        JavaFileObject source = new SimpleJavaFileObject(uri, Kind.SOURCE) {
-            @Override
-            public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-                return docyToJava(path, docy, className, packageName);
-            }
-        };
-
-        CompilationTask task = compiler.getTask(
-                null, /* Writer out */
-                null, /* JavaFileManager fileManager */
-                null, /* DiagnosticListener<? super JavaFileObject> diagnosticListener */
-                Arrays.asList(options),
-                null, /* Iterable<String> classes */
-                Arrays.asList(source)
-        );
-        return task.call(); 
+            final String... options) throws IOException {
+        return new DocyCompilerImpl().compile(
+                path.get(),
+                new ByteArrayInputStream(docy.getBytes()),
+                className,
+                packageName,
+                Arrays.asList(options));
     }
 }
