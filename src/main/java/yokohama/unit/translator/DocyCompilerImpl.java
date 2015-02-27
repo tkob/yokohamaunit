@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -21,7 +20,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.apache.commons.io.IOUtils;
 import yokohama.unit.ast.ErrorMessage;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
@@ -45,13 +43,11 @@ public class DocyCompilerImpl implements DocyCompiler {
     @Override
     public boolean compile(
             Path docyPath,
+            InputStream ins,
             String className,
             String packageName,
             List<String> javacArgs
     ) throws IOException {
-        // Get docy code
-        String docyCode = IOUtils.toString(docyPath.toUri());
-
         // Source to ANTLR parse tree
         final AtomicInteger numErrors = new AtomicInteger(0);
         BaseErrorListener errorListener = new BaseErrorListener() {
@@ -66,7 +62,6 @@ public class DocyCompilerImpl implements DocyCompiler {
                 numErrors.incrementAndGet();
             }
         };
-        InputStream ins = new FileInputStream(docyPath.toString());
         CharStream stream = new ANTLRInputStream(ins);
         Lexer lex = new YokohamaUnitLexer(stream);
         lex.addErrorListener(errorListener);

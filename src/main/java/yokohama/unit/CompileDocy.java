@@ -27,6 +27,7 @@ import yokohama.unit.translator.DocyCompiler;
 @AllArgsConstructor
 public class CompileDocy implements Command {
     private final DocyCompiler compiler;
+    FileInputStreamFactory fileInputStreamFactory;
 
     static Options constructOptions() {
         Options options = new Options();
@@ -119,6 +120,7 @@ public class CompileDocy implements Command {
                 String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
                 boolean success = compiler.compile(
                         path,
+                        fileInputStreamFactory.create(path.toFile()),
                         className,
                         packageName,
                         javacArgs);

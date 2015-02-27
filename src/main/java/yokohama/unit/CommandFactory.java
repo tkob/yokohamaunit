@@ -10,7 +10,7 @@ import yokohama.unit.translator.DocyCompilerImpl;
 public class CommandFactory {
     private static final Map<String, Supplier<Command>> subCommands =
             new HashMap<String, Supplier<Command>>() {{
-                put("docyc", () -> new CompileDocy(new DocyCompilerImpl()));
+                put("docyc", () -> new CompileDocy(new DocyCompilerImpl(), new FileInputStreamFactory()));
                 put("docy2java", () -> new Docy2Java());
             }};
 

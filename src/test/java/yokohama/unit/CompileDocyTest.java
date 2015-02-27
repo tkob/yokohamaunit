@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,10 +66,11 @@ public class CompileDocyTest {
     public void testRun() {
         String[] args = { "-help" };
         DocyCompiler compiler = mock(DocyCompiler.class);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -77,10 +79,11 @@ public class CompileDocyTest {
     public void testRun0() {
         String[] args = {};
         DocyCompiler compiler = mock(DocyCompiler.class);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -89,10 +92,11 @@ public class CompileDocyTest {
     public void testRun1() {
         String[] args = { "-d" };
         DocyCompiler compiler = mock(DocyCompiler.class);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -101,10 +105,11 @@ public class CompileDocyTest {
     public void testRun2() {
         String[] args = { "-xxxxxx" };
         DocyCompiler compiler = mock(DocyCompiler.class);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -114,15 +119,16 @@ public class CompileDocyTest {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
                 .thenReturn(true);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(Paths.get("E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
     }
 
     @Test
@@ -130,15 +136,16 @@ public class CompileDocyTest {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main\\", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
                 .thenReturn(true);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(Paths.get("E:/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), eq(Arrays.asList()));
     }
 
     @Test
@@ -146,15 +153,16 @@ public class CompileDocyTest {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
                 .thenReturn(true);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), anyObject(), "Foo", "yokohama.unit", Arrays.asList());
     }
 
     @Test
@@ -162,15 +170,16 @@ public class CompileDocyTest {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main/", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
                 .thenReturn(true);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new CompileDocy(compiler).run(in, out, err, args);
+        int actual = new CompileDocy(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), "Foo", "yokohama.unit", Arrays.asList());
+        verify(compiler).compile(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy"), anyObject(), "Foo", "yokohama.unit", Arrays.asList());
     }
 
 }
