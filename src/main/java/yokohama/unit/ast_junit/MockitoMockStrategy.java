@@ -43,7 +43,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         }
                         throw new RuntimeException("should not reach here");
                     },
-                    classType -> "isA(" + classType.getName() + brackets + ".class)"
+                    classType -> "org.mockito.Mockito.isA(" + classType.getName() + brackets + ".class)"
             );
         }
     }
