@@ -16,7 +16,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             sb.appendln("} catch (ognl.OgnlException e) {");
             sb.shift();
                 sb.appendln("Throwable reason = e.getReason();");
-                sb.appendln("ognl.OgnlException e2 = reason == null ? newognl. OgnlException(span + \" \" + e.getMessage(), e)",
+                sb.appendln("ognl.OgnlException e2 = reason == null ? new ognl.OgnlException(span + \" \" + e.getMessage(), e)",
                                                              " : new ognl.OgnlException(span + \" \" + reason.getMessage(), reason);");
                 sb.appendln("StackTraceElement[] st = { new StackTraceElement(\"\", \"\", fileName, startLine) };");
                 sb.appendln("e2.setStackTrace(st);");
