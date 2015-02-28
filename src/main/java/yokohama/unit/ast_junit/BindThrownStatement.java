@@ -1,9 +1,7 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.union;
 
 @Value
 public class BindThrownStatement implements Statement {
@@ -41,18 +39,6 @@ public class BindThrownStatement implements Statement {
             sb.appendln(name, " = e;");
         sb.unshift();
         sb.appendln("}");
-    }
-
-    @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return union(
-                value.accept(
-                        quotedExpr -> expressionStrategy.getValueImports(), 
-                        stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                        matcherExpr -> matcherExpr.importedNames(expressionStrategy, mockStrategy)),
-                union(
-                        expressionStrategy.wrappingExceptionImports(), 
-                        expressionStrategy.wrappedExceptionImports()));
     }
 
     @Override

@@ -1,8 +1,6 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -10,15 +8,6 @@ import org.junit.Test;
 import yokohama.unit.util.SBuilder;
 
 public class ClassDeclTest {
-    
-    @Test
-    public void testImportedNames() {
-        ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
-        Set<ImportedName> expected = new TreeSet<>();
-        Set<ImportedName> actual = instance.importedNames(new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        assertThat(actual, is(expected));
-    }
-
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
@@ -31,5 +20,4 @@ public class ClassDeclTest {
 
         assertThat(actual.toString(), is(expected.toString()));
     }
-
 }

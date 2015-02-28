@@ -1,10 +1,7 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.setOf;
-import static yokohama.unit.util.SetUtils.union;
 
 @Value
 public class VarDeclStatement implements Statement {
@@ -26,16 +23,6 @@ public class VarDeclStatement implements Statement {
                     matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
                     return null;
                 });
-    }
-
-    @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return value.accept(
-                quotedExpr -> expressionStrategy.getValueImports(), 
-                stubExpr -> mockStrategy.stubImports(stubExpr, expressionStrategy),
-                matcherExpr -> union(
-                        matcherExpr.importedNames(expressionStrategy, mockStrategy),
-                        setOf(new ImportClass("org.hamcrest.Matcher"))));
     }
 
     @Override

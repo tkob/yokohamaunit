@@ -1,9 +1,7 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.setOf;
 
 @Value
 public class ReturnIsNotStatement implements Statement {
@@ -12,12 +10,7 @@ public class ReturnIsNotStatement implements Statement {
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln("return not(", predicate.getName(), ").matches(", subject.getName(), ");");
-    }
-
-    @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return setOf(new ImportStatic("org.hamcrest.CoreMatchers.not"));
+        sb.appendln("return org.hamcrest.CoreMatchers.not(", predicate.getName(), ").matches(", subject.getName(), ");");
     }
 
     @Override

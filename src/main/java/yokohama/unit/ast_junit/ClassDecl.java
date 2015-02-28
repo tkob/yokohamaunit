@@ -1,32 +1,15 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.union;
 
 @Value
 @NonFinal
 public class ClassDecl {
     private final String name;
     private final List<TestMethod> testMethods;
-
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return testMethods.stream()
-                .<Set<ImportedName>>collect(
-                        () -> testMethods.size() > 0 ? union(expressionStrategy.auxMethodsImports(),
-                                                             new MockUsedVisitor(this).mockUsed()
-                                                                     ? mockStrategy.auxMethodsImports()
-                                                                     : new TreeSet<>())
-                                                     : new TreeSet<>(Arrays.asList()),
-                        (set, testMethod) -> set.addAll(testMethod.importedNames(expressionStrategy, mockStrategy)),
-                        (s1, s2) -> s1.addAll(s2)
-                );
-    }
 
     public void toString(
             SBuilder sb,
