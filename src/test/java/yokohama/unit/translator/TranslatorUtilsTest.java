@@ -44,49 +44,41 @@ public class TranslatorUtilsTest {
     public static class DocyToJava {
         @DataPoints
         public static Fixture[] PARAMs = {
-            new Fixture("TestIs.docy", "TestIs.java", Arrays.asList("Simple_Arithmetic_1")),
-            new Fixture("TestIsNot.docy", "TestIsNot.java", Arrays.asList("Simple_Arithmetic_1")),
-            new Fixture("TestNull.docy", "TestNull.java", Arrays.asList("Null_test_1", "Null_test_2")),
-            new Fixture("TestThrows.docy", "TestThrows.java", Arrays.asList("Division_by_zero_1", "No_exception_1")),
-            new Fixture("TestMultiplePropositions.docy", "TestMultiplePropositions.java", Arrays.asList("Multiple_propositions_1")),
+            new Fixture("TestIs.docy", Arrays.asList("Simple_Arithmetic_1")),
+            new Fixture("TestIsNot.docy", Arrays.asList("Simple_Arithmetic_1")),
+            new Fixture("TestNull.docy", Arrays.asList("Null_test_1", "Null_test_2")),
+            new Fixture("TestThrows.docy", Arrays.asList("Division_by_zero_1", "No_exception_1")),
+            new Fixture("TestMultiplePropositions.docy", Arrays.asList("Multiple_propositions_1")),
             new Fixture(
                     "TestMultipleAssertions.docy",
-                    "TestMultipleAssertions.java",
                     Arrays.asList("Multiple_assertions_1", "Multiple_assertions_2")
             ),
             new Fixture(
                     "TestBindings.docy",
-                    "TestBindings.java",
                     Arrays.asList("String_startsWith_returns_true_if_the_prefix_is_empty_1")
             ),
             new Fixture(
                     "TestTable.docy",
-                    "TestTable.java",
                     Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
             ),
             new Fixture(
                     "TestCSV.docy",
-                    "TestCSV.java",
                     Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
             ),
             new Fixture(
                     "TestExcel.docy",
-                    "TestExcel.java",
                     Arrays.asList("String_startsWith_1_1", "String_startsWith_1_2", "String_startsWith_1_3")
             ),
             new Fixture(
                     "TestFourPhase.docy",
-                    "TestFourPhase.java",
                     Arrays.asList("AtomicInteger_incrementAndGet_increments_the_content")
             ),
             new Fixture(
                     "TestFourPhaseWithTeardown.docy",
-                    "TestFourPhaseWithTeardown.java",
                     Arrays.asList("The_size_of_a_new_temporary_file_is_zero")
             ),
             new Fixture(
                     "TestStub.docy",
-                    "TestStub.java",
                     Arrays.asList(
                             "Submit_a_task_and_get_the_result_1",
                             "Collections_unmodifiableMap_preserves_lookup_1",
@@ -95,12 +87,11 @@ public class TranslatorUtilsTest {
             ),
             new Fixture(
                     "TestStubVariations.docy",
-                    null,
                     Arrays.asList(
                             "Variations_of_stubbing_1"
                     )
             ),
-            new Fixture("TestInstanceSuchThat.docy", null, Arrays.asList(
+            new Fixture("TestInstanceSuchThat.docy", Arrays.asList(
                     "instance_such_that_1",
                     "instance_such_that_2",
                     "instance_such_that_3",
@@ -108,20 +99,6 @@ public class TranslatorUtilsTest {
                     "instance_such_that_5"
             ))
         };
-
-        @Theory
-        public void testDocyToJava(final Fixture fixture) throws Exception {
-            assumeThat(fixture.java, is(not(nullValue())));
-            try (   InputStream docyIn = getClass().getResourceAsStream(fixture.docy);
-                    InputStream javaIn = getClass().getResourceAsStream(fixture.java)) {
-                String docy = IOUtils.toString(docyIn, "UTF-8");
-                String className = FilenameUtils.removeExtension(fixture.docy);
-                String packageName = "yokohama.unit.translator";
-                String actual = TranslatorUtils.docyToJava(Optional.of(Paths.get(fixture.docy)), docy, className, packageName);
-                String expected = IOUtils.toString(javaIn, "UTF-8").replace("\r\n", IOUtils.LINE_SEPARATOR);
-                assertThat(actual, is(expected));
-            }
-        }
 
         @Rule
         public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -191,7 +168,6 @@ public class TranslatorUtilsTest {
         @AllArgsConstructor
         public static class Fixture {
             public final String docy;
-            public final String java;
             public final List<String> methods;
         }
     }
