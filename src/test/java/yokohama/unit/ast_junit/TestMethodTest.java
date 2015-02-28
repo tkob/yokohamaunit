@@ -15,9 +15,9 @@ public class TestMethodTest {
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
-        expected.appendln("@Test");
+        expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    OgnlContext env = new OgnlContext();");
+        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
@@ -36,12 +36,12 @@ public class TestMethodTest {
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
-        expected.appendln("@Test");
+        expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    OgnlContext env = new OgnlContext();");
+        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
         expected.appendln("    Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
         expected.appendln("    Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
-        expected.appendln("    assertThat(actual, is(expected));");
+        expected.appendln("    org.junit.Assert.assertThat(actual, org.hamcrest.CoreMatchers.is(expected));");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
