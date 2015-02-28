@@ -1,7 +1,5 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
-import java.util.TreeSet;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
@@ -9,10 +7,6 @@ import yokohama.unit.util.SBuilder;
 public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
-
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return classDecl.importedNames(expressionStrategy, mockStrategy);
-    }
 
     public String getText(
             ExpressionStrategy expressionStrategy,
@@ -29,10 +23,6 @@ public class CompilationUnit {
             MockStrategy mockStrategy
     ) {
         sb.appendln("package ", packageName, ";");
-        sb.appendln();
-        for (ImportedName name : new TreeSet<>(importedNames(expressionStrategy, mockStrategy))) {
-            name.toString(sb);
-        }
         sb.appendln();
         classDecl.toString(sb, expressionStrategy, mockStrategy);
     }

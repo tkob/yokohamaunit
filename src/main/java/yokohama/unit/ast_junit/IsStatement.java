@@ -1,10 +1,7 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.setOf;
-import static yokohama.unit.util.SetUtils.union;
 
 
 @Value
@@ -13,17 +10,8 @@ public class IsStatement implements Statement {
     private Var complement;
 
     @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return union(
-                expressionStrategy.getValueImports(),
-                setOf(
-                        new ImportStatic("org.junit.Assert.assertThat"),
-                        new ImportStatic("org.hamcrest.CoreMatchers.is")));
-    }
-
-    @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln("assertThat(", subject.getName(), ", is(", complement.getName(), "));");
+        sb.appendln("org.junit.Assert.assertThat(", subject.getName(), ", org.hamcrest.CoreMatchers.is(", complement.getName(), "));");
     }
 
     @Override

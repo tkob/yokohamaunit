@@ -1,6 +1,5 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Set;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
@@ -12,11 +11,6 @@ public class TopBindStatement implements Statement {
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         expressionStrategy.bind(sb, name, value);
-    }
-
-    @Override
-    public Set<ImportedName> importedNames(ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        return expressionStrategy.bindImports();
     }
 
     @Override

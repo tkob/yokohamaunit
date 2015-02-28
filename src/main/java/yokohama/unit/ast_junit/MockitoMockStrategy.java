@@ -1,13 +1,10 @@
 package yokohama.unit.ast_junit;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.util.SBuilder;
-import static yokohama.unit.util.SetUtils.setOf;
 
 public class MockitoMockStrategy implements MockStrategy {
 
@@ -17,59 +14,36 @@ public class MockitoMockStrategy implements MockStrategy {
             return argumentType.getNonArrayType().accept(
                     primitiveType -> {
                         switch (primitiveType.getKind()) {
-                            case BOOLEAN: return "anyBoolean()";
-                            case BYTE:    return "anyByte()";
-                            case SHORT:   return "anyShort()";
-                            case INT:     return "anyInt()";
-                            case LONG:    return "anyLong()";
-                            case CHAR:    return "anyChar()";
-                            case FLOAT:   return "anyFloat()";
-                            case DOUBLE:  return "anyDouble()";
+                            case BOOLEAN: return "org.mockito.Mockito.anyBoolean()";
+                            case BYTE:    return "org.mockito.Mockito.anyByte()";
+                            case SHORT:   return "org.mockito.Mockito.anyShort()";
+                            case INT:     return "org.mockito.Mockito.anyInt()";
+                            case LONG:    return "org.mockito.Mockito.anyLong()";
+                            case CHAR:    return "org.mockito.Mockito.anyChar()";
+                            case FLOAT:   return "org.mockito.Mockito.anyFloat()";
+                            case DOUBLE:  return "org.mockito.Mockito.anyDouble()";
                         }
                         throw new RuntimeException("should not reach here");
                     },
-                    classType -> "isA(" + classType.getName() + ".class)"
+                    classType -> "org.mockito.Mockito.isA(" + classType.getName() + ".class)"
             );
         } else { 
             String brackets = StringUtils.repeat("[]", dims);
             return argumentType.getNonArrayType().accept(
                     primitiveType -> {
                         switch (primitiveType.getKind()) {
-                            case BOOLEAN: return "isA(boolean" + brackets + ".class)";
-                            case BYTE:    return "isA(byte"    + brackets + ".class)";
-                            case SHORT:   return "isA(short"   + brackets + ".class)";
-                            case INT:     return "isA(int"     + brackets + ".class)";
-                            case LONG:    return "isA(long"    + brackets + ".class)";
-                            case CHAR:    return "isA(char"    + brackets + ".class)";
-                            case FLOAT:   return "isA(float"   + brackets + ".class)";
-                            case DOUBLE:  return "isA(double"  + brackets + ".class)";
+                            case BOOLEAN: return "org.mockito.Mockito.isA(boolean" + brackets + ".class)";
+                            case BYTE:    return "org.mockito.Mockito.isA(byte"    + brackets + ".class)";
+                            case SHORT:   return "org.mockito.Mockito.isA(short"   + brackets + ".class)";
+                            case INT:     return "org.mockito.Mockito.isA(int"     + brackets + ".class)";
+                            case LONG:    return "org.mockito.Mockito.isA(long"    + brackets + ".class)";
+                            case CHAR:    return "org.mockito.Mockito.isA(char"    + brackets + ".class)";
+                            case FLOAT:   return "org.mockito.Mockito.isA(float"   + brackets + ".class)";
+                            case DOUBLE:  return "org.mockito.Mockito.isA(double"  + brackets + ".class)";
                         }
                         throw new RuntimeException("should not reach here");
                     },
-                    classType -> "isA(" + classType.getName() + brackets + ".class)"
-            );
-        }
-    }
-
-    private Set<ImportedName> argumentTypeImports(Type argumentType) {
-        if (argumentType.getDims() > 0) {
-            return setOf(new ImportStatic("org.mockito.Mockito.isA"));
-        } else {
-            return argumentType.getNonArrayType().accept(
-                    primitiveType -> {
-                        switch (primitiveType.getKind()) {
-                            case BOOLEAN: return setOf(new ImportStatic("org.mockito.Mockito.anyBoolean"));
-                            case BYTE:    return setOf(new ImportStatic("org.mockito.Mockito.anyByte"));
-                            case SHORT:   return setOf(new ImportStatic("org.mockito.Mockito.anyShort"));
-                            case INT:     return setOf(new ImportStatic("org.mockito.Mockito.anyInt"));
-                            case LONG:    return setOf(new ImportStatic("org.mockito.Mockito.anyLong"));
-                            case CHAR:    return setOf(new ImportStatic("org.mockito.Mockito.anyChar"));
-                            case FLOAT:   return setOf(new ImportStatic("org.mockito.Mockito.anyFloat"));
-                            case DOUBLE:  return setOf(new ImportStatic("org.mockito.Mockito.anyDouble"));
-                        }
-                        throw new RuntimeException("should not reach here");
-                    },
-                    classType -> setOf(new ImportStatic("org.mockito.Mockito.isA"))
+                    classType -> "org.mockito.Mockito.isA(" + classType.getName() + brackets + ".class)"
             );
         }
     }
@@ -94,14 +68,14 @@ public class MockitoMockStrategy implements MockStrategy {
                                             .stream()
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "))
-                               + (argumentTypes.size() > 1 ? ", anyVararg()" : "anyVararg()")
+                               + (argumentTypes.size() > 1 ? ", org.mockito.Mockito.anyVararg()" : "org.mockito.Mockito.anyVararg()")
                              : argumentTypes.stream()
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "));
             behavior.getToBeReturned().<Void>accept(
                     quotedExpr -> {
                         String toBeReturned = expressionStrategy.getValue(quotedExpr);
-                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");
                         return null;
                     },
                     stubExpr2 -> {
@@ -109,7 +83,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         sb.appendln("{");
                         sb.shift();
                         stub(sb, name2, stubExpr2, expressionStrategy);
-                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         sb.unshift();
                         sb.appendln("}");
                         return null;
@@ -117,59 +91,11 @@ public class MockitoMockStrategy implements MockStrategy {
                     matcherExpr -> {
                         String name2 = name + "_";
                         matcherExpr.getExpr(sb, name2, expressionStrategy, this);
-                        sb.appendln("when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         return null;
                     }
             );
         }
-    }
-
-    @Override
-    public Set<ImportedName> stubImports(StubExpr stubExpr, ExpressionStrategy expressionStrategy) {
-        return stubExpr.getBehavior()
-                .stream()
-                .collect(
-                        () -> setOf(new ImportStatic("org.mockito.Mockito.mock")),
-                        (set, behavior) -> {
-                            MethodPattern methodPattern = behavior.getMethodPattern();
-                            boolean isVarArg = methodPattern.isVarArg();
-                            List<Type> argumentTypes = methodPattern.getArgumentTypes();
-                            Expr toBeReturned = behavior.getToBeReturned();
-
-                            if (isVarArg) {
-                                set.add(new ImportStatic("org.mockito.Mockito.anyVararg"));
-                                set.addAll(argumentTypes.subList(0, argumentTypes.size() - 1).stream()
-                                        .collect(
-                                                () -> new TreeSet<>(),
-                                                (set_, type) -> set_.addAll(argumentTypeImports(type)),
-                                                (s1, s2) -> s1.addAll(s2)));
-                            } else {
-                                set.addAll(argumentTypes.stream()
-                                        .collect(
-                                                () -> new TreeSet<>(),
-                                                (set_, type) -> set_.addAll(argumentTypeImports(type)),
-                                                (s1, s2) -> s1.addAll(s2)));
-                            }
-
-                            set.add(new ImportStatic("org.mockito.Mockito.when"));
-                            toBeReturned.<Void>accept(
-                                    quotedExpr -> {
-                                        set.addAll(expressionStrategy.getValueImports());
-                                        return null;
-                                    },
-                                    (StubExpr stubExpr_) -> {
-                                        set.addAll(stubImports(stubExpr, expressionStrategy));
-                                        return null;
-                                    },
-                                    matcherExpr -> {
-                                        set.addAll(matcherExpr.importedNames(expressionStrategy, this));
-                                        return null;
-                                    }
-                            );
-
-                        },
-                        (s1, s2) -> s1.addAll(s2)
-                );
     }
 
     @Override
@@ -178,7 +104,7 @@ public class MockitoMockStrategy implements MockStrategy {
         sb.shift();
             sb.appendln("try {");
             sb.shift();
-                sb.appendln("return mock(classToMock);");
+                sb.appendln("return org.mockito.Mockito.mock(classToMock);");
             sb.unshift();
             sb.appendln("} catch (Exception e) {");
             sb.shift();
@@ -191,10 +117,4 @@ public class MockitoMockStrategy implements MockStrategy {
         sb.unshift();
         sb.appendln("}");
     }
-
-    @Override
-    public Set<ImportedName> auxMethodsImports() {
-        return setOf(new ImportStatic("org.mockito.Mockito.mock"));
-    }
-
 }
