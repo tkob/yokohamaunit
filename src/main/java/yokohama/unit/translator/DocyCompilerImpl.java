@@ -3,17 +3,9 @@ package yokohama.unit.translator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import yokohama.unit.ast.ErrorMessage;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -21,11 +13,10 @@ import yokohama.unit.ast_junit.ExpressionStrategy;
 import yokohama.unit.ast_junit.MockStrategy;
 import yokohama.unit.ast_junit.MockitoMockStrategy;
 import yokohama.unit.ast_junit.OgnlExpressionStrategy;
-import yokohama.unit.grammar.YokohamaUnitLexer;
-import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
 public class DocyCompilerImpl implements DocyCompiler {
+    DocyParser docyParser = new DocyParserImpl();
     ParseTreeToAstVisitor parseTreeToAstVisitor = new ParseTreeToAstVisitor();
     VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
     AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
@@ -41,37 +32,19 @@ public class DocyCompilerImpl implements DocyCompiler {
             String packageName,
             List<String> javacArgs
     ) throws IOException {
-        // Source to ANTLR parse tree
-        final AtomicInteger numErrors = new AtomicInteger(0);
-        BaseErrorListener errorListener = new BaseErrorListener() {
-            @Override
-            public void syntaxError(
-                    Recognizer<?, ?> recognizer,
-                    Object offendingSymbol,
-                    int line,
-                    int charPositionInLine,
-                    String msg,
-                    RecognitionException e) {
-                numErrors.incrementAndGet();
-            }
-        };
-        CharStream stream = new ANTLRInputStream(ins);
-        Lexer lex = new YokohamaUnitLexer(stream);
-        lex.addErrorListener(errorListener);
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        YokohamaUnitParser parser = new YokohamaUnitParser(tokens);
-        parser.addErrorListener(errorListener);
+        List<ErrorMessage> errors = new ArrayList<>();
 
-        GroupContext ctx = parser.group();
-        if (numErrors.get() > 0) return false;
+        // Source to ANTLR parse tree
+        GroupContext ctx = docyParser.parse(ins, errors);
+        if (errors.size() > 0) return false;
 
         // ANTLR parse tree to AST
         Group ast = parseTreeToAstVisitor.visitGroup(ctx);
 
         // Check AST
-        List<ErrorMessage> errorMessages = variableCheckVisitor.check(ast);
+        List<yokohama.unit.ast.ErrorMessage> errorMessages = variableCheckVisitor.check(ast);
         if (errorMessages.size() > 0) {
-            for (ErrorMessage errorMessage : errorMessages) {
+            for (yokohama.unit.ast.ErrorMessage errorMessage : errorMessages) {
                 System.err.println(errorMessage.getSpan() + ": " + errorMessage.getMessage());
             }
             return false;
