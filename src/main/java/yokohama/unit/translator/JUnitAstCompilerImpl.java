@@ -47,7 +47,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
         List<String> args = new ArrayList<>();
         if (classPath.size() > 0) {
             args.add("-cp");
-            args.add(String.join(File.pathSeparator, args));
+            args.add(String.join(File.pathSeparator, classPath));
         }
         if (dest.isPresent()) {
             args.add("-d");
