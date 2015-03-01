@@ -1,5 +1,6 @@
 package yokohama.unit;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -9,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -82,11 +84,23 @@ public class CompileDocy implements Command {
                 .collect(Collectors.toList());
     }
 
+    static List<String> getClassPath(CommandLine commandLine) {
+        String cp = commandLine.getOptionValue("cp");
+        String classpath = commandLine.getOptionValue("classpath");
+        if (cp != null) {
+            return Arrays.asList(cp.split(File.pathSeparator));
+        } else if (classpath != null) {
+            return Arrays.asList(classpath.split(File.pathSeparator));
+        } else {
+            return Arrays.asList();
+        }
+    }
+
     @Override
     public int run(InputStream in, PrintStream out, PrintStream err, String... args) {
         Options options = constructOptions();
         List<String> javacOptions =
-            Arrays.asList("nowarn", "verbose", "classpath", "cp", "d", "target");
+            Arrays.asList("nowarn", "verbose", "target");
 
         try {
             CommandLine commandLine = new BasicParser().parse(options, args);
@@ -107,6 +121,9 @@ public class CompileDocy implements Command {
                 return Command.EXIT_SUCCESS;
             }
             URI baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
+            String d = commandLine.getOptionValue("d");
+            Optional<Path> dest= d == null ? Optional.empty() : Optional.of(Paths.get(d));
+            List<String> classPath = getClassPath(commandLine);
             List<String> javacArgs =
                     extractOptions(
                             Arrays.asList(commandLine.getOptions()),
@@ -123,6 +140,8 @@ public class CompileDocy implements Command {
                         fileInputStreamFactory.create(path),
                         className,
                         packageName,
+                        classPath,
+                        dest,
                         javacArgs);
                 if (!success) return Command.EXIT_FAILURE;
             }

@@ -1,8 +1,12 @@
 package yokohama.unit.translator;
 
+import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject.Kind;
@@ -25,7 +29,13 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
 
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     @Override
-    public boolean compile(CompilationUnit ast, String className, String packageName, List<String> javacArgs) {
+    public boolean compile(
+            CompilationUnit ast,
+            String className,
+            String packageName,
+            List<String> classPath,
+            Optional<Path> dest,
+            List<String> javacArgs) {
         String javaCode = ast.getText(expressionStrategy, mockStrategy);
 
         // Compile Java code
@@ -34,11 +44,22 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
             return false;
         }
 
+        List<String> args = new ArrayList<>();
+        if (classPath.size() > 0) {
+            args.add("-cp");
+            args.add(String.join(File.pathSeparator, args));
+        }
+        if (dest.isPresent()) {
+            args.add("-d");
+            args.add(dest.get().toString());
+        }
+        args.addAll(javacArgs);
+
         CompilationTask task = compiler.getTask(
                 null, /* Writer out */
                 null, /* JavaFileManager fileManager */
                 null, /* DiagnosticListener<? super JavaFileObject> diagnosticListener */
-                javacArgs,
+                args,
                 null, /* Iterable<String> classes */
                 Arrays.asList(new SimpleJavaFileObject(
                         URI.create("string:///"

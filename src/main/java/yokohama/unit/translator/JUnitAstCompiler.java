@@ -1,6 +1,8 @@
 package yokohama.unit.translator;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import yokohama.unit.ast_junit.CompilationUnit;
 
 public interface JUnitAstCompiler {
@@ -8,6 +10,8 @@ public interface JUnitAstCompiler {
             CompilationUnit ast,
             String className,
             String packageName,
+            List<String> classPath,
+            Optional<Path> dest,
             List<String> javacArgs
     );
 }

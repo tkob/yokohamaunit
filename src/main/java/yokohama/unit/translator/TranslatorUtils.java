@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -84,12 +85,16 @@ public class TranslatorUtils {
             final String docy,
             final String className,
             final String packageName,
+            final List<String> classPath,
+            final Optional<Path> dest,
             final String... options) throws IOException {
         return new DocyCompilerImpl().compile(
                 path.get(),
                 new ByteArrayInputStream(docy.getBytes()),
                 className,
                 packageName,
+                classPath,
+                dest,
                 Arrays.asList(options));
     }
 }

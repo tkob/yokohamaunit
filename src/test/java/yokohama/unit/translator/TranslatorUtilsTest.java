@@ -116,7 +116,8 @@ public class TranslatorUtilsTest {
                                     docy,
                                     className, 
                                     packageName,
-                                    "-d", dest.getAbsolutePath());
+                                    Arrays.asList(),
+                                    Optional.of(Paths.get(dest.getAbsolutePath())));
                     boolean expected = true;
                     assertThat(actual, is(expected));
                 }

@@ -30,6 +30,8 @@ public class DocyCompilerImpl implements DocyCompiler {
             InputStream ins,
             String className,
             String packageName,
+            List<String> classPath,
+            Optional<Path> dest,
             List<String> javacArgs
     ) throws IOException {
         List<ErrorMessage> errors = new ArrayList<>();
@@ -55,6 +57,6 @@ public class DocyCompilerImpl implements DocyCompiler {
                 .translate(className, ast, packageName);
 
         // JUnit AST to Java code
-        return jUnitAstCompiler.compile(junit, className, packageName, javacArgs);
+        return jUnitAstCompiler.compile(junit, className, packageName, classPath, dest, javacArgs);
     }
 }
