@@ -30,6 +30,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     @Override
     public boolean compile(
+            Path docyPath,
             CompilationUnit ast,
             String className,
             String packageName,

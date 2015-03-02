@@ -9,6 +9,7 @@ import yokohama.unit.ast_junit.CompilationUnit;
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     @Override
     public boolean compile(
+            Path docyPath,
             CompilationUnit ast,
             String className,
             String packageName,
