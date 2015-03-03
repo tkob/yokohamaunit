@@ -25,6 +25,10 @@ public class BindThrownStatement implements Statement {
                     matcherExpr -> {
                         matcherExpr.getExpr(sb, "_", expressionStrategy, mockStrategy);
                         return null;
+                    },
+                    newExpr -> {
+                        newExpr.getExpr(sb, "_");
+                        return null;
                     });
             sb.appendln(name, " = null;");
         sb.unshift();

@@ -8,7 +8,8 @@ public interface Expr {
     default <T> T accept(
             Function<QuotedExpr, T> visitQuotedExpr_,
             Function<StubExpr, T> visitStubExpr_,
-            Function<MatcherExpr, T> visitMatcherExpr_
+            Function<MatcherExpr, T> visitMatcherExpr_,
+            Function<NewExpr, T> visitNewExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -22,6 +23,10 @@ public interface Expr {
             @Override
             public T visitMatcherExpr(MatcherExpr matcherExpr) {
                 return visitMatcherExpr_.apply(matcherExpr);
+            }
+            @Override
+            public T visitNewExpr(NewExpr newExpr) {
+                return visitNewExpr_.apply(newExpr);
             }
         });
     }

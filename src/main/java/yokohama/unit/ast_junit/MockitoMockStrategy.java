@@ -93,6 +93,12 @@ public class MockitoMockStrategy implements MockStrategy {
                         matcherExpr.getExpr(sb, name2, expressionStrategy, this);
                         sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
                         return null;
+                    },
+                    newExpr -> {
+                        String name2 = name + "_";
+                        newExpr.getExpr(sb, name2);
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
+                        return null;
                     }
             );
         }

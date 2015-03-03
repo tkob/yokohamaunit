@@ -22,6 +22,10 @@ public class VarDeclStatement implements Statement {
                 matcherExpr -> {
                     matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
                     return null;
+                },
+                newExpr -> {
+                    newExpr.getExpr(sb, name);
+                    return null;
                 });
     }
 

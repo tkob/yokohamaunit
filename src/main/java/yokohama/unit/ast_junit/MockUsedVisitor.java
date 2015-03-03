@@ -34,6 +34,7 @@ public class MockUsedVisitor {
         return value.accept(
                 quoted -> false,
                 stubExpr -> true,
-                matcherExpr -> false);
+                matcherExpr -> false,
+                newExpr -> false);
     }
 }
