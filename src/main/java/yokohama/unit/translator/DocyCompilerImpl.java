@@ -9,10 +9,6 @@ import java.util.Optional;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
-import yokohama.unit.ast_junit.ExpressionStrategy;
-import yokohama.unit.ast_junit.MockStrategy;
-import yokohama.unit.ast_junit.MockitoMockStrategy;
-import yokohama.unit.ast_junit.OgnlExpressionStrategy;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
 public class DocyCompilerImpl implements DocyCompiler {
@@ -20,9 +16,9 @@ public class DocyCompilerImpl implements DocyCompiler {
     ParseTreeToAstVisitor parseTreeToAstVisitor = new ParseTreeToAstVisitor();
     VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
     AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
-    ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
-    MockStrategy mockStrategy = new MockitoMockStrategy();
-    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(expressionStrategy, mockStrategy);
+    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(
+            new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
+            new yokohama.unit.ast_junit.MockitoMockStrategy());
 
     @Override
     public boolean compile(
