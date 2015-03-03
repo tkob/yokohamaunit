@@ -84,9 +84,16 @@ import yokohama.unit.util.SUtils;
 
 public class AstToJUnitAst {
     private final Optional<Path> docyPath;
+    ExpressionStrategy expressionStrategy;
+    MockStrategy mockStrategy;
     
-    AstToJUnitAst(Optional<Path> docyPath) {
+    AstToJUnitAst(
+            Optional<Path> docyPath,
+            ExpressionStrategy expressionStrategy,
+            MockStrategy mockStrategy) {
         this.docyPath = docyPath;
+        this.expressionStrategy = expressionStrategy;
+        this.mockStrategy = mockStrategy;
     }
 
     TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();

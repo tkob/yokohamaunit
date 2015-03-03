@@ -17,8 +17,6 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast_junit.CompilationUnit;
-import yokohama.unit.ast_junit.MockitoMockStrategy;
-import yokohama.unit.ast_junit.OgnlExpressionStrategy;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
@@ -74,10 +72,16 @@ public class TranslatorUtils {
 
         // AST to JUnit AST
         CompilationUnit junit =
-                new AstToJUnitAst(docyPath).translate(className, ast, packageName);
+                new AstToJUnitAst(
+                        docyPath,
+                        new OgnlExpressionStrategy(),
+                        new MockitoMockStrategy()
+                ).translate(className, ast, packageName);
 
         // JUnit AST to string
-        return junit.getText(new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        return junit.getText(
+                new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
+                new yokohama.unit.ast_junit.MockitoMockStrategy());
     }
 
     public static boolean compileDocy(

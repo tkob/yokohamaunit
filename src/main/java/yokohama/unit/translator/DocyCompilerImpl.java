@@ -16,6 +16,8 @@ public class DocyCompilerImpl implements DocyCompiler {
     ParseTreeToAstVisitor parseTreeToAstVisitor = new ParseTreeToAstVisitor();
     VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
     AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
+    ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
+    MockStrategy mockStrategy = new MockitoMockStrategy();
     JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(
             new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
             new yokohama.unit.ast_junit.MockitoMockStrategy());
@@ -49,8 +51,9 @@ public class DocyCompilerImpl implements DocyCompiler {
         }
 
         // AST to JUnit AST
-        CompilationUnit junit = astToJUnitAstFactory.create(Optional.of(docyPath))
-                .translate(className, ast, packageName);
+        CompilationUnit junit =
+                astToJUnitAstFactory.create(Optional.of(docyPath), expressionStrategy, mockStrategy)
+                        .translate(className, ast, packageName);
 
         // JUnit AST to Java code
         return jUnitAstCompiler.compile(junit, className, packageName, classPath, dest, javacArgs);
