@@ -11,7 +11,7 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
+        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList(), Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
@@ -28,6 +28,7 @@ public class TestMethodTest {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod(
                 "test",
+                Arrays.asList(),
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("x", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("y", Span.dummySpan())),

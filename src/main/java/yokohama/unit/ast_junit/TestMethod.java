@@ -7,6 +7,7 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TestMethod {
     private final String name;
+    private final List<Statement> before;
     private final List<Statement> statements;
     private final List<ActionStatement> actionsAfter;
 
@@ -18,6 +19,7 @@ public class TestMethod {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
+        before.forEach(statement -> statement.toString(sb, expressionStrategy, mockStrategy));
         sb.appendln(expressionStrategy.environment());
         if (actionsAfter.size() > 0) {
             sb.appendln("try {");

@@ -65,7 +65,7 @@ public class AstToJUnitAstTest {
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
-        List<TestMethod> expected = Arrays.asList(new TestMethod("test_0", Arrays.asList(), Arrays.asList()));
+        List<TestMethod> expected = Arrays.asList(new TestMethod("test_0", Arrays.asList(), Arrays.asList(), Arrays.asList()));
         assertThat(actual, is(expected));
     }
 
