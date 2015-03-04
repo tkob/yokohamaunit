@@ -32,6 +32,7 @@
  *             | BindThrownStatement
  *             | ReturnIsStatement
  *             | ReturnIsNotStatement
+ *             | InvokeVoidStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
@@ -39,6 +40,7 @@
  * TopBindStatement ::= Expr
  * VarDeclStatement ::= Expr
  * BindThrownStatement ::= Expr
+ * InvokeVoidStatement ::= Var Var*
  * </pre>
  * 
  */

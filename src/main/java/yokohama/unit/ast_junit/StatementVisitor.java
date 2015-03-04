@@ -9,4 +9,5 @@ public interface StatementVisitor<T> {
     T visitBindThrownStatement(BindThrownStatement bindThrownStatement);
     T visitReturnIsStatement(ReturnIsStatement returnIsStatement);
     T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement);
+    T visitInvokeVoidStatement(InvokeVoidStatement returnInvokeVoidStatement);
 }

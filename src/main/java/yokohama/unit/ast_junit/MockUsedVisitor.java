@@ -27,7 +27,8 @@ public class MockUsedVisitor {
                 varDeclStatement -> visitExpr(varDeclStatement.getValue()),
                 bindThrownStatement -> visitExpr(bindThrownStatement.getValue()),
                 returnIsStatement -> false,
-                returnIsNotStatement -> false);
+                returnIsNotStatement -> false,
+                invokeVoidStatement -> false);
     }
 
     private boolean visitExpr(Expr value) {
