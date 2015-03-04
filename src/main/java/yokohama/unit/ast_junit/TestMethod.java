@@ -20,7 +20,6 @@ public class TestMethod {
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
         before.forEach(statement -> statement.toString(sb, expressionStrategy, mockStrategy));
-        sb.appendln(expressionStrategy.environment());
         if (actionsAfter.size() > 0) {
             sb.appendln("try {");
             sb.shift();

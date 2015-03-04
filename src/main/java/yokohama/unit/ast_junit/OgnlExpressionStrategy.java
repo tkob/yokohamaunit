@@ -28,11 +28,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public String environment() {
-        return "ognl.OgnlContext env = new ognl.OgnlContext();";
-    }
-
-    @Override
     public void bind(SBuilder sb, String name, Var varExpr) {
         sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
     }

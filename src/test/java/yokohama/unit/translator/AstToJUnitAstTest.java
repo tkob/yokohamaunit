@@ -24,6 +24,7 @@ import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
+import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
@@ -65,7 +66,11 @@ public class AstToJUnitAstTest {
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
-        List<TestMethod> expected = Arrays.asList(new TestMethod("test_0", Arrays.asList(), Arrays.asList(), Arrays.asList()));
+        List<TestMethod> expected = Arrays.asList(new TestMethod(
+                "test_0",
+                Arrays.asList(new VarDeclStatement("env", new NewExpr("ognl.OgnlContext"))),
+                Arrays.asList(),
+                Arrays.asList()));
         assertThat(actual, is(expected));
     }
 

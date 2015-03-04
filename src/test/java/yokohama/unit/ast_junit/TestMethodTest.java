@@ -17,7 +17,6 @@ public class TestMethodTest {
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
@@ -28,7 +27,8 @@ public class TestMethodTest {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod(
                 "test",
-                Arrays.asList(),
+                Arrays.asList(
+                        new VarDeclStatement("env", new NewExpr("ognl.OgnlContext"))),
                 Arrays.asList(
                         new VarDeclStatement("actual", new QuotedExpr("x", Span.dummySpan())),
                         new VarDeclStatement("expected", new QuotedExpr("y", Span.dummySpan())),

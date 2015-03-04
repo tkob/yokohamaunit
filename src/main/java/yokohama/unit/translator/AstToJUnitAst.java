@@ -131,7 +131,7 @@ public class AstToJUnitAst {
                     GenSym genSym = new GenSym();
                     return Arrays.asList(new TestMethod(
                             methodName,
-                            Arrays.asList(),
+                            expressionStrategy.env("env"),
                             propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym)).collect(Collectors.toList()),
                             Arrays.asList()));
                 },
@@ -143,7 +143,7 @@ public class AstToJUnitAst {
                             .map(i -> {
                                 return new TestMethod(
                                         methodName + "_" + (i + 1),
-                                        Arrays.asList(),
+                                        expressionStrategy.env("env"),
                                         ListUtils.union(
                                                 table.get(i),
                                                 propositions
@@ -158,7 +158,7 @@ public class AstToJUnitAst {
                     GenSym genSym = new GenSym();
                     return Arrays.asList(new TestMethod(
                             methodName,
-                            Arrays.asList(),
+                            expressionStrategy.env("env"),
                             Stream.concat(
                                     bindings.getBindings()
                                             .stream()
@@ -583,7 +583,11 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(new TestMethod(testName, Arrays.asList(), statements, actionsAfter));
+        return Arrays.asList(new TestMethod(
+                testName,
+                expressionStrategy.env("env"),
+                statements,
+                actionsAfter));
     }
 
     Stream<ActionStatement> translateExecutions(List<Execution> executions) {
