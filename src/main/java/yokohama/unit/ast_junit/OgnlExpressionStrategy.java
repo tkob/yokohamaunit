@@ -28,11 +28,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public void bind(SBuilder sb, String envVarName, String name, Var varExpr) {
-        sb.appendln(envVarName, ".put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
-    }
-
-    @Override
     public String getValue(QuotedExpr quotedExpr) {
         return "eval(\"" + escapeJava(quotedExpr.getText()) + "\", env, " +
                 "\"" + escapeJava(quotedExpr.getSpan().getFileName()) +  "\", " +
