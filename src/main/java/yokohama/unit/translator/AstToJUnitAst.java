@@ -52,7 +52,6 @@ import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ActionStatement;
 import yokohama.unit.ast_junit.BindThrownStatement;
-import yokohama.unit.ast_junit.TopBindStatement;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -257,7 +256,7 @@ public class AstToJUnitAst {
                                                     suchThatVar.getName(),
                                                     new SuchThatMatcherExpr(
                                                             new ArrayList<Statement>() {{
-                                                                add(new TopBindStatement(envVarName, bindVarName, matchesArg));
+                                                                addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
                                                                 add(new VarDeclStatement(
                                                                         "actual",
@@ -283,7 +282,7 @@ public class AstToJUnitAst {
                                                     suchThatVar.getName(),
                                                     new SuchThatMatcherExpr(
                                                             new ArrayList<Statement>() {{
-                                                                add(new TopBindStatement(envVarName, bindVarName, matchesArg));
+                                                                addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
                                                                 add(new VarDeclStatement(
                                                                         "actual",
@@ -309,7 +308,7 @@ public class AstToJUnitAst {
                                                     suchThatVar.getName(),
                                                     new SuchThatMatcherExpr(
                                                             new ArrayList<Statement>() {{
-                                                                add(new TopBindStatement(envVarName, bindVarName, matchesArg));
+                                                                addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
                                                                 add(new BindThrownStatement(
                                                                         "actual",
@@ -353,8 +352,9 @@ public class AstToJUnitAst {
         String name = binding.getName().getName();
         Expr value = translateExpr(binding.getValue());
         String varName = genSym.generate(name);
-        return Stream.of(new VarDeclStatement(varName, value),
-                new TopBindStatement(envVarName, name, new Var(varName)));
+        return Stream.concat(
+                Stream.of(new VarDeclStatement(varName, value)),
+                expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
     }
 
     Expr translateExpr(yokohama.unit.ast.Expr expr) {
@@ -464,8 +464,9 @@ public class AstToJUnitAst {
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
-                    return Stream.of(new VarDeclStatement(varName, translateExpr(row.getExprs().get(i))),
-                            new TopBindStatement(envVarName, header.get(i), new Var(varName)));
+                    return Stream.concat(
+                            Stream.of(new VarDeclStatement(varName, translateExpr(row.getExprs().get(i)))),
+                            expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
                 })
                 .collect(Collectors.toList());
     }
@@ -482,15 +483,16 @@ public class AstToJUnitAst {
                                     .filter(key -> idents.contains(key))
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
-                                        return Stream.of(new VarDeclStatement(
+                                        return Stream.concat(
+                                                Stream.of(new VarDeclStatement(
                                                         varName,
                                                         new QuotedExpr(
                                                                 record.get(name),
                                                                 new Span(
                                                                         Optional.of(Paths.get(fileName)), 
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
-                                                                        new Position(-1, -1)))),
-                                                new TopBindStatement(envVarName, name, new Var(varName)));
+                                                                        new Position(-1, -1))))),
+                                                expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
                                     })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -514,15 +516,16 @@ public class AstToJUnitAst {
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
-                                    return Stream.of(new VarDeclStatement(
+                                    return Stream.concat(
+                                            Stream.of(new VarDeclStatement(
                                                     varName,
                                                     new QuotedExpr(
                                                             row.getCell(left + i).getStringCellValue(),
                                                             new Span(
                                                                     Optional.of(Paths.get(fileName)), 
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
-                                                                    new Position(-1, -1)))),
-                                            new TopBindStatement(envVarName, names.get(i), new Var(varName)));
+                                                                    new Position(-1, -1))))),
+                                            expressionStrategy.bind(envVarName, names.get(i), new Var(varName), genSym).stream());
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -544,8 +547,9 @@ public class AstToJUnitAst {
                         .stream()
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
-                            return Stream.of(new VarDeclStatement(varName, translateExpr(binding.getValue())),
-                                    new TopBindStatement(env, binding.getName(), new Var(varName)));
+                            return Stream.concat(
+                                    Stream.of(new VarDeclStatement(varName, translateExpr(binding.getValue()))),
+                                    expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
                         });
             } else {
                 bindings = Stream.empty();
