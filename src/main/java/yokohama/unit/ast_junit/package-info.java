@@ -27,7 +27,6 @@
  *             | IsNotStatement
  *             | ThrowsStatement
  *             | ActionStatement
- *             | TopBindStatement
  *             | VarDeclStatement
  *             | BindThrownStatement
  *             | ReturnIsStatement
@@ -37,7 +36,6 @@
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
  * ActionStatement ::= QuotedExpr
- * TopBindStatement ::= Expr
  * VarDeclStatement ::= Expr
  * BindThrownStatement ::= Expr
  * ReturnIsStatement ::= Var Var
