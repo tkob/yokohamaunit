@@ -5,7 +5,7 @@ import yokohama.unit.util.SBuilder;
 
 public interface ExpressionStrategy {
     public void auxMethods(SBuilder sb);
-    public void bind(SBuilder sb, String name, Var varExpr);
+    public void bind(SBuilder sb, String envVarName, String name, Var varExpr);
     public String getValue(QuotedExpr quotedExpr);
     public Optional<String> wrappingException();
     public String wrappedException(String e);

@@ -85,7 +85,7 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
                 new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
@@ -106,7 +106,7 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
                 new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
@@ -126,7 +126,7 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym()).collect(Collectors.toList());
+        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(new BindThrownStatement("actual", new QuotedExpr("a", Span.dummySpan())),
                 new VarDeclStatement("expected", new InstanceOfMatcherExpr("b")),
                 new IsStatement(new Var("actual"), new Var("expected")));

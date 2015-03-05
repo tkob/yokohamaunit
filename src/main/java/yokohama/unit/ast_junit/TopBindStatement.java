@@ -5,12 +5,13 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class TopBindStatement implements Statement {
+    private final String envVarName;
     private final String name;
     private final Var value;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        expressionStrategy.bind(sb, name, value);
+        expressionStrategy.bind(sb, envVarName, name, value);
     }
 
     @Override

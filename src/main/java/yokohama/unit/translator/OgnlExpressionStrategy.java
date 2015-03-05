@@ -11,7 +11,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     public List<Statement> env(String varName) {
         return Arrays.asList(
                 new VarDeclStatement(
-                        "env",
+                        varName,
                         new NewExpr("ognl.OgnlContext")));
     }
 }

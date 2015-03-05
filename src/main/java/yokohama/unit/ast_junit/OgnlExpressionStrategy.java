@@ -28,8 +28,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public void bind(SBuilder sb, String name, Var varExpr) {
-        sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
+    public void bind(SBuilder sb, String envVarName, String name, Var varExpr) {
+        sb.appendln(envVarName, ".put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
     }
 
     @Override
