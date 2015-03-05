@@ -9,7 +9,8 @@ public interface Expr {
             Function<QuotedExpr, T> visitQuotedExpr_,
             Function<StubExpr, T> visitStubExpr_,
             Function<MatcherExpr, T> visitMatcherExpr_,
-            Function<NewExpr, T> visitNewExpr_
+            Function<NewExpr, T> visitNewExpr_,
+            Function<StrLitExpr, T> visitStrLitExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -27,6 +28,10 @@ public interface Expr {
             @Override
             public T visitNewExpr(NewExpr newExpr) {
                 return visitNewExpr_.apply(newExpr);
+            }
+            @Override
+            public T visitStrLitExpr(StrLitExpr strLitExpr) {
+                return visitStrLitExpr_.apply(strLitExpr);
             }
         });
     }

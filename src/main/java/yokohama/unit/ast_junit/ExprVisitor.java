@@ -5,4 +5,5 @@ public interface ExprVisitor<T> {
     T visitStubExpr(StubExpr stubExpr);
     T visitMatcherExpr(MatcherExpr matcherExpr);
     T visitNewExpr(NewExpr newExpr);
+    T visitStrLitExpr(StrLitExpr strLitExpr);
 }

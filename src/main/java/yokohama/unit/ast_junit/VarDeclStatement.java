@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import lombok.Value;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -25,6 +26,10 @@ public class VarDeclStatement implements Statement {
                 },
                 newExpr -> {
                     newExpr.getExpr(sb, name);
+                    return null;
+                },
+                strLitExpr -> {
+                    sb.appendln("String ", name, " = \"", escapeJava(strLitExpr.getText()), "\";");
                     return null;
                 });
     }

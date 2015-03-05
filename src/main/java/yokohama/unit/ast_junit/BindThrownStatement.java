@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import lombok.Value;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -28,6 +29,10 @@ public class BindThrownStatement implements Statement {
                     },
                     newExpr -> {
                         newExpr.getExpr(sb, "_");
+                        return null;
+                    },
+                    strLitExpr -> {
+                        sb.appendln("String _ = \"", escapeJava(strLitExpr.getText()), "\";");
                         return null;
                     });
             sb.appendln(name, " = null;");

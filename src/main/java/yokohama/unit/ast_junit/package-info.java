@@ -8,7 +8,7 @@
  * 
  * TestMethod ::= Statement* ActionStatement*
  * 
- * Expr ::= QuotedExpr | StubExpr | MatcherExpr | NewExpr
+ * Expr ::= QuotedExpr | StubExpr | MatcherExpr | NewExpr | StrLitExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr
