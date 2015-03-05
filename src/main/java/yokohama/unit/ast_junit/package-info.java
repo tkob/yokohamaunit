@@ -40,6 +40,8 @@
  * TopBindStatement ::= Expr
  * VarDeclStatement ::= Expr
  * BindThrownStatement ::= Expr
+ * ReturnIsStatement ::= Var Var
+ * ReturnIsNotStatement ::= Var Var
  * InvokeVoidStatement ::= Var Var*
  * </pre>
  * 
