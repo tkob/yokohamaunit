@@ -26,9 +26,9 @@ public class SuchThatMatcherExpr extends MatcherExpr {
                     statement.toString(sb, expressionStrategy, mockStrategy);
                 }
                 sb.unshift();
-                sb.appendln("} catch (Exception e) {");
+                sb.appendln("} catch (Exception $e) {"); // TODO: var name should be gensym'ed
                 sb.shift();
-                    sb.appendln("throw new RuntimeException(e);");
+                    sb.appendln("throw new RuntimeException($e);");
                 sb.unshift();
                 sb.appendln("}");
             sb.unshift();

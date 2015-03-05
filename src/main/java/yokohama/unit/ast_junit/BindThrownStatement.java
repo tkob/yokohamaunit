@@ -38,14 +38,14 @@ public class BindThrownStatement implements Statement {
             sb.appendln(name, " = null;");
         sb.unshift();
         if (expressionStrategy.wrappingException().isPresent()) {
-            sb.appendln("} catch (", expressionStrategy.wrappingException().get(), " e) {");
+            sb.appendln("} catch (", expressionStrategy.wrappingException().get(), " $e) {"); // TODO: var name should be gensym'ed
             sb.shift();
-                sb.appendln(name, " = ", expressionStrategy.wrappedException("e"), ";");
+                sb.appendln(name, " = ", expressionStrategy.wrappedException("$e"), ";");
             sb.unshift();
         }
-        sb.appendln("} catch (Throwable e) {");
+        sb.appendln("} catch (Throwable $e) {"); // TODO: var name should be gensym'ed
         sb.shift();
-            sb.appendln(name, " = e;");
+            sb.appendln(name, " = $e;");
         sb.unshift();
         sb.appendln("}");
     }
