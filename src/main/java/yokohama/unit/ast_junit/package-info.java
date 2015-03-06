@@ -32,6 +32,7 @@
  *             | ReturnIsStatement
  *             | ReturnIsNotStatement
  *             | InvokeVoidStatement
+ *             | TryStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
@@ -41,6 +42,9 @@
  * ReturnIsStatement ::= Var Var
  * ReturnIsNotStatement ::= Var Var
  * InvokeVoidStatement ::= Var Var*
+ * TryStatement ::= Statement* CatchClause* Statement*
+ * 
+ * CatchClause ::= ClassType Var Statement*
  * </pre>
  * 
  */

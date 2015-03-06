@@ -16,7 +16,8 @@ public interface Statement {
             Function<BindThrownStatement, T> visitBindThrownStatement_,
             Function<ReturnIsStatement, T> visitReturnIsStatement_,
             Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_,
-            Function<InvokeVoidStatement, T> visitInvokeVoidStatement_
+            Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
+            Function<TryStatement, T> visitTryStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -56,6 +57,11 @@ public interface Statement {
             @Override
             public T visitInvokeVoidStatement(InvokeVoidStatement invokeVoidStatement) {
                 return visitInvokeVoidStatement_.apply(invokeVoidStatement);
+            }
+
+            @Override
+            public T visitTryStatement(TryStatement tryStatement) {
+                return visitTryStatement_.apply(tryStatement);
             }
         });
     }
