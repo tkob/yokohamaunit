@@ -1,0 +1,25 @@
+# Test: The first call of generate method returns prefix
+
+## Setup
+Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
+
+## Verify
+Assert `instance.generate(prefix)` is `"prefix"`.
+    
+# Test: The second call of generate method returns prefix plus '2'
+
+## Setup
+Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
+Do `instance.generate(prefix)`.
+
+## Verify
+Assert `instance.generate(prefix)` is `"prefix2"`.
+
+# Test: Different prefixes are independent of each other as for numbering
+
+## Setup
+Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
+Do `instance.generate("another")`.
+
+## Verify
+Assert `instance.generate(prefix)` is `"prefix"`.
