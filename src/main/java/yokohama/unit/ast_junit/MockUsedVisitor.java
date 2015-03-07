@@ -43,6 +43,7 @@ public class MockUsedVisitor {
                 stubExpr -> true,
                 matcherExpr -> false,
                 newExpr -> false,
-                strLitExpr -> false);
+                strLitExpr -> false,
+                nullExpr -> false);
     }
 }

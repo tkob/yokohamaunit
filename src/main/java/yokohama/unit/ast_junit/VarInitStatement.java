@@ -35,6 +35,10 @@ public class VarInitStatement implements Statement {
                 strLitExpr -> {
                     sb.appendln("String ", name, " = \"", escapeJava(strLitExpr.getText()), "\";");
                     return null;
+                },
+                nullExpr -> {
+                    sb.appendln("Object", name, " = null;");
+                    return null;
                 });
     }
 

@@ -38,6 +38,10 @@ public class BindThrownStatement implements Statement {
                     strLitExpr -> {
                         sb.appendln("String _ = \"", escapeJava(strLitExpr.getText()), "\";");
                         return null;
+                    },
+                    nullExpr -> {
+                        sb.appendln("null;");
+                        return null;
                     });
             sb.appendln(name, " = null;");
         sb.unshift();

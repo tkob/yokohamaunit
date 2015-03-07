@@ -107,6 +107,10 @@ public class MockitoMockStrategy implements MockStrategy {
                     strLitExpr -> {
                         sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", escapeJava(strLitExpr.getText()), ");");
                         return null;
+                    },
+                    nullExpr -> {
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(null);");
+                        return null;
                     }
             );
         }

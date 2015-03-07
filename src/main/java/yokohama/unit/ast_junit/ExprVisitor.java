@@ -7,4 +7,5 @@ public interface ExprVisitor<T> {
     T visitMatcherExpr(MatcherExpr matcherExpr);
     T visitNewExpr(NewExpr newExpr);
     T visitStrLitExpr(StrLitExpr strLitExpr);
+    T visitNullExpr(NullExpr nullExpr);
 }

@@ -11,7 +11,8 @@ public interface Expr {
             Function<StubExpr, T> visitStubExpr_,
             Function<MatcherExpr, T> visitMatcherExpr_,
             Function<NewExpr, T> visitNewExpr_,
-            Function<StrLitExpr, T> visitStrLitExpr_
+            Function<StrLitExpr, T> visitStrLitExpr_,
+            Function<NullExpr, T> visitNullExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -37,6 +38,10 @@ public interface Expr {
             @Override
             public T visitStrLitExpr(StrLitExpr strLitExpr) {
                 return visitStrLitExpr_.apply(strLitExpr);
+            }
+            @Override
+            public T visitNullExpr(NullExpr nullExpr) {
+                return visitNullExpr_.apply(nullExpr);
             }
         });
     }
