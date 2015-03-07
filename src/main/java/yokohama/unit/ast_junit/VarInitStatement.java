@@ -39,6 +39,10 @@ public class VarInitStatement implements Statement {
                 nullExpr -> {
                     sb.appendln("Object", name, " = null;");
                     return null;
+                },
+                invokeExpr -> {
+                    invokeExpr.getExpr(sb, name);
+                    return null;
                 });
     }
 

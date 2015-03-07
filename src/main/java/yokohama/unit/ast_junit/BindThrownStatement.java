@@ -42,6 +42,10 @@ public class BindThrownStatement implements Statement {
                     nullExpr -> {
                         sb.appendln("null;");
                         return null;
+                    },
+                    invokeExpr -> {
+                        invokeExpr.getExpr(sb, "_");
+                        return null;
                     });
             sb.appendln(name, " = null;");
         sb.unshift();

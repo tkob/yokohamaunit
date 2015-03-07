@@ -42,6 +42,11 @@ public class VarAssignStatement implements Statement {
                 nullExpr -> {
                     sb.appendln(name, " = null;");
                     return null;
+                },
+                invokeExpr -> {
+                    // TODO: need fix, this results in variable initialization, not assignment
+                    invokeExpr.getExpr(sb, name);
+                    return null;
                 });
     }
 
