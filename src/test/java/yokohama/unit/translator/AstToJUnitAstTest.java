@@ -137,7 +137,7 @@ public class AstToJUnitAstTest {
                 new TryStatement(
                         Arrays.asList(
                                 new VarInitStatement("tmp", new QuotedExpr("a", Span.dummySpan())),
-                                new VarAssignStatement("actual", Optional.empty(), new NullExpr())
+                                new VarAssignStatement("actual", AstToJUnitAst.THROWABLE, new NullExpr())
                         ),
                         Arrays.asList(
                                 new CatchClause(
@@ -147,13 +147,13 @@ public class AstToJUnitAstTest {
                                                 new VarInitStatement("cause", new InvokeExpr(new Var("ex"), "getReason", Arrays.asList())),
                                                 new VarAssignStatement(
                                                         "actual",
-                                                        Optional.of(new ClassType("java.lang.Throwable", Span.dummySpan())),
+                                                        new ClassType("java.lang.Throwable", Span.dummySpan()),
                                                         new VarExpr("cause")))),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var("ex"),
                                         Arrays.asList(
-                                                new VarAssignStatement("actual", Optional.empty(), new VarExpr("ex"))))
+                                                new VarAssignStatement("actual", AstToJUnitAst.THROWABLE, new VarExpr("ex"))))
                         ),
                         Arrays.asList()),
                 new VarInitStatement("expected", new InstanceOfMatcherExpr("b")),

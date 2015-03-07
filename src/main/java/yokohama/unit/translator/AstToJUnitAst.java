@@ -102,6 +102,8 @@ public class AstToJUnitAst {
 
     TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();
 
+    static final ClassType THROWABLE = new ClassType("java.lang.Throwable", Span.dummySpan());
+
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
@@ -231,7 +233,7 @@ public class AstToJUnitAst {
                 new TryStatement(
                         Arrays.asList(
                                 new VarInitStatement(tmp, subject),
-                                new VarAssignStatement(actual, Optional.empty(), new NullExpr())
+                                new VarAssignStatement(actual, THROWABLE, new NullExpr())
                         ),
                         Arrays.asList(
                                 expressionStrategy.catchAndAssignCause(e, actual, genSym),
@@ -239,7 +241,7 @@ public class AstToJUnitAst {
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var(e),
                                         Arrays.asList(
-                                                new VarAssignStatement(actual, Optional.empty(), new VarExpr(e))))),
+                                                new VarAssignStatement(actual, THROWABLE, new VarExpr(e))))),
                         Arrays.asList()));
     }
 

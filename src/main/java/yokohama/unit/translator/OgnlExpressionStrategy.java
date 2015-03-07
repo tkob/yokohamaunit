@@ -2,7 +2,6 @@ package yokohama.unit.translator;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.InvokeExpr;
@@ -46,7 +45,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         new VarInitStatement(cause, new InvokeExpr(caughtVar, "getReason", Arrays.asList())),
                         new VarAssignStatement(
                                 causeVarName,
-                                Optional.of(new ClassType("java.lang.Throwable", Span.dummySpan())),
+                                new ClassType("java.lang.Throwable", Span.dummySpan()),
                                 new VarExpr(cause))));
     }
 }
