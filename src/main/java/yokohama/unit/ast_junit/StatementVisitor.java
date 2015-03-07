@@ -11,4 +11,5 @@ public interface StatementVisitor<T> {
     T visitInvokeVoidStatement(InvokeVoidStatement returnInvokeVoidStatement);
     T visitTryStatement(TryStatement tryStatement);
     T visitVarDeclStatement(VarDeclStatement varDeclStatement);
+    T visitVarAssignStatement(VarAssignStatement varAssignStatement);
 }
