@@ -1,6 +1,5 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Optional;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
@@ -33,15 +32,5 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 "\"" + escapeJava(quotedExpr.getSpan().getFileName()) +  "\", " +
                 quotedExpr.getSpan().getStart().getLine() + ", " +
                 "\"" + escapeJava(quotedExpr.getSpan().toString()) + "\")";
-    }
-
-    @Override
-    public Optional<String> wrappingException() {
-        return Optional.of("ognl.OgnlException");
-    }
-
-    @Override
-    public String wrappedException(String e) {
-        return e + ".getReason()";
     }
 }
