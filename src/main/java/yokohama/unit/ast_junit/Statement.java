@@ -17,7 +17,8 @@ public interface Statement {
             Function<ReturnIsStatement, T> visitReturnIsStatement_,
             Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_,
             Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
-            Function<TryStatement, T> visitTryStatement_
+            Function<TryStatement, T> visitTryStatement_,
+            Function<VarDeclStatement, T> visitVarDeclStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -62,6 +63,10 @@ public interface Statement {
             @Override
             public T visitTryStatement(TryStatement tryStatement) {
                 return visitTryStatement_.apply(tryStatement);
+            }
+            @Override
+            public T visitVarDeclStatement(VarDeclStatement varDeclStatement) {
+                return visitVarDeclStatement_.apply(varDeclStatement);
             }
         });
     }
