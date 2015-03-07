@@ -17,20 +17,27 @@ import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.ThrowsPredicate;
-import yokohama.unit.ast_junit.BindThrownStatement;
+import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
+import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
+import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
+import yokohama.unit.ast_junit.VarAssignStatement;
+import yokohama.unit.ast_junit.VarDeclStatement;
+import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstTest {
@@ -125,7 +132,30 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new BindThrownStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+        List<Statement> expected = Arrays.asList(
+                new VarDeclStatement(new ClassType("java.lang.Throwable", Span.dummySpan()), "actual"),
+                new TryStatement(
+                        Arrays.asList(
+                                new VarInitStatement("tmp", new QuotedExpr("a", Span.dummySpan())),
+                                new VarAssignStatement("actual", Optional.empty(), new NullExpr())
+                        ),
+                        Arrays.asList(
+                                new CatchClause(
+                                        new ClassType("ognl.OgnlException", Span.dummySpan()),
+                                        new Var("ex"),
+                                        Arrays.asList(
+                                                new VarInitStatement("cause", new InvokeExpr(new Var("ex"), "getReason", Arrays.asList())),
+                                                new VarAssignStatement(
+                                                        "actual",
+                                                        Optional.of(new ClassType("java.lang.Throwable", Span.dummySpan())),
+                                                        new VarExpr("cause")))),
+                                new CatchClause(
+                                        new ClassType("java.lang.Throwable", Span.dummySpan()),
+                                        new Var("ex"),
+                                        Arrays.asList(
+                                                new VarAssignStatement("actual", Optional.empty(), new VarExpr("ex"))))
+                        ),
+                        Arrays.asList()),
                 new VarInitStatement("expected", new InstanceOfMatcherExpr("b")),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));

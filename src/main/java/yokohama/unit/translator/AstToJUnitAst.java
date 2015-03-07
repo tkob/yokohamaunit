@@ -51,7 +51,7 @@ import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.ActionStatement;
-import yokohama.unit.ast_junit.BindThrownStatement;
+import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -63,6 +63,7 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.MethodPattern;
 import yokohama.unit.ast_junit.NonArrayType;
+import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.QuotedExpr;
@@ -74,9 +75,13 @@ import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.SuchThatMatcherExpr;
+import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
+import yokohama.unit.ast_junit.VarAssignStatement;
+import yokohama.unit.ast_junit.VarDeclStatement;
+import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
@@ -198,12 +203,44 @@ public class AstToJUnitAst {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
                     return Stream.concat(
-                            Stream.of(new BindThrownStatement(actual, subject)),
+                            bindThrown(actual, subject, genSym, envVarName),
                             Stream.concat(
                                     translateMatcher(throwsPredicate.getThrowee(), expected, genSym, envVarName),
                                     Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
                 }
         );
+    }
+
+    Stream<Statement> bindThrown(String actual, QuotedExpr subject, GenSym genSym, String envVarName) {
+        String e = genSym.generate("ex");
+        String tmp = genSym.generate("tmp");
+        /*
+        Throwable actual;
+        try {
+            // evaluate subject according to the strategy
+            ...
+            actual = null;
+        } catch (XXXXException e) { // extract the cause if wrapped: inserted by the strategy
+            actual = e.get...;
+        } catch (Throwable e) {
+            actual = e;
+        }
+        */
+        return Stream.of(
+                new VarDeclStatement(new ClassType("java.lang.Throwable", Span.dummySpan()), actual),
+                new TryStatement(
+                        Arrays.asList(
+                                new VarInitStatement(tmp, subject),
+                                new VarAssignStatement(actual, Optional.empty(), new NullExpr())
+                        ),
+                        Arrays.asList(
+                                expressionStrategy.catchAndAssignCause(e, actual, genSym),
+                                new CatchClause(
+                                        new ClassType("java.lang.Throwable", Span.dummySpan()),
+                                        new Var(e),
+                                        Arrays.asList(
+                                                new VarAssignStatement(actual, Optional.empty(), new VarExpr(e))))),
+                        Arrays.asList()));
     }
 
     Stream<Statement> translateMatcher(Matcher matcher, String varName, GenSym genSym, String envVarName) {
@@ -304,14 +341,16 @@ public class AstToJUnitAst {
                                                             new ArrayList<Statement>() {{
                                                                 addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
-                                                                add(new BindThrownStatement(
+                                                                addAll(bindThrown(
                                                                         "actual",
                                                                         new QuotedExpr(
                                                                                 subject.getText(),
                                                                                 new Span(
                                                                                         docyPath,
                                                                                         subject.getSpan().getStart(),
-                                                                                        subject.getSpan().getEnd()))));
+                                                                                        subject.getSpan().getEnd())),
+                                                                        genSym,
+                                                                        envVarName).collect(Collectors.toList()));
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
