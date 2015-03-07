@@ -4,7 +4,7 @@ public interface StatementVisitor<T> {
     T visitIsStatement(IsStatement isStatement);
     T visitIsNotStatement(IsNotStatement isNotStatement);
     T visitActionStatement(ActionStatement actionStatement);
-    T visitVarDeclStatement(VarDeclStatement varDeclStatement);
+    T visitVarInitStatement(VarInitStatement varInitStatement);
     T visitBindThrownStatement(BindThrownStatement bindThrownStatement);
     T visitReturnIsStatement(ReturnIsStatement returnIsStatement);
     T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement);

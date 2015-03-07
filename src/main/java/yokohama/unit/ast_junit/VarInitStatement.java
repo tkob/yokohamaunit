@@ -5,7 +5,7 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class VarDeclStatement implements Statement {
+public class VarInitStatement implements Statement {
     private final String name;
     private final Expr value;
 
@@ -36,6 +36,6 @@ public class VarDeclStatement implements Statement {
 
     @Override
     public <T> T accept(StatementVisitor<T> visitor) {
-        return visitor.visitVarDeclStatement(this);
+        return visitor.visitVarInitStatement(this);
     }
 }

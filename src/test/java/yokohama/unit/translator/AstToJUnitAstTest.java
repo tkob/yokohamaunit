@@ -29,7 +29,7 @@ import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.VarDeclStatement;
+import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.util.GenSym;
 
@@ -68,7 +68,7 @@ public class AstToJUnitAstTest {
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
         List<TestMethod> expected = Arrays.asList(new TestMethod(
                 "test_0",
-                Arrays.asList(new VarDeclStatement("env", new NewExpr("ognl.OgnlContext"))),
+                Arrays.asList(new VarInitStatement("env", new NewExpr("ognl.OgnlContext"))),
                 Arrays.asList(),
                 Arrays.asList()));
         assertThat(actual, is(expected));
@@ -86,10 +86,9 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(
-                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
-                new VarDeclStatement("expected", new EqualToMatcherExpr(new Var("obj"))),
+        List<Statement> expected = Arrays.asList(new VarInitStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement("obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarInitStatement("expected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }
@@ -107,10 +106,9 @@ public class AstToJUnitAstTest {
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(
-                new VarDeclStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarDeclStatement("obj", new QuotedExpr("b", Span.dummySpan())),
-                new VarDeclStatement("unexpected", new EqualToMatcherExpr(new Var("obj"))),
+        List<Statement> expected = Arrays.asList(new VarInitStatement("actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement("obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarInitStatement("unexpected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsNotStatement(new Var("actual"), new Var("unexpected")));
         assertThat(actual, is(expected));
     }
@@ -128,7 +126,7 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(new BindThrownStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarDeclStatement("expected", new InstanceOfMatcherExpr("b")),
+                new VarInitStatement("expected", new InstanceOfMatcherExpr("b")),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }
