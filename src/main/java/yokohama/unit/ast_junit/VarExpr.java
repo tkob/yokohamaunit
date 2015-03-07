@@ -8,7 +8,7 @@ public class VarExpr implements Expr {
 
     @Override
     public <T> T accept(ExprVisitor<T> visitor) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return visitor.visitVarExpr(this);
     }
     
 }
