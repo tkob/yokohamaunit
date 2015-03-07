@@ -15,6 +15,10 @@ public class BindThrownStatement implements Statement {
         sb.appendln("try {");
         sb.shift();
             value.<Void>accept(
+                    varExpr -> {
+                        sb.appendln(varExpr.getName(), ";");
+                        return null;
+                    },
                     quotedExpr -> {
                         sb.appendln(expressionStrategy.getValue(quotedExpr), ";");
                         return null;

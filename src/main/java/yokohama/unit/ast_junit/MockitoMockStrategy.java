@@ -73,6 +73,10 @@ public class MockitoMockStrategy implements MockStrategy {
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "));
             behavior.getToBeReturned().<Void>accept(
+                    varExpr -> {
+                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", varExpr.getName(), ");");
+                        return null;
+                    },
                     quotedExpr -> {
                         String toBeReturned = expressionStrategy.getValue(quotedExpr);
                         sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", toBeReturned, ");");

@@ -12,6 +12,10 @@ public class VarInitStatement implements Statement {
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         value.<Void>accept(
+                varExpr -> {
+                    sb.appendln("Object ", name, " = ", varExpr.getName(), ";");
+                    return null;
+                },
                 quotedExpr -> {
                     sb.appendln("Object ", name, " = ", expressionStrategy.getValue(quotedExpr), ";");
                     return null;
