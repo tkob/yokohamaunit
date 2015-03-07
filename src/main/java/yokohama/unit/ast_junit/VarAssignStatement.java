@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import java.util.Optional;
 import lombok.Value;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
@@ -7,13 +8,15 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class VarAssignStatement implements Statement {
     private final String name;
+    private final Optional<ClassType> cast;
     private final Expr value;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         value.<Void>accept(
                 varExpr -> {
-                    sb.appendln(name, " = ", varExpr.getName(), ";");
+                    String cast_ = cast.isPresent() ? "(" + cast.get().getName() + ")" : "";
+                    sb.appendln(name, " = ", cast_, varExpr.getName(), ";");
                     return null;
                 },
                 quotedExpr -> {
