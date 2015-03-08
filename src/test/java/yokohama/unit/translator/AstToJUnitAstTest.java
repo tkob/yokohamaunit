@@ -75,7 +75,7 @@ public class AstToJUnitAstTest {
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
         List<TestMethod> expected = Arrays.asList(new TestMethod(
                 "test_0",
-                Arrays.asList(new VarInitStatement("env", new NewExpr("ognl.OgnlContext"))),
+                Arrays.asList(new VarInitStatement(OgnlExpressionStrategy.OGNL_CONTEXT, "env", new NewExpr("ognl.OgnlContext"))),
                 Arrays.asList(),
                 Arrays.asList()));
         assertThat(actual, is(expected));
@@ -93,9 +93,10 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new VarInitStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarInitStatement("obj", new QuotedExpr("b", Span.dummySpan())),
-                new VarInitStatement("expected", new EqualToMatcherExpr(new Var("obj"))),
+        List<Statement> expected = Arrays.asList(
+                new VarInitStatement(ClassType.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement(ClassType.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarInitStatement(ClassType.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }
@@ -113,9 +114,10 @@ public class AstToJUnitAstTest {
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
-        List<Statement> expected = Arrays.asList(new VarInitStatement("actual", new QuotedExpr("a", Span.dummySpan())),
-                new VarInitStatement("obj", new QuotedExpr("b", Span.dummySpan())),
-                new VarInitStatement("unexpected", new EqualToMatcherExpr(new Var("obj"))),
+        List<Statement> expected = Arrays.asList(
+                new VarInitStatement(ClassType.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement(ClassType.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
+                new VarInitStatement(ClassType.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsNotStatement(new Var("actual"), new Var("unexpected")));
         assertThat(actual, is(expected));
     }
@@ -133,18 +135,18 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
-                new VarDeclStatement(new ClassType("java.lang.Throwable", Span.dummySpan()), "actual"),
+                new VarDeclStatement(ClassType.THROWABLE, "actual"),
                 new TryStatement(
                         Arrays.asList(
-                                new VarInitStatement("tmp", new QuotedExpr("a", Span.dummySpan())),
-                                new VarAssignStatement("actual", AstToJUnitAst.THROWABLE, new NullExpr())
+                                new VarInitStatement(ClassType.OBJECT, "tmp", new QuotedExpr("a", Span.dummySpan())),
+                                new VarAssignStatement("actual", ClassType.THROWABLE, new NullExpr())
                         ),
                         Arrays.asList(
                                 new CatchClause(
                                         new ClassType("ognl.OgnlException", Span.dummySpan()),
                                         new Var("ex"),
                                         Arrays.asList(
-                                                new VarInitStatement("cause", new InvokeExpr(new Var("ex"), "getReason", Arrays.asList())),
+                                                new VarInitStatement(ClassType.THROWABLE, "cause", new InvokeExpr(new Var("ex"), "getReason", Arrays.asList())),
                                                 new VarAssignStatement(
                                                         "actual",
                                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
@@ -153,10 +155,10 @@ public class AstToJUnitAstTest {
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var("ex"),
                                         Arrays.asList(
-                                                new VarAssignStatement("actual", AstToJUnitAst.THROWABLE, new VarExpr("ex"))))
+                                                new VarAssignStatement("actual", ClassType.THROWABLE, new VarExpr("ex"))))
                         ),
                         Arrays.asList()),
-                new VarInitStatement("expected", new InstanceOfMatcherExpr("b")),
+                new VarInitStatement(ClassType.MATCHER, "expected", new InstanceOfMatcherExpr("b")),
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }

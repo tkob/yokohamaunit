@@ -17,17 +17,25 @@ import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.GenSym;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
+    static final ClassType OGNL_CONTEXT = new ClassType("ognl.OgnlContext", Span.dummySpan());
+    static final ClassType OGNL_EXCEPTION = new ClassType("ognl.OgnlException", Span.dummySpan());
+
     @Override
     public List<Statement> env(String varName) {
         return Arrays.asList(new VarInitStatement(
-                        varName,
-                        new NewExpr("ognl.OgnlContext")));
+                OGNL_CONTEXT,
+                varName,
+                new NewExpr("ognl.OgnlContext")));
     }
 
     @Override
     public List<Statement> bind(String envVarName, String name, Var rhs, GenSym genSym) {
         Var nameVar = new Var(genSym.generate(name));
-        return Arrays.asList(new VarInitStatement(nameVar.getName(), new StrLitExpr(name)),
+        return Arrays.asList(
+                new VarInitStatement(
+                        ClassType.STRING,
+                        nameVar.getName(),
+                        new StrLitExpr(name)),
                 new InvokeVoidStatement(
                         new Var(envVarName),
                         "put",
@@ -39,13 +47,16 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         Var caughtVar = new Var(caughtVarName);
         String cause = genSym.generate("cause");
         return new CatchClause(
-                new ClassType("ognl.OgnlException", Span.dummySpan()),
+                OGNL_EXCEPTION,
                 caughtVar,
                 Arrays.asList(
-                        new VarInitStatement(cause, new InvokeExpr(caughtVar, "getReason", Arrays.asList())),
+                        new VarInitStatement(
+                                ClassType.THROWABLE,
+                                cause,
+                                new InvokeExpr(caughtVar, "getReason", Arrays.asList())),
                         new VarAssignStatement(
                                 causeVarName,
-                                new ClassType("java.lang.Throwable", Span.dummySpan()),
+                                ClassType.THROWABLE,
                                 new VarExpr(cause))));
     }
 }

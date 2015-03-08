@@ -28,10 +28,14 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test",
                 Arrays.asList(
-                        new VarInitStatement("env", new NewExpr("ognl.OgnlContext"))),
+                        new VarInitStatement(
+                                new ClassType("ognl.OgnlContext", Span.dummySpan()),
+                                "env",
+                                new NewExpr("ognl.OgnlContext"))),
+
                 Arrays.asList(
-                        new VarInitStatement("actual", new QuotedExpr("x", Span.dummySpan())),
-                        new VarInitStatement("expected", new QuotedExpr("y", Span.dummySpan())),
+                        new VarInitStatement(ClassType.OBJECT, "actual", new QuotedExpr("x", Span.dummySpan())),
+                        new VarInitStatement(ClassType.OBJECT, "expected", new QuotedExpr("y", Span.dummySpan())),
                         new IsStatement(new Var("actual"), new Var("expected"))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
