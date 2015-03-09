@@ -14,11 +14,11 @@ public class VarInitStatement implements Statement {
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         value.<Void>accept(
                 varExpr -> {
-                    sb.appendln("Object ", name, " = ", varExpr.getName(), ";");
+                    sb.appendln(name, " = ", varExpr.getName(), ";");
                     return null;
                 },
                 quotedExpr -> {
-                    sb.appendln("Object ", name, " = ", expressionStrategy.getValue(quotedExpr), ";");
+                    sb.appendln(name, " = ", expressionStrategy.getValue(quotedExpr), ";");
                     return null;
                 },
                 stubExpr -> {
@@ -34,11 +34,11 @@ public class VarInitStatement implements Statement {
                     return null;
                 },
                 strLitExpr -> {
-                    sb.appendln("String ", name, " = \"", escapeJava(strLitExpr.getText()), "\";");
+                    sb.appendln(name, " = \"", escapeJava(strLitExpr.getText()), "\";");
                     return null;
                 },
                 nullExpr -> {
-                    sb.appendln("Object", name, " = null;");
+                    sb.appendln(name, " = null;");
                     return null;
                 },
                 invokeExpr -> {

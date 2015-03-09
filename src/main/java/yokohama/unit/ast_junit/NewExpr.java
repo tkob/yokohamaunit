@@ -8,7 +8,7 @@ public class NewExpr implements Expr {
     private final String type;
 
     public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(type, " ", varName, " = new ", type, "();");
+        sb.appendln(varName, " = new ", type, "();");
     }
 
     @Override

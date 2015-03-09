@@ -10,7 +10,7 @@ public class VarDeclStatement implements Statement {
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln(classType.getName(), " ", name, ";");
+        //sb.appendln(classType.getName(), " ", name, ";");
     }
 
     @Override

@@ -54,7 +54,7 @@ public class MockitoMockStrategy implements MockStrategy {
         String fileName = stubExpr.getClassToStub().getSpan().getFileName();
         int startLine = stubExpr.getClassToStub().getSpan().getStart().getLine();
         String span = stubExpr.getClassToStub().getSpan().toString();
-        sb.appendln(classToStub, " ", name, " = mock_(", classToStub, ".class",
+        sb.appendln(/*classToStub, " ", */name, " = mock_(", classToStub, ".class",
                 ", \"", escapeJava(fileName), "\", ",
                 startLine,
                 ", \"", escapeJava(span), "\");");

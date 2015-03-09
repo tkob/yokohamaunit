@@ -15,7 +15,7 @@ public class SuchThatMatcherExpr extends MatcherExpr {
 
     @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln("org.hamcrest.Matcher ", varName, " = new org.hamcrest.BaseMatcher() {");
+        sb.appendln(varName, " = new org.hamcrest.BaseMatcher() {");
         sb.shift();
             sb.appendln("@Override");
             sb.appendln("public boolean matches(Object ", argVar.getName(), ") {");
