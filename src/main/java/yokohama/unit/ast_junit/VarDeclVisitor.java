@@ -1,16 +1,20 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import yokohama.unit.util.Pair;
 
 public class VarDeclVisitor {
     public Set<Pair<ClassType, String>> visitTestMethod(TestMethod testMethod) {
-        return Stream.concat(
+        TreeSet<Pair<ClassType, String>> varDecls = new TreeSet<>();
+        varDecls.addAll(Stream.concat(
                 testMethod.getBefore().stream().flatMap(this::visitStatement),
                 testMethod.getStatements().stream().flatMap(this::visitStatement))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()));
+        return varDecls;
+
     }
 
     public Stream<Pair<ClassType, String>> visitStatement(Statement statement) { 
