@@ -43,9 +43,12 @@ public class TestMethodTest {
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
-        expected.appendln("    Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
-        expected.appendln("    Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("    java.lang.Object actual;");
+        expected.appendln("    ognl.OgnlContext env;");
+        expected.appendln("    java.lang.Object expected;");
+        expected.appendln("    env = new ognl.OgnlContext();");
+        expected.appendln("    actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("    expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
         expected.appendln("    org.junit.Assert.assertThat(actual, org.hamcrest.CoreMatchers.is(expected));");
         expected.appendln("}");
 
