@@ -382,7 +382,7 @@ public class AstToJUnitAst {
             }
             @Override
             public Stream<Statement> visitNullValue(NullValueMatcher nullValue) {
-                return Stream.of(new VarInitStatement(ClassType.OBJECT, varName, new NullValueMatcherExpr()));
+                return Stream.of(new VarInitStatement(ClassType.MATCHER, varName, new NullValueMatcherExpr()));
             }
         });
     }
