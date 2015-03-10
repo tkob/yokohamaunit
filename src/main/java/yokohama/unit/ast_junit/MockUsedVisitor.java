@@ -31,8 +31,7 @@ public class MockUsedVisitor {
                         tryStatement.getTryStatements().stream().anyMatch(this::visitStatement)
                      || tryStatement.getCatchClauses().stream().anyMatch(catchClause ->
                              catchClause.getStatements().stream().anyMatch(this::visitStatement))
-                     || tryStatement.getFinallyStatements().stream().anyMatch(this::visitStatement),
-                varAssignStatement -> visitExpr(varAssignStatement.getValue()));
+                     || tryStatement.getFinallyStatements().stream().anyMatch(this::visitStatement));
     }
 
     private boolean visitExpr(Expr value) {

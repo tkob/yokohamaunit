@@ -79,7 +79,6 @@ import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
-import yokohama.unit.ast_junit.VarAssignStatement;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
@@ -234,7 +233,7 @@ public class AstToJUnitAst {
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var(e),
-                                        Arrays.asList(new VarAssignStatement(actual, ClassType.THROWABLE, new VarExpr(e))))),
+                                        Arrays.asList(new VarInitStatement(ClassType.THROWABLE, actual, new VarExpr(e))))),
                         Arrays.asList()));
     }
 

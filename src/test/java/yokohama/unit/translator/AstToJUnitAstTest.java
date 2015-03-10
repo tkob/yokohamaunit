@@ -35,7 +35,6 @@ import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
-import yokohama.unit.ast_junit.VarAssignStatement;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 
@@ -145,15 +144,15 @@ public class AstToJUnitAstTest {
                                         new Var("ex"),
                                         Arrays.asList(
                                                 new VarInitStatement(ClassType.THROWABLE, "cause", new InvokeExpr(new Var("ex"), "getReason", Arrays.asList())),
-                                                new VarAssignStatement(
-                                                        "actual",
+                                                new VarInitStatement(
                                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
+                                                        "actual",
                                                         new VarExpr("cause")))),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var("ex"),
                                         Arrays.asList(
-                                                new VarAssignStatement("actual", ClassType.THROWABLE, new VarExpr("ex"))))
+                                                new VarInitStatement(ClassType.THROWABLE, "actual", new VarExpr("ex"))))
                         ),
                         Arrays.asList()),
                 new VarInitStatement(ClassType.MATCHER, "expected", new InstanceOfMatcherExpr("b")),

@@ -31,8 +31,7 @@ public class VarDeclVisitor {
                                 tryStatement.getTryStatements().stream().flatMap(this::visitStatement),
                                 Stream.concat(
                                         tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
-                                        tryStatement.getFinallyStatements().stream().flatMap(this::visitStatement))),
-                varAssignStatement -> Stream.<Pair<ClassType, String>>empty());
+                                        tryStatement.getFinallyStatements().stream().flatMap(this::visitStatement))));
     }
 
     public Stream<Pair<ClassType, String>> visitCatchClause(CatchClause catchClause) { 

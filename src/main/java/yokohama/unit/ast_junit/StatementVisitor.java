@@ -9,5 +9,4 @@ public interface StatementVisitor<T> {
     T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement);
     T visitInvokeVoidStatement(InvokeVoidStatement returnInvokeVoidStatement);
     T visitTryStatement(TryStatement tryStatement);
-    T visitVarAssignStatement(VarAssignStatement varAssignStatement);
 }

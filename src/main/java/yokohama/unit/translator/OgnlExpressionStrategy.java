@@ -11,7 +11,6 @@ import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Var;
-import yokohama.unit.ast_junit.VarAssignStatement;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.GenSym;
@@ -54,9 +53,9 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 ClassType.THROWABLE,
                                 cause,
                                 new InvokeExpr(caughtVar, "getReason", Arrays.asList())),
-                        new VarAssignStatement(
-                                causeVarName,
+                        new VarInitStatement(
                                 ClassType.THROWABLE,
+                                causeVarName,
                                 new VarExpr(cause))));
     }
 }
