@@ -36,7 +36,6 @@ import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarAssignStatement;
-import yokohama.unit.ast_junit.VarDeclStatement;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 
@@ -135,11 +134,10 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
-                new VarDeclStatement(ClassType.THROWABLE, "actual"),
                 new TryStatement(
                         Arrays.asList(
                                 new VarInitStatement(ClassType.OBJECT, "tmp", new QuotedExpr("a", Span.dummySpan())),
-                                new VarAssignStatement("actual", ClassType.THROWABLE, new NullExpr())
+                                new VarInitStatement(ClassType.THROWABLE, "actual", new NullExpr())
                         ),
                         Arrays.asList(
                                 new CatchClause(

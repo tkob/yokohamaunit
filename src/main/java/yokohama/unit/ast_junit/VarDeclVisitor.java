@@ -30,8 +30,6 @@ public class VarDeclVisitor {
                         Stream.concat(
                                 tryStatement.getTryStatements().stream().flatMap(this::visitStatement),
                                 tryStatement.getFinallyStatements().stream().flatMap(this::visitStatement)),
-                varDeclStatement ->
-                        Stream.of(new Pair<ClassType, String>(varDeclStatement.getClassType(), varDeclStatement.getName())),
                 varAssignStatement -> Stream.<Pair<ClassType, String>>empty());
     }
 }
