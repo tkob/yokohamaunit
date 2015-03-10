@@ -12,7 +12,7 @@ public class InvokeExpr implements Expr {
     List<Var> args;
 
     public void getExpr(SBuilder sb, String varName) {
-        sb.appendln("Object ", varName, " = ", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+        sb.appendln(varName, " = ", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
     }
 
     @Override
