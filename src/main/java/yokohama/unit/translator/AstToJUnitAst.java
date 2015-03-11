@@ -86,14 +86,20 @@ import yokohama.unit.util.SUtils;
 
 public class AstToJUnitAst {
     private final Optional<Path> docyPath;
+    private final String className;
+    private final String packageName;
     ExpressionStrategy expressionStrategy;
     MockStrategy mockStrategy;
     
     AstToJUnitAst(
             Optional<Path> docyPath,
+            String className,
+            String packageName,
             ExpressionStrategy expressionStrategy,
             MockStrategy mockStrategy) {
         this.docyPath = docyPath;
+        this.className = className;
+        this.packageName = packageName;
         this.expressionStrategy = expressionStrategy;
         this.mockStrategy = mockStrategy;
     }

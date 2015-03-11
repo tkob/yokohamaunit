@@ -45,7 +45,7 @@ public class AstToJUnitAstTest {
         String name = "TestGroup";
         Group group = new Group(Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
         String packageName = "com.example";
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy());
         CompilationUnit actual = instance.translate(name, group, packageName);
         CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Arrays.asList()));
         assertThat(actual, is(expected));
@@ -55,7 +55,7 @@ public class AstToJUnitAstTest {
     public void testTranslateTest() {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
         List<Table> tables = Arrays.asList();
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<TestMethod> actual = instance.translateTest(test, tables);
         List<TestMethod> expected = Arrays.asList();
         assertThat(actual, is(expected));
@@ -69,7 +69,7 @@ public class AstToJUnitAstTest {
         Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), yokohama.unit.ast.Span.dummySpan());
         String testName = "test";
         List<Table> tables = Arrays.asList();
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
         List<TestMethod> expected = Arrays.asList(new TestMethod(
                 "test_0",
@@ -89,7 +89,7 @@ public class AstToJUnitAstTest {
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new VarInitStatement(ClassType.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
@@ -110,7 +110,7 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
 
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new VarInitStatement(ClassType.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
@@ -130,7 +130,7 @@ public class AstToJUnitAstTest {
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new TryStatement(

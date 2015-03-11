@@ -74,6 +74,8 @@ public class TranslatorUtils {
         CompilationUnit junit =
                 new AstToJUnitAst(
                         docyPath,
+                        className,
+                        packageName,
                         new OgnlExpressionStrategy(),
                         new MockitoMockStrategy()
                 ).translate(className, ast, packageName);
