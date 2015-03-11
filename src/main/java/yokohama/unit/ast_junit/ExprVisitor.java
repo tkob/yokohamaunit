@@ -9,4 +9,5 @@ public interface ExprVisitor<T> {
     T visitStrLitExpr(StrLitExpr strLitExpr);
     T visitNullExpr(NullExpr nullExpr);
     T visitInvokeExpr(InvokeExpr invokeExpr);
+    T visitThisExpr(ThisExpr thisExpr);
 }
