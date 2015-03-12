@@ -601,11 +601,11 @@ public class AstToJUnitAst {
         Optional<Stream<ActionStatement>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
-                        .map(this::translateExecutions);
+                        .map(execition -> translateExecutions(execition, genSym, env));
         Optional<Stream<ActionStatement>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
-                        .map(this::translateExecutions);
+                        .map(execution -> translateExecutions(execution, genSym, env));
         Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
@@ -628,7 +628,7 @@ public class AstToJUnitAst {
         List<ActionStatement> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
-            actionsAfter = translateExecutions(teardown.getExecutions()).collect(Collectors.toList());
+            actionsAfter = translateExecutions(teardown.getExecutions(), genSym, env).collect(Collectors.toList());
         } else {
             actionsAfter = Arrays.asList();
         }
@@ -640,7 +640,7 @@ public class AstToJUnitAst {
                 actionsAfter));
     }
 
-    Stream<ActionStatement> translateExecutions(List<Execution> executions) {
+    Stream<ActionStatement> translateExecutions(List<Execution> executions, GenSym genSym, String envVarName) {
         return executions.stream()
                 .flatMap(execution ->
                         execution.getExpressions()
