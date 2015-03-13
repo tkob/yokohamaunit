@@ -44,6 +44,7 @@ public class MockUsedVisitor {
                 strLitExpr -> false,
                 nullExpr -> false,
                 invokeExpr -> false,
-                thisExpr -> false);
+                thisExpr -> false,
+                invokeStaticExpr -> false);
     }
 }

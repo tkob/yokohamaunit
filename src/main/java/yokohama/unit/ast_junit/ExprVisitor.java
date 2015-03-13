@@ -10,4 +10,5 @@ public interface ExprVisitor<T> {
     T visitNullExpr(NullExpr nullExpr);
     T visitInvokeExpr(InvokeExpr invokeExpr);
     T visitThisExpr(ThisExpr thisExpr);
+    T visitInvokeStaticExpr(InvokeStaticExpr aThis);
 }
