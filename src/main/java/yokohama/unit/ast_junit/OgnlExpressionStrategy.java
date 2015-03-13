@@ -6,7 +6,7 @@ import yokohama.unit.util.SBuilder;
 public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
     public void auxMethods(SBuilder sb) {
-        sb.appendln("private Object eval(String expression, ognl.OgnlContext env, String fileName, int startLine, String span) throws ognl.OgnlException {");
+        sb.appendln("private static Object eval(String expression, ognl.OgnlContext env, String fileName, int startLine, String span) throws ognl.OgnlException {");
         sb.shift();
             sb.appendln("try {");
             sb.shift();
