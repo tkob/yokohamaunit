@@ -20,10 +20,10 @@ public class TestMethod {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
-        for (Pair<ClassType, String> pair : new VarDeclVisitor().visitTestMethod(this)) {
-            ClassType type = pair.getFirst();
+        for (Pair<Type, String> pair : new VarDeclVisitor().visitTestMethod(this)) {
+            Type type = pair.getFirst();
             String name = pair.getSecond();
-            sb.appendln(type.getName(), " ", name, ";");
+            sb.appendln(type.getText(), " ", name, ";");
         }
         before.forEach(statement -> statement.toString(sb, expressionStrategy, mockStrategy));
         if (actionsAfter.size() > 0) {

@@ -6,7 +6,7 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class VarInitStatement implements Statement {
-    private final ClassType type;
+    private final Type type;
     private final String name;
     private final Expr value;
 
