@@ -22,7 +22,6 @@ public class MockUsedVisitor {
         return statement.accept(
                 isStatement -> false,
                 isNotStatement -> false,
-                actionStatement -> false,
                 varDeclStatement -> visitExpr(varDeclStatement.getValue()),
                 returnIsStatement -> false,
                 returnIsNotStatement -> false,

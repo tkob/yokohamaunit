@@ -36,7 +36,6 @@
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | ThrowsStatement
- *             | ActionStatement
  *             | VarInitStatement
  *             | BindThrownStatement
  *             | ReturnIsStatement
@@ -48,7 +47,6 @@
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
- * ActionStatement ::= QuotedExpr
  * VarInitStatement ::= ClassType Expr
  * BindThrownStatement ::= Expr
  * ReturnIsStatement ::= Var Var
