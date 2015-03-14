@@ -13,6 +13,11 @@ public class ClassType implements NonArrayType {
     public static final ClassType MATCHER = new ClassType("org.hamcrest.Matcher", Span.dummySpan());
 
     @Override
+    public String getText() {
+        return name;
+    }
+
+    @Override
     public <T> T accept(NonArrayTypeVisitor<T> visitor) {
         return visitor.visitClassType(this);
     }

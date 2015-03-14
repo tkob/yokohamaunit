@@ -3,6 +3,8 @@ package yokohama.unit.ast_junit;
 import java.util.function.Function;
 
 public interface NonArrayType {
+    String getText();
+
     <T> T accept(NonArrayTypeVisitor<T> visitor);
 
     default <T> T accept(
