@@ -646,13 +646,14 @@ public class AstToJUnitAst {
                 .flatMap(execution ->
                         execution.getExpressions()
                                 .stream()
-                                .map(expression ->
-                                        new ActionStatement(
-                                                new QuotedExpr(
-                                                        expression.getText(),
-                                                        new Span(
-                                                                docyPath,
-                                                                expression.getSpan().getStart(),
-                                                                expression.getSpan().getEnd())))));
+                                .flatMap(expression ->
+                                        expressionStrategy.eval(
+                                                __,
+                                                envVarName,
+                                                expression,
+                                                genSym,
+                                                docyPath,
+                                                className,
+                                                packageName).stream()));
     }
 }
