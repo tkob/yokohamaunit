@@ -10,7 +10,7 @@ public class TestMethod {
     private final String name;
     private final List<Statement> before;
     private final List<Statement> statements;
-    private final List<ActionStatement> actionsAfter;
+    private final List<Statement> actionsAfter;
 
     public void toString(
             SBuilder sb,

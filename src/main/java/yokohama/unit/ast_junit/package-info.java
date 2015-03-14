@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= Statement* ActionStatement*
+ * TestMethod ::= Statement* Statement* Statement*
  * 
  * Expr ::= VarExpr
  *        | QuotedExpr
