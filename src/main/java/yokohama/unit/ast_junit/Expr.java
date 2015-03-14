@@ -15,7 +15,8 @@ public interface Expr {
             Function<NullExpr, T> visitNullExpr_,
             Function<InvokeExpr, T> visitInvokeExpr_,
             Function<ThisExpr, T> visitThisExpr_,
-            Function<InvokeStaticExpr, T> visitInvokeStaticExpr_
+            Function<InvokeStaticExpr, T> visitInvokeStaticExpr_,
+            Function<IntLitExpr, T> visitIntLitExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -57,6 +58,10 @@ public interface Expr {
             @Override
             public T visitInvokeStaticExpr(InvokeStaticExpr invokeStaticExpr) {
                 return visitInvokeStaticExpr_.apply(invokeStaticExpr);
+            }
+            @Override
+            public T visitIntLitExpr(IntLitExpr intLitExpr) {
+                return visitIntLitExpr_.apply(intLitExpr);
             }
         });
     }

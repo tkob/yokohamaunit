@@ -18,6 +18,7 @@
  *        | InvokeExpr
  *        | ThisExpr
  *        | InvokeStaticExpr
+ *        | IntLitExpr
  * 
  * StubExpr ::= QuotedExpr StubBehavior
  * StubBehavior ::= MethodPattern Expr

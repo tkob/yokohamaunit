@@ -52,6 +52,10 @@ public class VarInitStatement implements Statement {
                 invokeStaticExpr -> {
                     invokeStaticExpr.getExpr(sb, name);
                     return null;
+                },
+                intLitExpr -> {
+                    sb.appendln(name, " = ", intLitExpr, ";");
+                    return null;
                 });
     }
 
