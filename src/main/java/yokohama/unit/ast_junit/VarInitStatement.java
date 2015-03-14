@@ -54,7 +54,7 @@ public class VarInitStatement implements Statement {
                     return null;
                 },
                 intLitExpr -> {
-                    sb.appendln(name, " = ", intLitExpr, ";");
+                    sb.appendln(name, " = ", intLitExpr.getValue(), ";");
                     return null;
                 });
     }
