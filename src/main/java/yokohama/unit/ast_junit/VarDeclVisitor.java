@@ -9,7 +9,9 @@ public class VarDeclVisitor {
     public List<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
         return Stream.concat(
                 testMethod.getBefore().stream().flatMap(this::visitStatement),
-                testMethod.getStatements().stream().flatMap(this::visitStatement))
+                Stream.concat(
+                        testMethod.getStatements().stream().flatMap(this::visitStatement),
+                        testMethod.getActionsAfter().stream().flatMap(this::visitStatement)))
                 .collect(Collectors.toSet())
                 .stream()
                 .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
