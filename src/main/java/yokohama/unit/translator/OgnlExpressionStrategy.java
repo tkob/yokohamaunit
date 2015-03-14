@@ -4,8 +4,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassType;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
@@ -61,5 +63,43 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Type.THROWABLE,
                                 causeVarName,
                                 new VarExpr(cause))));
+    }
+
+    @Override
+    public List<Statement> eval(
+            String varName,
+            String envVarName,
+            QuotedExpr quotedExpr,
+            GenSym genSym,
+            Optional<Path> docyPath,
+            String className,
+            String packageName) {
+        Var exprVar = new Var(genSym.generate("expression"));
+        Var fileNameVar = new Var(genSym.generate("fileName"));
+        Var lineVar = new Var(genSym.generate("line"));
+        Var spanVar = new Var(genSym.generate("span"));
+        Span span = new Span(
+                docyPath,
+                quotedExpr.getSpan().getStart(),
+                quotedExpr.getSpan().getEnd());
+        return Arrays.asList(
+                new VarInitStatement(Type.STRING, exprVar.getName(),
+                        new StrLitExpr(quotedExpr.getText())),
+                new VarInitStatement(Type.STRING, fileNameVar.getName(),
+                        new StrLitExpr(span.getFileName())),
+                new VarInitStatement(Type.INT, lineVar.getName(),
+                        new IntLitExpr(quotedExpr.getSpan().getStart().getLine())),
+                new VarInitStatement(Type.STRING, spanVar.getName(),
+                        new StrLitExpr(span.toString())),
+                new VarInitStatement(Type.OBJECT, varName,
+                        new InvokeStaticExpr(
+                                new ClassType(packageName + "." + className, Span.dummySpan()),
+                                "eval",
+                                Arrays.asList(
+                                        exprVar,
+                                        new Var(envVarName),
+                                        fileNameVar,
+                                        lineVar,
+                                        spanVar))));
     }
 }
