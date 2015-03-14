@@ -203,10 +203,15 @@ public class AstToJUnitAst {
                                     Stream.of(new IsNotStatement(new Var(actual), new Var(unexpected)))));
                 },
                 throwsPredicate -> {
+                    String __ = genSym.generate("tmp");
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
                     return Stream.concat(
-                            bindThrown(actual, subject, genSym, envVarName),
+                            bindThrown(
+                                    actual,
+                                    Arrays.asList(new VarInitStatement(Type.OBJECT, __, subject)),
+                                    genSym,
+                                    envVarName),
                             Stream.concat(
                                     translateMatcher(throwsPredicate.getThrowee(), expected, genSym, envVarName),
                                     Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
@@ -214,13 +219,12 @@ public class AstToJUnitAst {
         );
     }
 
-    Stream<Statement> bindThrown(String actual, QuotedExpr subject, GenSym genSym, String envVarName) {
+    Stream<Statement> bindThrown(String actual, List<Statement> statements, GenSym genSym, String envVarName) {
         String e = genSym.generate("ex");
-        String tmp = genSym.generate("tmp");
         /*
         Throwable actual;
         try {
-            // evaluate subject according to the strategy
+            // statements
             ...
             actual = null;
         } catch (XXXXException e) { // extract the cause if wrapped: inserted by the strategy
@@ -231,9 +235,9 @@ public class AstToJUnitAst {
         */
         return Stream.of(
                 new TryStatement(
-                        Arrays.asList(new VarInitStatement(Type.OBJECT, tmp, subject),
-                                new VarInitStatement(Type.THROWABLE, actual, new NullExpr())
-                        ),
+                        ListUtils.union(
+                                statements,
+                                Arrays.asList(new VarInitStatement(Type.THROWABLE, actual, new NullExpr()))),
                         Arrays.asList(expressionStrategy.catchAndAssignCause(e, actual, genSym),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
@@ -351,14 +355,17 @@ public class AstToJUnitAst {
                                                                 addAll(predStatements.collect(Collectors.toList()));
                                                                 addAll(bindThrown(
                                                                         "actual",
-                                                                        new QuotedExpr(
-                                                                                subject.getText(),
-                                                                                new Span(
-                                                                                        docyPath,
-                                                                                        subject.getSpan().getStart(),
-                                                                                        subject.getSpan().getEnd())),
-                                                                        genSym,
-                                                                        envVarName).collect(Collectors.toList()));
+                                                                        Arrays.asList(new VarInitStatement(
+                                                                                Type.OBJECT,
+                                                                                "__",
+                                                                                new QuotedExpr(
+                                                                                        subject.getText(),
+                                                                                        new Span(
+                                                                                                docyPath,
+                                                                                                subject.getSpan().getStart(),
+                                                                                                subject.getSpan().getEnd())))),
+                                                                                genSym,
+                                                                                envVarName).collect(Collectors.toList()));
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
