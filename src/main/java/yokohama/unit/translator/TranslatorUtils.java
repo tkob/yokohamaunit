@@ -45,7 +45,7 @@ public class TranslatorUtils {
     }
 
     @SneakyThrows(IOException.class)
-    static Group parseDocy(final String input, final int mode) {
+    public static Group parseDocy(final String input, final int mode) {
         ErrorListener errorListener = new ErrorListener();
         InputStream bais = new ByteArrayInputStream(input.getBytes());
         CharStream stream = new ANTLRInputStream(bais);
