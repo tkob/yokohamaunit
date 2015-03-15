@@ -7,7 +7,6 @@ public interface Expr {
 
     default <T> T accept(
             Function<VarExpr, T> visitVarExpr_,
-            Function<QuotedExpr, T> visitQuotedExpr_,
             Function<StubExpr, T> visitStubExpr_,
             Function<MatcherExpr, T> visitMatcherExpr_,
             Function<NewExpr, T> visitNewExpr_,
@@ -22,10 +21,6 @@ public interface Expr {
             @Override
             public T visitVarExpr(VarExpr varExpr) {
                 return visitVarExpr_.apply(varExpr);
-            }
-            @Override
-            public T visitQuotedExpr(QuotedExpr quotedExpr) {
-                return visitQuotedExpr_.apply(quotedExpr);
             }
             @Override
             public T visitStubExpr(StubExpr stubExpr) {

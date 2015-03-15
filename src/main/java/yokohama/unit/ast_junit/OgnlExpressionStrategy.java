@@ -1,6 +1,5 @@
 package yokohama.unit.ast_junit;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
@@ -24,13 +23,5 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             sb.appendln("}");
         sb.unshift();
         sb.appendln("}");
-    }
-
-    @Override
-    public String getValue(QuotedExpr quotedExpr) {
-        return "eval(\"" + escapeJava(quotedExpr.getText()) + "\", env, " +
-                "\"" + escapeJava(quotedExpr.getSpan().getFileName()) +  "\", " +
-                quotedExpr.getSpan().getStart().getLine() + ", " +
-                "\"" + escapeJava(quotedExpr.getSpan().toString()) + "\")";
     }
 }

@@ -36,7 +36,6 @@ public class MockUsedVisitor {
     private boolean visitExpr(Expr value) {
         return value.accept(
                 var -> false,
-                quoted -> false,
                 stubExpr -> true,
                 matcherExpr -> false,
                 newExpr -> false,

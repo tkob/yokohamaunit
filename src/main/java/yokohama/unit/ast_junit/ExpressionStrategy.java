@@ -4,5 +4,4 @@ import yokohama.unit.util.SBuilder;
 
 public interface ExpressionStrategy {
     public void auxMethods(SBuilder sb);
-    public String getValue(QuotedExpr quotedExpr);
 }
