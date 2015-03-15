@@ -9,7 +9,6 @@
  * TestMethod ::= Statement* Statement* Statement*
  * 
  * Expr ::= VarExpr
- *        | QuotedExpr
  *        | StubExpr
  *        | MatcherExpr
  *        | NewExpr
@@ -20,9 +19,10 @@
  *        | InvokeStaticExpr
  *        | IntLitExpr
  * 
- * StubExpr ::= QuotedExpr StubBehavior
- * StubBehavior ::= MethodPattern Expr
+ * StubExpr ::= ClassType StubBehavior*
+ * StubBehavior ::= MethodPattern Var
  * MethodPattern ::= Type*
+ * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
@@ -35,26 +35,19 @@
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement
- *             | ThrowsStatement
  *             | VarInitStatement
- *             | BindThrownStatement
  *             | ReturnIsStatement
  *             | ReturnIsNotStatement
  *             | InvokeVoidStatement
  *             | TryStatement
- *             | VarDeclStatement
- *             | VarAssignStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
  * VarInitStatement ::= ClassType Expr
- * BindThrownStatement ::= Expr
  * ReturnIsStatement ::= Var Var
  * ReturnIsNotStatement ::= Var Var
  * InvokeVoidStatement ::= Var Var*
  * TryStatement ::= Statement* CatchClause* Statement*
- * VarDeclStatement ::= ClassType
- * VarAssignStatement ::= Expr
  * 
  * CatchClause ::= ClassType Var Statement*
  * </pre>
