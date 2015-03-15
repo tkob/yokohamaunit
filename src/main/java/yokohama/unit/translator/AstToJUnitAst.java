@@ -388,7 +388,17 @@ public class AstToJUnitAst {
                                         varName, envVarName, quotedExpr,
                                         genSym, docyPath, className, packageName)
                                         .stream(),
-                        stubExpr -> Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr, genSym, envVarName)))),
+                        stubExpr -> Stream.of(new VarInitStatement(
+                                new Type(
+                                        new ClassType(
+                                                stubExpr.getClassToStub().getName(),
+                                                new Span(
+                                                        docyPath,
+                                                        stubExpr.getClassToStub().getSpan().getStart(),
+                                                        stubExpr.getClassToStub().getSpan().getEnd())),
+                                        0),
+                                varName,
+                                translateExpr(stubExpr, genSym, envVarName)))),
                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
     }
 
@@ -505,7 +515,14 @@ public class AstToJUnitAst {
                                                     .stream(),
                                     stubExpr ->
                                             Stream.of(new VarInitStatement(
-                                                    Type.OBJECT,
+                                                    new Type(
+                                                            new ClassType(
+                                                                    stubExpr.getClassToStub().getName(),
+                                                                    new Span(
+                                                                            docyPath,
+                                                                            stubExpr.getClassToStub().getSpan().getStart(),
+                                                                            stubExpr.getClassToStub().getSpan().getEnd())),
+                                                            0),
                                                     varName, translateExpr(stubExpr, genSym, envVarName)))),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
                 })
@@ -600,7 +617,16 @@ public class AstToJUnitAst {
                                                             genSym, docyPath, className, packageName)
                                                             .stream(),
                                             stubExpr ->
-                                                    Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr, genSym, env)))),
+                                                    Stream.of(new VarInitStatement(
+                                                            new Type(
+                                                                    new ClassType(
+                                                                            stubExpr.getClassToStub().getName(),
+                                                                            new Span(
+                                                                                    docyPath,
+                                                                                    stubExpr.getClassToStub().getSpan().getStart(),
+                                                                                    stubExpr.getClassToStub().getSpan().getEnd())),
+                                                                    0),
+                                                            varName, translateExpr(stubExpr, genSym, env)))),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
                         });
             } else {
