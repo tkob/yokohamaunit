@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Ignore;
 import org.junit.Test;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.EqualToMatcher;
@@ -31,7 +30,6 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
-import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
@@ -97,6 +95,7 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
+                // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a")),
                 new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?")),
                 new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
@@ -109,8 +108,22 @@ public class AstToJUnitAstTest {
                                 new Var("fileName"),
                                 new Var("line"),
                                 new Var("span")))),
-                new VarInitStatement(Type.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
+                // `b`
+                new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b")),
+                new VarInitStatement(Type.STRING, "fileName2", new StrLitExpr("?")),
+                new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1)),
+                new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?")),
+                new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
+                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        Arrays.asList(
+                                new Var("expression2"),
+                                new Var("env"),
+                                new Var("fileName2"),
+                                new Var("line2"),
+                                new Var("span2")))),
+                // is `b`
                 new VarInitStatement(Type.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj"))),
+                // `a` is `b`
                 new IsStatement(new Var("actual"), new Var("expected")));
         assertThat(actual, is(expected));
     }
@@ -129,6 +142,7 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
+                // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a")),
                 new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?")),
                 new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
@@ -141,8 +155,22 @@ public class AstToJUnitAstTest {
                                 new Var("fileName"),
                                 new Var("line"),
                                 new Var("span")))),
-                new VarInitStatement(Type.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
+                // `b`
+                new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b")),
+                new VarInitStatement(Type.STRING, "fileName2", new StrLitExpr("?")),
+                new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1)),
+                new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?")),
+                new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
+                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        Arrays.asList(
+                                new Var("expression2"),
+                                new Var("env"),
+                                new Var("fileName2"),
+                                new Var("line2"),
+                                new Var("span2")))),
+                // is not `b`
                 new VarInitStatement(Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj"))),
+                // `a` is not `b`
                 new IsNotStatement(new Var("actual"), new Var("unexpected")));
         assertThat(actual, is(expected));
     }

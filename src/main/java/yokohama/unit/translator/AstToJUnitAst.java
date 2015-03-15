@@ -254,19 +254,14 @@ public class AstToJUnitAst {
             @Override
             public Stream<Statement> visitEqualTo(EqualToMatcher equalTo) {
                 Var objVar = new Var(genSym.generate("obj"));
-                return Stream.of(new VarInitStatement(
-                                Type.OBJECT,
-                                objVar.getName(),
-                                new QuotedExpr(
-                                        equalTo.getExpr().getText(),
-                                        new Span(
-                                                docyPath,
-                                                equalTo.getSpan().getStart(),
-                                                equalTo.getSpan().getEnd()))),
-                        new VarInitStatement(
+                return Stream.concat(
+                        expressionStrategy.eval(
+                                objVar.getName(), envVarName, equalTo.getExpr(),
+                                genSym, docyPath, className, packageName).stream(),
+                        Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
-                                new EqualToMatcherExpr(objVar)));
+                                new EqualToMatcherExpr(objVar))));
             }
             @Override
             public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
@@ -302,15 +297,9 @@ public class AstToJUnitAst {
                                                             new ArrayList<Statement>() {{
                                                                 addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
-                                                                add(new VarInitStatement(
-                                                                        Type.OBJECT,
-                                                                        "actual",
-                                                                        new QuotedExpr(
-                                                                                subject.getText(),
-                                                                                new Span(
-                                                                                        docyPath,
-                                                                                        subject.getSpan().getStart(),
-                                                                                        subject.getSpan().getEnd()))));
+                                                                addAll(expressionStrategy.eval(
+                                                                        "actual", envVarName, subject,
+                                                                        genSym, docyPath, className, packageName));
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
@@ -329,15 +318,9 @@ public class AstToJUnitAst {
                                                             new ArrayList<Statement>() {{
                                                                 addAll(expressionStrategy.bind(envVarName, bindVarName, matchesArg, genSym));
                                                                 addAll(predStatements.collect(Collectors.toList()));
-                                                                add(new VarInitStatement(
-                                                                        Type.OBJECT,
-                                                                        "actual",
-                                                                        new QuotedExpr(
-                                                                                subject.getText(),
-                                                                                new Span(
-                                                                                        docyPath,
-                                                                                        subject.getSpan().getStart(),
-                                                                                        subject.getSpan().getEnd()))));
+                                                                addAll(expressionStrategy.eval(
+                                                                        "actual", envVarName, subject,
+                                                                        genSym, docyPath, className, packageName));
                                                                 add(new ReturnIsNotStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
@@ -358,17 +341,12 @@ public class AstToJUnitAst {
                                                                 addAll(predStatements.collect(Collectors.toList()));
                                                                 addAll(bindThrown(
                                                                         "actual",
-                                                                        Arrays.asList(new VarInitStatement(
-                                                                                Type.OBJECT,
-                                                                                "__",
-                                                                                new QuotedExpr(
-                                                                                        subject.getText(),
-                                                                                        new Span(
-                                                                                                docyPath,
-                                                                                                subject.getSpan().getStart(),
-                                                                                                subject.getSpan().getEnd())))),
-                                                                                genSym,
-                                                                                envVarName).collect(Collectors.toList()));
+                                                                        expressionStrategy.eval(
+                                                                                "__", envVarName, subject,
+                                                                                genSym, docyPath, className, packageName),
+                                                                        genSym,
+                                                                        envVarName)
+                                                                        .collect(Collectors.toList()));
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
