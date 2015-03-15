@@ -380,9 +380,15 @@ public class AstToJUnitAst {
 
     Stream<Statement> translateBinding(yokohama.unit.ast.Binding binding, GenSym genSym, String envVarName) {
         String name = binding.getName().getName();
-        Expr value = translateExpr(binding.getValue());
         String varName = genSym.generate(name);
-        return Stream.concat(Stream.of(new VarInitStatement(Type.OBJECT, varName, value)),
+        return Stream.concat(
+                binding.getValue().accept(
+                        quotedExpr ->
+                                expressionStrategy.eval(
+                                        varName, envVarName, quotedExpr,
+                                        genSym, docyPath, className, packageName)
+                                        .stream(),
+                        stubExpr -> Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr)))),
                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
     }
 
@@ -493,7 +499,17 @@ public class AstToJUnitAst {
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
-                    return Stream.concat(Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(row.getExprs().get(i)))),
+                    return Stream.concat(
+                            row.getExprs().get(i).accept(
+                                    quotedExpr ->
+                                            expressionStrategy.eval(
+                                                    varName, envVarName, quotedExpr,
+                                                    genSym, docyPath, className, packageName)
+                                                    .stream(),
+                                    stubExpr ->
+                                            Stream.of(new VarInitStatement(
+                                                    Type.OBJECT,
+                                                    varName, translateExpr(stubExpr)))),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
                 })
                 .collect(Collectors.toList());
@@ -579,7 +595,15 @@ public class AstToJUnitAst {
                         .stream()
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
-                            return Stream.concat(Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(binding.getValue()))),
+                            return Stream.concat(
+                                    binding.getValue().accept(
+                                            quotedExpr ->
+                                                    expressionStrategy.eval(
+                                                            varName, env, quotedExpr,
+                                                            genSym, docyPath, className, packageName)
+                                                            .stream(),
+                                            stubExpr ->
+                                                    Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr)))),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
                         });
             } else {
