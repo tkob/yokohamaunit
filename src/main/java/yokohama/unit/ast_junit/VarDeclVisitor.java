@@ -6,16 +6,19 @@ import java.util.stream.Stream;
 import yokohama.unit.util.Pair;
 
 public class VarDeclVisitor {
-    public List<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
+    public static List<Pair<Type, String>> sortedSet(Stream<Pair<Type, String>> i) {
+        return i.collect(Collectors.toSet())
+                .stream()
+                .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
+                .collect(Collectors.toList());
+    }
+
+    public Stream<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
         return Stream.concat(
                 visitStatements(testMethod.getBefore()),
                 Stream.concat(
                         visitStatements(testMethod.getStatements()),
-                        visitStatements(testMethod.getActionsAfter())))
-                .collect(Collectors.toSet())
-                .stream()
-                .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
-                .collect(Collectors.toList());
+                        visitStatements(testMethod.getActionsAfter())));
     }
 
     public Stream<Pair<Type, String>> visitStatements(List<Statement> statements) {

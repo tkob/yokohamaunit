@@ -20,7 +20,7 @@ public class TestMethod {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
-        for (Pair<Type, String> pair : new VarDeclVisitor().visitTestMethod(this)) {
+        for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(this))) {
             Type type = pair.getFirst();
             String name = pair.getSecond();
             sb.appendln(type.getText(), " ", name, ";");
