@@ -411,16 +411,13 @@ public class AstToJUnitAst {
                                 ),
                                 stubExpr.getBehavior()
                                         .stream()
-                                        .map(behavior -> translateStubBehavior(behavior, genSym, envVarName))
+                                        .map(behavior ->
+                                                new StubBehavior(
+                                                        translateMethodPattern(behavior.getMethodPattern()),
+                                                        translateExpr(behavior.getToBeReturned(), genSym, envVarName)))
                                         .collect(Collectors.toList())
                         )
         );
-    }
-
-    StubBehavior translateStubBehavior(yokohama.unit.ast.StubBehavior stubBehavior, GenSym genSym, String envVarName) {
-        return new StubBehavior(
-                translateMethodPattern(stubBehavior.getMethodPattern()),
-                translateExpr(stubBehavior.getToBeReturned(), genSym, envVarName));
     }
 
     MethodPattern translateMethodPattern(yokohama.unit.ast.MethodPattern methodPattern) {
