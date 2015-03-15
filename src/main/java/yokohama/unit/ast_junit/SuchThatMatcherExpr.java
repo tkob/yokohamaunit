@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import yokohama.unit.util.Pair;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -20,6 +21,11 @@ public class SuchThatMatcherExpr extends MatcherExpr {
             sb.appendln("@Override");
             sb.appendln("public boolean matches(Object ", argVar.getName(), ") {");
             sb.shift();
+                for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitStatements(statements))) {
+                    Type type = pair.getFirst();
+                    String name = pair.getSecond();
+                    sb.appendln(type.getText(), " ", name, ";");
+                }
                 sb.appendln("try {");
                 sb.shift();
                 for (Statement statement : statements) {
