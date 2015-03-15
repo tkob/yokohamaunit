@@ -388,11 +388,11 @@ public class AstToJUnitAst {
                                         varName, envVarName, quotedExpr,
                                         genSym, docyPath, className, packageName)
                                         .stream(),
-                        stubExpr -> Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr)))),
+                        stubExpr -> Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr, genSym, envVarName)))),
                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
     }
 
-    Expr translateExpr(yokohama.unit.ast.Expr expr) {
+    Expr translateExpr(yokohama.unit.ast.Expr expr, GenSym genSym, String envVarName) {
         return expr.accept(
                 quotedExpr -> new QuotedExpr(
                         quotedExpr.getText(),
@@ -411,16 +411,16 @@ public class AstToJUnitAst {
                                 ),
                                 stubExpr.getBehavior()
                                         .stream()
-                                        .map(this::translateStubBehavior)
+                                        .map(behavior -> translateStubBehavior(behavior, genSym, envVarName))
                                         .collect(Collectors.toList())
                         )
         );
     }
 
-    StubBehavior translateStubBehavior(yokohama.unit.ast.StubBehavior stubBehavior) {
+    StubBehavior translateStubBehavior(yokohama.unit.ast.StubBehavior stubBehavior, GenSym genSym, String envVarName) {
         return new StubBehavior(
                 translateMethodPattern(stubBehavior.getMethodPattern()),
-                translateExpr(stubBehavior.getToBeReturned()));
+                translateExpr(stubBehavior.getToBeReturned(), genSym, envVarName));
     }
 
     MethodPattern translateMethodPattern(yokohama.unit.ast.MethodPattern methodPattern) {
@@ -509,7 +509,7 @@ public class AstToJUnitAst {
                                     stubExpr ->
                                             Stream.of(new VarInitStatement(
                                                     Type.OBJECT,
-                                                    varName, translateExpr(stubExpr)))),
+                                                    varName, translateExpr(stubExpr, genSym, envVarName)))),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
                 })
                 .collect(Collectors.toList());
@@ -603,7 +603,7 @@ public class AstToJUnitAst {
                                                             genSym, docyPath, className, packageName)
                                                             .stream(),
                                             stubExpr ->
-                                                    Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr)))),
+                                                    Stream.of(new VarInitStatement(Type.OBJECT, varName, translateExpr(stubExpr, genSym, env)))),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
                         });
             } else {
