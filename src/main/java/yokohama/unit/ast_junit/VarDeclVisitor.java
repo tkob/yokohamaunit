@@ -8,14 +8,18 @@ import yokohama.unit.util.Pair;
 public class VarDeclVisitor {
     public List<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
         return Stream.concat(
-                testMethod.getBefore().stream().flatMap(this::visitStatement),
+                visitStatements(testMethod.getBefore()),
                 Stream.concat(
-                        testMethod.getStatements().stream().flatMap(this::visitStatement),
-                        testMethod.getActionsAfter().stream().flatMap(this::visitStatement)))
+                        visitStatements(testMethod.getStatements()),
+                        visitStatements(testMethod.getActionsAfter())))
                 .collect(Collectors.toSet())
                 .stream()
                 .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
                 .collect(Collectors.toList());
+    }
+
+    public Stream<Pair<Type, String>> visitStatements(List<Statement> statements) {
+        return statements.stream().flatMap(this::visitStatement);
     }
 
     public Stream<Pair<Type, String>> visitStatement(Statement statement) { 
@@ -29,13 +33,13 @@ public class VarDeclVisitor {
                 invokeVoidStatement -> Stream.<Pair<Type, String>>empty(),
                 tryStatement ->
                         Stream.concat(
-                                tryStatement.getTryStatements().stream().flatMap(this::visitStatement),
+                                visitStatements(tryStatement.getTryStatements()),
                                 Stream.concat(
                                         tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
-                                        tryStatement.getFinallyStatements().stream().flatMap(this::visitStatement))));
+                                        visitStatements(tryStatement.getFinallyStatements()))));
     }
 
     public Stream<Pair<Type, String>> visitCatchClause(CatchClause catchClause) { 
-        return catchClause.getStatements().stream().flatMap(this::visitStatement);
+        return visitStatements(catchClause.getStatements());
     }
 }
