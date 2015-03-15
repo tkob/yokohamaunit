@@ -566,15 +566,17 @@ public class AstToJUnitAst {
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
-                                    return Stream.concat(Stream.of(new VarInitStatement(
-                                                    Type.OBJECT,
-                                                    varName,
-                                                    new QuotedExpr(
+                                    return Stream.concat(
+                                            expressionStrategy.eval(
+                                                    varName, envVarName,
+                                                    new yokohama.unit.ast.QuotedExpr(
                                                             row.getCell(left + i).getStringCellValue(),
-                                                            new Span(
-                                                                    Optional.of(Paths.get(fileName)), 
+                                                            new yokohama.unit.ast.Span(
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
-                                                                    new Position(-1, -1))))),
+                                                                    new Position(-1, -1))),
+                                                    genSym,
+                                                    Optional.of(Paths.get(fileName)), 
+                                                    className, packageName).stream(),
                                             expressionStrategy.bind(envVarName, names.get(i), new Var(varName), genSym).stream());
                                 })
                                 .collect(Collectors.toList()))
