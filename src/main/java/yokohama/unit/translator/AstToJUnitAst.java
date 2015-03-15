@@ -533,15 +533,17 @@ public class AstToJUnitAst {
                                     .filter(key -> idents.contains(key))
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
-                                        return Stream.concat(Stream.of(new VarInitStatement( 
-                                                        Type.OBJECT,
-                                                        varName,
-                                                        new QuotedExpr(
+                                        return Stream.concat(
+                                                expressionStrategy.eval(
+                                                        varName, envVarName,
+                                                        new yokohama.unit.ast.QuotedExpr(
                                                                 record.get(name),
-                                                                new Span(
-                                                                        Optional.of(Paths.get(fileName)), 
+                                                                new yokohama.unit.ast.Span(
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
-                                                                        new Position(-1, -1))))),
+                                                                        new Position(-1, -1))),
+                                                        genSym,
+                                                        Optional.of(Paths.get(fileName)), 
+                                                        className, packageName).stream(),
                                                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
                                     })
                                     .collect(Collectors.toList()))
