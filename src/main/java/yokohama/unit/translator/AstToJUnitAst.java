@@ -56,7 +56,6 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.ConjunctionMatcherExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
-import yokohama.unit.ast_junit.Expr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
@@ -65,7 +64,6 @@ import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
-import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.ReturnIsNotStatement;
 import yokohama.unit.ast_junit.ReturnIsStatement;
 import yokohama.unit.ast_junit.Span;
@@ -382,52 +380,44 @@ public class AstToJUnitAst {
         String name = binding.getName().getName();
         String varName = genSym.generate(name);
         return Stream.concat(
-                binding.getValue().accept(
-                        quotedExpr ->
-                                expressionStrategy.eval(
-                                        varName, envVarName, quotedExpr,
-                                        genSym, docyPath, className, packageName)
-                                        .stream(),
-                        stubExpr -> Stream.of(new VarInitStatement(
-                                new Type(
-                                        new ClassType(
-                                                stubExpr.getClassToStub().getName(),
-                                                new Span(
-                                                        docyPath,
-                                                        stubExpr.getClassToStub().getSpan().getStart(),
-                                                        stubExpr.getClassToStub().getSpan().getEnd())),
-                                        0),
-                                varName,
-                                translateExpr(stubExpr, genSym, envVarName)))),
+                translateExpr(binding.getValue(), varName, genSym, envVarName),
                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
     }
 
-    Expr translateExpr(yokohama.unit.ast.Expr expr, GenSym genSym, String envVarName) {
+    Stream<Statement> translateExpr(yokohama.unit.ast.Expr expr, String varName, GenSym genSym, String envVarName) {
         return expr.accept(
-                quotedExpr -> new QuotedExpr(
-                        quotedExpr.getText(),
-                        new Span(
-                                docyPath,
-                                quotedExpr.getSpan().getStart(),
-                                quotedExpr.getSpan().getEnd())),
-                stubExpr ->
-                        new StubExpr(
-                                new ClassType(
-                                        stubExpr.getClassToStub().getName(),
-                                        new Span(
-                                                docyPath,
-                                                stubExpr.getClassToStub().getSpan().getStart(),
-                                                stubExpr.getClassToStub().getSpan().getEnd())
-                                ),
-                                stubExpr.getBehavior()
-                                        .stream()
-                                        .map(behavior ->
-                                                new StubBehavior(
-                                                        translateMethodPattern(behavior.getMethodPattern()),
-                                                        translateExpr(behavior.getToBeReturned(), genSym, envVarName)))
-                                        .collect(Collectors.toList())
-                        )
-        );
+                quotedExpr ->
+                        expressionStrategy.eval(
+                                varName, envVarName, quotedExpr,
+                                genSym, docyPath, className, packageName)
+                                .stream(),
+                stubExpr -> {
+                    ClassType classType = new ClassType(
+                            stubExpr.getClassToStub().getName(),
+                            new Span(
+                                    docyPath,
+                                    stubExpr.getClassToStub().getSpan().getStart(),
+                                    stubExpr.getClassToStub().getSpan().getEnd()));
+                    List<Pair<Stream<Statement>, StubBehavior>> behaviors =
+                            stubExpr.getBehavior().stream().map(behavior -> {
+                                String returnedVarName = genSym.generate("returned");
+                                return new Pair<Stream<Statement>, StubBehavior>(
+                                        translateExpr(behavior.getToBeReturned(), returnedVarName, genSym, envVarName),
+                                        new StubBehavior(
+                                            translateMethodPattern(behavior.getMethodPattern()),
+                                            new VarExpr(returnedVarName)));
+                            }).collect(Collectors.toList());
+                    return Stream.concat(
+                            behaviors.stream().flatMap(Pair<Stream<Statement>, StubBehavior>::getFirst),
+                            Stream.of(new VarInitStatement(
+                                    new Type(classType, 0),
+                                    varName,
+                                    new StubExpr(
+                                            classType,
+                                            behaviors.stream()
+                                                    .map(Pair<Stream<Statement>, StubBehavior>::getSecond)
+                                                    .collect(Collectors.toList())))));
+                });
     }
 
     MethodPattern translateMethodPattern(yokohama.unit.ast.MethodPattern methodPattern) {
@@ -507,23 +497,7 @@ public class AstToJUnitAst {
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
                     return Stream.concat(
-                            row.getExprs().get(i).accept(
-                                    quotedExpr ->
-                                            expressionStrategy.eval(
-                                                    varName, envVarName, quotedExpr,
-                                                    genSym, docyPath, className, packageName)
-                                                    .stream(),
-                                    stubExpr ->
-                                            Stream.of(new VarInitStatement(
-                                                    new Type(
-                                                            new ClassType(
-                                                                    stubExpr.getClassToStub().getName(),
-                                                                    new Span(
-                                                                            docyPath,
-                                                                            stubExpr.getClassToStub().getSpan().getStart(),
-                                                                            stubExpr.getClassToStub().getSpan().getEnd())),
-                                                            0),
-                                                    varName, translateExpr(stubExpr, genSym, envVarName)))),
+                            translateExpr(row.getExprs().get(i), varName, genSym, envVarName),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
                 })
                 .collect(Collectors.toList());
@@ -610,23 +584,7 @@ public class AstToJUnitAst {
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
                             return Stream.concat(
-                                    binding.getValue().accept(
-                                            quotedExpr ->
-                                                    expressionStrategy.eval(
-                                                            varName, env, quotedExpr,
-                                                            genSym, docyPath, className, packageName)
-                                                            .stream(),
-                                            stubExpr ->
-                                                    Stream.of(new VarInitStatement(
-                                                            new Type(
-                                                                    new ClassType(
-                                                                            stubExpr.getClassToStub().getName(),
-                                                                            new Span(
-                                                                                    docyPath,
-                                                                                    stubExpr.getClassToStub().getSpan().getStart(),
-                                                                                    stubExpr.getClassToStub().getSpan().getEnd())),
-                                                                    0),
-                                                            varName, translateExpr(stubExpr, genSym, env)))),
+                                    translateExpr(binding.getValue(), varName, genSym, env),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
                         });
             } else {
