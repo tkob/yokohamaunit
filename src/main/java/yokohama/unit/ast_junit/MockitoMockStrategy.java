@@ -72,62 +72,10 @@ public class MockitoMockStrategy implements MockStrategy {
                              : argumentTypes.stream()
                                             .map(this::mapArgumentType)
                                             .collect(Collectors.joining(", "));
-            behavior.getToBeReturned().<Void>accept(
-                    varExpr -> {
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", varExpr.getName(), ");");
-                        return null;
-                    },
-                    stubExpr2 -> {
-                        String name2 = name + "_";
-                        sb.appendln("{");
-                        sb.shift();
-                        stub(sb, name2, stubExpr2, expressionStrategy);
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
-                        sb.unshift();
-                        sb.appendln("}");
-                        return null;
-                    },
-                    matcherExpr -> {
-                        String name2 = name + "_";
-                        matcherExpr.getExpr(sb, name2, expressionStrategy, this);
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
-                        return null;
-                    },
-                    newExpr -> {
-                        String name2 = name + "_";
-                        newExpr.getExpr(sb, name2);
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
-                        return null;
-                    },
-                    strLitExpr -> {
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", escapeJava(strLitExpr.getText()), ");");
-                        return null;
-                    },
-                    nullExpr -> {
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(null);");
-                        return null;
-                    },
-                    invokeExpr -> {
-                        String name2 = name + "_";
-                        invokeExpr.getExpr(sb, name2);
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
-                        return null;
-                    },
-                    thisExpr -> {
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(this);");
-                        return null;
-                    },
-                    invokeStaticExpr -> {
-                        String name2 = name + "_";
-                        invokeStaticExpr.getExpr(sb, name2);
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", name2, ");");
-                        return null;
-                    },
-                    intLitExpr -> {
-                        sb.appendln("org.mockito.Mockito.when((Object)", name, ".", methodName, "(", args, ")).thenReturn(", intLitExpr.getValue(), ");");
-                        return null;
-                    }
-            );
+            sb.appendln(
+                    "org.mockito.Mockito.when((Object)",
+                    name, ".", methodName, "(", args, ")).thenReturn(",
+                    behavior.getToBeReturned().getName(), ");");
         }
     }
 

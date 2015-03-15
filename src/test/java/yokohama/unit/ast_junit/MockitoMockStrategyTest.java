@@ -28,7 +28,7 @@ public class MockitoMockStrategyTest {
                             Arrays.asList(
                                     new StubBehavior(
                                             new MethodPattern("call", Arrays.asList(), false),
-                                            new VarExpr("returned")))),
+                                            new Var("returned")))),
                     new SBuilder(4)
                             .appendln("stub = mock_(java.util.concurrent.Callable.class, \"?\", -1, \"?:?\");")
                             .appendln("org.mockito.Mockito.when((Object)stub.call()).thenReturn(returned);")
@@ -45,7 +45,7 @@ public class MockitoMockStrategyTest {
                                                             new Type(new ClassType("Object", Span.dummySpan()), 0)
                                                     ),
                                                     false),
-                                            new VarExpr("returned")))),
+                                            new Var("returned")))),
                     new SBuilder(4)
                             .appendln("stub = mock_(Comparable.class, \"?\", -1, \"?:?\");")
                             .appendln("org.mockito.Mockito.when((Object)stub.compare(org.mockito.Mockito.isA(Object.class))).thenReturn(returned);")
@@ -62,7 +62,7 @@ public class MockitoMockStrategyTest {
                                                             new Type(new PrimitiveType(Kind.INT), 0)
                                                     ),
                                                     false),
-                                            new VarExpr("returned")))),
+                                            new Var("returned")))),
                     new SBuilder(4)
                             .appendln("stub = mock_(CharSequence.class, \"?\", -1, \"?:?\");")
                             .appendln("org.mockito.Mockito.when((Object)stub.charAt(org.mockito.Mockito.anyInt())).thenReturn(returned);")
@@ -100,104 +100,104 @@ public class MockitoMockStrategyTest {
             // non array types
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyBoolean())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyBoolean())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.BYTE), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyByte())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyByte())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.SHORT), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyShort())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyShort())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.INT), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyInt())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyInt())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.LONG), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyLong())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyLong())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.CHAR), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyChar())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyChar())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.FLOAT), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyFloat())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyFloat())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.DOUBLE), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyDouble())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyDouble())).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new ClassType("Object", Span.dummySpan()), 0, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object.class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object.class))).thenReturn(__);")
                     .toString()
             ),
             // array types
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(boolean[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(boolean[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.BYTE), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(byte[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(byte[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.SHORT), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(short[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(short[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.INT), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(int[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(int[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.LONG), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(long[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(long[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.CHAR), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(char[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(char[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.FLOAT), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(float[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(float[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new PrimitiveType(Kind.DOUBLE), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(double[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(double[].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new ClassType("Object", Span.dummySpan()), 1, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object[].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object[].class))).thenReturn(__);")
                     .toString()
             ),
             // array types 2D
             new Fixture(new PrimitiveType(Kind.BOOLEAN), 2, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(boolean[][].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(boolean[][].class))).thenReturn(__);")
                     .toString()
             ),
             new Fixture(new ClassType("Object", Span.dummySpan()), 2, new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object[][].class))).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.isA(Object[][].class))).thenReturn(__);")
                     .toString()
             ),
         };
@@ -224,7 +224,7 @@ public class MockitoMockStrategyTest {
                                                             new Type(fixture.type, fixture.dims)
                                                     ),
                                                     false),
-                                            new NullExpr()))),
+                                            new Var("__")))),
                     expressionStrategy);
 
             // Verify
@@ -278,14 +278,14 @@ public class MockitoMockStrategyTest {
                                                             new Type(fixture, 0)
                                                     ),
                                                     true),
-                                            new NullExpr()))),
+                                            new Var("__")))),
                     expressionStrategy);
 
             // Verify
             String actual = sb.toString();
             String expected = new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyVararg())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyVararg())).thenReturn(__);")
                     .toString();
             assertThat(actual, is(expected));
         }
@@ -313,14 +313,14 @@ public class MockitoMockStrategyTest {
                                                             new Type(fixture, 0)
                                                     ),
                                                     true),
-                                            new NullExpr()))),
+                                            new Var("__")))),
                     expressionStrategy);
 
             // Verify
             String actual = sb.toString();
             String expected = new SBuilder(4)
                     .appendln("stub = mock_(DummyClass.class, \"?\", -1, \"?:?\");")
-                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyInt(), org.mockito.Mockito.anyVararg())).thenReturn(null);")
+                    .appendln("org.mockito.Mockito.when((Object)stub.dummyMethod(org.mockito.Mockito.anyInt(), org.mockito.Mockito.anyVararg())).thenReturn(__);")
                     .toString();
             assertThat(actual, is(expected));
         }

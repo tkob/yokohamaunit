@@ -405,7 +405,7 @@ public class AstToJUnitAst {
                                         translateExpr(behavior.getToBeReturned(), returnedVarName, genSym, envVarName),
                                         new StubBehavior(
                                             translateMethodPattern(behavior.getMethodPattern()),
-                                            new VarExpr(returnedVarName)));
+                                            new Var(returnedVarName)));
                             }).collect(Collectors.toList());
                     return Stream.concat(
                             behaviors.stream().flatMap(Pair<Stream<Statement>, StubBehavior>::getFirst),
