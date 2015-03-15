@@ -180,16 +180,14 @@ public class AstToJUnitAst {
     }
 
     Stream<Statement> translateProposition(Proposition proposition, GenSym genSym, String envVarName) {
-        QuotedExpr subject = new QuotedExpr(
-                proposition.getSubject().getText(),
-                new Span(
-                        docyPath,
-                        proposition.getSubject().getSpan().getStart(),
-                        proposition.getSubject().getSpan().getEnd()));
-        return proposition.getPredicate().<Stream<Statement>>accept(isPredicate -> {
+        return proposition.getPredicate().<Stream<Statement>>accept(
+                isPredicate -> {
                     String actual = genSym.generate("actual");
                     String expected = genSym.generate("expected");
-                    return Stream.concat(Stream.of(new VarInitStatement(Type.OBJECT, actual, subject)),
+                    return Stream.concat(
+                            expressionStrategy.eval(
+                                    actual, envVarName, proposition.getSubject(),
+                                    genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isPredicate.getComplement(), expected, genSym, envVarName),
                                     Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
@@ -197,7 +195,10 @@ public class AstToJUnitAst {
                 isNotPredicate -> {
                     String actual = genSym.generate("actual");
                     String unexpected = genSym.generate("unexpected");
-                    return Stream.concat(Stream.of(new VarInitStatement(Type.OBJECT, actual, subject)),
+                    return Stream.concat(
+                            expressionStrategy.eval(
+                                    actual, envVarName, proposition.getSubject(),
+                                    genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(), unexpected, genSym, envVarName),
                                     Stream.of(new IsNotStatement(new Var(actual), new Var(unexpected)))));
@@ -209,7 +210,9 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             bindThrown(
                                     actual,
-                                    Arrays.asList(new VarInitStatement(Type.OBJECT, __, subject)),
+                                    expressionStrategy.eval(
+                                            __, envVarName, proposition.getSubject(),
+                                            genSym, docyPath, className, packageName),
                                     genSym,
                                     envVarName),
                             Stream.concat(

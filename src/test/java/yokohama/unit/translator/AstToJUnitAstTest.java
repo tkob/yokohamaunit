@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.junit.Ignore;
 import org.junit.Test;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.EqualToMatcher;
@@ -23,7 +24,9 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
+import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
@@ -32,6 +35,7 @@ import yokohama.unit.ast_junit.QuotedExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -90,10 +94,21 @@ public class AstToJUnitAstTest {
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
-                new VarInitStatement(Type.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a")),
+                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?")),
+                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
+                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
+                new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
+                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        Arrays.asList(
+                                new Var("expression"),
+                                new Var("env"),
+                                new Var("fileName"),
+                                new Var("line"),
+                                new Var("span")))),
                 new VarInitStatement(Type.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
                 new VarInitStatement(Type.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsStatement(new Var("actual"), new Var("expected")));
@@ -111,10 +126,21 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
 
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
-                new VarInitStatement(Type.OBJECT, "actual", new QuotedExpr("a", Span.dummySpan())),
+                new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a")),
+                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?")),
+                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
+                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
+                new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
+                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        Arrays.asList(
+                                new Var("expression"),
+                                new Var("env"),
+                                new Var("fileName"),
+                                new Var("line"),
+                                new Var("span")))),
                 new VarInitStatement(Type.OBJECT, "obj", new QuotedExpr("b", Span.dummySpan())),
                 new VarInitStatement(Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj"))),
                 new IsNotStatement(new Var("actual"), new Var("unexpected")));
@@ -131,14 +157,24 @@ public class AstToJUnitAstTest {
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new TryStatement(
                         Arrays.asList(
-                                new VarInitStatement(Type.OBJECT, "tmp", new QuotedExpr("a", Span.dummySpan())),
-                                new VarInitStatement(Type.THROWABLE, "actual", new NullExpr())
-                        ),
+                                new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a")),
+                                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?")),
+                                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
+                                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
+                                new VarInitStatement(Type.OBJECT, "tmp", new InvokeStaticExpr(
+                                        new ClassType("p.C", Span.dummySpan()), "eval",
+                                        Arrays.asList(
+                                                new Var("expression"),
+                                                new Var("env"),
+                                                new Var("fileName"),
+                                                new Var("line"),
+                                                new Var("span")))),
+                                new VarInitStatement(Type.THROWABLE, "actual", new NullExpr())),
                         Arrays.asList(
                                 new CatchClause(
                                         new ClassType("ognl.OgnlException", Span.dummySpan()),
