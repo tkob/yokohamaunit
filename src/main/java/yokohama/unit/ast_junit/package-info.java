@@ -18,6 +18,7 @@
  *        | ThisExpr
  *        | InvokeStaticExpr
  *        | IntLitExpr
+ *        | ClassLitExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * StubBehavior ::= MethodPattern Var
