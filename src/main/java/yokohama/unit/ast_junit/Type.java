@@ -11,6 +11,7 @@ public class Type {
 
     public static final Type OBJECT = new Type(new ClassType("java.lang.Object", Span.dummySpan()), 0);
     public static final Type THROWABLE = new Type(new ClassType("java.lang.Throwable", Span.dummySpan()), 0);
+    public static final Type CLASS = new Type(new ClassType("java.lang.Class", Span.dummySpan()), 0);
     public static final Type STRING = new Type(new ClassType("java.lang.String", Span.dummySpan()), 0);
     public static final Type MATCHER = new Type(new ClassType("org.hamcrest.Matcher", Span.dummySpan()), 0);
     public static final Type INT = new Type(new PrimitiveType(Kind.INT), 0);
