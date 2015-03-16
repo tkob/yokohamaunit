@@ -4,7 +4,7 @@ import lombok.Value;
 
 @Value
 public class ClassLitExpr implements Expr {
-    private final ClassType classType;
+    private final Type type;
     
     @Override
     public <T> T accept(ExprVisitor<T> visitor) {
