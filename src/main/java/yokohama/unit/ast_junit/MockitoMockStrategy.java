@@ -81,7 +81,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
     @Override
     public void auxMethods(SBuilder sb) {
-        sb.appendln("private <T> T mock_(Class<T> classToMock, String fileName, int startLine, String span) {");
+        sb.appendln("private static <T> T mock_(Class<T> classToMock, String fileName, int startLine, String span) {");
         sb.shift();
             sb.appendln("try {");
             sb.shift();
