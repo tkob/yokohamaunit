@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import java.util.Optional;
 import lombok.Value;
 
 @Value
@@ -10,6 +11,16 @@ public class ClassType implements NonArrayType {
     @Override
     public String getText() {
         return name;
+    }
+
+    public static ClassType of(yokohama.unit.ast.ClassType classType) {
+        return new ClassType(
+                classType.getName(),
+                new Span(
+                        Optional.empty(),
+                        classType.getSpan().getStart(),
+                        classType.getSpan().getEnd()));
+
     }
 
     @Override

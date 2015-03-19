@@ -34,6 +34,10 @@ public class PrimitiveType implements NonArrayType {
         throw new RuntimeException("should not reach here");
     }
 
+    public static PrimitiveType of(yokohama.unit.ast.PrimitiveType primitiveType) {
+        return new PrimitiveType(primitiveType.getKind());
+    }
+
     @Override
     public <T> T accept(NonArrayTypeVisitor<T> visitor) {
         return visitor.visitPrimitiveType(this);

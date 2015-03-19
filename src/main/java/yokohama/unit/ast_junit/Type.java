@@ -26,4 +26,8 @@ public class Type {
     public String getText() {
         return nonArrayType.getText() + StringUtils.repeat("[]", dims);
     }
+
+    public static Type of(yokohama.unit.ast.Type type) {
+        return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
+    }
 }

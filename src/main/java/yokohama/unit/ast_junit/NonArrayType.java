@@ -22,4 +22,10 @@ public interface NonArrayType {
             }
         });
     }
+
+    public static NonArrayType of(yokohama.unit.ast.NonArrayType nonArrayType) {
+        return nonArrayType.accept(
+                primitiveType -> PrimitiveType.of(primitiveType), 
+                classType -> ClassType.of(classType));
+    }
 }
