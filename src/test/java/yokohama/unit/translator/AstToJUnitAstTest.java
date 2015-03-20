@@ -101,7 +101,7 @@ public class AstToJUnitAstTest {
                 new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
                 new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
                         Arrays.asList(
                                 new Var("expression"),
                                 new Var("env"),
@@ -114,7 +114,7 @@ public class AstToJUnitAstTest {
                 new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1)),
                 new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?")),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
                         Arrays.asList(
                                 new Var("expression2"),
                                 new Var("env"),
@@ -148,7 +148,7 @@ public class AstToJUnitAstTest {
                 new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
                 new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
                         Arrays.asList(
                                 new Var("expression"),
                                 new Var("env"),
@@ -161,7 +161,7 @@ public class AstToJUnitAstTest {
                 new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1)),
                 new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?")),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), "eval",
+                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
                         Arrays.asList(
                                 new Var("expression2"),
                                 new Var("env"),
@@ -195,7 +195,7 @@ public class AstToJUnitAstTest {
                                 new VarInitStatement(Type.INT, "line", new IntLitExpr(-1)),
                                 new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?")),
                                 new VarInitStatement(Type.OBJECT, "tmp", new InvokeStaticExpr(
-                                        new ClassType("p.C", Span.dummySpan()), "eval",
+                                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
                                         Arrays.asList(
                                                 new Var("expression"),
                                                 new Var("env"),
