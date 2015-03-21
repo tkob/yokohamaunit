@@ -59,7 +59,6 @@ import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
-import yokohama.unit.ast_junit.MethodPattern;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
@@ -401,16 +400,6 @@ public class AstToJUnitAst {
                             className,
                             packageName);
                 });
-    }
-
-    MethodPattern translateMethodPattern(yokohama.unit.ast.MethodPattern methodPattern) {
-        return new MethodPattern(
-                methodPattern.getName(),
-                methodPattern.getArgumentTypes().stream()
-                                                .map(this::translateType)
-                                                .collect(Collectors.toList()),
-                methodPattern.isVarArg()
-        );
     }
 
     Type translateType(yokohama.unit.ast.Type type) {

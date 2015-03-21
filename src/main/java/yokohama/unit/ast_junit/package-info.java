@@ -9,7 +9,6 @@
  * TestMethod ::= Statement* Statement* Statement*
  * 
  * Expr ::= VarExpr
- *        | StubExpr
  *        | MatcherExpr
  *        | NewExpr
  *        | StrLitExpr
@@ -19,10 +18,6 @@
  *        | InvokeStaticExpr
  *        | IntLitExpr
  *        | ClassLitExpr
- * 
- * StubExpr ::= ClassType StubBehavior*
- * StubBehavior ::= MethodPattern Var
- * MethodPattern ::= Type*
  * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType

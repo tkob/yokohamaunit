@@ -17,10 +17,6 @@ public class VarInitStatement implements Statement {
                     sb.appendln(name, " = ", varExpr.getName(), ";");
                     return null;
                 },
-                stubExpr -> {
-                    mockStrategy.stub(sb, name, stubExpr, expressionStrategy);
-                    return null;
-                },
                 matcherExpr -> {
                     matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
                     return null;
