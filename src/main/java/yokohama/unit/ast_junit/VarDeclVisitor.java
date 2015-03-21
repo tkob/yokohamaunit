@@ -14,11 +14,7 @@ public class VarDeclVisitor {
     }
 
     public Stream<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
-        return Stream.concat(
-                visitStatements(testMethod.getBefore()),
-                Stream.concat(
-                        visitStatements(testMethod.getStatements()),
-                        visitStatements(testMethod.getActionsAfter())));
+        return visitStatements(testMethod.getStatements());
     }
 
     public Stream<Pair<Type, String>> visitStatements(List<Statement> statements) {

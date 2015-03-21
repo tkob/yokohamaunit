@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= TestMethod*
  * 
- * TestMethod ::= Statement* Statement* Statement*
+ * TestMethod ::= Statement*
  * 
  * Expr ::= VarExpr
  *        | MatcherExpr

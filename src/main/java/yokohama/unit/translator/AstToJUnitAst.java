@@ -132,11 +132,18 @@ public class AstToJUnitAst {
                 () -> {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
-                    return Arrays.asList(new TestMethod(
-                            methodName,
-                            expressionStrategy.env(env),
-                            propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym, env)).collect(Collectors.toList()),
-                            Arrays.asList()));
+                    return Arrays.asList(
+                            new TestMethod(
+                                    methodName,
+                                    ListUtils.union(
+                                            expressionStrategy.env(env),
+                                            propositions.stream()
+                                                    .flatMap(proposition ->
+                                                                translateProposition(
+                                                                        proposition,
+                                                                        genSym,
+                                                                        env))
+                                                    .collect(Collectors.toList()))));
                 },
                 tableRef -> {
                     GenSym genSym = new GenSym();
@@ -147,30 +154,44 @@ public class AstToJUnitAst {
                             .map(i -> {
                                 return new TestMethod(
                                         methodName + "_" + (i + 1),
-                                        expressionStrategy.env(env),
                                         ListUtils.union(
-                                                table.get(i),
-                                                propositions
-                                                        .stream()
-                                                        .flatMap(proposition -> translateProposition(proposition, genSym, env))
-                                                        .collect(Collectors.toList())),
-                                        Arrays.asList());
+                                                expressionStrategy.env(env),
+                                                ListUtils.union(
+                                                        table.get(i),
+                                                        propositions
+                                                                .stream()
+                                                                .flatMap(proposition ->
+                                                                        translateProposition(
+                                                                                proposition,
+                                                                                genSym,
+                                                                                env))
+                                                                .collect(Collectors.toList()))));
                             })
                             .collect(Collectors.toList());
                 },
                 bindings -> {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
-                    return Arrays.asList(new TestMethod(
-                            methodName,
-                            expressionStrategy.env(env),
-                            Stream.concat(
-                                    bindings.getBindings()
-                                            .stream()
-                                            .flatMap(binding -> translateBinding(binding, genSym, env)),
-                                    propositions.stream().flatMap(proposition -> translateProposition(proposition, genSym, env)))
-                                    .collect(Collectors.toList()),
-                            Arrays.asList()));
+                    return Arrays.asList(
+                            new TestMethod(
+                                    methodName,
+                                    ListUtils.union(
+                                            expressionStrategy.env(env),
+                                            Stream.concat(
+                                                    bindings.getBindings()
+                                                            .stream()
+                                                            .flatMap(binding ->
+                                                                    translateBinding(
+                                                                            binding,
+                                                                            genSym,
+                                                                            env)),
+                                                    propositions.stream()
+                                                            .flatMap(proposition ->
+                                                                    translateProposition(
+                                                                            proposition,
+                                                                            genSym,
+                                                                            env)))
+                                                    .collect(Collectors.toList()))));
                 });
     }
 
@@ -601,11 +622,18 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(new TestMethod(
-                testName,
-                expressionStrategy.env(env),
-                statements,
-                actionsAfter));
+        return Arrays.asList(
+                new TestMethod(
+                        testName,
+                        ListUtils.union(
+                                expressionStrategy.env(env),
+                                actionsAfter.size() > 0
+                                        ?  Arrays.asList(
+                                                new TryStatement(
+                                                        statements,
+                                                        Arrays.asList(),
+                                                        actionsAfter))
+                                        : statements)));
     }
 
     Stream<Statement> translateExecutions(List<Execution> executions, GenSym genSym, String envVarName) {

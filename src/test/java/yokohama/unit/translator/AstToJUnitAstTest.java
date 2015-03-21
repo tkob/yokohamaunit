@@ -76,9 +76,11 @@ public class AstToJUnitAstTest {
         List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
         List<TestMethod> expected = Arrays.asList(new TestMethod(
                 "test_0",
-                Arrays.asList(new VarInitStatement(OgnlExpressionStrategy.OGNL_CONTEXT, "env", new NewExpr("ognl.OgnlContext"))),
-                Arrays.asList(),
-                Arrays.asList()));
+                Arrays.asList(
+                        new VarInitStatement(
+                                OgnlExpressionStrategy.OGNL_CONTEXT,
+                                "env",
+                                new NewExpr("ognl.OgnlContext")))));
         assertThat(actual, is(expected));
     }
 

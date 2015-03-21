@@ -8,9 +8,7 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class TestMethod {
     private final String name;
-    private final List<Statement> before;
     private final List<Statement> statements;
-    private final List<Statement> actionsAfter;
 
     public void toString(
             SBuilder sb,
@@ -25,20 +23,7 @@ public class TestMethod {
             String name = pair.getSecond();
             sb.appendln(type.getText(), " ", name, ";");
         }
-        before.forEach(statement -> statement.toString(sb, expressionStrategy, mockStrategy));
-        if (actionsAfter.size() > 0) {
-            sb.appendln("try {");
-            sb.shift();
-        }
         statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy, mockStrategy));
-        if (actionsAfter.size() > 0) {
-            sb.unshift();
-            sb.appendln("} finally {");
-            sb.shift();
-            actionsAfter.forEach(actionStatement -> actionStatement.toString(sb, expressionStrategy, mockStrategy));
-            sb.unshift();
-            sb.appendln("}");
-        }
         sb.unshift();
         sb.appendln("}");
     }
