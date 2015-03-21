@@ -67,8 +67,6 @@ import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.ReturnIsNotStatement;
 import yokohama.unit.ast_junit.ReturnIsStatement;
 import yokohama.unit.ast_junit.Span;
-import yokohama.unit.ast_junit.StubBehavior;
-import yokohama.unit.ast_junit.StubExpr;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.SuchThatMatcherExpr;
@@ -392,31 +390,16 @@ public class AstToJUnitAst {
                                 genSym, docyPath, className, packageName)
                                 .stream(),
                 stubExpr -> {
-                    ClassType classType = new ClassType(
-                            stubExpr.getClassToStub().getName(),
-                            new Span(
-                                    docyPath,
-                                    stubExpr.getClassToStub().getSpan().getStart(),
-                                    stubExpr.getClassToStub().getSpan().getEnd()));
-                    List<Pair<Stream<Statement>, StubBehavior>> behaviors =
-                            stubExpr.getBehavior().stream().map(behavior -> {
-                                String returnedVarName = genSym.generate("returned");
-                                return new Pair<Stream<Statement>, StubBehavior>(
-                                        translateExpr(behavior.getToBeReturned(), returnedVarName, genSym, envVarName),
-                                        new StubBehavior(
-                                            translateMethodPattern(behavior.getMethodPattern()),
-                                            new Var(returnedVarName)));
-                            }).collect(Collectors.toList());
-                    return Stream.concat(
-                            behaviors.stream().flatMap(Pair<Stream<Statement>, StubBehavior>::getFirst),
-                            Stream.of(new VarInitStatement(
-                                    new Type(classType, 0),
-                                    varName,
-                                    new StubExpr(
-                                            classType,
-                                            behaviors.stream()
-                                                    .map(Pair<Stream<Statement>, StubBehavior>::getSecond)
-                                                    .collect(Collectors.toList())))));
+                    return mockStrategy.stub(
+                            varName,
+                            stubExpr.getClassToStub(),
+                            stubExpr.getBehavior(),
+                            expressionStrategy,
+                            envVarName,
+                            genSym,
+                            docyPath,
+                            className,
+                            packageName);
                 });
     }
 
