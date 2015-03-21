@@ -36,6 +36,10 @@ public class Type {
                 classType -> this);
     }
 
+    public Type toArray() {
+        return new Type(nonArrayType, dims + 1);
+    }
+
     public static Type of(yokohama.unit.ast.Type type) {
         return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
     }
