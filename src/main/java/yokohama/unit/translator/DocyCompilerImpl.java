@@ -9,10 +9,6 @@ import java.util.Optional;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
-import yokohama.unit.ast_junit.ExpressionStrategy;
-import yokohama.unit.ast_junit.MockStrategy;
-import yokohama.unit.ast_junit.MockitoMockStrategy;
-import yokohama.unit.ast_junit.OgnlExpressionStrategy;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
 public class DocyCompilerImpl implements DocyCompiler {
@@ -22,7 +18,9 @@ public class DocyCompilerImpl implements DocyCompiler {
     AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
     ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
     MockStrategy mockStrategy = new MockitoMockStrategy();
-    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(expressionStrategy, mockStrategy);
+    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(
+            new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
+            new yokohama.unit.ast_junit.MockitoMockStrategy());
 
     @Override
     public boolean compile(
@@ -53,8 +51,14 @@ public class DocyCompilerImpl implements DocyCompiler {
         }
 
         // AST to JUnit AST
-        CompilationUnit junit = astToJUnitAstFactory.create(Optional.of(docyPath))
-                .translate(className, ast, packageName);
+        CompilationUnit junit =
+                astToJUnitAstFactory.create(
+                        Optional.of(docyPath),
+                        className,
+                        packageName,
+                        expressionStrategy,
+                        mockStrategy)
+                        .translate(className, ast, packageName);
 
         // JUnit AST to Java code
         return jUnitAstCompiler.compile(junit, className, packageName, classPath, dest, javacArgs);

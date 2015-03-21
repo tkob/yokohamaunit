@@ -11,13 +11,12 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList());
+        TestMethod instance = new TestMethod("test", Arrays.asList(), Arrays.asList(), Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
@@ -29,8 +28,14 @@ public class TestMethodTest {
         TestMethod instance = new TestMethod(
                 "test",
                 Arrays.asList(
-                        new VarDeclStatement("actual", new QuotedExpr("x", Span.dummySpan())),
-                        new VarDeclStatement("expected", new QuotedExpr("y", Span.dummySpan())),
+                        new VarInitStatement(
+                                new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),
+                                "env",
+                                new NewExpr("ognl.OgnlContext"))),
+
+                Arrays.asList(
+                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1)),
+                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1)),
                         new IsStatement(new Var("actual"), new Var("expected"))),
                 Arrays.asList());
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
@@ -38,9 +43,12 @@ public class TestMethodTest {
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws Exception {");
-        expected.appendln("    ognl.OgnlContext env = new ognl.OgnlContext();");
-        expected.appendln("    Object actual = eval(\"x\", env, \"?\", -1, \"?:?\");");
-        expected.appendln("    Object expected = eval(\"y\", env, \"?\", -1, \"?:?\");");
+        expected.appendln("    java.lang.Object actual;");
+        expected.appendln("    ognl.OgnlContext env;");
+        expected.appendln("    java.lang.Object expected;");
+        expected.appendln("    env = new ognl.OgnlContext();");
+        expected.appendln("    actual = 1;");
+        expected.appendln("    expected = 1;");
         expected.appendln("    org.junit.Assert.assertThat(actual, org.hamcrest.CoreMatchers.is(expected));");
         expected.appendln("}");
 

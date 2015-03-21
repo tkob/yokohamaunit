@@ -2,13 +2,15 @@ package yokohama.unit.ast_junit;
 
 import java.util.List;
 import lombok.Value;
+import yokohama.unit.util.Pair;
 import yokohama.unit.util.SBuilder;
 
 @Value
 public class TestMethod {
     private final String name;
+    private final List<Statement> before;
     private final List<Statement> statements;
-    private final List<ActionStatement> actionsAfter;
+    private final List<Statement> actionsAfter;
 
     public void toString(
             SBuilder sb,
@@ -18,7 +20,12 @@ public class TestMethod {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
-        sb.appendln(expressionStrategy.environment());
+        for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(this))) {
+            Type type = pair.getFirst();
+            String name = pair.getSecond();
+            sb.appendln(type.getText(), " ", name, ";");
+        }
+        before.forEach(statement -> statement.toString(sb, expressionStrategy, mockStrategy));
         if (actionsAfter.size() > 0) {
             sb.appendln("try {");
             sb.shift();

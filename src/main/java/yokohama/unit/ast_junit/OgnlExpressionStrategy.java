@@ -1,13 +1,11 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Optional;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.util.SBuilder;
 
 public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
     public void auxMethods(SBuilder sb) {
-        sb.appendln("private Object eval(String expression, ognl.OgnlContext env, String fileName, int startLine, String span) throws ognl.OgnlException {");
+        sb.appendln("private static Object eval(String expression, ognl.OgnlContext env, String fileName, int startLine, String span) throws ognl.OgnlException {");
         sb.shift();
             sb.appendln("try {");
             sb.shift();
@@ -25,33 +23,5 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             sb.appendln("}");
         sb.unshift();
         sb.appendln("}");
-    }
-
-    @Override
-    public String environment() {
-        return "ognl.OgnlContext env = new ognl.OgnlContext();";
-    }
-
-    @Override
-    public void bind(SBuilder sb, String name, Var varExpr) {
-        sb.appendln("env.put(\"", escapeJava(name), "\", ", varExpr.getName(), ");");
-    }
-
-    @Override
-    public String getValue(QuotedExpr quotedExpr) {
-        return "eval(\"" + escapeJava(quotedExpr.getText()) + "\", env, " +
-                "\"" + escapeJava(quotedExpr.getSpan().getFileName()) +  "\", " +
-                quotedExpr.getSpan().getStart().getLine() + ", " +
-                "\"" + escapeJava(quotedExpr.getSpan().toString()) + "\")";
-    }
-
-    @Override
-    public Optional<String> wrappingException() {
-        return Optional.of("ognl.OgnlException");
-    }
-
-    @Override
-    public String wrappedException(String e) {
-        return e + ".getReason()";
     }
 }

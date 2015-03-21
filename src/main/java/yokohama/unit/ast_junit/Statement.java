@@ -11,12 +11,11 @@ public interface Statement {
     default <T> T accept(
             Function<IsStatement, T> visitIsStatement_,
             Function<IsNotStatement, T> visitIsNotStatement_,
-            Function<ActionStatement, T> visitActionStatement_,
-            Function<TopBindStatement, T> visitTopBindStatement_,
-            Function<VarDeclStatement, T> visitVarDeclStatement_,
-            Function<BindThrownStatement, T> visitBindThrownStatement_,
+            Function<VarInitStatement, T> visitVarInitStatement_,
             Function<ReturnIsStatement, T> visitReturnIsStatement_,
-            Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_
+            Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_,
+            Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
+            Function<TryStatement, T> visitTryStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -30,23 +29,8 @@ public interface Statement {
             }
 
             @Override
-            public T visitActionStatement(ActionStatement actionStatement) {
-                return visitActionStatement_.apply(actionStatement);
-            }
-
-            @Override
-            public T visitTopBindStatement(TopBindStatement topBindStatement) {
-                return visitTopBindStatement_.apply(topBindStatement);
-            }
-
-            @Override
-            public T visitVarDeclStatement(VarDeclStatement varDeclStatement) {
-                return visitVarDeclStatement_.apply(varDeclStatement);
-            }
-
-            @Override
-            public T visitBindThrownStatement(BindThrownStatement bindThrownStatement) {
-                return visitBindThrownStatement_.apply(bindThrownStatement);
+            public T visitVarInitStatement(VarInitStatement varInitStatement) {
+                return visitVarInitStatement_.apply(varInitStatement);
             }
 
             @Override
@@ -57,6 +41,15 @@ public interface Statement {
             @Override
             public T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement) {
                 return visitReturnIsNotStatement_.apply(returnIsNotStatement);
+            }
+            @Override
+            public T visitInvokeVoidStatement(InvokeVoidStatement invokeVoidStatement) {
+                return visitInvokeVoidStatement_.apply(invokeVoidStatement);
+            }
+
+            @Override
+            public T visitTryStatement(TryStatement tryStatement) {
+                return visitTryStatement_.apply(tryStatement);
             }
         });
     }

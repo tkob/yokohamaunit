@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import yokohama.unit.util.Pair;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -15,20 +16,25 @@ public class SuchThatMatcherExpr extends MatcherExpr {
 
     @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln("org.hamcrest.Matcher ", varName, " = new org.hamcrest.BaseMatcher() {");
+        sb.appendln(varName, " = new org.hamcrest.BaseMatcher() {");
         sb.shift();
             sb.appendln("@Override");
             sb.appendln("public boolean matches(Object ", argVar.getName(), ") {");
             sb.shift();
+                for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitStatements(statements))) {
+                    Type type = pair.getFirst();
+                    String name = pair.getSecond();
+                    sb.appendln(type.getText(), " ", name, ";");
+                }
                 sb.appendln("try {");
                 sb.shift();
                 for (Statement statement : statements) {
                     statement.toString(sb, expressionStrategy, mockStrategy);
                 }
                 sb.unshift();
-                sb.appendln("} catch (Exception e) {");
+                sb.appendln("} catch (Exception $e) {"); // TODO: var name should be gensym'ed
                 sb.shift();
-                    sb.appendln("throw new RuntimeException(e);");
+                    sb.appendln("throw new RuntimeException($e);");
                 sb.unshift();
                 sb.appendln("}");
             sb.unshift();

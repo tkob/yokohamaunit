@@ -3,6 +3,8 @@ package yokohama.unit.ast_junit;
 import java.util.function.Function;
 
 public interface NonArrayType {
+    String getText();
+
     <T> T accept(NonArrayTypeVisitor<T> visitor);
 
     default <T> T accept(
@@ -19,5 +21,11 @@ public interface NonArrayType {
                 return visitClassType_.apply(classType);
             }
         });
+    }
+
+    public static NonArrayType of(yokohama.unit.ast.NonArrayType nonArrayType) {
+        return nonArrayType.accept(
+                primitiveType -> PrimitiveType.of(primitiveType), 
+                classType -> ClassType.of(classType));
     }
 }

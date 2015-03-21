@@ -20,9 +20,7 @@ public class ClassDecl {
         sb.shift();
         if (testMethods.size() > 0) {
             expressionStrategy.auxMethods(sb);
-            if (new MockUsedVisitor(this).mockUsed()) {
-                mockStrategy.auxMethods(sb);
-            }
+            mockStrategy.auxMethods(sb);
         }
         for (TestMethod testMethod : testMethods) {
             testMethod.toString(sb, expressionStrategy, mockStrategy);
