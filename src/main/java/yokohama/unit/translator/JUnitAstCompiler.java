@@ -7,6 +7,7 @@ import yokohama.unit.ast_junit.CompilationUnit;
 
 public interface JUnitAstCompiler {
     boolean compile(
+            Path docyPath,
             CompilationUnit ast,
             String className,
             String packageName,

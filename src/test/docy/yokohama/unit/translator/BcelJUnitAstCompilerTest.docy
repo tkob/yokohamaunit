@@ -1,0 +1,25 @@
+# Test: Test makeClassFilePath
+
+Assert `new yokohama.unit.translator.BcelJUnitAstCompiler()
+            .makeClassFilePath(
+                @java.util.Optional@of(new java.io.File(dest).toPath()),
+                packageName,
+                className)`
+       is `new java.io.File(expected).toPath()`
+for all dest, packageName, className and expected in Table 'Fixture'.
+
+Table: Fixture
+| dest | packageName   | className | expected                     |
+| ""   | "com.example" | "Hello"   | "com/example/Hello.class"    |
+| "."  | "com.example" | "Hello"   | "./com/example/Hello.class"  |
+| "/d" | "com.example" | "Hello"   | "/d/com/example/Hello.class" |
+| "d/" | "com.example" | "Hello"   | "d/com/example/Hello.class"  |
+
+# Test: makeClassFilePath uses dot as prefix path when dest argument is empty.
+
+Assert `new yokohama.unit.translator.BcelJUnitAstCompiler()
+            .makeClassFilePath(
+                @java.util.Optional@empty(),
+                "com.example",
+                "Hello")`
+       is `new java.io.File("./com/example/Hello.class").toPath()`.

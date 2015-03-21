@@ -61,6 +61,6 @@ public class DocyCompilerImpl implements DocyCompiler {
                         .translate(className, ast, packageName);
 
         // JUnit AST to Java code
-        return jUnitAstCompiler.compile(junit, className, packageName, classPath, dest, javacArgs);
+        return jUnitAstCompiler.compile(docyPath, junit, className, packageName, classPath, dest, javacArgs);
     }
 }
