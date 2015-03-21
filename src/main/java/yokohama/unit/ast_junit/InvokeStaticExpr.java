@@ -8,14 +8,14 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class InvokeStaticExpr implements Expr {
     ClassType clazz;
-    List<ClassType> typeArgs;
+    List<Type> typeArgs;
     String methodName;
     List<Var> args;
 
     public void getExpr(SBuilder sb, String varName) {
         sb.appendln(varName, " = ", clazz.getName(), ".", 
                 typeArgs.size() > 0
-                        ? "<" + typeArgs.stream().map(ClassType::getText).collect(Collectors.joining(", "))  + ">"
+                        ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",
                 methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
     }

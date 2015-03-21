@@ -94,6 +94,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 new VarInitStatement(Type.OBJECT, varName,
                         new InvokeStaticExpr(
                                 new ClassType(packageName + "." + className, Span.dummySpan()),
+                                Arrays.asList(),
                                 "eval",
                                 Arrays.asList(
                                         exprVar,
