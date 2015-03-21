@@ -27,6 +27,15 @@ public class Type {
         return nonArrayType.getText() + StringUtils.repeat("[]", dims);
     }
 
+    public Type box() {
+        if (dims > 0) return this;
+
+        return nonArrayType.accept(
+                primitiveType ->
+                        new Type(primitiveType.box(), dims),
+                classType -> this);
+    }
+
     public static Type of(yokohama.unit.ast.Type type) {
         return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
     }
