@@ -17,7 +17,6 @@ import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
-import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.GenSym;
 
@@ -50,19 +49,15 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
     public CatchClause catchAndAssignCause(String caughtVarName, String causeVarName, GenSym genSym) {
         Var caughtVar = new Var(caughtVarName);
-        String cause = genSym.generate("cause");
         return new CatchClause(
                 OGNL_EXCEPTION,
                 caughtVar,
                 Arrays.asList(
                         new VarInitStatement(
                                 Type.THROWABLE,
-                                cause,
-                                new InvokeExpr(caughtVar, "getReason", Arrays.asList())),
-                        new VarInitStatement(
-                                Type.THROWABLE,
                                 causeVarName,
-                                new VarExpr(cause))));
+                                new InvokeExpr(caughtVar, "getReason", Arrays.asList()))));
+                                
     }
 
     @Override
