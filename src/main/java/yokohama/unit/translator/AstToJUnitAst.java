@@ -100,6 +100,10 @@ public class AstToJUnitAst {
 
     TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();
 
+    Span spanOf(yokohama.unit.ast.Span span) {
+        return new Span(docyPath, span.getStart(), span.getEnd());
+    }
+
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
