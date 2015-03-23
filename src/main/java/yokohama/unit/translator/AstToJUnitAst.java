@@ -225,7 +225,11 @@ public class AstToJUnitAst {
                                     genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(), unexpected, genSym, envVarName),
-                                    Stream.of(new IsNotStatement(new Var(actual), new Var(unexpected)))));
+                                    Stream.of(
+                                            new IsNotStatement(
+                                                    new Var(actual),
+                                                    new Var(unexpected),
+                                                    spanOf(isNotPredicate.getSpan())))));
                 },
                 throwsPredicate -> {
                     String __ = genSym.generate("tmp");

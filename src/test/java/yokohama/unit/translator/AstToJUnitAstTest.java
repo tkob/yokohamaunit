@@ -173,7 +173,7 @@ public class AstToJUnitAstTest {
                 // is not `b`
                 new VarInitStatement(Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj"))),
                 // `a` is not `b`
-                new IsNotStatement(new Var("actual"), new Var("unexpected")));
+                new IsNotStatement(new Var("actual"), new Var("unexpected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
     
