@@ -126,7 +126,7 @@ public class AstToJUnitAstTest {
                 // is `b`
                 new VarInitStatement(Type.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj"))),
                 // `a` is `b`
-                new IsStatement(new Var("actual"), new Var("expected")));
+                new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
     
@@ -219,7 +219,7 @@ public class AstToJUnitAstTest {
                         ),
                         Arrays.asList()),
                 new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("b")),
-                new IsStatement(new Var("actual"), new Var("expected")));
+                new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
     

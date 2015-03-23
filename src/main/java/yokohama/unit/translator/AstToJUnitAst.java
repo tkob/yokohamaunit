@@ -210,7 +210,11 @@ public class AstToJUnitAst {
                                     genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isPredicate.getComplement(), expected, genSym, envVarName),
-                                    Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
+                                    Stream.of(
+                                            new IsStatement(
+                                                    new Var(actual),
+                                                    new Var(expected),
+                                                    spanOf(isPredicate.getSpan())))));
                 },
                 isNotPredicate -> {
                     String actual = genSym.generate("actual");
@@ -237,7 +241,11 @@ public class AstToJUnitAst {
                                     envVarName),
                             Stream.concat(
                                     translateMatcher(throwsPredicate.getThrowee(), expected, genSym, envVarName),
-                                    Stream.of(new IsStatement(new Var(actual), new Var(expected)))));
+                                    Stream.of(
+                                            new IsStatement(
+                                                    new Var(actual),
+                                                    new Var(expected),
+                                                    spanOf(throwsPredicate.getSpan())))));
                 }
         );
     }

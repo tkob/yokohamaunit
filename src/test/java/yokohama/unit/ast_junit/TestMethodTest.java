@@ -34,7 +34,7 @@ public class TestMethodTest {
                                 new NewExpr("ognl.OgnlContext")),
                         new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1)),
                         new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1)),
-                        new IsStatement(new Var("actual"), new Var("expected"))));
+                        new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan())));
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
