@@ -9,6 +9,7 @@ public class VarInitStatement implements Statement {
     private final Type type;
     private final String name;
     private final Expr value;
+    private final Span span;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {

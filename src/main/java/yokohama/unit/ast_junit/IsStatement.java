@@ -8,6 +8,7 @@ import yokohama.unit.util.SBuilder;
 public class IsStatement implements Statement {
     private Var subject;
     private Var complement;
+    private Span span;
 
     @Override
     public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {

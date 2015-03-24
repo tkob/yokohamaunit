@@ -31,10 +31,11 @@ public class TestMethodTest {
                         new VarInitStatement(
                                 new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),
                                 "env",
-                                new NewExpr("ognl.OgnlContext")),
-                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1)),
-                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1)),
-                        new IsStatement(new Var("actual"), new Var("expected"))));
+                                new NewExpr("ognl.OgnlContext"),
+                                Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
+                        new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan())));
         instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
 
         StrBuilder expected = new StrBuilder();
