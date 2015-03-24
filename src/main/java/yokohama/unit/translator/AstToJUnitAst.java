@@ -272,12 +272,14 @@ public class AstToJUnitAst {
                 new TryStatement(
                         ListUtils.union(
                                 statements,
-                                Arrays.asList(new VarInitStatement(Type.THROWABLE, actual, new NullExpr()))),
+                                Arrays.asList(new VarInitStatement(
+                                        Type.THROWABLE, actual, new NullExpr(), Span.dummySpan()))),
                         Arrays.asList(expressionStrategy.catchAndAssignCause(e, actual, genSym),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var(e),
-                                        Arrays.asList(new VarInitStatement(Type.THROWABLE, actual, new VarExpr(e))))),
+                                        Arrays.asList(new VarInitStatement(
+                                                Type.THROWABLE, actual, new VarExpr(e), Span.dummySpan())))),
                         Arrays.asList()));
     }
 
@@ -293,14 +295,16 @@ public class AstToJUnitAst {
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
-                                new EqualToMatcherExpr(objVar))));
+                                new EqualToMatcherExpr(objVar),
+                                Span.dummySpan())));
             }
             @Override
             public Stream<Statement> visitInstanceOf(InstanceOfMatcher instanceOf) {
                 return Stream.of(new VarInitStatement(
                         Type.MATCHER,
                         varName,
-                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName())));
+                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName()),
+                        spanOf(instanceOf.getSpan())));
             }
             @Override
             public Stream<Statement> visitInstanceSuchThat(InstanceSuchThatMatcher instanceSuchThat) {
@@ -309,7 +313,8 @@ public class AstToJUnitAst {
                 VarInitStatement instanceOfStatement = new VarInitStatement(
                         Type.MATCHER,
                         instanceOfVarName,
-                        new InstanceOfMatcherExpr(instanceSuchThat.getClazz().getName()));
+                        new InstanceOfMatcherExpr(instanceSuchThat.getClazz().getName()),
+                        spanOf(instanceSuchThat.getSpan()));
                 List<Pair<Var, Stream<Statement>>> suchThats =
                         instanceSuchThat.getPropositions().stream().map(proposition -> {
                             Var suchThatVar = new Var(genSym.generate("suchThat"));
@@ -335,7 +340,8 @@ public class AstToJUnitAst {
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
-                                                            matchesArg)));
+                                                            matchesArg),
+                                            spanOf(isPredicate.getSpan())));
                                     return new Pair<>(suchThatVar, s);
                                 }
                                 @Override
@@ -356,7 +362,8 @@ public class AstToJUnitAst {
                                                                 add(new ReturnIsNotStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
-                                                            matchesArg)));
+                                                            matchesArg),
+                                            spanOf(isNotPredicate.getSpan())));
                                     return new Pair<>(suchThatVar, s);
                                 }
                                 @Override
@@ -382,7 +389,8 @@ public class AstToJUnitAst {
                                                                 add(new ReturnIsStatement(new Var("actual"), predVar));
                                                             }},
                                                             proposition.getDescription(),
-                                                            matchesArg)));
+                                                            matchesArg),
+                                            spanOf(throwsPredicate.getSpan())));
                                     return new Pair<>(suchThatVar, s);
                                 }
                             });
@@ -396,7 +404,8 @@ public class AstToJUnitAst {
                                 Stream.concat(
                                         Stream.of(new Var(instanceOfVarName)),
                                         suchThatVars
-                                ).collect(Collectors.toList())));
+                                ).collect(Collectors.toList())),
+                        Span.dummySpan());
                 return Stream.concat(
                         Stream.of(instanceOfStatement),
                         Stream.concat(
@@ -405,7 +414,12 @@ public class AstToJUnitAst {
             }
             @Override
             public Stream<Statement> visitNullValue(NullValueMatcher nullValue) {
-                return Stream.of(new VarInitStatement(Type.MATCHER, varName, new NullValueMatcherExpr()));
+                return Stream.of(
+                        new VarInitStatement(
+                                Type.MATCHER,
+                                varName,
+                                new NullValueMatcherExpr(),
+                                spanOf(nullValue.getSpan())));
             }
         });
     }

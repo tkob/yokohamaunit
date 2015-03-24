@@ -29,7 +29,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         return Arrays.asList(new VarInitStatement(
                 OGNL_CONTEXT,
                 varName,
-                new NewExpr("ognl.OgnlContext")));
+                new NewExpr("ognl.OgnlContext"),
+                Span.dummySpan()));
     }
 
     @Override
@@ -39,7 +40,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name)),
+                        new StrLitExpr(name),
+                        Span.dummySpan()),
                 new InvokeVoidStatement(
                         new Var(envVarName),
                         "put",
@@ -56,7 +58,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         new VarInitStatement(
                                 Type.THROWABLE,
                                 causeVarName,
-                                new InvokeExpr(caughtVar, "getReason", Arrays.asList()))));
+                                new InvokeExpr(caughtVar, "getReason", Arrays.asList()),
+                                Span.dummySpan())));
                                 
     }
 
@@ -79,13 +82,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 quotedExpr.getSpan().getEnd());
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText())),
+                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
                 new VarInitStatement(Type.STRING, fileNameVar.getName(),
-                        new StrLitExpr(span.getFileName())),
+                        new StrLitExpr(span.getFileName()), Span.dummySpan()),
                 new VarInitStatement(Type.INT, lineVar.getName(),
-                        new IntLitExpr(quotedExpr.getSpan().getStart().getLine())),
+                        new IntLitExpr(quotedExpr.getSpan().getStart().getLine()), Span.dummySpan()),
                 new VarInitStatement(Type.STRING, spanVar.getName(),
-                        new StrLitExpr(span.toString())),
+                        new StrLitExpr(span.toString()), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, varName,
                         new InvokeStaticExpr(
                                 new ClassType(packageName + "." + className, Span.dummySpan()),
@@ -96,6 +99,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                         new Var(envVarName),
                                         fileNameVar,
                                         lineVar,
-                                        spanVar))));
+                                        spanVar)),
+                        span));
     }
 }
