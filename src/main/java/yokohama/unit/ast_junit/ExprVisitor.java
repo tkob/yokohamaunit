@@ -11,4 +11,5 @@ public interface ExprVisitor<T> {
     T visitInvokeStaticExpr(InvokeStaticExpr aThis);
     T visitIntLitExpr(IntLitExpr intLitExpr);
     T visitClassLitExpr(ClassLitExpr classLitExpr);
+    T visitEqualOpExpr(EqualOpExpr equalOpExpr);
 }

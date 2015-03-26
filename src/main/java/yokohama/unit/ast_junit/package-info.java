@@ -18,6 +18,7 @@
  *        | InvokeStaticExpr
  *        | IntLitExpr
  *        | ClassLitExpr
+ *        | EqualOpExpr
  * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
