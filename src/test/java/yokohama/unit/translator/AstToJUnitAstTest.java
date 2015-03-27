@@ -21,7 +21,9 @@ import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
+import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
@@ -100,31 +102,19 @@ public class AstToJUnitAstTest {
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?"), Span.dummySpan()),
-                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
+                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
                         Arrays.asList(
                                 new Var("expression"),
-                                new Var("env"),
-                                new Var("fileName"),
-                                new Var("line"),
-                                new Var("span"))),
+                                new Var("env"))),
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "fileName2", new StrLitExpr("?"), Span.dummySpan()),
-                new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
+                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
                         Arrays.asList(
                                 new Var("expression2"),
-                                new Var("env"),
-                                new Var("fileName2"),
-                                new Var("line2"),
-                                new Var("span2"))),
+                                new Var("env"))),
                         Span.dummySpan()),
                 // is `b`
                 new VarInitStatement(
@@ -150,31 +140,19 @@ public class AstToJUnitAstTest {
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?"), Span.dummySpan()),
-                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
+                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
                         Arrays.asList(
                                 new Var("expression"),
-                                new Var("env"),
-                                new Var("fileName"),
-                                new Var("line"),
-                                new Var("span"))),
+                                new Var("env"))),
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "fileName2", new StrLitExpr("?"), Span.dummySpan()),
-                new VarInitStatement(Type.INT, "line2", new IntLitExpr(-1), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, "span2", new StrLitExpr("?:?"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
+                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
                         Arrays.asList(
                                 new Var("expression2"),
-                                new Var("env"),
-                                new Var("fileName2"),
-                                new Var("line2"),
-                                new Var("span2"))),
+                                new Var("env"))),
                         Span.dummySpan()),
                 // is not `b`
                 new VarInitStatement(
@@ -200,17 +178,11 @@ public class AstToJUnitAstTest {
                 new TryStatement(
                         Arrays.asList(
                                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                                new VarInitStatement(Type.STRING, "fileName", new StrLitExpr("?"), Span.dummySpan()),
-                                new VarInitStatement(Type.INT, "line", new IntLitExpr(-1), Span.dummySpan()),
-                                new VarInitStatement(Type.STRING, "span", new StrLitExpr("?:?"), Span.dummySpan()),
                                 new VarInitStatement(Type.OBJECT, "tmp", new InvokeStaticExpr(
-                                        new ClassType("p.C", Span.dummySpan()), Arrays.asList(), "eval",
+                                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
                                         Arrays.asList(
                                                 new Var("expression"),
-                                                new Var("env"),
-                                                new Var("fileName"),
-                                                new Var("line"),
-                                                new Var("span"))),
+                                                new Var("env"))),
                                         Span.dummySpan()),
                                 new VarInitStatement(Type.THROWABLE, "actual", new NullExpr(), Span.dummySpan())),
                         Arrays.asList(
@@ -220,9 +192,33 @@ public class AstToJUnitAstTest {
                                         Arrays.asList(
                                                 new VarInitStatement(
                                                         Type.THROWABLE,
-                                                        "actual",
+                                                        "reason",
                                                         new InvokeExpr(new Var("ex"), "getReason", Arrays.asList()),
-                                                        Span.dummySpan()))),
+                                                        Span.dummySpan()),
+                                                new VarInitStatement(
+                                                        Type.THROWABLE,
+                                                        "nullValue",
+                                                        new NullExpr(),
+                                                        Span.dummySpan()),
+                                                new VarInitStatement(
+                                                        Type.BOOLEAN,
+                                                        "cond",
+                                                        new EqualOpExpr(new Var("reason"), new Var("nullValue")),
+                                                        Span.dummySpan()),
+                                                new IfStatement(
+                                                        new Var("cond"),
+                                                        Arrays.asList(
+                                                                new VarInitStatement(
+                                                                        Type.THROWABLE,
+                                                                        "actual",
+                                                                        new VarExpr("ex"),
+                                                                        Span.dummySpan())),
+                                                        Arrays.asList(
+                                                                new VarInitStatement(
+                                                                        Type.THROWABLE,
+                                                                        "actual",
+                                                                        new VarExpr("reason"),
+                                                                        Span.dummySpan()))))),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var("ex"),

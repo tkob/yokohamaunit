@@ -7,16 +7,19 @@ import java.util.Optional;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassType;
-import yokohama.unit.ast_junit.IntLitExpr;
+import yokohama.unit.ast_junit.EqualOpExpr;
+import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.NewExpr;
+import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
+import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.GenSym;
 
@@ -51,16 +54,42 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
     public CatchClause catchAndAssignCause(String caughtVarName, String causeVarName, GenSym genSym) {
         Var caughtVar = new Var(caughtVarName);
+        Var reasonVar = new Var(genSym.generate("reason"));
+        Var nullValueVar = new Var(genSym.generate("nullValue"));
+        Var condVar = new Var(genSym.generate("cond"));
         return new CatchClause(
                 OGNL_EXCEPTION,
                 caughtVar,
                 Arrays.asList(
                         new VarInitStatement(
                                 Type.THROWABLE,
-                                causeVarName,
+                                reasonVar.getName(),
                                 new InvokeExpr(caughtVar, "getReason", Arrays.asList()),
-                                Span.dummySpan())));
-                                
+                                Span.dummySpan()),
+                        new VarInitStatement(
+                                Type.THROWABLE,
+                                nullValueVar.getName(),
+                                new NullExpr(),
+                                Span.dummySpan()),
+                        new VarInitStatement(
+                                Type.BOOLEAN,
+                                condVar.getName(),
+                                new EqualOpExpr(reasonVar, nullValueVar),
+                                Span.dummySpan()),
+                        new IfStatement(
+                                condVar,
+                                Arrays.asList(
+                                        new VarInitStatement(
+                                                Type.THROWABLE,
+                                                causeVarName,
+                                                new VarExpr(caughtVarName),
+                                                Span.dummySpan())),
+                                Arrays.asList(
+                                        new VarInitStatement(
+                                                Type.THROWABLE,
+                                                causeVarName,
+                                                new VarExpr(reasonVar.getName()),
+                                                Span.dummySpan())))));
     }
 
     @Override
@@ -73,9 +102,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String className,
             String packageName) {
         Var exprVar = new Var(genSym.generate("expression"));
-        Var fileNameVar = new Var(genSym.generate("fileName"));
-        Var lineVar = new Var(genSym.generate("line"));
-        Var spanVar = new Var(genSym.generate("span"));
         Span span = new Span(
                 docyPath,
                 quotedExpr.getSpan().getStart(),
@@ -83,23 +109,14 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, fileNameVar.getName(),
-                        new StrLitExpr(span.getFileName()), Span.dummySpan()),
-                new VarInitStatement(Type.INT, lineVar.getName(),
-                        new IntLitExpr(quotedExpr.getSpan().getStart().getLine()), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, spanVar.getName(),
-                        new StrLitExpr(span.toString()), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, varName,
                         new InvokeStaticExpr(
-                                new ClassType(packageName + "." + className, Span.dummySpan()),
+                                new ClassType("ognl.Ognl", Span.dummySpan()),
                                 Arrays.asList(),
-                                "eval",
+                                "getValue",
                                 Arrays.asList(
                                         exprVar,
-                                        new Var(envVarName),
-                                        fileNameVar,
-                                        lineVar,
-                                        spanVar)),
+                                        new Var(envVarName))),
                         span));
     }
 }
