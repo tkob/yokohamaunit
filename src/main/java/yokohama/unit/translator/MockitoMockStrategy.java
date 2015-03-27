@@ -11,13 +11,11 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
-import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -38,7 +36,7 @@ public class MockitoMockStrategy implements MockStrategy {
             Optional<Path> docyPath,
             String className,
             String packageName) {
-        Stream<Statement> createMock = createMock(varName, classToStub, genSym, docyPath, className, packageName);
+        Stream<Statement> createMock = createMock(varName, classToStub, genSym, docyPath);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         varName,
@@ -56,13 +54,8 @@ public class MockitoMockStrategy implements MockStrategy {
             String varName,
             yokohama.unit.ast.ClassType classToStub,
             GenSym genSym,
-            Optional<Path> docyPath,
-            String className,
-            String packageName) {
+            Optional<Path> docyPath) {
         Var classToStubVar = new Var(genSym.generate("classToStub"));
-        Var fileNameVar = new Var(genSym.generate("fileName"));
-        Var lineVar = new Var(genSym.generate("line"));
-        Var spanVar = new Var(genSym.generate("span"));
         Span span = new Span(
                 docyPath,
                 classToStub.getSpan().getStart(),
@@ -71,22 +64,13 @@ public class MockitoMockStrategy implements MockStrategy {
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
                         new ClassLitExpr(clazz), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, fileNameVar.getName(),
-                        new StrLitExpr(span.getFileName()), Span.dummySpan()),
-                new VarInitStatement(Type.INT, lineVar.getName(),
-                        new IntLitExpr(span.getStart().getLine()), Span.dummySpan()),
-                new VarInitStatement(Type.STRING, spanVar.getName(),
-                        new StrLitExpr(span.toString()), Span.dummySpan()),
                 new VarInitStatement(clazz, varName,
                         new InvokeStaticExpr(
-                                new ClassType(packageName + "." + className, Span.dummySpan()),
+                                MOCKITO,
                                 Arrays.asList(new Type(new ClassType(classToStub.getName(), Span.dummySpan()), 0)),
-                                "mock_",
+                                "mock",
                                 Arrays.asList(
-                                        classToStubVar,
-                                        fileNameVar,
-                                        lineVar,
-                                        spanVar)),
+                                        classToStubVar)),
                        span));
     }
 
