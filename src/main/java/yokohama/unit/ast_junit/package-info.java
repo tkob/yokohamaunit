@@ -14,7 +14,6 @@
  *        | StrLitExpr
  *        | NullExpr
  *        | InvokeExpr
- *        | ThisExpr
  *        | InvokeStaticExpr
  *        | IntLitExpr
  *        | ClassLitExpr
