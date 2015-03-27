@@ -45,7 +45,7 @@ public class TranslatorUtilsTest {
             new Fixture("TestIs.docy", Arrays.asList("Simple_Arithmetic_1")),
             new Fixture("TestIsNot.docy", Arrays.asList("Simple_Arithmetic_1")),
             new Fixture("TestNull.docy", Arrays.asList("Null_test_1", "Null_test_2")),
-            new Fixture("TestThrows.docy", Arrays.asList("Division_by_zero_1", "No_exception_1")),
+            new Fixture("TestThrows.docy", Arrays.asList("Division_by_zero_1", "NPO_1", "OgnlException_1", "UnsupportedEncodingException_1", "No_exception_1")),
             new Fixture("TestMultiplePropositions.docy", Arrays.asList("Multiple_propositions_1")),
             new Fixture(
                     "TestMultipleAssertions.docy",
