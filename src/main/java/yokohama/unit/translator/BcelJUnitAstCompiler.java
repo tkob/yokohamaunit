@@ -60,7 +60,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
 
     private void visitTestMethod(TestMethod testMethod, ClassGen cg, ConstantPoolGen cp) {
         InstructionList il = new InstructionList();
-        MethodGen  mg = new MethodGen(Constants.ACC_STATIC | Constants.ACC_PUBLIC, // access flags
+        MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                 Type.VOID, // return type of a test method is always void
                 Type.NO_ARGS, new String[]{}, // test methods have no arguments
                 testMethod.getName(),
