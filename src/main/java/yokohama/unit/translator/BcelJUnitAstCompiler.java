@@ -2,15 +2,18 @@ package yokohama.unit.translator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.bcel.Constants;
+import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionConstants;
 import org.apache.bcel.generic.InstructionFactory;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.TestMethod;
@@ -63,6 +66,12 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 testMethod.getName(),
                 cg.getClassName(),
                 il, cp);
+        AnnotationEntryGen ag = new AnnotationEntryGen(
+                new ObjectType("org.junit.Test"),
+                Arrays.asList(),
+                true,
+                cp);
+        mg.addAnnotationEntry(ag);
         InstructionFactory factory = new InstructionFactory(cg);
 
         il.append(InstructionConstants.RETURN);
