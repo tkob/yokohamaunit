@@ -16,6 +16,7 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TestMethod;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
@@ -78,11 +79,32 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         mg.addAnnotationEntry(ag);
         InstructionFactory factory = new InstructionFactory(cg);
 
+        for (Statement statement : testMethod.getStatements()) {
+            visitStatement(statement, il, factory, cp);
+        }
+
         il.append(InstructionConstants.RETURN);
 
         mg.setMaxStack();
         mg.setMaxLocals();
         cg.addMethod(mg.getMethod());
         il.dispose();
+    }
+
+    private void visitStatement(
+            Statement statement,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        statement.<Void>accept(
+            isStatement -> { return null; },
+            isNotStatement -> { return null; },
+            varInitStatement -> { return null; },
+            returnIsStatement -> { return null; },
+            returnIsNotStatement -> { return null; },
+            invokeVoidStatement -> { return null; },
+            tryStatement -> { return null; },
+            ifStatement -> { return null; }
+        );
     }
 }
