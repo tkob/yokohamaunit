@@ -26,6 +26,7 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.Pair;
@@ -197,10 +198,65 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            instanceOfMatcherExpr -> { return null; },
-            nullValueMatcherExpr -> { return null; },
-            conjunctionMatcherExpr -> { return null; },
-            equalToMatcherExpr -> { return null; },
+            instanceOfMatcherExpr -> {
+                il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClassName())));
+                il.append(factory.createInvoke(
+                        "org.hamcrest.CoreMatchers",
+                        "instanceOf",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        new Type[] { new ObjectType("java.lang.Class") },
+                        Constants.INVOKESTATIC));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            nullValueMatcherExpr -> {
+                il.append(factory.createInvoke(
+                        "org.hamcrest.CoreMatchers",
+                        "nullValue",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        Type.NO_ARGS,
+                        Constants.INVOKESTATIC));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            conjunctionMatcherExpr -> {
+                List<Var> matchers = conjunctionMatcherExpr.getMatchers();
+                int numMatchers = matchers.size();
+                // first create array
+                il.append(new PUSH(cp, numMatchers));
+                il.append(factory.createNewArray(new ObjectType("org.hamcrest.Matcher"), (short) 1));
+                // fill the array with the matchers
+                for (int i = 0; i < numMatchers; i++) {
+                    String name = matchers.get(i).getName();
+                    LocalVariableGen lv = locals.get(name);
+                    il.append(InstructionConstants.DUP);
+                    il.append(new PUSH(cp, i));
+                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                    il.append(InstructionConstants.AASTORE);
+                }
+                // then call allOf with the array(=vararg)
+                il.append(factory.createInvoke(
+                        "org.hamcrest.CoreMatchers",
+                        "allOf",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        new Type[] { new ArrayType(new ObjectType("org.hamcrest.Matcher"), 1) },
+                        Constants.INVOKESTATIC));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            equalToMatcherExpr -> {
+                Var operand = equalToMatcherExpr.getOperand();
+                LocalVariableGen lv = locals.get(operand.getName());
+                il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                il.append(factory.createInvoke(
+                        "org.hamcrest.CoreMatchers",
+                        "is",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        new Type[] { lv.getType() },
+                        Constants.INVOKESTATIC));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
             suchThatMatcherExpr -> { return null; },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
