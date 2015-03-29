@@ -18,12 +18,16 @@ import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.LocalVariableGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.PUSH;
 import org.apache.bcel.generic.Type;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.IsNotStatement;
+import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TestMethod;
 import yokohama.unit.ast_junit.VarDeclVisitor;
+import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
@@ -113,15 +117,118 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             InstructionFactory factory,
             ConstantPoolGen cp) {
         statement.<Void>accept(
-            isStatement -> { return null; },
-            isNotStatement -> { return null; },
-            varInitStatement -> { return null; },
+            isStatement -> {
+                visitIsStatement(isStatement, locals, il, factory, cp);
+                return null;
+            },
+            isNotStatement -> {
+                visitIsNotStatement(isNotStatement, locals, il, factory, cp);
+                return null;
+            },
+            varInitStatement -> {
+                visitVarInitStatement(varInitStatement, locals, il, factory, cp);
+                return null;
+            },
             returnIsStatement -> { return null; },
             returnIsNotStatement -> { return null; },
             invokeVoidStatement -> { return null; },
             tryStatement -> { return null; },
             ifStatement -> { return null; }
         );
+    }
+
+    private void visitIsStatement(
+            IsStatement isStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen subject = locals.get(isStatement.getSubject().getName());
+        LocalVariableGen complement = locals.get(isStatement.getComplement().getName());
+        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
+        il.append(
+                factory.createInvoke(
+                        "org.junit.Assert",
+                        "assertThat",
+                        Type.VOID,
+                        new Type[] { subject.getType(), complement.getType() },
+                        Constants.INVOKESTATIC));
+    }
+
+    private void visitIsNotStatement(
+            IsNotStatement isNotStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen subject = locals.get(isNotStatement.getSubject().getName());
+        LocalVariableGen complement = locals.get(isNotStatement.getComplement().getName());
+        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
+        il.append(
+                factory.createInvoke(
+                        "org.hamcrest.CoreMatchers",
+                        "not",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        new Type[] { complement.getType() },
+                        Constants.INVOKESTATIC));
+        il.append(
+                factory.createInvoke(
+                        "org.junit.Assert",
+                        "assertThat",
+                        Type.VOID,
+                        new Type[] { subject.getType(), new ObjectType("org.hamcrest.Matcher") },
+                        Constants.INVOKESTATIC));
+    }
+
+    private void visitVarInitStatement(
+            VarInitStatement varInitStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen var = locals.get(varInitStatement.getName());
+        Type type = typeOf(varInitStatement.getType());
+        varInitStatement.getValue().<Void>accept(
+            varExpr -> {
+                LocalVariableGen from = locals.get(varExpr.getName());
+                il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            matcherExpr -> { return null; },
+            newExpr -> {
+                il.append(factory.createNew(newExpr.getType()));
+                il.append(InstructionConstants.DUP);
+                il.append(factory.createInvoke(
+                        newExpr.getType(),
+                        "<init>",
+                        Type.VOID,
+                        Type.NO_ARGS,
+                        Constants.INVOKESPECIAL));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            strLitExpr -> {
+                il.append(new PUSH(cp, strLitExpr.getText()));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            nullExpr -> {
+                il.append(InstructionConstants.ACONST_NULL);
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            invokeExpr -> { return null; },
+            invokeStaticExpr -> { return null; },
+            intLitExpr -> { return null; },
+            classLitExpr -> {
+                il.append(new PUSH(cp, new ObjectType(classLitExpr.getType().getText())));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
+            equalOpExp -> { return null; });
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {
