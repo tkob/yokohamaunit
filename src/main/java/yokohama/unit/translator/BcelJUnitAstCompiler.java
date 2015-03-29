@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
+import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionConstants;
@@ -15,6 +16,7 @@ import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
+import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TestMethod;
@@ -106,5 +108,31 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             tryStatement -> { return null; },
             ifStatement -> { return null; }
         );
+    }
+
+    static Type typeOf(yokohama.unit.ast_junit.Type type) {
+        int dims = type.getDims();
+        if (dims == 0) {
+            return type.getNonArrayType().accept(
+                    primitiveType -> {
+                        Kind kind = primitiveType.getKind();
+                        switch (kind) {
+                            case BOOLEAN: return Type.BOOLEAN;
+                            case BYTE:    return Type.BYTE;
+                            case SHORT:   return Type.SHORT;
+                            case INT:     return Type.INT;
+                            case LONG:    return Type.LONG;
+                            case CHAR:    return Type.CHAR;
+                            case FLOAT:   return Type.FLOAT;
+                            case DOUBLE:  return Type.DOUBLE;
+                        }
+                        throw new RuntimeException("should not reach here");
+                    },
+                    classType -> new ObjectType(classType.getText()));
+        } else {
+            return new ArrayType(
+                    typeOf(new yokohama.unit.ast_junit.Type(type.getNonArrayType() , 0)),
+                    dims);
+        }
     }
 }
