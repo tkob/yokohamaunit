@@ -18,8 +18,24 @@ public class VarInitStatement implements Statement {
                     sb.appendln(name, " = ", varExpr.getName(), ";");
                     return null;
                 },
-                matcherExpr -> {
-                    matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                instanceOfMatcherExpr -> {
+                    instanceOfMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    return null;
+                },
+                nullValueMatcherExpr -> {
+                    nullValueMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    return null;
+                },
+                conjunctionMatcherExpr -> {
+                    conjunctionMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    return null;
+                },
+                equalToMatcherExpr -> {
+                    equalToMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    return null;
+                },
+                suchThatMatcherExpr -> {
+                    suchThatMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
                     return null;
                 },
                 newExpr -> {

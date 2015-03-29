@@ -9,7 +9,11 @@
  * TestMethod ::= Statement*
  * 
  * Expr ::= VarExpr
- *        | MatcherExpr
+ *        | InstanceOfMatcherExpr
+ *        | NullValueMatcherExpr
+ *        | ConjunctionMatcherExpr 
+ *        | EqualToMatcherExpr
+ *        | SuchThatMatcherExpr 
  *        | NewExpr
  *        | StrLitExpr
  *        | NullExpr
@@ -22,12 +26,6 @@
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
- * 
- * MatcherExpr ::= InstanceOfMatcherExpr
- *               | NullValueMatcherExpr
- *               | ConjunctionMatcherExpr 
- *               | EqualToMatcherExpr
- *               | SuchThatMatcherExpr 
  * 
  * Statement ::= IsStatement
  *             | IsNotStatement

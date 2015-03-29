@@ -197,7 +197,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            matcherExpr -> { return null; },
+            instanceOfMatcherExpr -> { return null; },
+            nullValueMatcherExpr -> { return null; },
+            conjunctionMatcherExpr -> { return null; },
+            equalToMatcherExpr -> { return null; },
+            suchThatMatcherExpr -> { return null; },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);

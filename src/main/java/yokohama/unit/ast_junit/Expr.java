@@ -7,7 +7,11 @@ public interface Expr {
 
     default <T> T accept(
             Function<VarExpr, T> visitVarExpr_,
-            Function<MatcherExpr, T> visitMatcherExpr_,
+            Function<InstanceOfMatcherExpr, T> visitInstanceOfMatcherExpr_,
+            Function<NullValueMatcherExpr, T> visitNullValueMatcherExpr_,
+            Function<ConjunctionMatcherExpr, T> visitConjunctionMatcherExpr_,
+            Function<EqualToMatcherExpr, T> visitEqualToMatcherExpr_,
+            Function<SuchThatMatcherExpr, T> visitSuchThatMatcherExpr_,
             Function<NewExpr, T> visitNewExpr_,
             Function<StrLitExpr, T> visitStrLitExpr_,
             Function<NullExpr, T> visitNullExpr_,
@@ -23,8 +27,24 @@ public interface Expr {
                 return visitVarExpr_.apply(varExpr);
             }
             @Override
-            public T visitMatcherExpr(MatcherExpr matcherExpr) {
-                return visitMatcherExpr_.apply(matcherExpr);
+            public T visitInstanceOfMatcherExpr(InstanceOfMatcherExpr instanceOfMatcherExpr) {
+                return visitInstanceOfMatcherExpr_.apply(instanceOfMatcherExpr);
+            }
+            @Override
+            public T visitNullValueMatcherExpr(NullValueMatcherExpr nullValueMatcherExpr) {
+                return visitNullValueMatcherExpr_.apply(nullValueMatcherExpr);
+            }
+            @Override
+            public T visitConjunctionMatcherExpr(ConjunctionMatcherExpr conjunctionMatcherExpr) {
+                return visitConjunctionMatcherExpr_.apply(conjunctionMatcherExpr);
+            }
+            @Override
+            public T visitEqualToMatcherExpr(EqualToMatcherExpr equalToMatcherExpr) {
+                return visitEqualToMatcherExpr_.apply(equalToMatcherExpr);
+            }
+            @Override
+            public T visitSuchThatMatcherExpr(SuchThatMatcherExpr suchThatMatcherExpr) {
+                return visitSuchThatMatcherExpr_.apply(suchThatMatcherExpr);
             }
             @Override
             public T visitNewExpr(NewExpr newExpr) {

@@ -9,12 +9,11 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 @EqualsAndHashCode(callSuper=false)
-public class SuchThatMatcherExpr extends MatcherExpr {
+public class SuchThatMatcherExpr implements Expr {
     private List<Statement> statements;
     private String description;
     private Var argVar;
 
-    @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln(varName, " = new org.hamcrest.BaseMatcher() {");
         sb.shift();
@@ -47,5 +46,10 @@ public class SuchThatMatcherExpr extends MatcherExpr {
             sb.appendln("}");
         sb.unshift();
         sb.appendln("};");
+    }
+
+    @Override
+    public <T> T accept(ExprVisitor<T> visitor) {
+        return visitor.visitSuchThatMatcherExpr(this);
     }
 }

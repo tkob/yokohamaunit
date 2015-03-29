@@ -8,14 +8,18 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 @EqualsAndHashCode(callSuper = false)
-public class ConjunctionMatcherExpr extends MatcherExpr {
+public class ConjunctionMatcherExpr implements Expr {
     private final List<Var> matchers;
 
-    @Override
     public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
         sb.appendln(varName, " = org.hamcrest.CoreMatchers.allOf(",
                 matchers.stream().map(Var::getName).collect(Collectors.joining(", ")),
                 ");");
+    }
+
+    @Override
+    public <T> T accept(ExprVisitor<T> visitor) {
+        return visitor.visitConjunctionMatcherExpr(this);
     }
 
 }
