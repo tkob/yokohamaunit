@@ -11,7 +11,6 @@ import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
-import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.Span;
@@ -45,10 +44,14 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         nameVar.getName(),
                         new StrLitExpr(name),
                         Span.dummySpan()),
-                new InvokeVoidStatement(
-                        new Var(envVarName),
-                        "put",
-                        Arrays.asList(nameVar, rhs)));
+                new VarInitStatement(
+                        Type.OBJECT,
+                        genSym.generate("__"),
+                        new InvokeExpr(
+                                new Var(envVarName),
+                                "put",
+                                Arrays.asList(nameVar, rhs)),
+                        Span.dummySpan()));
     }
 
     @Override
