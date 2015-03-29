@@ -3,7 +3,9 @@ package yokohama.unit.translator;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
@@ -13,6 +15,7 @@ import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionConstants;
 import org.apache.bcel.generic.InstructionFactory;
 import org.apache.bcel.generic.InstructionList;
+import org.apache.bcel.generic.LocalVariableGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
@@ -20,6 +23,8 @@ import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.VarDeclVisitor;
+import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     @Override
@@ -81,20 +86,29 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         mg.addAnnotationEntry(ag);
         InstructionFactory factory = new InstructionFactory(cg);
 
+        Map<String, LocalVariableGen> locals = new HashMap<>();
+        for (Pair<yokohama.unit.ast_junit.Type,String> pair :
+                VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(testMethod))) {
+            yokohama.unit.ast_junit.Type type = pair.getFirst();
+            String name = pair.getSecond();
+            LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);
+            locals.put(name, lv);
+        }
+
         for (Statement statement : testMethod.getStatements()) {
-            visitStatement(statement, il, factory, cp);
+            visitStatement(statement, locals, il, factory, cp);
         }
 
         il.append(InstructionConstants.RETURN);
 
         mg.setMaxStack();
-        mg.setMaxLocals();
         cg.addMethod(mg.getMethod());
         il.dispose();
     }
 
     private void visitStatement(
             Statement statement,
+            Map<String, LocalVariableGen> locals,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
