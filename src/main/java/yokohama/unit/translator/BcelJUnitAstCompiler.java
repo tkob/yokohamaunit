@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
@@ -280,8 +281,48 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            invokeExpr -> { return null; },
-            invokeStaticExpr -> { return null; },
+            invokeExpr -> {
+                // first push target object
+                LocalVariableGen object = locals.get(invokeExpr.getObject().getName());
+                il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
+                // push arguments
+                for (Var arg : invokeExpr.getArgs()) {
+                    LocalVariableGen lv = locals.get(arg.getName());
+                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                }
+                // then call method
+                il.append(factory.createInvoke(
+                        object.getType().toString(), // TODO: ?
+                        invokeExpr.getMethodName(),
+                        var.getType(),
+                        invokeExpr.getArgs().stream()
+                                .map(Var::getName)
+                                .map(locals::get)
+                                .map(LocalVariableGen::getType)
+                                .collect(Collectors.toList())
+                                .toArray(new Type[]{}),
+                        Constants.INVOKEVIRTUAL));                
+                return null;
+            },
+            invokeStaticExpr -> {
+                for (Var arg : invokeStaticExpr.getArgs()) {
+                    LocalVariableGen lv = locals.get(arg.getName());
+                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                }
+                il.append(factory.createInvoke(
+                        invokeStaticExpr.getClazz().getText(),
+                        invokeStaticExpr.getMethodName(),
+                        var.getType(),
+                        invokeStaticExpr.getArgs().stream()
+                                .map(Var::getName)
+                                .map(locals::get)
+                                .map(LocalVariableGen::getType)
+                                .collect(Collectors.toList())
+                                .toArray(new Type[]{}),
+                        Constants.INVOKESTATIC));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
             intLitExpr -> { return null; },
             classLitExpr -> {
                 il.append(new PUSH(cp, new ObjectType(classLitExpr.getType().getText())));
