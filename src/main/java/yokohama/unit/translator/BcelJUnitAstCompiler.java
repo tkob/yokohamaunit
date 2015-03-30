@@ -323,7 +323,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            intLitExpr -> { return null; },
+            intLitExpr -> {
+                il.append(new PUSH(cp, intLitExpr.getValue()));
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                return null;
+            },
             classLitExpr -> {
                 il.append(new PUSH(cp, new ObjectType(classLitExpr.getType().getText())));
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
