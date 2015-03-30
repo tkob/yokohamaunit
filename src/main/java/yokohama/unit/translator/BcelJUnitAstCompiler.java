@@ -11,10 +11,12 @@ import java.util.stream.Collectors;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
+import org.apache.bcel.generic.BranchInstruction;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionConstants;
 import org.apache.bcel.generic.InstructionFactory;
+import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.LocalVariableGen;
 import org.apache.bcel.generic.MethodGen;
@@ -333,7 +335,30 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            equalOpExp -> { return null; });
+            equalOpExpr -> {
+                LocalVariableGen lhs = locals.get(equalOpExpr.getLhs().getName());
+                il.append(InstructionFactory.createLoad(lhs.getType(), lhs.getIndex()));
+                LocalVariableGen rhs = locals.get(equalOpExpr.getRhs().getName());
+                il.append(InstructionFactory.createLoad(rhs.getType(), rhs.getIndex()));
+
+                // if
+                BranchInstruction if_acmpne = InstructionFactory.createBranchInstruction(Constants.IF_ACMPNE, null);
+                il.append(if_acmpne);
+                // then
+                il.append(new PUSH(cp, true));
+                BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
+                il.append(goto_);
+                // else
+                InstructionHandle else_ = il.append(new PUSH(cp, false));
+
+                InstructionHandle store = il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+
+                // tie the knot
+                if_acmpne.setTarget(else_);
+                goto_.setTarget(store);
+
+                return null;
+            });
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {
