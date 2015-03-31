@@ -137,7 +137,35 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             returnIsNotStatement -> { return null; },
             invokeVoidStatement -> { return null; },
             tryStatement -> { return null; },
-            ifStatement -> { return null; }
+            ifStatement -> {
+                LocalVariableGen lv = locals.get(ifStatement.getCond().getName());
+                il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+
+                // if
+                BranchInstruction ifeq  = InstructionFactory.createBranchInstruction(Constants.IFEQ, null);
+                il.append(ifeq);
+
+                // then
+                for (Statement thenStatement : ifStatement.getThen()) {
+                    visitStatement(thenStatement, locals, il, factory, cp);
+                }
+                BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
+                il.append(goto_);
+
+                // else
+                InstructionHandle else_ = il.append(InstructionFactory.NOP);
+                for (Statement elseStatement : ifStatement.getOtherwise()) {
+                    visitStatement(elseStatement, locals, il, factory, cp);
+                }
+
+                InstructionHandle fi = il.append(InstructionFactory.NOP);
+
+                // tie the knot
+                ifeq.setTarget(else_);
+                goto_.setTarget(fi);
+
+                return null;
+            }
         );
     }
 
