@@ -9,6 +9,7 @@ import yokohama.unit.util.SBuilder;
 public class InvokeExpr implements Expr {
     Var object;
     String methodName;
+    List<Type> argTypes;
     List<Var> args;
 
     public void getExpr(SBuilder sb, String varName) {

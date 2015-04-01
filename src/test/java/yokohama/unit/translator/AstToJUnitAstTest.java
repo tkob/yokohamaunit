@@ -103,7 +103,10 @@ public class AstToJUnitAstTest {
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
+                        new ClassType("ognl.Ognl", Span.dummySpan()),
+                        Arrays.asList(),
+                        "getValue",
+                        Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
                                 new Var("env"))),
@@ -111,7 +114,10 @@ public class AstToJUnitAstTest {
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
+                        new ClassType("ognl.Ognl", Span.dummySpan()),
+                        Arrays.asList(),
+                        "getValue",
+                        Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
                                 new Var("env"))),
@@ -141,7 +147,10 @@ public class AstToJUnitAstTest {
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
+                        new ClassType("ognl.Ognl", Span.dummySpan()),
+                        Arrays.asList(),
+                        "getValue",
+                        Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
                                 new Var("env"))),
@@ -149,7 +158,10 @@ public class AstToJUnitAstTest {
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
-                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
+                        new ClassType("ognl.Ognl", Span.dummySpan()),
+                        Arrays.asList(),
+                        "getValue",
+                        Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
                                 new Var("env"))),
@@ -179,7 +191,10 @@ public class AstToJUnitAstTest {
                         Arrays.asList(
                                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                                 new VarInitStatement(Type.OBJECT, "tmp", new InvokeStaticExpr(
-                                        new ClassType("ognl.Ognl", Span.dummySpan()), Arrays.asList(), "getValue",
+                                        new ClassType("ognl.Ognl", Span.dummySpan()),
+                                        Arrays.asList(),
+                                        "getValue",
+                                        Arrays.asList(Type.STRING, Type.OBJECT),
                                         Arrays.asList(
                                                 new Var("expression"),
                                                 new Var("env"))),
@@ -193,7 +208,11 @@ public class AstToJUnitAstTest {
                                                 new VarInitStatement(
                                                         Type.THROWABLE,
                                                         "reason",
-                                                        new InvokeExpr(new Var("ex"), "getReason", Arrays.asList()),
+                                                        new InvokeExpr(
+                                                                new Var("ex"),
+                                                                "getReason",
+                                                                Arrays.asList(),
+                                                                Arrays.asList()),
                                                         Span.dummySpan()),
                                                 new VarInitStatement(
                                                         Type.THROWABLE,

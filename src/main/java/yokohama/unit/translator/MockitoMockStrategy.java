@@ -69,8 +69,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                 MOCKITO,
                                 Arrays.asList(new Type(new ClassType(classToStub.getName(), Span.dummySpan()), 0)),
                                 "mock",
-                                Arrays.asList(
-                                        classToStubVar)),
+                                Arrays.asList(Type.CLASS),
+                                Arrays.asList(classToStubVar)),
                        span));
     }
 
@@ -136,7 +136,9 @@ public class MockitoMockStrategy implements MockStrategy {
                                             MOCKITO,
                                             Arrays.asList(
                                                     Type.of(argumentTypes.get(argumentTypes.size() - 1)).toArray()),
-                                            "anyVararg", Arrays.asList()),
+                                            "anyVararg",
+                                            Arrays.asList(),
+                                            Arrays.asList()),
                                     span)));
         } else {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
@@ -155,6 +157,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         new InvokeExpr(
                                 new Var(varName),
                                 methodName,
+                                methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
                                 argVars.collect(Collectors.toList())),
                         span),
                 new VarInitStatement(
@@ -164,12 +167,14 @@ public class MockitoMockStrategy implements MockStrategy {
                                 MOCKITO,
                                 Arrays.asList(),
                                 "when",
+                                Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(invokeVarName))),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
                                 new Var(stubbingVarName),
                                 "thenReturn",
+                                Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(returnedVarName))),
                         span));
 
@@ -196,49 +201,81 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.BOOLEAN, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyBoolean", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyBoolean",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case BYTE:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.BYTE, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyByte", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyByte",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case SHORT:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.SHORT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyShort", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyShort",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case INT:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.INT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyInt", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyInt",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case LONG:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.LONG, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyLong", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyLong",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case CHAR:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.CHAR, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyChar", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyChar",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case FLOAT:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.FLOAT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyFloat", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyFloat",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             case DOUBLE:
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.DOUBLE, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO, Arrays.asList(), "anyDouble", Arrays.asList()),
+                                                        MOCKITO,
+                                                        Arrays.asList(),
+                                                        "anyDouble",
+                                                        Arrays.asList(),
+                                                        Arrays.asList()),
                                                 span));
                             default:
                                 throw new RuntimeException("should not reach here");
@@ -264,6 +301,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                                 MOCKITO,
                                                 Arrays.asList(type),
                                                 "isA",
+                                                Arrays.asList(Type.CLASS),
                                                 Arrays.asList(new Var(clazzVarName))),
                                         Span.dummySpan()));
                     }
@@ -278,6 +316,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                             MOCKITO,
                                             Arrays.asList(type),
                                             "isA",
+                                            Arrays.asList(Type.CLASS),
                                             Arrays.asList(new Var(clazzVarName))),
                                     Span.dummySpan()));
                 });

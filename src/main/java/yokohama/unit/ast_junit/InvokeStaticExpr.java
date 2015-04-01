@@ -10,6 +10,7 @@ public class InvokeStaticExpr implements Expr {
     ClassType clazz;
     List<Type> typeArgs;
     String methodName;
+    List<Type> argTypes;
     List<Var> args;
 
     public void getExpr(SBuilder sb, String varName) {

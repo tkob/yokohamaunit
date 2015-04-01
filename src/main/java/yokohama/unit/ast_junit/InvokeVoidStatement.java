@@ -9,6 +9,7 @@ import yokohama.unit.util.SBuilder;
 public class InvokeVoidStatement implements Statement {
     private final Var object;
     private final String methodName;
+    List<Type> argTypes;
     private final List<Var> args;
 
     @Override
