@@ -325,10 +325,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         object.getType().toString(), // TODO: ?
                         invokeExpr.getMethodName(),
                         var.getType(),
-                        invokeExpr.getArgs().stream()
-                                .map(Var::getName)
-                                .map(locals::get)
-                                .map(LocalVariableGen::getType)
+                        invokeExpr.getArgTypes().stream()
+                                .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
                         Constants.INVOKEVIRTUAL));                
@@ -343,10 +341,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         invokeStaticExpr.getClazz().getText(),
                         invokeStaticExpr.getMethodName(),
                         var.getType(),
-                        invokeStaticExpr.getArgs().stream()
-                                .map(Var::getName)
-                                .map(locals::get)
-                                .map(LocalVariableGen::getType)
+                        invokeStaticExpr.getArgTypes().stream()
+                                .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
                         Constants.INVOKESTATIC));
