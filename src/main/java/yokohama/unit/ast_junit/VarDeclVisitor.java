@@ -44,6 +44,8 @@ public class VarDeclVisitor {
     }
 
     public Stream<Pair<Type, String>> visitCatchClause(CatchClause catchClause) { 
-        return visitStatements(catchClause.getStatements());
+        return Stream.concat(
+                Stream.of(new Pair<>(catchClause.getClassType().toType(), catchClause.getVar().getName())),
+                visitStatements(catchClause.getStatements()));
     }
 }
