@@ -13,6 +13,10 @@ public class ClassType implements NonArrayType {
         return name;
     }
 
+    public Type toType() {
+        return new Type(this, 0);
+    }
+
     public static ClassType of(yokohama.unit.ast.ClassType classType) {
         return new ClassType(
                 classType.getName(),
