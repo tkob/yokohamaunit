@@ -330,6 +330,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
                         Constants.INVOKEVIRTUAL));                
+
+                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             invokeStaticExpr -> {
