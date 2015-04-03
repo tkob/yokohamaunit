@@ -2,6 +2,7 @@ package yokohama.unit.translator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUSH;
 import org.apache.bcel.generic.Type;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
@@ -104,7 +106,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         }
 
         for (Statement statement : testMethod.getStatements()) {
-            visitStatement(statement, locals, il, factory, cp);
+            visitStatement(statement, locals, mg, il, factory, cp);
         }
 
         il.append(InstructionConstants.RETURN);
@@ -117,6 +119,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitStatement(
             Statement statement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
@@ -136,7 +139,45 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             returnIsStatement -> { return null; },
             returnIsNotStatement -> { return null; },
             invokeVoidStatement -> { return null; },
-            tryStatement -> { return null; },
+            tryStatement -> {
+                InstructionHandle startTry = il.append(InstructionFactory.NOP);
+                for (Statement s : tryStatement.getTryStatements()) {
+                    visitStatement(s, locals, mg, il, factory, cp);
+                }
+                InstructionHandle endTry = il.append(InstructionFactory.NOP);
+                BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
+                il.append(goto_);
+
+                List<BranchInstruction> catchExits = new ArrayList<>();
+                for (CatchClause catchClause : tryStatement.getCatchClauses()) {
+                    LocalVariableGen ex = locals.get(catchClause.getVar().getName());
+                    InstructionHandle startCatch = il.append(
+                            InstructionFactory.createStore(ex.getType(), ex.getIndex()));
+                    mg.addExceptionHandler(
+                            startTry,
+                            endTry,
+                            startCatch,
+                            (ObjectType)typeOf(catchClause.getClassType().toType()));
+                    for (Statement s : catchClause.getStatements()) {
+                        this.visitStatement(s, locals, mg, il, factory, cp);
+                    }
+                    BranchInstruction exitCatch = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
+                    il.append(exitCatch);
+                    catchExits.add(exitCatch);
+                }
+
+                InstructionHandle startFinally = il.append(InstructionFactory.NOP);
+                for (Statement s : tryStatement.getFinallyStatements()) {
+                    visitStatement(s, locals, mg, il, factory, cp);
+                }
+
+                goto_.setTarget(startFinally);
+                for (BranchInstruction bi : catchExits) {
+                    bi.setTarget(startFinally);
+                }
+
+                return null;
+            },
             ifStatement -> {
                 LocalVariableGen lv = locals.get(ifStatement.getCond().getName());
                 il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
@@ -147,7 +188,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
 
                 // then
                 for (Statement thenStatement : ifStatement.getThen()) {
-                    visitStatement(thenStatement, locals, il, factory, cp);
+                    visitStatement(thenStatement, locals, mg, il, factory, cp);
                 }
                 BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
                 il.append(goto_);
@@ -155,7 +196,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 // else
                 InstructionHandle else_ = il.append(InstructionFactory.NOP);
                 for (Statement elseStatement : ifStatement.getOtherwise()) {
-                    visitStatement(elseStatement, locals, il, factory, cp);
+                    visitStatement(elseStatement, locals, mg, il, factory, cp);
                 }
 
                 InstructionHandle fi = il.append(InstructionFactory.NOP);
