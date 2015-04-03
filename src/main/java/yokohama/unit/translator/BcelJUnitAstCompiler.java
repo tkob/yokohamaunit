@@ -52,7 +52,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 null // implemented interfaces
         );
         // set class file version to Java 1.6
-        cg.setMajor(50);
+        cg.setMajor(49);
         cg.setMinor(0);
         
         ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
