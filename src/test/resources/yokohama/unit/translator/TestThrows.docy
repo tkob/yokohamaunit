@@ -1,8 +1,8 @@
 Test: Division by zero
-Assert that `1 / 0` throws an instance of `ArithmeticException`.
+Assert that `1 / 0` throws an instance of `java.lang.ArithmeticException`.
 
 Test: NPO
-Assert that `null.toString()` throws an instance of `NullPointerException`.
+Assert that `null.toString()` throws an instance of `java.lang.NullPointerException`.
 
 Test: UnsupportedEncodingException
 Assert that `"".getBytes("")` throws an instance of `java.io.UnsupportedEncodingException`.
