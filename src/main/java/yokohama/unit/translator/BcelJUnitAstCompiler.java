@@ -184,7 +184,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         "org.junit.Assert",
                         "assertThat",
                         Type.VOID,
-                        new Type[] { subject.getType(), complement.getType() },
+                        new Type[] { Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
                         Constants.INVOKESTATIC));
     }
 
@@ -210,7 +210,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         "org.junit.Assert",
                         "assertThat",
                         Type.VOID,
-                        new Type[] { subject.getType(), new ObjectType("org.hamcrest.Matcher") },
+                        new Type[] { Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
                         Constants.INVOKESTATIC));
     }
 
