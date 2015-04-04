@@ -40,7 +40,47 @@ public class Type {
         return new Type(nonArrayType, dims + 1);
     }
 
+    public Class<?> toClass() {
+        if (dims > 0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else {
+            return nonArrayType.accept(
+                    primitiveType -> {
+                            switch (primitiveType.getKind()) {
+                                case BOOLEAN: return Boolean.TYPE;
+                                case BYTE:    return Byte.TYPE;
+                                case SHORT:   return Short.TYPE;
+                                case INT:     return Integer.TYPE;
+                                case LONG:    return Long.TYPE;
+                                case CHAR:    return Character.TYPE;
+                                case FLOAT:   return Float.TYPE;
+                                case DOUBLE:  return Double.TYPE;
+                            }
+                            throw new RuntimeException("should not reach here");
+                    },
+                    classType -> classType.toClass());
+        }
+    }
+
     public static Type of(yokohama.unit.ast.Type type) {
         return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
+    }
+
+    public static Type fromClass(Class<?> clazz) {
+        if (clazz.isArray()) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else if (clazz.isPrimitive()) {
+            if      (clazz.equals(  Boolean.TYPE)) { return BOOLEAN; }
+            else if (clazz.equals(     Byte.TYPE)) { return BYTE;    }
+            else if (clazz.equals(    Short.TYPE)) { return SHORT;   }
+            else if (clazz.equals(  Integer.TYPE)) { return INT;     }
+            else if (clazz.equals(     Long.TYPE)) { return LONG;    }
+            else if (clazz.equals(Character.TYPE)) { return CHAR;    }
+            else if (clazz.equals(    Float.TYPE)) { return FLOAT;   }
+            else if (clazz.equals(   Double.TYPE)) { return DOUBLE;  }
+            else { throw new RuntimeException("should not reach here"); }
+        } else {
+            return new ClassType(clazz.getName(), Span.dummySpan()).toType();
+        }
     }
 }
