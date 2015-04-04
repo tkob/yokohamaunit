@@ -28,10 +28,10 @@ Assert that
     and `s.get(@yokohama.unit.translator.DummyStub@float2d)` is `@yokohama.unit.translator.DummyStub@float2d`
     and `s.get(@yokohama.unit.translator.DummyStub@double2d)` is `@yokohama.unit.translator.DummyStub@double2d`
     and `s.get(@yokohama.unit.translator.DummyStub@string2d)` is `@yokohama.unit.translator.DummyStub@string2d`
-    and `s.getVararg(new Object[0])` is `"hello"`
+    and `s.getVararg(new java.lang.Object[0])` is `"hello"`
     and `s.getVararg("hello")` is `"hello"`
     and `s.getVararg("hello", "hello")` is `"hello"`
-    and `s.getVararg(42, new Object[0])` is `42`
+    and `s.getVararg(42, new java.lang.Object[0])` is `42`
     and `s.getVararg(42, "hello")` is `42`
     and `s.getVararg(42, "hello", "hello")` is `42`
 where s is a stub of `yokohama.unit.translator.DummyStub` such that
@@ -43,7 +43,7 @@ where s is a stub of `yokohama.unit.translator.DummyStub` such that
     and method `get(char)` returns `'a'`
     and method `get(float)` returns `3.14F`
     and method `get(double)` returns `3.15D`
-    and method `get(String)` returns `"hello"`
+    and method `get(java.lang.String)` returns `"hello"`
     and method `get(boolean[])` returns `new boolean[0]`
     and method `get(byte[])` returns `new byte[0]`
     and method `get(short[])` returns `new short[0]`
@@ -52,7 +52,7 @@ where s is a stub of `yokohama.unit.translator.DummyStub` such that
     and method `get(char[])` returns `new char[0]`
     and method `get(float[])` returns `new float[0]`
     and method `get(double[])` returns `new double[0]`
-    and method `get(String[])` returns `new String[0]`
+    and method `get(java.lang.String[])` returns `new String[0]`
     and method `get(boolean[][])` returns `@yokohama.unit.translator.DummyStub@boolean2d`
     and method `get(byte[][])` returns `@yokohama.unit.translator.DummyStub@byte2d`
     and method `get(short[][])` returns `@yokohama.unit.translator.DummyStub@short2d`
@@ -61,6 +61,6 @@ where s is a stub of `yokohama.unit.translator.DummyStub` such that
     and method `get(char[][])` returns `@yokohama.unit.translator.DummyStub@char2d`
     and method `get(float[][])` returns `@yokohama.unit.translator.DummyStub@float2d`
     and method `get(double[][])` returns `@yokohama.unit.translator.DummyStub@double2d`
-    and method `get(String[][])` returns `@yokohama.unit.translator.DummyStub@string2d`
-    and method `getVararg(Object...)` returns `"hello"`
-    and method `getVararg(int, Object...)` returns `42`.
+    and method `get(java.lang.String[][])` returns `@yokohama.unit.translator.DummyStub@string2d`
+    and method `getVararg(java.lang.Object...)` returns `"hello"`
+    and method `getVararg(int, java.lang.Object...)` returns `42`.
