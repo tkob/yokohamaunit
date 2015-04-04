@@ -17,6 +17,10 @@ public class ClassType implements NonArrayType {
         return new Type(this, 0);
     }
 
+    public Class<?> toClass() throws ClassNotFoundException {
+        return Class.forName(name);
+    }
+
     public static ClassType of(yokohama.unit.ast.ClassType classType) {
         return new ClassType(
                 classType.getName(),
