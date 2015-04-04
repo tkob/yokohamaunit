@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
@@ -95,7 +96,7 @@ public class MockitoMockStrategy implements MockStrategy {
         String methodName = methodPattern.getName();
         boolean isVarArg = methodPattern.isVarArg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getArgumentTypes();
-        Type returnType = this.getReturnType(classToStub, methodName, argumentTypes);
+        Type returnType = getReturnType(classToStub, methodName, argumentTypes, isVarArg);
 
         String returnedVarName = genSym.generate("returned");
         Stream<Statement> returned = behavior.getToBeReturned().accept(
@@ -370,16 +371,22 @@ public class MockitoMockStrategy implements MockStrategy {
     private Type getReturnType(
             yokohama.unit.ast.ClassType classToStub,
             String methodName,
-            List<yokohama.unit.ast.Type> argumentTypes) {
+            List<yokohama.unit.ast.Type> argumentTypes,
+            boolean isVarArg) {
         try {
             Class<?> clazz = Class.forName(classToStub.getName());
             Method method = clazz.getMethod(
                     methodName,
-                    argumentTypes.stream()
-                            .map(Type::of)
-                            .map(Type::toClass)
-                            .collect(Collectors.toList())
-                            .toArray(new Class[]{}));
+                    (isVarArg
+                            ? ListUtils.union(
+                                    argumentTypes.subList(0, argumentTypes.size() - 1),
+                                    Arrays.asList(
+                                            argumentTypes.get(argumentTypes.size() - 1).toArray())) 
+                            : argumentTypes).stream()
+                                    .map(Type::of)
+                                    .map(Type::toClass)
+                                    .collect(Collectors.toList())
+                                    .toArray(new Class[]{}));
             return Type.fromClass(method.getReturnType());
         } catch (ClassNotFoundException | NoSuchMethodException ex) {
             throw new RuntimeException(ex);
