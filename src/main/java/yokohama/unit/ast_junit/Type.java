@@ -36,6 +36,12 @@ public class Type {
                 classType -> this);
     }
 
+    public boolean isPrimitive() {
+        return dims == 0 && nonArrayType.accept(
+                primitiveType -> true,
+                classType -> false);
+    }
+
     public Type toArray() {
         return new Type(nonArrayType, dims + 1);
     }
