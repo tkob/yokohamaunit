@@ -29,6 +29,7 @@ import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
@@ -424,7 +425,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
-                        Constants.INVOKEVIRTUAL));                
+                        invokeExpr.getInstruction() == InvokeExpr.Instruction.VIRTUAL
+                                ? Constants.INVOKEVIRTUAL
+                                : Constants.INVOKEINTERFACE));                
 
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
