@@ -12,6 +12,7 @@ public class InvokeStaticExpr implements Expr {
     String methodName;
     List<Type> argTypes;
     List<Var> args;
+    Type returnType; // erasued return type
 
     public void getExpr(SBuilder sb, String varName) {
         sb.appendln(varName, " = ", clazz.getName(), ".", 

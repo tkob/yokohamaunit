@@ -70,7 +70,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(new Type(new ClassType(classToStub.getName(), Span.dummySpan()), 0)),
                                 "mock",
                                 Arrays.asList(Type.CLASS),
-                                Arrays.asList(classToStubVar)),
+                                Arrays.asList(classToStubVar),
+                                Type.OBJECT),
                        span));
     }
 
@@ -138,7 +139,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                     Type.of(argumentTypes.get(argumentTypes.size() - 1)).toArray()),
                                             "anyVararg",
                                             Arrays.asList(),
-                                            Arrays.asList()),
+                                            Arrays.asList(),
+                                            Type.OBJECT),
                                     span)));
         } else {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
@@ -158,7 +160,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                 new Var(varName),
                                 methodName,
                                 methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
-                                argVars.collect(Collectors.toList())),
+                                argVars.collect(Collectors.toList()),
+                                Type.OBJECT), // TODO: should be infered?
                         span),
                 new VarInitStatement(
                         new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0),
@@ -168,14 +171,16 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(),
                                 "when",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Var(invokeVarName))),
+                                Arrays.asList(new Var(invokeVarName)),
+                                new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0)),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
                                 new Var(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Var(returnedVarName))),
+                                Arrays.asList(new Var(returnedVarName)),
+                                new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0)),
                         span));
 
         return Stream.concat(
@@ -205,7 +210,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyBoolean",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.BOOLEAN),
                                                 span));
                             case BYTE:
                                 return Stream.<Statement>of(
@@ -215,7 +221,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyByte",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.BYTE),
                                                 span));
                             case SHORT:
                                 return Stream.<Statement>of(
@@ -225,7 +232,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyShort",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.SHORT),
                                                 span));
                             case INT:
                                 return Stream.<Statement>of(
@@ -235,7 +243,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyInt",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.INT),
                                                 span));
                             case LONG:
                                 return Stream.<Statement>of(
@@ -245,7 +254,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyLong",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.LONG),
                                                 span));
                             case CHAR:
                                 return Stream.<Statement>of(
@@ -255,7 +265,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyChar",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.CHAR),
                                                 span));
                             case FLOAT:
                                 return Stream.<Statement>of(
@@ -265,7 +276,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyFloat",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.FLOAT),
                                                 span));
                             case DOUBLE:
                                 return Stream.<Statement>of(
@@ -275,7 +287,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                         Arrays.asList(),
                                                         "anyDouble",
                                                         Arrays.asList(),
-                                                        Arrays.asList()),
+                                                        Arrays.asList(),
+                                                        Type.DOUBLE),
                                                 span));
                             default:
                                 throw new RuntimeException("should not reach here");
@@ -302,7 +315,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                 Arrays.asList(type),
                                                 "isA",
                                                 Arrays.asList(Type.CLASS),
-                                                Arrays.asList(new Var(clazzVarName))),
+                                                Arrays.asList(new Var(clazzVarName)),
+                                                Type.OBJECT),
                                         Span.dummySpan()));
                     }
                 },
@@ -317,7 +331,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Arrays.asList(type),
                                             "isA",
                                             Arrays.asList(Type.CLASS),
-                                            Arrays.asList(new Var(clazzVarName))),
+                                            Arrays.asList(new Var(clazzVarName)),
+                                            Type.OBJECT),
                                     Span.dummySpan()));
                 });
         return new Pair<>(new Var(argVarName), statements);

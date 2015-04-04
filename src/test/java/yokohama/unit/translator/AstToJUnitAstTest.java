@@ -109,7 +109,8 @@ public class AstToJUnitAstTest {
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
-                                new Var("env"))),
+                                new Var("env")),
+                        Type.OBJECT),
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
@@ -120,7 +121,8 @@ public class AstToJUnitAstTest {
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
-                                new Var("env"))),
+                                new Var("env")),
+                        Type.OBJECT),
                         Span.dummySpan()),
                 // is `b`
                 new VarInitStatement(
@@ -153,7 +155,8 @@ public class AstToJUnitAstTest {
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
-                                new Var("env"))),
+                                new Var("env")),
+                        Type.OBJECT),
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
@@ -164,7 +167,8 @@ public class AstToJUnitAstTest {
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
-                                new Var("env"))),
+                                new Var("env")),
+                        Type.OBJECT),
                         Span.dummySpan()),
                 // is not `b`
                 new VarInitStatement(
@@ -197,7 +201,8 @@ public class AstToJUnitAstTest {
                                         Arrays.asList(Type.STRING, Type.OBJECT),
                                         Arrays.asList(
                                                 new Var("expression"),
-                                                new Var("env"))),
+                                                new Var("env")),
+                                        Type.OBJECT),
                                         Span.dummySpan()),
                                 new VarInitStatement(Type.THROWABLE, "actual", new NullExpr(), Span.dummySpan())),
                         Arrays.asList(
@@ -212,7 +217,8 @@ public class AstToJUnitAstTest {
                                                                 new Var("ex"),
                                                                 "getReason",
                                                                 Arrays.asList(),
-                                                                Arrays.asList()),
+                                                                Arrays.asList(),
+                                                                Type.THROWABLE),
                                                         Span.dummySpan()),
                                                 new VarInitStatement(
                                                         Type.THROWABLE,

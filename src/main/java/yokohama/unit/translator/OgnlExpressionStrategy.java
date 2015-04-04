@@ -51,7 +51,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 new Var(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
-                                Arrays.asList(nameVar, rhs)),
+                                Arrays.asList(nameVar, rhs),
+                                Type.OBJECT),
                         Span.dummySpan()));
     }
 
@@ -68,7 +69,12 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         new VarInitStatement(
                                 Type.THROWABLE,
                                 reasonVar.getName(),
-                                new InvokeExpr(caughtVar, "getReason", Arrays.asList(), Arrays.asList()),
+                                new InvokeExpr(
+                                        caughtVar,
+                                        "getReason",
+                                        Arrays.asList(),
+                                        Arrays.asList(),
+                                        Type.THROWABLE),
                                 Span.dummySpan()),
                         new VarInitStatement(
                                 Type.THROWABLE,
@@ -121,7 +127,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING, Type.OBJECT),
                                 Arrays.asList(
                                         exprVar,
-                                        new Var(envVarName))),
+                                        new Var(envVarName)),
+                                Type.OBJECT),
                         span));
     }
 }
