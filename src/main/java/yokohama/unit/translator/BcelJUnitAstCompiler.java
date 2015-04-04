@@ -101,6 +101,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(testMethod))) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
             String name = pair.getSecond();
+            if (locals.containsKey(name))
+                throw new RuntimeException("duplicate local variable: " + name);
             LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);
             locals.put(name, lv);
         }
