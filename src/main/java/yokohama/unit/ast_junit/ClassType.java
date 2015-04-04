@@ -1,6 +1,8 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.Value;
 
 @Value
@@ -17,8 +19,12 @@ public class ClassType implements NonArrayType {
         return new Type(this, 0);
     }
 
-    public Class<?> toClass() throws ClassNotFoundException {
-        return Class.forName(name);
+    public Class<?> toClass() {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public static ClassType of(yokohama.unit.ast.ClassType classType) {
