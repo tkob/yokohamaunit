@@ -94,7 +94,8 @@ public class Type {
 
     public static Type fromClass(Class<?> clazz) {
         if (clazz.isArray()) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            Type componentType = fromClass(clazz.getComponentType());
+            return new Type(componentType.getNonArrayType(), componentType.getDims() + 1);
         } else if (clazz.isPrimitive()) {
             if      (clazz.equals(  Boolean.TYPE)) { return BOOLEAN; }
             else if (clazz.equals(     Byte.TYPE)) { return BYTE;    }
