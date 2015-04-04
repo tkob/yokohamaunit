@@ -1,8 +1,6 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Value;
 
 @Value
