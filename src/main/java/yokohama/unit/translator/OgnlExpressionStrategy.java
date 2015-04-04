@@ -57,8 +57,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public CatchClause catchAndAssignCause(String caughtVarName, String causeVarName, GenSym genSym) {
-        Var caughtVar = new Var(caughtVarName);
+    public CatchClause catchAndAssignCause(String causeVarName, GenSym genSym) {
+        Var caughtVar = new Var(genSym.generate("ex"));
         Var reasonVar = new Var(genSym.generate("reason"));
         Var nullValueVar = new Var(genSym.generate("nullValue"));
         Var condVar = new Var(genSym.generate("cond"));
@@ -92,7 +92,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                         new VarInitStatement(
                                                 Type.THROWABLE,
                                                 causeVarName,
-                                                new VarExpr(caughtVarName),
+                                                new VarExpr(caughtVar.getName()),
                                                 Span.dummySpan())),
                                 Arrays.asList(
                                         new VarInitStatement(

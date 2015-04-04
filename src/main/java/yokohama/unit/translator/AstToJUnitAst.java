@@ -274,7 +274,7 @@ public class AstToJUnitAst {
                                 statements,
                                 Arrays.asList(new VarInitStatement(
                                         Type.THROWABLE, actual, new NullExpr(), Span.dummySpan()))),
-                        Arrays.asList(expressionStrategy.catchAndAssignCause(e, actual, genSym),
+                        Arrays.asList(expressionStrategy.catchAndAssignCause(actual, genSym),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var(e),
