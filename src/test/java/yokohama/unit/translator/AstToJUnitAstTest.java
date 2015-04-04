@@ -214,6 +214,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE,
                                                         "reason",
                                                         new InvokeExpr(
+                                                                InvokeExpr.Instruction.VIRTUAL,
                                                                 new Var("ex2"),
                                                                 "getReason",
                                                                 Arrays.asList(),

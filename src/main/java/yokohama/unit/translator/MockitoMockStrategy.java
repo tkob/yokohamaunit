@@ -161,6 +161,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 Stream.of(
                         new VarInitStatement(returnType, invokeTmpVarName, 
                                 new InvokeExpr(
+                                        isInterface(classToStub) ? InvokeExpr.Instruction.INTERFACE : InvokeExpr.Instruction.VIRTUAL,
                                         new Var(varName),
                                         methodName,
                                         methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
@@ -203,6 +204,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
+                                InvokeExpr.Instruction.INTERFACE,
                                 new Var(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
@@ -380,6 +382,14 @@ public class MockitoMockStrategy implements MockStrategy {
                             .toArray(new Class[]{}));
             return Type.fromClass(method.getReturnType());
         } catch (ClassNotFoundException | NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private boolean isInterface(yokohama.unit.ast.ClassType classType) {
+        try {
+            return Class.forName(classType.getName()).isInterface();
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         }
     }

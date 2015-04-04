@@ -48,6 +48,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.OBJECT,
                         genSym.generate("__"),
                         new InvokeExpr(
+                                InvokeExpr.Instruction.VIRTUAL,
                                 new Var(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
@@ -70,6 +71,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Type.THROWABLE,
                                 reasonVar.getName(),
                                 new InvokeExpr(
+                                        InvokeExpr.Instruction.VIRTUAL,
                                         caughtVar,
                                         "getReason",
                                         Arrays.asList(),

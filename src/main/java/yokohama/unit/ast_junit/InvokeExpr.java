@@ -7,6 +7,7 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class InvokeExpr implements Expr {
+    Instruction instruction;
     Var object;
     String methodName;
     List<Type> argTypes;
@@ -22,4 +23,7 @@ public class InvokeExpr implements Expr {
         return visitor.visitInvokeExpr(this);
     }
     
+    public enum Instruction {
+        VIRTUAL, INTERFACE
+    }
 }
