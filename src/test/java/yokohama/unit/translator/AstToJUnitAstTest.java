@@ -208,13 +208,13 @@ public class AstToJUnitAstTest {
                         Arrays.asList(
                                 new CatchClause(
                                         new ClassType("ognl.OgnlException", Span.dummySpan()),
-                                        new Var("ex"),
+                                        new Var("ex2"),
                                         Arrays.asList(
                                                 new VarInitStatement(
                                                         Type.THROWABLE,
                                                         "reason",
                                                         new InvokeExpr(
-                                                                new Var("ex"),
+                                                                new Var("ex2"),
                                                                 "getReason",
                                                                 Arrays.asList(),
                                                                 Arrays.asList(),
@@ -236,7 +236,7 @@ public class AstToJUnitAstTest {
                                                                 new VarInitStatement(
                                                                         Type.THROWABLE,
                                                                         "actual",
-                                                                        new VarExpr("ex"),
+                                                                        new VarExpr("ex2"),
                                                                         Span.dummySpan())),
                                                         Arrays.asList(
                                                                 new VarInitStatement(
