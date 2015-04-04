@@ -419,7 +419,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(factory.createInvoke(
                         object.getType().toString(), // TODO: ?
                         invokeExpr.getMethodName(),
-                        var.getType(),
+                        typeOf(invokeExpr.getReturnType()),
                         invokeExpr.getArgTypes().stream()
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
@@ -437,7 +437,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(factory.createInvoke(
                         invokeStaticExpr.getClazz().getText(),
                         invokeStaticExpr.getMethodName(),
-                        var.getType(),
+                        typeOf(invokeStaticExpr.getReturnType()),
                         invokeStaticExpr.getArgTypes().stream()
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
