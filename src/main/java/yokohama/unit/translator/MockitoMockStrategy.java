@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,7 @@ public class MockitoMockStrategy implements MockStrategy {
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         varName,
+                        classToStub,
                         b,
                         expressionStrategy,
                         envVarName,
@@ -77,6 +79,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
     private Stream<Statement> defineBehavior(
             String varName,
+            yokohama.unit.ast.ClassType classToStub,
             StubBehavior behavior,
             ExpressionStrategy expressionStrategy,
             String envVarName,
@@ -92,6 +95,7 @@ public class MockitoMockStrategy implements MockStrategy {
         String methodName = methodPattern.getName();
         boolean isVarArg = methodPattern.isVarArg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getArgumentTypes();
+        Type returnType = this.getReturnType(classToStub, methodName, argumentTypes);
 
         String returnedVarName = genSym.generate("returned");
         Stream<Statement> returned = behavior.getToBeReturned().accept(
@@ -150,19 +154,42 @@ public class MockitoMockStrategy implements MockStrategy {
             argMatchers = pairs.stream().flatMap(Pair::getSecond);
         }
 
-        // when ... thenReturn
+        // invoke the method
         String invokeVarName = genSym.generate("invoke");
+        String invokeTmpVarName = returnType.isPrimitive() ? genSym.generate("invoke") : invokeVarName;
+        Stream<Statement> invoke = Stream.concat(
+                Stream.of(
+                        new VarInitStatement(returnType, invokeTmpVarName, 
+                                new InvokeExpr(
+                                        new Var(varName),
+                                        methodName,
+                                        methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
+                                        argVars.collect(Collectors.toList()),
+                                        returnType),
+                                span)),
+                // box primitive type if needed
+                returnType.getDims() == 0
+                        ? returnType.getNonArrayType().accept(
+                                primitiveType -> {
+                                    ClassType boxed = primitiveType.box();
+                                    return Stream.of(
+                                            new VarInitStatement(boxed.toType(), invokeVarName,
+                                                    new InvokeStaticExpr(
+                                                            boxed,
+                                                            Arrays.asList(),
+                                                            "valueOf",
+                                                            Arrays.asList(primitiveType.toType()),
+                                                            Arrays.asList(new Var(invokeTmpVarName)),
+                                                            boxed.toType()),
+                                                    span));
+                                },
+                                classType -> Stream.empty())
+                        : Stream.empty());
+
+        // when ... thenReturn
         String stubbingVarName = genSym.generate("stubbing");
         String __ = genSym.generate("__");
         Stream<Statement> whenReturn = Stream.of(
-                new VarInitStatement(Type.OBJECT, invokeVarName, 
-                        new InvokeExpr(
-                                new Var(varName),
-                                methodName,
-                                methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
-                                argVars.collect(Collectors.toList()),
-                                Type.OBJECT), // TODO: should be infered?
-                        span),
                 new VarInitStatement(
                         new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0),
                         stubbingVarName,
@@ -183,9 +210,9 @@ public class MockitoMockStrategy implements MockStrategy {
                                 new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0)),
                         span));
 
-        return Stream.concat(
-                returned,
-                Stream.concat(argMatchers, whenReturn));
+        return Stream.concat(returned,
+                Stream.concat(argMatchers,
+                        Stream.concat(invoke, whenReturn)));
     }
 
     private Pair<Var, Stream<Statement>> mapArgumentType(
@@ -336,5 +363,24 @@ public class MockitoMockStrategy implements MockStrategy {
                                     Span.dummySpan()));
                 });
         return new Pair<>(new Var(argVarName), statements);
+    }
+
+    private Type getReturnType(
+            yokohama.unit.ast.ClassType classToStub,
+            String methodName,
+            List<yokohama.unit.ast.Type> argumentTypes) {
+        try {
+            Class<?> clazz = Class.forName(classToStub.getName());
+            Method method = clazz.getMethod(
+                    methodName,
+                    argumentTypes.stream()
+                            .map(Type::of)
+                            .map(Type::toClass)
+                            .collect(Collectors.toList())
+                            .toArray(new Class[]{}));
+            return Type.fromClass(method.getReturnType());
+        } catch (ClassNotFoundException | NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
