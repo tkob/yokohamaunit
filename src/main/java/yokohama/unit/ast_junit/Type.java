@@ -46,26 +46,29 @@ public class Type {
         return new Type(nonArrayType, dims + 1);
     }
 
+    public String getFieldDescriptor() {
+        String brackets = StringUtils.repeat('[', dims);
+        return brackets + nonArrayType.accept(
+                primitiveType -> {
+                    switch (primitiveType.getKind()) {
+                        case BOOLEAN: return "Z";
+                        case BYTE:    return "B"; 
+                        case SHORT:   return "S";
+                        case INT:     return "I";
+                        case LONG:    return "J";
+                        case CHAR:    return "C";
+                        case FLOAT:   return "F";
+                        case DOUBLE:  return "D";
+                    }
+                    throw new RuntimeException("should not reach here");
+                },
+                classType -> "L" + classType.getText() + ";");
+    }
+
     public Class<?> toClass() {
         if (dims > 0) {
-            String brackets = StringUtils.repeat('[', dims);
-            String name = brackets + nonArrayType.accept(
-                    primitiveType -> {
-                        switch (primitiveType.getKind()) {
-                            case BOOLEAN: return "Z";
-                            case BYTE:    return "B"; 
-                            case SHORT:   return "S";
-                            case INT:     return "I";
-                            case LONG:    return "J";
-                            case CHAR:    return "C";
-                            case FLOAT:   return "F";
-                            case DOUBLE:  return "D";
-                        }
-                        throw new RuntimeException("should not reach here");
-                    },
-                    classType -> "L" + classType.getText() + ";");
             try {
-                return Class.forName(name);
+                return Class.forName(getFieldDescriptor());
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
