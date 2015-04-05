@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.SneakyThrows;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
@@ -311,6 +312,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Constants.INVOKESTATIC));
     }
 
+    @SneakyThrows(ClassNotFoundException.class)
     private void visitVarInitStatement(
             VarInitStatement varInitStatement,
             Map<String, LocalVariableGen> locals,
@@ -484,14 +486,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return Type.BOOLEAN;
             });
         if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
-            try {
-                ReferenceType fromType_ = (ReferenceType)fromType;
-                ReferenceType type_ = (ReferenceType)type;
-                if (!fromType_.isAssignmentCompatibleWith(type_)) {
-                    il.append(factory.createCheckCast(type_));
-                }
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
+            ReferenceType fromType_ = (ReferenceType)fromType;
+            ReferenceType type_ = (ReferenceType)type;
+            if (!fromType_.isAssignmentCompatibleWith(type_)) {
+                il.append(factory.createCheckCast(type_));
             }
         }
         il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));

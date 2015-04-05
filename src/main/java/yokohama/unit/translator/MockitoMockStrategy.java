@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
@@ -374,36 +375,30 @@ public class MockitoMockStrategy implements MockStrategy {
         return new Pair<>(new Var(argVarName), statements);
     }
 
+    @SneakyThrows
     private Type getReturnType(
             yokohama.unit.ast.ClassType classToStub,
             String methodName,
             List<yokohama.unit.ast.Type> argumentTypes,
             boolean isVarArg) {
-        try {
-            Class<?> clazz = Class.forName(classToStub.getName());
-            Method method = clazz.getMethod(
-                    methodName,
-                    (isVarArg
-                            ? ListUtils.union(
-                                    argumentTypes.subList(0, argumentTypes.size() - 1),
-                                    Arrays.asList(
-                                            argumentTypes.get(argumentTypes.size() - 1).toArray())) 
-                            : argumentTypes).stream()
-                                    .map(Type::of)
-                                    .map(Type::toClass)
-                                    .collect(Collectors.toList())
-                                    .toArray(new Class[]{}));
-            return Type.fromClass(method.getReturnType());
-        } catch (ClassNotFoundException | NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        }
+        Class<?> clazz = Class.forName(classToStub.getName());
+        Method method = clazz.getMethod(
+                methodName,
+                (isVarArg
+                        ? ListUtils.union(
+                                argumentTypes.subList(0, argumentTypes.size() - 1),
+                                Arrays.asList(
+                                        argumentTypes.get(argumentTypes.size() - 1).toArray())) 
+                        : argumentTypes).stream()
+                        .map(Type::of)
+                        .map(Type::toClass)
+                        .collect(Collectors.toList())
+                        .toArray(new Class[]{}));
+        return Type.fromClass(method.getReturnType());
     }
 
+    @SneakyThrows(ClassNotFoundException.class)
     private boolean isInterface(yokohama.unit.ast.ClassType classType) {
-        try {
-            return Class.forName(classType.getName()).isInterface();
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
+        return Class.forName(classType.getName()).isInterface();
     }
 }

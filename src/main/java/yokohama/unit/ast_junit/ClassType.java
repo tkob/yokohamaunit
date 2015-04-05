@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Optional;
+import lombok.SneakyThrows;
 import lombok.Value;
 
 @Value
@@ -16,13 +17,10 @@ public class ClassType implements NonArrayType {
     public Type toType() {
         return new Type(this, 0);
     }
-
+    
+    @SneakyThrows(ClassNotFoundException.class)
     public Class<?> toClass() {
-        try {
-            return Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
+        return Class.forName(name);
     }
 
     public static ClassType of(yokohama.unit.ast.ClassType classType) {

@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Kind;
@@ -65,13 +66,10 @@ public class Type {
                 classType -> "L" + classType.getText() + ";");
     }
 
+    @SneakyThrows(ClassNotFoundException.class)
     public Class<?> toClass() {
         if (dims > 0) {
-            try {
-                return Class.forName(getFieldDescriptor());
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
+            return Class.forName(getFieldDescriptor());
         } else {
             return nonArrayType.accept(
                     primitiveType -> {
