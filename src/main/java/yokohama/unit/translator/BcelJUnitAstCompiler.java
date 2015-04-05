@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.bcel.Constants;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
@@ -23,10 +24,13 @@ import org.apache.bcel.generic.LocalVariableGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUSH;
+import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
+import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
@@ -37,6 +41,52 @@ import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
+    public static class CaughtExceptionVarVisitor {
+        public static List<Pair<yokohama.unit.ast_junit.Type, String>> sortedSet(Stream<Pair<yokohama.unit.ast_junit.Type, String>> i) {
+            return i.collect(Collectors.toSet())
+                    .stream()
+                    .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
+                    .collect(Collectors.toList());
+        }
+
+        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitTestMethod(TestMethod testMethod) {
+            return visitStatements(testMethod.getStatements());
+        }
+
+        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatements(List<Statement> statements) {
+            return statements.stream().flatMap(this::visitStatement);
+        }
+
+        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatement(Statement statement) {
+            return statement.accept(
+                    isStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    isNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    varInitStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    returnIsStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    returnIsNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    invokeVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    tryStatement ->
+                            Stream.concat(
+                                    visitStatements(tryStatement.getTryStatements()),
+                                    Stream.concat(
+                                            tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
+                                            visitStatements(tryStatement.getFinallyStatements()))),
+                    ifStatement ->
+                            Stream.concat(
+                                    visitStatements(ifStatement.getThen()),
+                                    visitStatements(ifStatement.getOtherwise())));
+        }
+
+        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
+            return Stream.concat(
+                    Stream.of(
+                            new Pair<>(
+                                    catchClause.getClassType().toType(),
+                                    catchClause.getVar().getName())),
+                    visitStatements(catchClause.getStatements()));
+        }
+    }
+
     @Override
     public boolean compile(
             Path docyPath,
@@ -97,10 +147,16 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         InstructionFactory factory = new InstructionFactory(cg);
 
         Map<String, LocalVariableGen> locals = new HashMap<>();
+        List<Pair<yokohama.unit.ast_junit.Type, String>> varDecls =
+                VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(testMethod));
+        List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
+                CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(testMethod));
         for (Pair<yokohama.unit.ast_junit.Type,String> pair :
-                VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(testMethod))) {
+                ListUtils.union(varDecls, caughtExVars)) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
             String name = pair.getSecond();
+            if (locals.containsKey(name))
+                throw new RuntimeException("duplicate local variable: " + name);
             LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);
             locals.put(name, lv);
         }
@@ -263,12 +319,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             ConstantPoolGen cp) {
         LocalVariableGen var = locals.get(varInitStatement.getName());
         Type type = typeOf(varInitStatement.getType());
-        varInitStatement.getValue().<Void>accept(
+        Type fromType = varInitStatement.getValue().<Type>accept(
             varExpr -> {
                 LocalVariableGen from = locals.get(varExpr.getName());
                 il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return from.getType();
             },
             instanceOfMatcherExpr -> {
                 il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClassName())));
@@ -278,8 +333,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { new ObjectType("java.lang.Class") },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return new ObjectType("org.hamcrest.Matcher");
             },
             nullValueMatcherExpr -> {
                 il.append(factory.createInvoke(
@@ -288,8 +342,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         Type.NO_ARGS,
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return new ObjectType("org.hamcrest.Matcher");
             },
             conjunctionMatcherExpr -> {
                 List<Var> matchers = conjunctionMatcherExpr.getMatchers();
@@ -313,8 +366,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { new ArrayType(new ObjectType("org.hamcrest.Matcher"), 1) },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return new ObjectType("org.hamcrest.Matcher");
             },
             equalToMatcherExpr -> {
                 Var operand = equalToMatcherExpr.getOperand();
@@ -326,10 +378,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { lv.getType() },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return new ObjectType("org.hamcrest.Matcher");
             },
-            suchThatMatcherExpr -> { return null; },
+            suchThatMatcherExpr -> {
+                 throw new UnsupportedOperationException("Not supported yet.");
+            },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);
@@ -339,20 +392,19 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Type.VOID,
                         Type.NO_ARGS,
                         Constants.INVOKESPECIAL));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return new ObjectType(newExpr.getType());
             },
             strLitExpr -> {
                 il.append(new PUSH(cp, strLitExpr.getText()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return Type.STRING;
             },
             nullExpr -> {
                 il.append(InstructionConstants.ACONST_NULL);
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return Type.NULL;
             },
             invokeExpr -> {
+                Type returnType = typeOf(invokeExpr.getReturnType());
+
                 // first push target object
                 LocalVariableGen object = locals.get(invokeExpr.getObject().getName());
                 il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
@@ -365,17 +417,19 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(factory.createInvoke(
                         object.getType().toString(), // TODO: ?
                         invokeExpr.getMethodName(),
-                        var.getType(),
+                        returnType,
                         invokeExpr.getArgTypes().stream()
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
-                        Constants.INVOKEVIRTUAL));                
+                        invokeExpr.getInstruction() == InvokeExpr.Instruction.VIRTUAL
+                                ? Constants.INVOKEVIRTUAL
+                                : Constants.INVOKEINTERFACE));                
 
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return returnType;
             },
             invokeStaticExpr -> {
+                Type returnType = typeOf(invokeStaticExpr.getReturnType());
                 for (Var arg : invokeStaticExpr.getArgs()) {
                     LocalVariableGen lv = locals.get(arg.getName());
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
@@ -383,24 +437,27 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(factory.createInvoke(
                         invokeStaticExpr.getClazz().getText(),
                         invokeStaticExpr.getMethodName(),
-                        var.getType(),
+                        returnType,
                         invokeStaticExpr.getArgTypes().stream()
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return returnType;
             },
             intLitExpr -> {
                 il.append(new PUSH(cp, intLitExpr.getValue()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                return Type.INT;
             },
             classLitExpr -> {
-                il.append(new PUSH(cp, new ObjectType(classLitExpr.getType().getText())));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
-                return null;
+                yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
+                il.append(new PUSH(cp, new ObjectType(
+                        type_.getDims() > 0
+                                /* this is strange since BCEL has ArrayType apart from ObjectType,
+                                   but there is no PUSH constructor in BCEL which takes ArrayType. */
+                                ? type_.getFieldDescriptor()
+                                : type_.getText())));
+                return Type.CLASS;
             },
             equalOpExpr -> {
                 LocalVariableGen lhs = locals.get(equalOpExpr.getLhs().getName());
@@ -418,14 +475,26 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 // else
                 InstructionHandle else_ = il.append(new PUSH(cp, false));
 
-                InstructionHandle store = il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                InstructionHandle endIf = il.append(InstructionFactory.NOP);
 
                 // tie the knot
                 if_acmpne.setTarget(else_);
-                goto_.setTarget(store);
+                goto_.setTarget(endIf);
 
-                return null;
+                return Type.BOOLEAN;
             });
+        if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
+            try {
+                ReferenceType fromType_ = (ReferenceType)fromType;
+                ReferenceType type_ = (ReferenceType)type;
+                if (!fromType_.isAssignmentCompatibleWith(type_)) {
+                    il.append(factory.createCheckCast(type_));
+                }
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {
