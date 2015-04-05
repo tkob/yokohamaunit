@@ -322,7 +322,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             varExpr -> {
                 LocalVariableGen from = locals.get(varExpr.getName());
                 il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             instanceOfMatcherExpr -> {
@@ -333,7 +332,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { new ObjectType("java.lang.Class") },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             nullValueMatcherExpr -> {
@@ -343,7 +341,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         Type.NO_ARGS,
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             conjunctionMatcherExpr -> {
@@ -368,7 +365,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { new ArrayType(new ObjectType("org.hamcrest.Matcher"), 1) },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             equalToMatcherExpr -> {
@@ -381,10 +377,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new ObjectType("org.hamcrest.Matcher"),
                         new Type[] { lv.getType() },
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
-            suchThatMatcherExpr -> { return null; },
+            suchThatMatcherExpr -> {
+                 throw new UnsupportedOperationException("Not supported yet.");
+            },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);
@@ -394,17 +391,14 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Type.VOID,
                         Type.NO_ARGS,
                         Constants.INVOKESPECIAL));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             strLitExpr -> {
                 il.append(new PUSH(cp, strLitExpr.getText()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             nullExpr -> {
                 il.append(InstructionConstants.ACONST_NULL);
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             invokeExpr -> {
@@ -429,7 +423,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                 ? Constants.INVOKEVIRTUAL
                                 : Constants.INVOKEINTERFACE));                
 
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             invokeStaticExpr -> {
@@ -446,12 +439,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
                         Constants.INVOKESTATIC));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             intLitExpr -> {
                 il.append(new PUSH(cp, intLitExpr.getValue()));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             classLitExpr -> {
@@ -462,7 +453,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                    but there is no PUSH constructor in BCEL which takes ArrayType. */
                                 ? type_.getFieldDescriptor()
                                 : type_.getText())));
-                il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
             equalOpExpr -> {
@@ -481,14 +471,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 // else
                 InstructionHandle else_ = il.append(new PUSH(cp, false));
 
-                InstructionHandle store = il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+                InstructionHandle endIf = il.append(InstructionFactory.NOP);
 
                 // tie the knot
                 if_acmpne.setTarget(else_);
-                goto_.setTarget(store);
+                goto_.setTarget(endIf);
 
                 return null;
             });
+        il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {
