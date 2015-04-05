@@ -455,7 +455,13 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return null;
             },
             classLitExpr -> {
-                il.append(new PUSH(cp, new ObjectType(classLitExpr.getType().getText())));
+                yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
+                il.append(new PUSH(cp, new ObjectType(
+                        type_.getDims() > 0
+                                /* this is strange since BCEL has ArrayType apart from ObjectType,
+                                   but there is no PUSH constructor in BCEL which takes ArrayType. */
+                                ? type_.getFieldDescriptor()
+                                : type_.getText())));
                 il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
                 return null;
             },
