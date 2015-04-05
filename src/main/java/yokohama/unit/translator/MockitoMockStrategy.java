@@ -122,6 +122,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 packageName)
                 );
 
+        Stream<Type> argTypes;
         Stream<Var> argVars;
         Stream<Statement> argMatchers;
         if (isVarArg) {
@@ -129,6 +130,10 @@ public class MockitoMockStrategy implements MockStrategy {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
                     .map(argumentType -> mapArgumentType(argumentType, genSym, docyPath))
                     .collect(Collectors.toList());
+            argTypes = Stream.concat(
+                    argumentTypes.subList(0, argumentTypes.size() - 1).stream().map(Type::of),
+                    Stream.of(
+                            Type.of(argumentTypes.get(argumentTypes.size() - 1)).toArray()));
             argVars = Stream.concat(
                     pairs.stream().map(Pair::getFirst),
                     Stream.of(new Var(varArg)));
@@ -151,6 +156,7 @@ public class MockitoMockStrategy implements MockStrategy {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, genSym, docyPath))
                     .collect(Collectors.toList());
+            argTypes = methodPattern.getArgumentTypes().stream().map(Type::of);
             argVars = pairs.stream().map(Pair::getFirst);
             argMatchers = pairs.stream().flatMap(Pair::getSecond);
         }
@@ -165,7 +171,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                         isInterface(classToStub) ? InvokeExpr.Instruction.INTERFACE : InvokeExpr.Instruction.VIRTUAL,
                                         new Var(varName),
                                         methodName,
-                                        methodPattern.getArgumentTypes().stream().map(Type::of).collect(Collectors.toList()),
+                                        argTypes.collect(Collectors.toList()),
                                         argVars.collect(Collectors.toList()),
                                         returnType),
                                 span)),
