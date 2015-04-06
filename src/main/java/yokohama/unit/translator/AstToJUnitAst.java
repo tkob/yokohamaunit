@@ -57,7 +57,7 @@ import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.ConjunctionMatcherExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
-import yokohama.unit.ast_junit.IsNotStatement;
+import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
@@ -200,10 +200,11 @@ public class AstToJUnitAst {
     }
 
     Stream<Statement> translateProposition(Proposition proposition, GenSym genSym, String envVarName) {
-        return proposition.getPredicate().<Stream<Statement>>accept(
+        String actual = genSym.generate("actual");
+        String expected = genSym.generate("expected");
+        Predicate predicate = proposition.getPredicate();
+        return predicate.<Stream<Statement>>accept(
                 isPredicate -> {
-                    String actual = genSym.generate("actual");
-                    String expected = genSym.generate("expected");
                     return Stream.concat(
                             expressionStrategy.eval(
                                     actual, envVarName, proposition.getSubject(),
@@ -214,7 +215,7 @@ public class AstToJUnitAst {
                                             new IsStatement(
                                                     new Var(actual),
                                                     new Var(expected),
-                                                    spanOf(isPredicate.getSpan())))));
+                                                    spanOf(predicate.getSpan())))));
                 },
                 isNotPredicate -> {
                     // inhibit `is not instance e of Exception such that...`
@@ -227,7 +228,6 @@ public class AstToJUnitAst {
                                         "`instance _ of _ such that` cannot follow `is not`");
                             },
                             nullValue -> null);
-                    String actual = genSym.generate("actual");
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
                             expressionStrategy.eval(
@@ -236,15 +236,24 @@ public class AstToJUnitAst {
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(), unexpected, genSym, envVarName),
                                     Stream.of(
-                                            new IsNotStatement(
+                                            new VarInitStatement(
+                                                    Type.MATCHER,
+                                                    expected,
+                                                    new InvokeStaticExpr(
+                                                            new ClassType("org.hamcrest.CoreMatchers", Span.dummySpan()),
+                                                            Arrays.asList(),
+                                                            "not",
+                                                            Arrays.asList(Type.MATCHER),
+                                                            Arrays.asList(new Var(unexpected)),
+                                                            Type.MATCHER),
+                                                    spanOf(predicate.getSpan())),
+                                            new IsStatement(
                                                     new Var(actual),
-                                                    new Var(unexpected),
-                                                    spanOf(isNotPredicate.getSpan())))));
+                                                    new Var(expected),
+                                                    spanOf(predicate.getSpan())))));
                 },
                 throwsPredicate -> {
                     String __ = genSym.generate("tmp");
-                    String actual = genSym.generate("actual");
-                    String expected = genSym.generate("expected");
                     return Stream.concat(
                             bindThrown(
                                     actual,
@@ -259,7 +268,7 @@ public class AstToJUnitAst {
                                             new IsStatement(
                                                     new Var(actual),
                                                     new Var(expected),
-                                                    spanOf(throwsPredicate.getSpan())))));
+                                                    spanOf(predicate.getSpan())))));
                 }
         );
     }
