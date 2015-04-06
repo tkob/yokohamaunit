@@ -217,6 +217,16 @@ public class AstToJUnitAst {
                                                     spanOf(isPredicate.getSpan())))));
                 },
                 isNotPredicate -> {
+                    // inhibit `is not instance e of Exception such that...`
+                    isNotPredicate.getComplement().accept(
+                            equalTo -> null,
+                            instanceOf -> null,
+                            instanceSuchThat -> {
+                                throw new TranslationException(
+                                        spanOf(instanceSuchThat.getSpan()).toString() + ": " +
+                                        "`instance _ of _ such that` cannot follow `is not`");
+                            },
+                            nullValue -> null);
                     String actual = genSym.generate("actual");
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
