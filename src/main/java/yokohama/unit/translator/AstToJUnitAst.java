@@ -203,19 +203,13 @@ public class AstToJUnitAst {
         String actual = genSym.generate("actual");
         String expected = genSym.generate("expected");
         Predicate predicate = proposition.getPredicate();
-        return predicate.<Stream<Statement>>accept(
+        Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(
                 isPredicate -> {
                     return Stream.concat(
                             expressionStrategy.eval(
                                     actual, envVarName, proposition.getSubject(),
                                     genSym, docyPath, className, packageName).stream(),
-                            Stream.concat(
-                                    translateMatcher(isPredicate.getComplement(), expected, genSym, envVarName),
-                                    Stream.of(
-                                            new IsStatement(
-                                                    new Var(actual),
-                                                    new Var(expected),
-                                                    spanOf(predicate.getSpan())))));
+                            translateMatcher(isPredicate.getComplement(), expected, genSym, envVarName));
                 },
                 isNotPredicate -> {
                     // inhibit `is not instance e of Exception such that...`
@@ -235,22 +229,17 @@ public class AstToJUnitAst {
                                     genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(), unexpected, genSym, envVarName),
-                                    Stream.of(
-                                            new VarInitStatement(
-                                                    Type.MATCHER,
-                                                    expected,
-                                                    new InvokeStaticExpr(
-                                                            new ClassType("org.hamcrest.CoreMatchers", Span.dummySpan()),
-                                                            Arrays.asList(),
-                                                            "not",
-                                                            Arrays.asList(Type.MATCHER),
-                                                            Arrays.asList(new Var(unexpected)),
-                                                            Type.MATCHER),
-                                                    spanOf(predicate.getSpan())),
-                                            new IsStatement(
-                                                    new Var(actual),
-                                                    new Var(expected),
-                                                    spanOf(predicate.getSpan())))));
+                                    Stream.of(new VarInitStatement(
+                                            Type.MATCHER,
+                                            expected,
+                                            new InvokeStaticExpr(
+                                                    new ClassType("org.hamcrest.CoreMatchers", Span.dummySpan()),
+                                                    Arrays.asList(),
+                                                    "not",
+                                                    Arrays.asList(Type.MATCHER),
+                                                    Arrays.asList(new Var(unexpected)),
+                                                    Type.MATCHER),
+                                            spanOf(predicate.getSpan())))));
                 },
                 throwsPredicate -> {
                     String __ = genSym.generate("tmp");
@@ -262,15 +251,12 @@ public class AstToJUnitAst {
                                             genSym, docyPath, className, packageName),
                                     genSym,
                                     envVarName),
-                            Stream.concat(
-                                    translateMatcher(throwsPredicate.getThrowee(), expected, genSym, envVarName),
-                                    Stream.of(
-                                            new IsStatement(
-                                                    new Var(actual),
-                                                    new Var(expected),
-                                                    spanOf(predicate.getSpan())))));
+                            translateMatcher(throwsPredicate.getThrowee(), expected, genSym, envVarName));
                 }
         );
+        return Stream.concat(
+                subjectAndPredicate,
+                Stream.of(new IsStatement(new Var(actual), new Var(expected), spanOf(predicate.getSpan()))));
     }
 
     Stream<Statement> bindThrown(String actual, List<Statement> statements, GenSym genSym, String envVarName) {
