@@ -10,7 +10,7 @@ public class IsNotStatement implements Statement {
     private Span span;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         sb.appendln("org.junit.Assert.assertThat(", subject.getName(), ", org.hamcrest.CoreMatchers.is(org.hamcrest.CoreMatchers.not(", complement.getName(), ")));");
     }
 

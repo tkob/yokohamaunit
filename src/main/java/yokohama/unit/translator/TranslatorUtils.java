@@ -81,9 +81,7 @@ public class TranslatorUtils {
                 ).translate(className, ast, packageName);
 
         // JUnit AST to string
-        return junit.getText(
-                new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
-                new yokohama.unit.ast_junit.MockitoMockStrategy());
+        return junit.getText();
     }
 
     public static boolean compileDocy(

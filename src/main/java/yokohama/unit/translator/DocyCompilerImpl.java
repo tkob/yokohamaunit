@@ -18,9 +18,7 @@ public class DocyCompilerImpl implements DocyCompiler {
     AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
     ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
     MockStrategy mockStrategy = new MockitoMockStrategy();
-    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl(
-            new yokohama.unit.ast_junit.OgnlExpressionStrategy(),
-            new yokohama.unit.ast_junit.MockitoMockStrategy());
+    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl();
 
     @Override
     public boolean compile(

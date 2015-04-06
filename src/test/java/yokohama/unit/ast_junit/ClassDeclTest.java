@@ -12,7 +12,7 @@ public class ClassDeclTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
-        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("public class TestClass {");

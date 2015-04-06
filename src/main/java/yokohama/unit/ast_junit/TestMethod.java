@@ -10,11 +10,7 @@ public class TestMethod {
     private final String name;
     private final List<Statement> statements;
 
-    public void toString(
-            SBuilder sb,
-            ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy
-    ) {
+    public void toString(SBuilder sb) {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
@@ -23,7 +19,7 @@ public class TestMethod {
             String name = pair.getSecond();
             sb.appendln(type.getText(), " ", name, ";");
         }
-        statements.forEach(testStatement -> testStatement.toString(sb, expressionStrategy, mockStrategy));
+        statements.forEach(testStatement -> testStatement.toString(sb));
         sb.unshift();
         sb.appendln("}");
     }

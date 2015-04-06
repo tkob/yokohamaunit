@@ -11,17 +11,17 @@ public class IfStatement implements Statement {
     private final List<Statement> otherwise;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         sb.appendln("if (", cond.getName(), ") {");
         sb.shift();
             for (Statement statement : then) {
-                statement.toString(sb, expressionStrategy, mockStrategy);
+                statement.toString(sb);
             }
         sb.unshift();
         sb.appendln("} else {");
         sb.shift();
             for (Statement statement : otherwise) {
-                statement.toString(sb, expressionStrategy, mockStrategy);
+                statement.toString(sb);
             }
         sb.unshift();
         sb.appendln("}");

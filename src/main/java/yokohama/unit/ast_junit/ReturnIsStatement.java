@@ -9,7 +9,7 @@ public class ReturnIsStatement implements Statement {
     private Var predicate;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         sb.appendln("return ", predicate.getName(), ".matches(", subject.getName(), ");");
     }
 

@@ -13,8 +13,14 @@ public class InvokeVoidStatement implements Statement {
     private final List<Var> args;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
-        sb.appendln(object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+    public void toString(SBuilder sb) {
+        sb.appendln(
+                object.getName(),
+                ".",
+                methodName,
+                "(",
+                args.stream().map(Var::getName).collect(Collectors.joining(", ")),
+                ");");
     }
 
     @Override

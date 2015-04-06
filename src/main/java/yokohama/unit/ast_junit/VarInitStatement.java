@@ -12,30 +12,30 @@ public class VarInitStatement implements Statement {
     private final Span span;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         value.<Void>accept(
                 varExpr -> {
                     sb.appendln(name, " = ", varExpr.getName(), ";");
                     return null;
                 },
                 instanceOfMatcherExpr -> {
-                    instanceOfMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    instanceOfMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 nullValueMatcherExpr -> {
-                    nullValueMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    nullValueMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 conjunctionMatcherExpr -> {
-                    conjunctionMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    conjunctionMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 equalToMatcherExpr -> {
-                    equalToMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    equalToMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 suchThatMatcherExpr -> {
-                    suchThatMatcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                    suchThatMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 newExpr -> {

@@ -13,21 +13,10 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 import yokohama.unit.ast_junit.CompilationUnit;
-import yokohama.unit.ast_junit.ExpressionStrategy;
-import yokohama.unit.ast_junit.MockStrategy;
 
 public class JUnitAstCompilerImpl implements JUnitAstCompiler {
-    ExpressionStrategy expressionStrategy;
-    MockStrategy mockStrategy;
-
-    public JUnitAstCompilerImpl(
-            ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy) {
-        this.expressionStrategy = expressionStrategy;
-        this.mockStrategy = mockStrategy;
-    }
-
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
     @Override
     public boolean compile(
             Path docyPath,
@@ -37,7 +26,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
             List<String> classPath,
             Optional<Path> dest,
             List<String> javacArgs) {
-        String javaCode = ast.getText(expressionStrategy, mockStrategy);
+        String javaCode = ast.getText();
 
         // Compile Java code
         if (compiler == null) {

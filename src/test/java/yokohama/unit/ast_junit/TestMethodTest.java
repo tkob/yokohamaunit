@@ -12,7 +12,7 @@ public class TestMethodTest {
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         TestMethod instance = new TestMethod("test", Arrays.asList());
-        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
@@ -36,7 +36,7 @@ public class TestMethodTest {
                         new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
                         new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan())));
-        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");

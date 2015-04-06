@@ -11,7 +11,7 @@ public class CompilationUnitTest {
         String packageName = "yokohama.unit.example";
         ClassDecl classDecl = new ClassDecl("", Arrays.asList());
         CompilationUnit instance = new CompilationUnit(packageName, classDecl);
-        String actual = instance.getText(new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        String actual = instance.getText();
         StrBuilder sb = new StrBuilder();
         sb.appendln("package yokohama.unit.example;");
         sb.appendNewLine();

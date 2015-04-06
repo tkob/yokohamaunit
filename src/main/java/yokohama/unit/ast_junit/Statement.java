@@ -4,7 +4,7 @@ import java.util.function.Function;
 import yokohama.unit.util.SBuilder;
 
 public interface Statement {
-    void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy);
+    void toString(SBuilder sb);
 
     <T> T accept(StatementVisitor<T> visitor);
 

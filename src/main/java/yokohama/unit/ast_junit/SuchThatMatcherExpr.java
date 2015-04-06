@@ -14,7 +14,7 @@ public class SuchThatMatcherExpr implements Expr {
     private String description;
     private Var argVar;
 
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void getExpr(SBuilder sb, String varName) {
         sb.appendln(varName, " = new org.hamcrest.BaseMatcher() {");
         sb.shift();
             sb.appendln("@Override");
@@ -28,7 +28,7 @@ public class SuchThatMatcherExpr implements Expr {
                 sb.appendln("try {");
                 sb.shift();
                 for (Statement statement : statements) {
-                    statement.toString(sb, expressionStrategy, mockStrategy);
+                    statement.toString(sb);
                 }
                 sb.unshift();
                 sb.appendln("} catch (Exception $e) {"); // TODO: var name should be gensym'ed

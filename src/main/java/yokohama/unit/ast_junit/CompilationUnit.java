@@ -8,22 +8,15 @@ public class CompilationUnit {
     private String packageName;
     private ClassDecl classDecl;
 
-    public String getText(
-            ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy
-    ) {
+    public String getText() {
         final SBuilder sb = new SBuilder(4);
-        toString(sb, expressionStrategy, mockStrategy);
+        toString(sb);
         return sb.toString();
     }
 
-    public void toString(
-            SBuilder sb,
-            ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy
-    ) {
+    public void toString(SBuilder sb) {
         sb.appendln("package ", packageName, ";");
         sb.appendln();
-        classDecl.toString(sb, expressionStrategy, mockStrategy);
+        classDecl.toString(sb);
     }
 }

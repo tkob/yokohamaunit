@@ -11,7 +11,7 @@ import yokohama.unit.util.SBuilder;
 public class ConjunctionMatcherExpr implements Expr {
     private final List<Var> matchers;
 
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void getExpr(SBuilder sb, String varName) {
         sb.appendln(varName, " = org.hamcrest.CoreMatchers.allOf(",
                 matchers.stream().map(Var::getName).collect(Collectors.joining(", ")),
                 ");");

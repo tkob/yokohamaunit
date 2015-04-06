@@ -9,7 +9,7 @@ public class ReturnIsNotStatement implements Statement {
     private Var predicate;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         sb.appendln("return org.hamcrest.CoreMatchers.not(", predicate.getName(), ").matches(", subject.getName(), ");");
     }
 
