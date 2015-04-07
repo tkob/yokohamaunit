@@ -6,7 +6,6 @@ public interface ExprVisitor<T> {
     T visitNullValueMatcherExpr(NullValueMatcherExpr nullValueMatcherExpr);
     T visitConjunctionMatcherExpr(ConjunctionMatcherExpr conjunctionMatcherExpr);
     T visitEqualToMatcherExpr(EqualToMatcherExpr equalToMatcherExpr);
-    T visitSuchThatMatcherExpr(SuchThatMatcherExpr suchThatMatcherExpr);
     T visitNewExpr(NewExpr newExpr);
     T visitStrLitExpr(StrLitExpr strLitExpr);
     T visitNullExpr(NullExpr nullExpr);

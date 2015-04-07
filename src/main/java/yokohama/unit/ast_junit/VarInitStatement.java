@@ -34,10 +34,6 @@ public class VarInitStatement implements Statement {
                     equalToMatcherExpr.getExpr(sb, name);
                     return null;
                 },
-                suchThatMatcherExpr -> {
-                    suchThatMatcherExpr.getExpr(sb, name);
-                    return null;
-                },
                 newExpr -> {
                     newExpr.getExpr(sb, name);
                     return null;

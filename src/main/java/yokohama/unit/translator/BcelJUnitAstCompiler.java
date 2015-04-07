@@ -382,9 +382,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Constants.INVOKESTATIC));
                 return new ObjectType("org.hamcrest.Matcher");
             },
-            suchThatMatcherExpr -> {
-                 throw new UnsupportedOperationException("Not supported yet.");
-            },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);
