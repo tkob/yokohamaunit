@@ -101,7 +101,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 Constants.ACC_PUBLIC | Constants.ACC_SUPER,
                 null // implemented interfaces
         );
-        // set class file version to Java 1.6
+        // set class file version to Java 1.5
         cg.setMajor(49);
         cg.setMinor(0);
         
