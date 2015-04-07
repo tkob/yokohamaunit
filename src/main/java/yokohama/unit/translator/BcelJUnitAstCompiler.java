@@ -63,8 +63,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     isStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     isNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     varInitStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    returnIsStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    returnIsNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     invokeVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     tryStatement ->
                             Stream.concat(
@@ -193,8 +191,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 visitVarInitStatement(varInitStatement, locals, il, factory, cp);
                 return null;
             },
-            returnIsStatement -> { return null; },
-            returnIsNotStatement -> { return null; },
             invokeVoidStatement -> { return null; },
             tryStatement -> {
                 InstructionHandle startTry = il.append(InstructionFactory.NOP);
