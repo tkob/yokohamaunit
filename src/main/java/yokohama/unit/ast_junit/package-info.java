@@ -28,16 +28,12 @@
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | VarInitStatement
- *             | InvokeVoidStatement
  *             | TryStatement
  *             | IfStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
  * VarInitStatement ::= ClassType Expr
- * ReturnIsStatement ::= Var Var
- * ReturnIsNotStatement ::= Var Var
- * InvokeVoidStatement ::= Var Var*
  * TryStatement ::= Statement* CatchClause* Statement*
  * IfStatement ::= Statement* Statement*
  * 

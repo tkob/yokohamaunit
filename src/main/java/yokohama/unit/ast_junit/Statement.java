@@ -12,7 +12,6 @@ public interface Statement {
             Function<IsStatement, T> visitIsStatement_,
             Function<IsNotStatement, T> visitIsNotStatement_,
             Function<VarInitStatement, T> visitVarInitStatement_,
-            Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
             Function<TryStatement, T> visitTryStatement_,
             Function<IfStatement, T> visitIfStatement_
     ) {
@@ -30,11 +29,6 @@ public interface Statement {
             @Override
             public T visitVarInitStatement(VarInitStatement varInitStatement) {
                 return visitVarInitStatement_.apply(varInitStatement);
-            }
-
-            @Override
-            public T visitInvokeVoidStatement(InvokeVoidStatement invokeVoidStatement) {
-                return visitInvokeVoidStatement_.apply(invokeVoidStatement);
             }
 
             @Override
