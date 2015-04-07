@@ -9,9 +9,7 @@ public interface Expr {
             Function<VarExpr, T> visitVarExpr_,
             Function<InstanceOfMatcherExpr, T> visitInstanceOfMatcherExpr_,
             Function<NullValueMatcherExpr, T> visitNullValueMatcherExpr_,
-            Function<ConjunctionMatcherExpr, T> visitConjunctionMatcherExpr_,
             Function<EqualToMatcherExpr, T> visitEqualToMatcherExpr_,
-            Function<SuchThatMatcherExpr, T> visitSuchThatMatcherExpr_,
             Function<NewExpr, T> visitNewExpr_,
             Function<StrLitExpr, T> visitStrLitExpr_,
             Function<NullExpr, T> visitNullExpr_,
@@ -35,16 +33,8 @@ public interface Expr {
                 return visitNullValueMatcherExpr_.apply(nullValueMatcherExpr);
             }
             @Override
-            public T visitConjunctionMatcherExpr(ConjunctionMatcherExpr conjunctionMatcherExpr) {
-                return visitConjunctionMatcherExpr_.apply(conjunctionMatcherExpr);
-            }
-            @Override
             public T visitEqualToMatcherExpr(EqualToMatcherExpr equalToMatcherExpr) {
                 return visitEqualToMatcherExpr_.apply(equalToMatcherExpr);
-            }
-            @Override
-            public T visitSuchThatMatcherExpr(SuchThatMatcherExpr suchThatMatcherExpr) {
-                return visitSuchThatMatcherExpr_.apply(suchThatMatcherExpr);
             }
             @Override
             public T visitNewExpr(NewExpr newExpr) {

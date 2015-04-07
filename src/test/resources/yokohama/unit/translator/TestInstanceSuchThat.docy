@@ -9,9 +9,6 @@ Assert that `"Abracadabra"` is an instance s of `String` such that
 Assert that `"Abracadabra"` is an instance s of `String` such that
             `s.toString()` is not `""`.
 
-Assert that `"Abracadabra"` is not an instance s of `String` such that
-            `s.toString()` is `""`.
-
 Assert that `@java.util.Collections@unmodifiableList(l)` is
             an instance u of `java.util.List` such that
                 `u.size()` is `3`

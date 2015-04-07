@@ -25,10 +25,8 @@ import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
-import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
-import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
@@ -173,8 +171,19 @@ public class AstToJUnitAstTest {
                 // is not `b`
                 new VarInitStatement(
                         Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
+                new VarInitStatement(
+                        Type.MATCHER,
+                        "expected",
+                        new InvokeStaticExpr(
+                                new ClassType("org.hamcrest.CoreMatchers", Span.dummySpan()),
+                                Arrays.asList(),
+                                "not",
+                                Arrays.asList(Type.MATCHER),
+                                Arrays.asList(new Var("unexpected")),
+                                Type.MATCHER),
+                        Span.dummySpan()),
                 // `a` is not `b`
-                new IsNotStatement(new Var("actual"), new Var("unexpected"), Span.dummySpan()));
+                new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
     

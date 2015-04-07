@@ -27,8 +27,6 @@ public class VarDeclVisitor {
                 isNotStatement -> Stream.<Pair<Type, String>>empty(),
                 varInitStatement ->
                         Stream.of(new Pair<Type, String>(varInitStatement.getType(), varInitStatement.getName())),
-                returnIsStatement -> Stream.<Pair<Type, String>>empty(),
-                returnIsNotStatement -> Stream.<Pair<Type, String>>empty(),
                 invokeVoidStatement -> Stream.<Pair<Type, String>>empty(),
                 tryStatement ->
                         Stream.concat(

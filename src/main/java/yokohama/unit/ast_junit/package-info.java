@@ -11,9 +11,7 @@
  * Expr ::= VarExpr
  *        | InstanceOfMatcherExpr
  *        | NullValueMatcherExpr
- *        | ConjunctionMatcherExpr 
  *        | EqualToMatcherExpr
- *        | SuchThatMatcherExpr 
  *        | NewExpr
  *        | StrLitExpr
  *        | NullExpr
@@ -30,8 +28,6 @@
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | VarInitStatement
- *             | ReturnIsStatement
- *             | ReturnIsNotStatement
  *             | InvokeVoidStatement
  *             | TryStatement
  *             | IfStatement

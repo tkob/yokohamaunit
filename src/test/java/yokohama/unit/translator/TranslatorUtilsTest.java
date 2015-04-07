@@ -93,8 +93,7 @@ public class TranslatorUtilsTest {
                     "instance_such_that_1",
                     "instance_such_that_2",
                     "instance_such_that_3",
-                    "instance_such_that_4",
-                    "instance_such_that_5"
+                    "instance_such_that_4"
             ))
         };
 

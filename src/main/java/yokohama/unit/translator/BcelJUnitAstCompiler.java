@@ -63,8 +63,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     isStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     isNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     varInitStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    returnIsStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    returnIsNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     invokeVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     tryStatement ->
                             Stream.concat(
@@ -193,8 +191,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 visitVarInitStatement(varInitStatement, locals, il, factory, cp);
                 return null;
             },
-            returnIsStatement -> { return null; },
-            returnIsNotStatement -> { return null; },
             invokeVoidStatement -> { return null; },
             tryStatement -> {
                 InstructionHandle startTry = il.append(InstructionFactory.NOP);
@@ -346,30 +342,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Constants.INVOKESTATIC));
                 return new ObjectType("org.hamcrest.Matcher");
             },
-            conjunctionMatcherExpr -> {
-                List<Var> matchers = conjunctionMatcherExpr.getMatchers();
-                int numMatchers = matchers.size();
-                // first create array
-                il.append(new PUSH(cp, numMatchers));
-                il.append(factory.createNewArray(new ObjectType("org.hamcrest.Matcher"), (short) 1));
-                // fill the array with the matchers
-                for (int i = 0; i < numMatchers; i++) {
-                    String name = matchers.get(i).getName();
-                    LocalVariableGen lv = locals.get(name);
-                    il.append(InstructionConstants.DUP);
-                    il.append(new PUSH(cp, i));
-                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
-                    il.append(InstructionConstants.AASTORE);
-                }
-                // then call allOf with the array(=vararg)
-                il.append(factory.createInvoke(
-                        "org.hamcrest.CoreMatchers",
-                        "allOf",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        new Type[] { new ArrayType(new ObjectType("org.hamcrest.Matcher"), 1) },
-                        Constants.INVOKESTATIC));
-                return new ObjectType("org.hamcrest.Matcher");
-            },
             equalToMatcherExpr -> {
                 Var operand = equalToMatcherExpr.getOperand();
                 LocalVariableGen lv = locals.get(operand.getName());
@@ -381,9 +353,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         new Type[] { lv.getType() },
                         Constants.INVOKESTATIC));
                 return new ObjectType("org.hamcrest.Matcher");
-            },
-            suchThatMatcherExpr -> {
-                 throw new UnsupportedOperationException("Not supported yet.");
             },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
