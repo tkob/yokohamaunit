@@ -11,7 +11,7 @@ public class MethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        Method instance = new Method(Arrays.asList(Annotation.TEST), "test", Arrays.asList());
+        Method instance = new Method(Arrays.asList(Annotation.TEST), "test", Arrays.asList(), Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
@@ -28,6 +28,7 @@ public class MethodTest {
         Method instance = new Method(
                 Arrays.asList(Annotation.TEST),
                 "test",
+                Arrays.asList(),
                 Arrays.asList(
                         new VarInitStatement(
                                 new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),

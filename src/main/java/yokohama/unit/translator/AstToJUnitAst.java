@@ -128,6 +128,7 @@ public class AstToJUnitAst {
                     return Arrays.asList(new Method(
                                     Arrays.asList(Annotation.TEST),
                                     methodName,
+                                    Arrays.asList(),
                                     ListUtils.union(
                                             expressionStrategy.env(env),
                                             propositions.stream()
@@ -148,6 +149,7 @@ public class AstToJUnitAst {
                                 return new Method(
                                         Arrays.asList(Annotation.TEST),
                                         methodName + "_" + (i + 1),
+                                        Arrays.asList(),
                                         ListUtils.union(
                                                 expressionStrategy.env(env),
                                                 ListUtils.union(
@@ -169,6 +171,7 @@ public class AstToJUnitAst {
                     return Arrays.asList(new Method(
                                     Arrays.asList(Annotation.TEST),
                                     methodName,
+                                    Arrays.asList(),
                                     ListUtils.union(
                                             expressionStrategy.env(env),
                                             Stream.concat(
@@ -585,6 +588,7 @@ public class AstToJUnitAst {
         return Arrays.asList(new Method(
                         Arrays.asList(Annotation.TEST),
                         testName,
+                        Arrays.asList(),
                         ListUtils.union(
                                 expressionStrategy.env(env),
                                 actionsAfter.size() > 0

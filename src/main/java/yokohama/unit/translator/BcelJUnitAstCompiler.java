@@ -133,7 +133,13 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         InstructionList il = new InstructionList();
         MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                 Type.VOID, // return type of a test method is always void
-                Type.NO_ARGS, new String[]{}, // test methods have no arguments
+                method.getArgs().stream()
+                        .map(Pair::getFirst)
+                        .map(BcelJUnitAstCompiler::typeOf)
+                        .collect(Collectors.toList()).toArray(new Type[]{}),
+                method.getArgs().stream()
+                        .map(Pair::getSecond)
+                        .collect(Collectors.toList()).toArray(new String[]{}),
                 method.getName(),
                 cg.getClassName(),
                 il, cp);
@@ -150,12 +156,13 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         InstructionFactory factory = new InstructionFactory(cg);
 
         Map<String, LocalVariableGen> locals = new HashMap<>();
+        List<Pair<yokohama.unit.ast_junit.Type, String>> args = method.getArgs();
         List<Pair<yokohama.unit.ast_junit.Type, String>> varDecls =
                 VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(method));
         List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
                 CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(method));
         for (Pair<yokohama.unit.ast_junit.Type,String> pair :
-                ListUtils.union(varDecls, caughtExVars)) {
+                ListUtils.union(args, ListUtils.union(varDecls, caughtExVars))) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
             String name = pair.getSecond();
             if (locals.containsKey(name))

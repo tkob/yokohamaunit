@@ -78,6 +78,7 @@ public class AstToJUnitAstTest {
         List<Method> expected = Arrays.asList(new Method(
                 Arrays.asList(Annotation.TEST),
                 "test_0",
+                Arrays.asList(),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,
