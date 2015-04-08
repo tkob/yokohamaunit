@@ -44,6 +44,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -57,7 +58,7 @@ import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Span;
-import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
@@ -96,38 +97,39 @@ public class AstToJUnitAst {
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
-        List<TestMethod> methods =
+        List<Method> methods =
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
                                    test -> translateTest(test, tables).stream(),
                                    fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, new GenSym()).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
-        ClassDecl classDecl = new ClassDecl(name, methods);
+        ClassDecl classDecl = new ClassDecl(name, Optional.empty(), Arrays.asList(), methods);
         return new CompilationUnit(packageName, classDecl);
     }
 
-    List<TestMethod> translateTest(Test test, final List<Table> tables) {
+    List<Method> translateTest(Test test, final List<Table> tables) {
         final String name = test.getName();
         List<Assertion> assertions = test.getAssertions();
-        List<TestMethod> testMethods = 
+        List<Method> methods = 
                 IntStream.range(0, assertions.size())
                         .mapToObj(Integer::new)
                         .flatMap(i -> translateAssertion(assertions.get(i), i + 1, name, tables).stream())
                         .collect(Collectors.toList());
-        return testMethods;
+        return methods;
     }
 
-    List<TestMethod> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
+    List<Method> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
-        return assertion.getFixture().accept(
-                () -> {
+        return assertion.getFixture().accept(() -> {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
-                    return Arrays.asList(
-                            new TestMethod(
+                    return Arrays.asList(new Method(
+                                    Arrays.asList(Annotation.TEST),
                                     methodName,
+                                    Arrays.asList(),
+                                    Optional.empty(),
                                     ListUtils.union(
                                             expressionStrategy.env(env),
                                             propositions.stream()
@@ -145,8 +147,11 @@ public class AstToJUnitAst {
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> {
-                                return new TestMethod(
+                                return new Method(
+                                        Arrays.asList(Annotation.TEST),
                                         methodName + "_" + (i + 1),
+                                        Arrays.asList(),
+                                        Optional.empty(),
                                         ListUtils.union(
                                                 expressionStrategy.env(env),
                                                 ListUtils.union(
@@ -165,9 +170,11 @@ public class AstToJUnitAst {
                 bindings -> {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
-                    return Arrays.asList(
-                            new TestMethod(
+                    return Arrays.asList(new Method(
+                                    Arrays.asList(Annotation.TEST),
                                     methodName,
+                                    Arrays.asList(),
+                                    Optional.empty(),
                                     ListUtils.union(
                                             expressionStrategy.env(env),
                                             Stream.concat(
@@ -522,7 +529,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<TestMethod> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, GenSym genSym) {
+    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, GenSym genSym) {
         String env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());
@@ -581,9 +588,11 @@ public class AstToJUnitAst {
             actionsAfter = Arrays.asList();
         }
 
-        return Arrays.asList(
-                new TestMethod(
+        return Arrays.asList(new Method(
+                        Arrays.asList(Annotation.TEST),
                         testName,
+                        Arrays.asList(),
+                        Optional.empty(),
                         ListUtils.union(
                                 expressionStrategy.env(env),
                                 actionsAfter.size() > 0

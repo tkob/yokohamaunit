@@ -9,6 +9,8 @@ public class ClassType implements NonArrayType {
     private String name;
     private Span span;
 
+    public static final ClassType TEST = new ClassType("org.junit.Test", Span.dummySpan());
+
     @Override
     public String getText() {
         return name;

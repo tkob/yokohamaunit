@@ -4,9 +4,9 @@
  * <pre>
  * CompilationUnit ::= ClassDecl
  * 
- * ClassDecl ::= TestMethod*
+ * ClassDecl ::= Method*
  * 
- * TestMethod ::= Statement*
+ * Method ::= Annotation* Type* Type? Statement*
  * 
  * Expr ::= VarExpr
  *        | InstanceOfMatcherExpr

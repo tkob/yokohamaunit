@@ -13,8 +13,8 @@ public class VarDeclVisitor {
                 .collect(Collectors.toList());
     }
 
-    public Stream<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
-        return visitStatements(testMethod.getStatements());
+    public Stream<Pair<Type, String>> visitMethod(Method method) {
+        return visitStatements(method.getStatements());
     }
 
     public Stream<Pair<Type, String>> visitStatements(List<Statement> statements) {

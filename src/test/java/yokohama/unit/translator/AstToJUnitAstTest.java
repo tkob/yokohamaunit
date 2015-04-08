@@ -17,6 +17,7 @@ import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.ThrowsPredicate;
+import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -31,7 +32,7 @@ import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.Span;
-import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
@@ -50,7 +51,7 @@ public class AstToJUnitAstTest {
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy());
         CompilationUnit actual = instance.translate(name, group, packageName);
-        CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Arrays.asList()));
+        CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Optional.empty(), Arrays.asList(), Arrays.asList()));
         assertThat(actual, is(expected));
     }
 
@@ -59,8 +60,8 @@ public class AstToJUnitAstTest {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<TestMethod> actual = instance.translateTest(test, tables);
-        List<TestMethod> expected = Arrays.asList();
+        List<Method> actual = instance.translateTest(test, tables);
+        List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
 
@@ -73,9 +74,12 @@ public class AstToJUnitAstTest {
         String testName = "test";
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
-        List<TestMethod> expected = Arrays.asList(new TestMethod(
+        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
+        List<Method> expected = Arrays.asList(new Method(
+                Arrays.asList(Annotation.TEST),
                 "test_0",
+                Arrays.asList(),
+                Optional.empty(),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,
