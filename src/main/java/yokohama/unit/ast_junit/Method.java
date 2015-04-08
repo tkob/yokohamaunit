@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Value;
 import yokohama.unit.util.Pair;
@@ -11,6 +12,7 @@ public class Method {
     private final List<Annotation> annotations;
     private final String name;
     private final List<Pair<Type, String>> args;
+    private final Optional<Type> returnType;
     private final List<Statement> statements;
 
     public void toString(SBuilder sb) {
@@ -18,7 +20,9 @@ public class Method {
             annotation.toString(sb);
         }
         sb.appendln(
-                "public void ", name, "(",
+                "public ",
+                returnType.isPresent() ? returnType.get().getText() : "void",
+                " ", name, "(",
                 args.stream()
                         .map(pair -> pair.getFirst().getText() + " " + pair.getSecond())
                         .collect(Collectors.joining(", ")),

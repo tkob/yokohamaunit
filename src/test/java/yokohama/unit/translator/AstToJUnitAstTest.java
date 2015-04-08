@@ -79,6 +79,7 @@ public class AstToJUnitAstTest {
                 Arrays.asList(Annotation.TEST),
                 "test_0",
                 Arrays.asList(),
+                Optional.empty(),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,

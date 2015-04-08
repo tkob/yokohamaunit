@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
+import java.util.Optional;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,7 +12,12 @@ public class MethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        Method instance = new Method(Arrays.asList(Annotation.TEST), "test", Arrays.asList(), Arrays.asList());
+        Method instance = new Method(
+                Arrays.asList(Annotation.TEST),
+                "test",
+                Arrays.asList(),
+                Optional.empty(),
+                Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
@@ -29,6 +35,7 @@ public class MethodTest {
                 Arrays.asList(Annotation.TEST),
                 "test",
                 Arrays.asList(),
+                Optional.empty(),
                 Arrays.asList(
                         new VarInitStatement(
                                 new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),

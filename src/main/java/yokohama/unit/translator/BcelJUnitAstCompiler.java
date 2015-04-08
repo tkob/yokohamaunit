@@ -132,7 +132,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitTestMethod(Method method, ClassGen cg, ConstantPoolGen cp) {
         InstructionList il = new InstructionList();
         MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
-                Type.VOID, // return type of a test method is always void
+                method.getReturnType().isPresent()
+                        ? typeOf(method.getReturnType().get())
+                        : Type.VOID,
                 method.getArgs().stream()
                         .map(Pair::getFirst)
                         .map(BcelJUnitAstCompiler::typeOf)
