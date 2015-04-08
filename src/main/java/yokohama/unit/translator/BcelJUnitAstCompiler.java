@@ -29,6 +29,7 @@ import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
 import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
@@ -136,12 +137,16 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 method.getName(),
                 cg.getClassName(),
                 il, cp);
-        AnnotationEntryGen ag = new AnnotationEntryGen(
-                new ObjectType("org.junit.Test"),
-                Arrays.asList(),
-                true,
-                cp);
-        mg.addAnnotationEntry(ag);
+
+        for (Annotation annotation : method.getAnnotations())  {
+            AnnotationEntryGen ag = new AnnotationEntryGen(
+                    new ObjectType(annotation.getClazz().getText()),
+                    Arrays.asList(),
+                    true,
+                    cp);
+            mg.addAnnotationEntry(ag);
+        }
+
         InstructionFactory factory = new InstructionFactory(cg);
 
         Map<String, LocalVariableGen> locals = new HashMap<>();

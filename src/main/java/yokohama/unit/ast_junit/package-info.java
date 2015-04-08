@@ -6,7 +6,7 @@
  * 
  * ClassDecl ::= Method*
  * 
- * Method ::= Statement*
+ * Method ::= Annotation* Statement*
  * 
  * Expr ::= VarExpr
  *        | InstanceOfMatcherExpr

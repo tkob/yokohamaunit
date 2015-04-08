@@ -7,11 +7,14 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class Method {
+    private final List<Annotation> annotations;
     private final String name;
     private final List<Statement> statements;
 
     public void toString(SBuilder sb) {
-        sb.appendln("@org.junit.Test");
+        for (Annotation annotation : annotations) {
+            annotation.toString(sb);
+        }
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
         for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(this))) {

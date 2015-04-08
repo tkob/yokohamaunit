@@ -11,7 +11,7 @@ public class MethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        Method instance = new Method("test", Arrays.asList());
+        Method instance = new Method(Arrays.asList(Annotation.TEST), "test", Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
@@ -26,6 +26,7 @@ public class MethodTest {
     public void testToString_SBuilder1() {
         SBuilder actual = new SBuilder(4);
         Method instance = new Method(
+                Arrays.asList(Annotation.TEST),
                 "test",
                 Arrays.asList(
                         new VarInitStatement(

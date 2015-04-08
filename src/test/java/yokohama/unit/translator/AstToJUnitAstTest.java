@@ -17,6 +17,7 @@ import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.ThrowsPredicate;
+import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -75,6 +76,7 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
         List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
         List<Method> expected = Arrays.asList(new Method(
+                Arrays.asList(Annotation.TEST),
                 "test_0",
                 Arrays.asList(
                         new VarInitStatement(

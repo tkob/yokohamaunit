@@ -44,6 +44,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -125,6 +126,7 @@ public class AstToJUnitAst {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
+                                    Arrays.asList(Annotation.TEST),
                                     methodName,
                                     ListUtils.union(
                                             expressionStrategy.env(env),
@@ -144,6 +146,7 @@ public class AstToJUnitAst {
                             .mapToObj(Integer::new)
                             .map(i -> {
                                 return new Method(
+                                        Arrays.asList(Annotation.TEST),
                                         methodName + "_" + (i + 1),
                                         ListUtils.union(
                                                 expressionStrategy.env(env),
@@ -164,6 +167,7 @@ public class AstToJUnitAst {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
+                                    Arrays.asList(Annotation.TEST),
                                     methodName,
                                     ListUtils.union(
                                             expressionStrategy.env(env),
@@ -579,6 +583,7 @@ public class AstToJUnitAst {
         }
 
         return Arrays.asList(new Method(
+                        Arrays.asList(Annotation.TEST),
                         testName,
                         ListUtils.union(
                                 expressionStrategy.env(env),
