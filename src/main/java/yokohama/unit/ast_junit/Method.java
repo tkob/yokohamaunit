@@ -6,7 +6,7 @@ import yokohama.unit.util.Pair;
 import yokohama.unit.util.SBuilder;
 
 @Value
-public class TestMethod {
+public class Method {
     private final String name;
     private final List<Statement> statements;
 
@@ -14,7 +14,7 @@ public class TestMethod {
         sb.appendln("@org.junit.Test");
         sb.appendln("public void ", name, "() throws Exception {");
         sb.shift();
-        for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(this))) {
+        for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(this))) {
             Type type = pair.getFirst();
             String name = pair.getSecond();
             sb.appendln(type.getText(), " ", name, ";");

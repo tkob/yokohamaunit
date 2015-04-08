@@ -31,7 +31,7 @@ import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.Span;
-import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
@@ -59,8 +59,8 @@ public class AstToJUnitAstTest {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<TestMethod> actual = instance.translateTest(test, tables);
-        List<TestMethod> expected = Arrays.asList();
+        List<Method> actual = instance.translateTest(test, tables);
+        List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
 
@@ -73,8 +73,8 @@ public class AstToJUnitAstTest {
         String testName = "test";
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<TestMethod> actual = instance.translateAssertion(assertion, 0, testName, tables);
-        List<TestMethod> expected = Arrays.asList(new TestMethod(
+        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
+        List<Method> expected = Arrays.asList(new Method(
                 "test_0",
                 Arrays.asList(
                         new VarInitStatement(

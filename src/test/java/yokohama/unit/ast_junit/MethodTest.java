@@ -7,11 +7,11 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import yokohama.unit.util.SBuilder;
 
-public class TestMethodTest {
+public class MethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList());
+        Method instance = new Method("test", Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
@@ -25,7 +25,7 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder1() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod(
+        Method instance = new Method(
                 "test",
                 Arrays.asList(
                         new VarInitStatement(

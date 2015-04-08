@@ -35,7 +35,7 @@ import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.TestMethod;
+import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -50,8 +50,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     .collect(Collectors.toList());
         }
 
-        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitTestMethod(TestMethod testMethod) {
-            return visitStatements(testMethod.getStatements());
+        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitTestMethod(Method method) {
+            return visitStatements(method.getStatements());
         }
 
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatements(List<Statement> statements) {
@@ -108,8 +108,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
         cg.addEmptyConstructor(Constants.ACC_PUBLIC);
 
-        for (TestMethod testMethod : ast.getClassDecl().getTestMethods()) {
-            visitTestMethod(testMethod, cg, cp);
+        for (Method method : ast.getClassDecl().getMethods()) {
+            visitTestMethod(method, cg, cp);
         }
 
         try {
@@ -128,12 +128,12 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         return classFile;
     }
 
-    private void visitTestMethod(TestMethod testMethod, ClassGen cg, ConstantPoolGen cp) {
+    private void visitTestMethod(Method method, ClassGen cg, ConstantPoolGen cp) {
         InstructionList il = new InstructionList();
         MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                 Type.VOID, // return type of a test method is always void
                 Type.NO_ARGS, new String[]{}, // test methods have no arguments
-                testMethod.getName(),
+                method.getName(),
                 cg.getClassName(),
                 il, cp);
         AnnotationEntryGen ag = new AnnotationEntryGen(
@@ -146,9 +146,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
 
         Map<String, LocalVariableGen> locals = new HashMap<>();
         List<Pair<yokohama.unit.ast_junit.Type, String>> varDecls =
-                VarDeclVisitor.sortedSet(new VarDeclVisitor().visitTestMethod(testMethod));
+                VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(method));
         List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
-                CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(testMethod));
+                CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(method));
         for (Pair<yokohama.unit.ast_junit.Type,String> pair :
                 ListUtils.union(varDecls, caughtExVars)) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
@@ -159,7 +159,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             locals.put(name, lv);
         }
 
-        for (Statement statement : testMethod.getStatements()) {
+        for (Statement statement : method.getStatements()) {
             visitStatement(statement, locals, mg, il, factory, cp);
         }
 

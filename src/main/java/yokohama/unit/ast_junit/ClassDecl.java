@@ -12,13 +12,13 @@ public class ClassDecl {
     private final String name;
     private final Optional<ClassType> extended;
     private final List<ClassType> implemented;
-    private final List<TestMethod> testMethods;
+    private final List<Method> methods;
 
     public void toString(SBuilder sb) {
         sb.appendln("public class ", name, " {");
         sb.shift();
-        for (TestMethod testMethod : testMethods) {
-            testMethod.toString(sb);
+        for (Method method : methods) {
+            method.toString(sb);
         }
         sb.unshift();
         sb.appendln("}");
