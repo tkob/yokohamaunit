@@ -7,6 +7,8 @@ import yokohama.unit.util.SBuilder;
 public class Annotation {
     private final ClassType clazz;
 
+    public static final Annotation TEST = new Annotation(ClassType.TEST);
+
     public void toString(SBuilder sb) {
         sb.appendln("@", clazz.getText());
     }
