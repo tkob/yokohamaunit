@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
+import java.util.Optional;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,7 +12,7 @@ public class ClassDeclTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        ClassDecl instance = new ClassDecl("TestClass", Arrays.asList());
+        ClassDecl instance = new ClassDecl("TestClass", Optional.empty(), Arrays.asList(), Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();

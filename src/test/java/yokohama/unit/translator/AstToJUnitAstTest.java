@@ -50,7 +50,7 @@ public class AstToJUnitAstTest {
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy());
         CompilationUnit actual = instance.translate(name, group, packageName);
-        CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Arrays.asList()));
+        CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Optional.empty(), Arrays.asList(), Arrays.asList()));
         assertThat(actual, is(expected));
     }
 

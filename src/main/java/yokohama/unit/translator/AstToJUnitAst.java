@@ -103,7 +103,7 @@ public class AstToJUnitAst {
                                    fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, new GenSym()).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
-        ClassDecl classDecl = new ClassDecl(name, methods);
+        ClassDecl classDecl = new ClassDecl(name, Optional.empty(), Arrays.asList(), methods);
         return new CompilationUnit(packageName, classDecl);
     }
 
