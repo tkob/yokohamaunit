@@ -139,7 +139,7 @@ task compileDocy(type:Exec) {
         "$projectDir/build/install/yokohamaunit/bin/yokohamaunit"
         + (System.getProperty("os.name").contains("Windows") ? ".bat" : ""),
         'docyc',
-        '-cp', ext.classpath,
+        //'-cp', ext.classpath,
         '-d', ext.classesDir,
         '-basedir', ext.baseDir
         ]
@@ -148,6 +148,7 @@ task compileDocy(type:Exec) {
     if (!ext.classesDir.exists()) {
         ext.classesDir.mkdirs()
     }
+    environment DOCY_CLASSPATH: ext.classpath
     commandLine ext.command
 }
 compileDocy.dependsOn installApp

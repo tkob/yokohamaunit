@@ -92,7 +92,13 @@ public class CompileDocy implements Command {
         } else if (classpath != null) {
             return Arrays.asList(classpath.split(File.pathSeparator));
         } else {
-            return Arrays.asList();
+            String env = System.getenv("DOCY_CLASSPATH");
+            if (env != null) {
+                return Arrays.asList(System.getenv("DOCY_CLASSPATH").split(File.pathSeparator));
+            } else {
+                return Arrays.asList();
+            }
+
         }
     }
 
