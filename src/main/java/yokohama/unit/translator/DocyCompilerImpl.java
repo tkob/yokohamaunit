@@ -6,19 +6,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
+@AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
-    DocyParser docyParser = new DocyParserImpl();
-    ParseTreeToAstVisitor parseTreeToAstVisitor = new ParseTreeToAstVisitor();
-    VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
-    AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
-    ExpressionStrategy expressionStrategy = new OgnlExpressionStrategy();
-    MockStrategy mockStrategy = new MockitoMockStrategy();
-    JUnitAstCompiler jUnitAstCompiler = new JUnitAstCompilerImpl();
+    DocyParser docyParser;
+    ParseTreeToAstVisitor parseTreeToAstVisitor;
+    VariableCheckVisitor variableCheckVisitor;
+    AstToJUnitAstFactory astToJUnitAstFactory;
+    ExpressionStrategy expressionStrategy;
+    MockStrategy mockStrategy;
+    JUnitAstCompiler jUnitAstCompiler;
 
     @Override
     public boolean compile(

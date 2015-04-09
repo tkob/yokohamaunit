@@ -15,6 +15,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitLexer;
@@ -92,13 +94,17 @@ public class TranslatorUtils {
             final List<String> classPath,
             final Optional<Path> dest,
             final String... options) throws IOException {
-        return new DocyCompilerImpl().compile(
-                path.get(),
-                new ByteArrayInputStream(docy.getBytes()),
-                className,
-                packageName,
-                classPath,
-                dest,
-                Arrays.asList(options));
+        try (ConfigurableApplicationContext context =
+                new ClassPathXmlApplicationContext("applicationContext.xml")) {
+            DocyCompiler docyCompiler = context.getBean(DocyCompilerImpl.class);
+            return docyCompiler.compile(
+                    path.get(),
+                    new ByteArrayInputStream(docy.getBytes()),
+                    className,
+                    packageName,
+                    classPath,
+                    dest,
+                    Arrays.asList(options));
+        }
     }
 }
