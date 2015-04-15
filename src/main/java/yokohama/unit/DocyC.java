@@ -27,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
-public class CompileDocy implements Command {
+public class DocyC implements Command {
     private final DocyCompiler compiler;
     FileInputStreamFactory fileInputStreamFactory;
 
