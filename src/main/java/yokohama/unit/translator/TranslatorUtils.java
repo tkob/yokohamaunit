@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -15,8 +13,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitLexer;
@@ -84,27 +80,5 @@ public class TranslatorUtils {
 
         // JUnit AST to string
         return junit.getText();
-    }
-
-    public static boolean compileDocy(
-            final Optional<Path> path,
-            final String docy,
-            final String className,
-            final String packageName,
-            final List<String> classPath,
-            final Optional<Path> dest,
-            final String... options) throws IOException {
-        try (ConfigurableApplicationContext context =
-                new ClassPathXmlApplicationContext("applicationContext.xml")) {
-            DocyCompiler docyCompiler = context.getBean(DocyCompilerImpl.class);
-            return docyCompiler.compile(
-                    path.get(),
-                    new ByteArrayInputStream(docy.getBytes()),
-                    className,
-                    packageName,
-                    classPath,
-                    dest,
-                    Arrays.asList(options));
-        }
     }
 }
