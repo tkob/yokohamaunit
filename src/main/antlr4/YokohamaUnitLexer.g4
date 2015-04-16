@@ -171,7 +171,7 @@ OPENBACKTICK5: '`' -> skip, mode(CLASS) ;
 SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
 
 mode AFTER_TABLE;
-OPENSINGLEQUOTE: '\'' -> skip, mode(IN_TABLE_NAME) ;
+LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
 SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
 
 mode AFTER_CSV;
@@ -183,8 +183,8 @@ OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_BOOK_NAME) ;
 SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
 
 mode IN_TABLE_NAME;
-SingleQuoteName: (~['\r\n]|'\'\'')* ;
-CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+SingleQuoteName: ~[\]\r\n]* ;
+RBRACKET2: ']' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_FILE_NAME;
 SingleQuoteName2: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;

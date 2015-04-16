@@ -198,7 +198,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitForAll() throws IOException {
-        YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table 'table name'").forAll();
+        YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table [table name]").forAll();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         //Object expResult = null;
         TableRef result = instance.visitForAll(ctx);
@@ -207,7 +207,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitTableRef() throws IOException {
-        YokohamaUnitParser.TableRefContext ctx = parser("Table 'a''b'").tableRef();
+        YokohamaUnitParser.TableRefContext ctx = parser("Table [a'b]").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Pair<TableType, String> expected = new Pair<>(TableType.INLINE, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);

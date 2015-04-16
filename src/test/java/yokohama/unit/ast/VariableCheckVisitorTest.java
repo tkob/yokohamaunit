@@ -119,7 +119,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all c and d in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all c and d in Table [table].")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
@@ -128,7 +128,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all b and c in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all b and c in Table [table].")
                         .toString(),
                 Arrays.asList("b")),
         new Fixture(
@@ -137,7 +137,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all c, d, c, e and c in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all c, d, c, e and c in Table [table].")
                         .toString(),
                 Arrays.asList("c", "c")),
         new Fixture(
@@ -235,7 +235,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all c and d in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all c and d in Table [table].")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
@@ -244,7 +244,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all a and b in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all a and b in Table [table].")
                         .toString(),
                 Arrays.asList("a", "a")),
         new Fixture(
@@ -253,7 +253,7 @@ public class VariableCheckVisitorTest {
                         .appendln("Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
                         .appendln("Verify: verify")
-                        .appendln("Assert `1` is `1` for all c, d, c, e and c in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all c, d, c, e and c in Table [table].")
                         .toString(),
                 Arrays.asList("a", "c", "c")),
         new Fixture(
@@ -333,13 +333,13 @@ public class VariableCheckVisitorTest {
         new Fixture(
                 new SBuilder(4)
                         .appendln("Test: test")
-                        .appendln("Assert `1` is `1` for all a and b in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all a and b in Table [table].")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
                         .appendln("Test: test")
-                        .appendln("Assert `1` is `1` for all a, b and a in Table 'table'.")
+                        .appendln("Assert `1` is `1` for all a, b and a in Table [table].")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
