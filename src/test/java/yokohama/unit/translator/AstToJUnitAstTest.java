@@ -47,7 +47,7 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslate() {
         String name = "TestGroup";
-        Group group = new Group(Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
+        Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy());
         CompilationUnit actual = instance.translate(name, group, packageName);
