@@ -79,6 +79,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitAbbreviation(YokohamaUnitParser.AbbreviationContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Definition visitDefinition(YokohamaUnitParser.DefinitionContext ctx) {
         return (Definition)visitChildren(ctx);
     }
