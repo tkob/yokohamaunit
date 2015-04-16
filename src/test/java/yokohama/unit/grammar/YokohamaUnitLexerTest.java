@@ -34,7 +34,7 @@ public class YokohamaUnitLexerTest {
     @DataPoints
     public static Fixture[] PARAMs = {
         new Fixture("Test: Simple Test\n", Arrays.asList("Test:", "Simple Test")),
-        new Fixture("Table: Test Fixture\n", Arrays.asList("Table:", "Test Fixture")),
+        new Fixture("[Test Fixture]\n", Arrays.asList("Test Fixture")),
         new Fixture("Setup \t\nLet", Arrays.asList("Setup", "Let")),
         new Fixture("Setup: make a mock\nLet", Arrays.asList("Setup", "make a mock", "Let")),
         new Fixture("Exercise \t\nDo", Arrays.asList("Exercise", "Do")),
@@ -47,8 +47,8 @@ public class YokohamaUnitLexerTest {
         new Fixture("that and using where be", Arrays.asList("that", "and", "using", "where", "be")),
         new Fixture(".=", Arrays.asList(".", "=")),
         new Fixture("is throws", Arrays.asList("is", "throws")),
-        new Fixture("Table 'a'", Arrays.asList("Table",  "a")),
-        new Fixture("Table 'a''b'", Arrays.asList("Table",  "a''b")),
+        new Fixture("Table [a]", Arrays.asList("Table",  "a")),
+        new Fixture("Table [a'b]", Arrays.asList("Table",  "a'b")),
         new Fixture("CSV 'a'", Arrays.asList("CSV",  "a")),
         new Fixture("CSV 'a''b'", Arrays.asList("CSV",  "a''b")),
         new Fixture("TSV 'a'", Arrays.asList("TSV",  "a")),
@@ -59,11 +59,12 @@ public class YokohamaUnitLexerTest {
         new Fixture("`a||b`", Arrays.asList("a||b")),
         new Fixture("|a|b\n", Arrays.asList("|", "a", "|", "b", "\n")),
         new Fixture("|a|b\n----\n", Arrays.asList("|", "a", "|", "b", "\n", "----\n")),
+        new Fixture("|a|b\n|-=:.+ \n", Arrays.asList("|", "a", "|", "b", "\n", "|-=:.+ \n")),
         new Fixture("|a|b\n----\n\n==", Arrays.asList("|", "a", "|", "b", "\n", "----\n", "=", "=")),
         new Fixture("|a|b|\n", Arrays.asList("|", "a", "|", "b", "|", "\n")),
         new Fixture("|a|b|\n-----\n", Arrays.asList("|", "a", "|", "b", "|", "\n", "-----\n")),
         new Fixture("|a|b\n-----\n|c|d\n", Arrays.asList("|", "a", "|", "b", "\n", "-----\n", "|", "c", "|", "d", "\n")),
-        new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|", "==", "\n")),
+        new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|==\n")),
     };
 
     @Theory

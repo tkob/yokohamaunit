@@ -75,7 +75,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitDefinition2() throws IOException {
-        YokohamaUnitParser.DefinitionContext ctx = parser("Table: table name\n|a|b\n----\n|1|2\n\n").definition();
+        YokohamaUnitParser.DefinitionContext ctx = parser("[table name]\n|a|b\n----\n|1|2\n\n").definition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Definition result = instance.visitDefinition(ctx);
         assertThat(result, is(instanceOf(Table.class)));
@@ -198,16 +198,15 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitForAll() throws IOException {
-        YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table 'table name'").forAll();
+        YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table [table name]").forAll();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        //Object expResult = null;
         TableRef result = instance.visitForAll(ctx);
         assertEquals("table name", result.getName());
     }
 
     @Test
     public void testVisitTableRef() throws IOException {
-        YokohamaUnitParser.TableRefContext ctx = parser("Table 'a''b'").tableRef();
+        YokohamaUnitParser.TableRefContext ctx = parser("Table [a'b]").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Pair<TableType, String> expected = new Pair<>(TableType.INLINE, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);
@@ -276,7 +275,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitTableDef() throws IOException {
-        YokohamaUnitParser.TableDefContext ctx = parser("Table: table name\n|a|b\n|1|2\n").tableDef();
+        YokohamaUnitParser.TableDefContext ctx = parser("[table name]\n|a|b\n|1|2\n").tableDef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
         Table actual = instance.visitTableDef(ctx);
         Table expected = new Table(

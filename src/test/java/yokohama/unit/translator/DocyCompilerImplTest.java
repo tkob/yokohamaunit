@@ -76,7 +76,10 @@ public class DocyCompilerImplTest {
                 Arrays.asList(
                         "String_startsWith_1_1",
                         "String_startsWith_1_2",
-                        "String_startsWith_1_3")),
+                        "String_startsWith_1_3",
+                        "String_endsWith_1_1",
+                        "String_endsWith_1_2",
+                        "String_endsWith_1_3")),
         new Fixture(
                 "TestCSV.docy",
                 Arrays.asList(

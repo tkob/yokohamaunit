@@ -7,7 +7,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' -> mode(TEST_LEADING);
-TABLE: 'Table:' -> mode(TABLE_LEADING);
+TABLECAPTION: '[' -> skip, mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -91,12 +91,9 @@ mode TEST_NAME;
 TestName: ~[\r\n]+ ;
 NEW_LINE_TESTNAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
-mode TABLE_LEADING;
-WS4: [ \t]+ -> skip, mode(TABLE_NAME);
-
 mode TABLE_NAME;
-TableName: ~[\r\n]+ ;
-NEW_LINE_TABLENAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+TableName: ~[\]\r\n]+ ;
+EXIT_TABLENAME: ']' [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode PHASE_LEADING;
 COLON: ':' [ \t]* -> skip, mode(PHASE_DESCRIPTION) ;
@@ -127,8 +124,9 @@ NEWLINECELL: '\r'? '\n' -> type(NEWLINE), mode(IN_TABLE_ONSET) ;
 SPACETABCELL: [ \t]+ -> skip ;
 
 mode IN_TABLE_ONSET;
+HBAR: [|\-=\:\.\+ \t]+ '\r'? '\n' ;
 BARONSET: '|' -> type(BAR), mode(IN_TABLE_CELL) ;
-HBAR: '-'+ '\r'? '\n' ;
+TABLECAPTION2: '[' -> skip, mode(TABLE_NAME);
 SPACETAB2: [ \t]+ -> skip ;
 NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
 
@@ -173,7 +171,7 @@ OPENBACKTICK5: '`' -> skip, mode(CLASS) ;
 SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
 
 mode AFTER_TABLE;
-OPENSINGLEQUOTE: '\'' -> skip, mode(IN_TABLE_NAME) ;
+LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
 SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
 
 mode AFTER_CSV;
@@ -185,8 +183,8 @@ OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_BOOK_NAME) ;
 SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
 
 mode IN_TABLE_NAME;
-SingleQuoteName: (~['\r\n]|'\'\'')* ;
-CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+SingleQuoteName: ~[\]\r\n]* ;
+RBRACKET2: ']' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_FILE_NAME;
 SingleQuoteName2: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;

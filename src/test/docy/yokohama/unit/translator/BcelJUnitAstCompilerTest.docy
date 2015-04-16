@@ -6,9 +6,9 @@ Assert `new yokohama.unit.translator.BcelJUnitAstCompiler()
                 packageName,
                 className)`
        is `new java.io.File(expected).toPath()`
-for all dest, packageName, className and expected in Table 'Fixture'.
+for all dest, packageName, className and expected in Table [Fixture].
 
-Table: Fixture
+[Fixture]
 | dest | packageName   | className | expected                     |
 | ""   | "com.example" | "Hello"   | "com/example/Hello.class"    |
 | "."  | "com.example" | "Hello"   | "./com/example/Hello.class"  |
