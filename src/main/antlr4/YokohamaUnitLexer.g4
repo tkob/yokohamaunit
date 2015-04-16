@@ -7,7 +7,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' -> mode(TEST_LEADING);
-TABLE: 'Table:' -> mode(TABLE_LEADING);
+TABLEDEF: '[' -> skip, mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -91,12 +91,9 @@ mode TEST_NAME;
 TestName: ~[\r\n]+ ;
 NEW_LINE_TESTNAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
-mode TABLE_LEADING;
-WS4: [ \t]+ -> skip, mode(TABLE_NAME);
-
 mode TABLE_NAME;
-TableName: ~[\r\n]+ ;
-NEW_LINE_TABLENAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+TableName: ~[\]\r\n]+ ;
+EXIT_TABLENAME: ']' [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode PHASE_LEADING;
 COLON: ':' [ \t]* -> skip, mode(PHASE_DESCRIPTION) ;
