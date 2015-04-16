@@ -7,7 +7,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' -> mode(TEST_LEADING);
-TABLEDEF: '[' -> skip, mode(TABLE_NAME);
+TABLECAPTION: '[' -> skip, mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -126,6 +126,7 @@ SPACETABCELL: [ \t]+ -> skip ;
 mode IN_TABLE_ONSET;
 HBAR: [|\-=\:\.\+ \t]+ '\r'? '\n' ;
 BARONSET: '|' -> type(BAR), mode(IN_TABLE_CELL) ;
+TABLECAPTION2: '[' -> skip, mode(TABLE_NAME);
 SPACETAB2: [ \t]+ -> skip ;
 NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
 

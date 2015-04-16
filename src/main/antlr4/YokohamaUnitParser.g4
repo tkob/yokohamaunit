@@ -58,7 +58,8 @@ letBindings: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
 execution: DO Expr (AND Expr)* STOP ;
 
-tableDef: TableName header HBAR? rows ;
+tableDef: TableName header HBAR? rows
+        | header HBAR? rows TableName ;
 
 header: BAR (Identifier BAR)* Identifier? NEWLINE;
 

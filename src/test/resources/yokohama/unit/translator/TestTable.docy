@@ -8,3 +8,15 @@ for all sut, prefix and expected in Table 'Test data for startsWith'.
 | "hello world" | ""      | true     | 1     |
 | "hello world" | "hello" | true     | 2     |
 | "hello world" | "world" | false    | 3     |
+
+# Test: String.endsWith
+
+Assert `sut.endsWith(suffix)` is `expected`
+for all sut, suffix and expected in Table 'Test data for endsWith'.
+
+| sut           | suffix  | expected |
+| ------------- | ------- | -------- |
+| "hello world" | ""      | true     |
+| "hello world" | "world" | true     |
+| "hello world" | "hello" | false    |
+[Test data for endsWith]
