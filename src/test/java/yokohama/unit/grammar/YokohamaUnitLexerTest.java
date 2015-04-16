@@ -59,11 +59,12 @@ public class YokohamaUnitLexerTest {
         new Fixture("`a||b`", Arrays.asList("a||b")),
         new Fixture("|a|b\n", Arrays.asList("|", "a", "|", "b", "\n")),
         new Fixture("|a|b\n----\n", Arrays.asList("|", "a", "|", "b", "\n", "----\n")),
+        new Fixture("|a|b\n|-=:.+ \n", Arrays.asList("|", "a", "|", "b", "\n", "|-=:.+ \n")),
         new Fixture("|a|b\n----\n\n==", Arrays.asList("|", "a", "|", "b", "\n", "----\n", "=", "=")),
         new Fixture("|a|b|\n", Arrays.asList("|", "a", "|", "b", "|", "\n")),
         new Fixture("|a|b|\n-----\n", Arrays.asList("|", "a", "|", "b", "|", "\n", "-----\n")),
         new Fixture("|a|b\n-----\n|c|d\n", Arrays.asList("|", "a", "|", "b", "\n", "-----\n", "|", "c", "|", "d", "\n")),
-        new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|", "==", "\n")),
+        new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|==\n")),
     };
 
     @Theory

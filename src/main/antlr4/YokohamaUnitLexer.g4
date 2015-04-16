@@ -124,8 +124,8 @@ NEWLINECELL: '\r'? '\n' -> type(NEWLINE), mode(IN_TABLE_ONSET) ;
 SPACETABCELL: [ \t]+ -> skip ;
 
 mode IN_TABLE_ONSET;
+HBAR: [|\-=\:\.\+ \t]+ '\r'? '\n' ;
 BARONSET: '|' -> type(BAR), mode(IN_TABLE_CELL) ;
-HBAR: '-'+ '\r'? '\n' ;
 SPACETAB2: [ \t]+ -> skip ;
 NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
 
