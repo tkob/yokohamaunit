@@ -200,7 +200,6 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitForAll() throws IOException {
         YokohamaUnitParser.ForAllContext ctx = parser("for all var in Table [table name]").forAll();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor();
-        //Object expResult = null;
         TableRef result = instance.visitForAll(ctx);
         assertEquals("table name", result.getName());
     }
