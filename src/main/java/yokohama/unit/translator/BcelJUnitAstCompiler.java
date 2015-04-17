@@ -31,6 +31,7 @@ import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
+import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
@@ -95,29 +96,31 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             List<String> classPath,
             Optional<Path> dest,
             List<String> javacArgs) {
-        ClassGen cg = new ClassGen(
-                packageName.equals("") ? className : packageName + "." + className,
-                "java.lang.Object", // super class
-                docyPath.getFileName().toString(), // source file name
-                Constants.ACC_PUBLIC | Constants.ACC_SUPER,
-                null // implemented interfaces
-        );
-        // set class file version to Java 1.5
-        cg.setMajor(49);
-        cg.setMinor(0);
-        
-        ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
-        cg.addEmptyConstructor(Constants.ACC_PUBLIC);
+        for (ClassDecl classDecl : ast.getClassDecls()) {
+            ClassGen cg = new ClassGen(
+                    packageName.equals("") ? className : packageName + "." + className,
+                    "java.lang.Object", // super class
+                    docyPath.getFileName().toString(), // source file name
+                    Constants.ACC_PUBLIC | Constants.ACC_SUPER,
+                    null // implemented interfaces
+            );
+            // set class file version to Java 1.5
+            cg.setMajor(49);
+            cg.setMinor(0);
 
-        for (Method method : ast.getClassDecl().getMethods()) {
-            visitTestMethod(method, cg, cp);
-        }
+            ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+            cg.addEmptyConstructor(Constants.ACC_PUBLIC);
 
-        try {
-            Path classFilePath = makeClassFilePath(dest, packageName, className);
-            cg.getJavaClass().dump(classFilePath.toFile());
-        } catch(java.io.IOException e) {
-            System.err.println(e);
+            for (Method method : classDecl.getMethods()) {
+                visitTestMethod(method, cg, cp);
+            }
+
+            try {
+                Path classFilePath = makeClassFilePath(dest, packageName, className);
+                cg.getJavaClass().dump(classFilePath.toFile());
+            } catch(java.io.IOException e) {
+                System.err.println(e);
+            }
         }
         return true;
     }

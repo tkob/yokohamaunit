@@ -93,7 +93,7 @@ public class AstToJUnitAst {
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl classDecl = new ClassDecl(name, Optional.empty(), Arrays.asList(), methods);
-        return new CompilationUnit(packageName, classDecl);
+        return new CompilationUnit(packageName, Arrays.asList(classDecl));
     }
 
     List<Method> translateTest(Test test, final List<Table> tables) {
