@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
@@ -68,27 +69,14 @@ import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.SUtils;
 
+@AllArgsConstructor
 public class AstToJUnitAst {
     private final Optional<Path> docyPath;
     private final String className;
     private final String packageName;
     ExpressionStrategy expressionStrategy;
     MockStrategy mockStrategy;
-    
-    AstToJUnitAst(
-            Optional<Path> docyPath,
-            String className,
-            String packageName,
-            ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy) {
-        this.docyPath = docyPath;
-        this.className = className;
-        this.packageName = packageName;
-        this.expressionStrategy = expressionStrategy;
-        this.mockStrategy = mockStrategy;
-    }
-
-    TableExtractVisitor tableExtractVisitor = new TableExtractVisitor();
+    TableExtractVisitor tableExtractVisitor;
 
     Span spanOf(yokohama.unit.ast.Span span) {
         return new Span(docyPath, span.getStart(), span.getEnd());

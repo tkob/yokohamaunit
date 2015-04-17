@@ -69,8 +69,9 @@ public class TranslatorUtils {
         Group ast = parseDocy(docy);
 
         // AST to JUnit AST
+        AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
         CompilationUnit junit =
-                new AstToJUnitAst(
+                astToJUnitAstFactory.create(
                         docyPath,
                         className,
                         packageName,
