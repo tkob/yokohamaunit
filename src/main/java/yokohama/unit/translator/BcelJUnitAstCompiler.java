@@ -38,6 +38,7 @@ import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.ReturnStatement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -74,7 +75,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     ifStatement ->
                             Stream.concat(
                                     visitStatements(ifStatement.getThen()),
-                                    visitStatements(ifStatement.getOtherwise())));
+                                    visitStatements(ifStatement.getOtherwise())),
+                    returnStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty());
         }
 
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
@@ -180,7 +182,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             visitStatement(statement, locals, mg, il, factory, cp);
         }
 
-        il.append(InstructionConstants.RETURN);
+        if (!method.getReturnType().isPresent()) {
+            il.append(InstructionConstants.RETURN);
+        }
 
         mg.setMaxStack();
         cg.addMethod(mg.getMethod());
@@ -274,8 +278,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 goto_.setTarget(fi);
 
                 return null;
-            }
-        );
+            },
+            returnStatement -> {
+                visitReturnStatement(returnStatement, locals, il, factory, cp);
+                return null;
+            });
     }
 
     private void visitIsStatement(
@@ -477,6 +484,17 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
         }
         il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+    }
+
+    private void visitReturnStatement(
+            ReturnStatement returnStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen lv = locals.get(returnStatement.getReturned().getName());
+        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+        il.append(InstructionFactory.createReturn(lv.getType()));
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {
