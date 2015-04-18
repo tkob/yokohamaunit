@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import com.gs.collections.impl.map.immutable.ImmutableMapFactoryImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,7 +8,9 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +27,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
@@ -83,31 +87,44 @@ public class AstToJUnitAst {
     }
 
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
+        Map<String, String> abbreviationMap = this.translateAbbreviations(group.getAbbreviations());
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
         List<Method> methods =
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
-                                   test -> translateTest(test, tables).stream(),
-                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, new GenSym()).stream(),
+                                   test -> translateTest(test, tables, abbreviationMap).stream(),
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, abbreviationMap, new GenSym()).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
-        ClassDecl classDecl = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
-        return new CompilationUnit(packageName, Arrays.asList(classDecl));
+        ClassDecl testClass = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
+        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(name, group, abbreviationMap);
+        List<ClassDecl> classes =
+                Stream.concat(auxClasses.stream(), Stream.of(testClass))
+                        .collect(Collectors.toList());
+        return new CompilationUnit(packageName, classes);
     }
 
-    List<Method> translateTest(Test test, final List<Table> tables) {
+    private Map<String, String> translateAbbreviations(List<Abbreviation> abbreviations) {
+        return abbreviations.stream().reduce(
+                new ImmutableMapFactoryImpl().<String, String>empty(),
+                (map, abbreviation) -> map.newWithKeyValue(abbreviation.getShortName(), abbreviation.getLongName()),
+                (map1, map2) -> map1.newWithAllKeyValues(map2.keyValuesView()))
+                .toMap();
+    }
+    
+    List<Method> translateTest(Test test, final List<Table> tables, Map<String, String> abbreviationMap) {
         final String name = test.getName();
         List<Assertion> assertions = test.getAssertions();
         List<Method> methods = 
                 IntStream.range(0, assertions.size())
                         .mapToObj(Integer::new)
-                        .flatMap(i -> translateAssertion(assertions.get(i), i + 1, name, tables).stream())
+                        .flatMap(i -> translateAssertion(assertions.get(i), i + 1, name, tables, abbreviationMap).stream())
                         .collect(Collectors.toList());
         return methods;
     }
 
-    List<Method> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
+    List<Method> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables, Map<String, String> abbreviationMap) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(() -> {
@@ -120,7 +137,7 @@ public class AstToJUnitAst {
                                     Optional.empty(),
                                     Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                     ListUtils.union(
-                                            expressionStrategy.env(env, genSym),
+                                            expressionStrategy.env(env, className, packageName, abbreviationMap, genSym),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                                 translateProposition(
@@ -143,7 +160,7 @@ public class AstToJUnitAst {
                                         Optional.empty(),
                                         Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                         ListUtils.union(
-                                                expressionStrategy.env(env, genSym),
+                                                expressionStrategy.env(env, className, packageName, abbreviationMap, genSym),
                                                 ListUtils.union(
                                                         table.get(i),
                                                         propositions
@@ -167,7 +184,7 @@ public class AstToJUnitAst {
                             Optional.empty(),
                             Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                             ListUtils.union(
-                                    expressionStrategy.env(env, genSym),
+                                    expressionStrategy.env(env, className, packageName, abbreviationMap, genSym),
                                     Stream.concat(
                                             bindings.getBindings()
                                                     .stream()
@@ -520,7 +537,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, GenSym genSym) {
+    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, Map<String, String> abbreviationMap, GenSym genSym) {
         String env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());
@@ -586,7 +603,7 @@ public class AstToJUnitAst {
                 Optional.empty(),
                 Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 ListUtils.union(
-                        expressionStrategy.env(env, genSym),
+                        expressionStrategy.env(env, className, packageName, abbreviationMap, genSym),
                         actionsAfter.size() > 0
                                 ?  Arrays.asList(
                                         new TryStatement(

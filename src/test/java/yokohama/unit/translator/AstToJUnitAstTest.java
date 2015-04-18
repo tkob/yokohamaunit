@@ -1,6 +1,7 @@
 package yokohama.unit.translator;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class AstToJUnitAstTest {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        List<Method> actual = instance.translateTest(test, tables);
+        List<Method> actual = instance.translateTest(test, tables, new HashMap<>());
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -75,7 +76,7 @@ public class AstToJUnitAstTest {
         String testName = "test";
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
+        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables, new HashMap<>());
         List<Method> expected = Arrays.asList(new Method(
                 Arrays.asList(Annotation.TEST),
                 "test_0",
@@ -110,9 +111,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -122,9 +124,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -156,9 +159,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -168,9 +172,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -213,9 +218,10 @@ public class AstToJUnitAstTest {
                                         new ClassType("ognl.Ognl", Span.dummySpan()),
                                         Arrays.asList(),
                                         "getValue",
-                                        Arrays.asList(Type.STRING, Type.OBJECT),
+                                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                                         Arrays.asList(
                                                 new Var("expression"),
+                                                new Var("env"),
                                                 new Var("env")),
                                         Type.OBJECT),
                                         Span.dummySpan()),
