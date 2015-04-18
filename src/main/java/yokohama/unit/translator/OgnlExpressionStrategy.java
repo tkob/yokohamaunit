@@ -27,7 +27,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     static final ClassType OGNL_EXCEPTION = new ClassType("ognl.OgnlException", Span.dummySpan());
 
     @Override
-    public List<Statement> env(String varName) {
+    public List<Statement> env(String varName, GenSym genSym) {
         return Arrays.asList(new VarInitStatement(
                 OGNL_CONTEXT,
                 varName,

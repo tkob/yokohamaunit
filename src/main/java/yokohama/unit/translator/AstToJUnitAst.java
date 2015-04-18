@@ -119,7 +119,7 @@ public class AstToJUnitAst {
                                     Arrays.asList(),
                                     Optional.empty(),
                                     ListUtils.union(
-                                            expressionStrategy.env(env),
+                                            expressionStrategy.env(env, genSym),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                                 translateProposition(
@@ -141,7 +141,7 @@ public class AstToJUnitAst {
                                         Arrays.asList(),
                                         Optional.empty(),
                                         ListUtils.union(
-                                                expressionStrategy.env(env),
+                                                expressionStrategy.env(env, genSym),
                                                 ListUtils.union(
                                                         table.get(i),
                                                         propositions
@@ -164,7 +164,7 @@ public class AstToJUnitAst {
                                     Arrays.asList(),
                                     Optional.empty(),
                                     ListUtils.union(
-                                            expressionStrategy.env(env),
+                                            expressionStrategy.env(env, genSym),
                                             Stream.concat(
                                                     bindings.getBindings()
                                                             .stream()
@@ -582,7 +582,7 @@ public class AstToJUnitAst {
                         Arrays.asList(),
                         Optional.empty(),
                         ListUtils.union(
-                                expressionStrategy.env(env),
+                                expressionStrategy.env(env, genSym),
                                 actionsAfter.size() > 0
                                         ?  Arrays.asList(
                                                 new TryStatement(
