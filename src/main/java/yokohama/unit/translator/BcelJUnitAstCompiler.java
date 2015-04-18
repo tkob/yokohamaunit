@@ -122,6 +122,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             try {
                 Path classFilePath = makeClassFilePath(dest, packageName, classDecl.getName());
                 cg.getJavaClass().dump(classFilePath.toFile());
+                cg.getJavaClass().dump(new java.io.File("build/tmp/" + packageName.replace(".", "/") + "/" + classDecl.getName() + ".class"));
                 Repository.getRepository().storeClass(cg.getJavaClass());
             } catch(IOException e) {
                 System.err.println(e);
@@ -172,12 +173,17 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
                 CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(method));
         for (Pair<yokohama.unit.ast_junit.Type,String> pair :
-                ListUtils.union(args, ListUtils.union(varDecls, caughtExVars))) {
+                ListUtils.union(varDecls, caughtExVars)) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
             String name = pair.getSecond();
             if (locals.containsKey(name))
                 throw new RuntimeException("duplicate local variable: " + name);
             LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);
+            locals.put(name, lv);
+        }
+        // populate locals again, since method arguments are not there yet
+        for (LocalVariableGen lv : mg.getLocalVariables()) {
+            String name = lv.getName();
             locals.put(name, lv);
         }
 
