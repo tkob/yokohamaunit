@@ -101,7 +101,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             Optional<Path> dest,
             List<String> javacArgs) {
         for (ClassDecl classDecl : ast.getClassDecls()) {
-            System.err.println(classDecl.getName());
             ClassGen cg = new ClassGen(
                     packageName.equals("") ? classDecl.getName() : packageName + "." + classDecl.getName(),
                     "java.lang.Object", // super class
@@ -123,6 +122,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             try {
                 Path classFilePath = makeClassFilePath(dest, packageName, classDecl.getName());
                 cg.getJavaClass().dump(classFilePath.toFile());
+                Repository.getRepository().storeClass(cg.getJavaClass());
             } catch(IOException e) {
                 System.err.println(e);
             }
