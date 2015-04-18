@@ -34,6 +34,7 @@ import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
@@ -101,13 +102,20 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             Optional<Path> dest,
             List<String> javacArgs) {
         for (ClassDecl classDecl : ast.getClassDecls()) {
+            Optional<ClassType> extended = classDecl.getExtended();
+            List<ClassType> implemented = classDecl.getImplemented();
             ClassGen cg = new ClassGen(
                     packageName.equals("") ? classDecl.getName() : packageName + "." + classDecl.getName(),
-                    "java.lang.Object", // super class
+                    extended.isPresent()
+                            ? extended.get().getName()
+                            : "java.lang.Object",
                     docyPath.getFileName().toString(), // source file name
                     Constants.ACC_PUBLIC | Constants.ACC_SUPER,
-                    null // implemented interfaces
-            );
+                    implemented.stream()
+                            .map(ClassType::getName)
+                            .collect(Collectors.toList())
+                            .toArray(new String[]{}));
+
             // set class file version to Java 1.5
             cg.setMajor(49);
             cg.setMinor(0);
