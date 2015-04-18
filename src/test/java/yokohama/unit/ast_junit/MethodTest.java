@@ -17,12 +17,13 @@ public class MethodTest {
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
+                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
-        expected.appendln("public void test() throws Exception {");
+        expected.appendln("public void test() throws java.lang.Exception {");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
@@ -36,6 +37,7 @@ public class MethodTest {
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
+                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
                                 new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),
@@ -49,7 +51,7 @@ public class MethodTest {
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
-        expected.appendln("public void test() throws Exception {");
+        expected.appendln("public void test() throws java.lang.Exception {");
         expected.appendln("    java.lang.Object actual;");
         expected.appendln("    ognl.OgnlContext env;");
         expected.appendln("    java.lang.Object expected;");

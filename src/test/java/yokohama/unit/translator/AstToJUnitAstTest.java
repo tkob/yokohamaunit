@@ -81,6 +81,7 @@ public class AstToJUnitAstTest {
                 "test_0",
                 Arrays.asList(),
                 Optional.empty(),
+                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,

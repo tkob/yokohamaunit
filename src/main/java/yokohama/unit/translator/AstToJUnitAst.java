@@ -118,6 +118,7 @@ public class AstToJUnitAst {
                                     methodName,
                                     Arrays.asList(),
                                     Optional.empty(),
+                                    Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                     ListUtils.union(
                                             expressionStrategy.env(env, genSym),
                                             propositions.stream()
@@ -140,6 +141,7 @@ public class AstToJUnitAst {
                                         methodName + "_" + (i + 1),
                                         Arrays.asList(),
                                         Optional.empty(),
+                                        Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                         ListUtils.union(
                                                 expressionStrategy.env(env, genSym),
                                                 ListUtils.union(
@@ -159,27 +161,28 @@ public class AstToJUnitAst {
                     GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
-                                    Arrays.asList(Annotation.TEST),
-                                    methodName,
-                                    Arrays.asList(),
-                                    Optional.empty(),
-                                    ListUtils.union(
-                                            expressionStrategy.env(env, genSym),
-                                            Stream.concat(
-                                                    bindings.getBindings()
-                                                            .stream()
-                                                            .flatMap(binding ->
-                                                                    translateBinding(
-                                                                            binding,
-                                                                            genSym,
-                                                                            env)),
-                                                    propositions.stream()
-                                                            .flatMap(proposition ->
-                                                                    translateProposition(
-                                                                            proposition,
-                                                                            genSym,
-                                                                            env)))
-                                                    .collect(Collectors.toList()))));
+                            Arrays.asList(Annotation.TEST),
+                            methodName,
+                            Arrays.asList(),
+                            Optional.empty(),
+                            Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                            ListUtils.union(
+                                    expressionStrategy.env(env, genSym),
+                                    Stream.concat(
+                                            bindings.getBindings()
+                                                    .stream()
+                                                    .flatMap(binding ->
+                                                            translateBinding(
+                                                                    binding,
+                                                                    genSym,
+                                                                    env)),
+                                            propositions.stream()
+                                                    .flatMap(proposition ->
+                                                            translateProposition(
+                                                                    proposition,
+                                                                    genSym,
+                                                                    env)))
+                                            .collect(Collectors.toList()))));
                 });
     }
 
@@ -577,19 +580,20 @@ public class AstToJUnitAst {
         }
 
         return Arrays.asList(new Method(
-                        Arrays.asList(Annotation.TEST),
-                        testName,
-                        Arrays.asList(),
-                        Optional.empty(),
-                        ListUtils.union(
-                                expressionStrategy.env(env, genSym),
-                                actionsAfter.size() > 0
-                                        ?  Arrays.asList(
-                                                new TryStatement(
-                                                        statements,
-                                                        Arrays.asList(),
-                                                        actionsAfter))
-                                        : statements)));
+                Arrays.asList(Annotation.TEST),
+                testName,
+                Arrays.asList(),
+                Optional.empty(),
+                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                ListUtils.union(
+                        expressionStrategy.env(env, genSym),
+                        actionsAfter.size() > 0
+                                ?  Arrays.asList(
+                                        new TryStatement(
+                                                statements,
+                                                Arrays.asList(),
+                                                actionsAfter))
+                                : statements)));
     }
 
     Stream<Statement> translateExecutions(List<Execution> executions, GenSym genSym, String envVarName) {

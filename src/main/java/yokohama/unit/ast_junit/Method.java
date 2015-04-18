@@ -13,6 +13,7 @@ public class Method {
     private final String name;
     private final List<Pair<Type, String>> args;
     private final Optional<Type> returnType;
+    private final List<ClassType> thrown;
     private final List<Statement> statements;
 
     public void toString(SBuilder sb) {
@@ -26,7 +27,11 @@ public class Method {
                 args.stream()
                         .map(pair -> pair.getFirst().getText() + " " + pair.getSecond())
                         .collect(Collectors.joining(", ")),
-                ") throws Exception {");
+                ")",
+                thrown.isEmpty()
+                        ? ""
+                        : " throws " + thrown.stream().map(ClassType::getText).collect(Collectors.joining(", ")),
+                " {");
         sb.shift();
         for (Pair<Type, String> pair : VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(this))) {
             Type type = pair.getFirst();
