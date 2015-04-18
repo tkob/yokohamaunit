@@ -15,6 +15,8 @@ public class Type {
     public static final Type CLASS = new Type(new ClassType("java.lang.Class", Span.dummySpan()), 0);
     public static final Type STRING = new Type(new ClassType("java.lang.String", Span.dummySpan()), 0);
     public static final Type MATCHER = new Type(new ClassType("org.hamcrest.Matcher", Span.dummySpan()), 0);
+    public static final Type MAP = new Type(new ClassType("java.util.Map", Span.dummySpan()), 0);
+
     public static final Type BOOLEAN = new Type(new PrimitiveType(Kind.BOOLEAN), 0);
     public static final Type BYTE = new Type(new PrimitiveType(Kind.BYTE), 0);
     public static final Type SHORT = new Type(new PrimitiveType(Kind.SHORT), 0);
