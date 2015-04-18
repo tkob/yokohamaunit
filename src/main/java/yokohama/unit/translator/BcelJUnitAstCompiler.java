@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.apache.bcel.Constants;
+import org.apache.bcel.Repository;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BranchInstruction;
@@ -36,9 +38,9 @@ import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
-import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.ReturnStatement;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -99,8 +101,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             Optional<Path> dest,
             List<String> javacArgs) {
         for (ClassDecl classDecl : ast.getClassDecls()) {
+            System.err.println(classDecl.getName());
             ClassGen cg = new ClassGen(
-                    packageName.equals("") ? className : packageName + "." + className,
+                    packageName.equals("") ? classDecl.getName() : packageName + "." + classDecl.getName(),
                     "java.lang.Object", // super class
                     docyPath.getFileName().toString(), // source file name
                     Constants.ACC_PUBLIC | Constants.ACC_SUPER,
@@ -118,9 +121,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
 
             try {
-                Path classFilePath = makeClassFilePath(dest, packageName, className);
+                Path classFilePath = makeClassFilePath(dest, packageName, classDecl.getName());
                 cg.getJavaClass().dump(classFilePath.toFile());
-            } catch(java.io.IOException e) {
+            } catch(IOException e) {
                 System.err.println(e);
             }
         }
