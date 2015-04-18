@@ -14,8 +14,9 @@ public class InvokeStaticExpr implements Expr {
     List<Var> args;
     Type returnType; // erasued return type
 
-    public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(varName, " = ", clazz.getName(), ".", 
+    public void getExpr(SBuilder sb, Type varType, String varName) {
+        sb.appendln(varName, " = (", varType.getText(), ")",
+                clazz.getName(), ".", 
                 typeArgs.size() > 0
                         ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",
