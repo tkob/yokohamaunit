@@ -457,11 +457,7 @@ public class AstToJUnitAst {
                 primitiveType -> new PrimitiveType(primitiveType.getKind()),
                 classType -> new ClassType(
                         classType.getName(),
-                        new Span(
-                                docyPath,
-                                classType.getSpan().getStart(),
-                                classType.getSpan().getEnd()))
-        );
+                        classType.getSpan()));
     }
 
     List<List<Statement>> translateTableRef(

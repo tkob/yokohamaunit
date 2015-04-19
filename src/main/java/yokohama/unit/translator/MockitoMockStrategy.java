@@ -93,10 +93,7 @@ public class MockitoMockStrategy implements MockStrategy {
             Optional<Path> docyPath,
             String className,
             String packageName) {
-        Span span = new Span(
-                docyPath,
-                behavior.getSpan().getStart(),
-                behavior.getSpan().getEnd());
+        Span span = behavior.getSpan();
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
         boolean isVarArg = methodPattern.isVarArg();
@@ -240,10 +237,7 @@ public class MockitoMockStrategy implements MockStrategy {
             ClassResolver classResolver,
             GenSym genSym,
             Optional<Path> docyPath) {
-        Span span = new Span(
-                docyPath,
-                argumentType.getSpan().getStart(),
-                argumentType.getSpan().getEnd());
+        Span span = argumentType.getSpan();
         String argVarName = genSym.generate("arg");
         int dims = argumentType.getDims();
         Stream<Statement> statements = argumentType.getNonArrayType().accept(

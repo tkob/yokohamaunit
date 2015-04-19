@@ -285,10 +285,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String className,
             String packageName) {
         Var exprVar = new Var(genSym.generate("expression"));
-        Span span = new Span(
-                docyPath,
-                quotedExpr.getSpan().getStart(),
-                quotedExpr.getSpan().getEnd());
+        Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
