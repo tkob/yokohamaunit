@@ -317,6 +317,14 @@ public class AstToJUnitAst {
                         Arrays.asList()));
     }
 
+    private String lookupClassName(String name, ClassResolver classResolver, Span span) {
+        try {
+            return classResolver.lookup(name).getCanonicalName();
+        } catch (ClassNotFoundException e) {
+            throw new TranslationException(e);
+        }
+    }
+
     Stream<Statement> translateMatcher(
             Matcher matcher,
             String varName,
@@ -338,19 +346,14 @@ public class AstToJUnitAst {
                                 Span.dummySpan())));
             },
             (InstanceOfMatcher instanceOf) -> {
-                String canonicalClassName;
-                try {
-                    canonicalClassName =
-                            classResolver
-                                    .lookup(instanceOf.getClazz().getName())
-                                    .getCanonicalName();
-                } catch (ClassNotFoundException e) {
-                    throw new TranslationException(e);
-                }
                 return Stream.of(new VarInitStatement(
                         Type.MATCHER,
                         varName,
-                        new InstanceOfMatcherExpr(canonicalClassName),
+                        new InstanceOfMatcherExpr(
+                                lookupClassName(
+                                        instanceOf.getClazz().getName(),
+                                        classResolver,
+                                        spanOf(instanceOf.getSpan()))),
                         spanOf(instanceOf.getSpan())));
             },
             (InstanceSuchThatMatcher instanceSuchThat) -> {
