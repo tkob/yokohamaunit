@@ -119,7 +119,8 @@ public class DocyCompilerImplTest {
                 Arrays.asList(
                         "Test_import_1",
                         "Test_import_2",
-                        "Test_import_3")),
+                        "Test_import_3",
+                        "Test_import_4")),
     };
 
     @DataPoints
