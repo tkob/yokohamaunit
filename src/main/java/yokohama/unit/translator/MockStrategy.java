@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import yokohama.unit.ast.Span;
 import yokohama.unit.ast.StubBehavior;
-import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
@@ -20,7 +20,6 @@ public interface MockStrategy {
             String envVarName,
             ClassResolver classResolver,
             GenSym genSym,
-            Optional<Path> docyPath,
             String className,
             String packageName);
 }

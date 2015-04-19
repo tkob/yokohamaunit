@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.QuotedExpr;
+import yokohama.unit.ast.Span;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
@@ -23,7 +23,6 @@ import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.ReturnStatement;
-import yokohama.unit.ast_junit.Span;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
@@ -281,14 +280,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String envVarName,
             QuotedExpr quotedExpr,
             GenSym genSym,
-            Optional<Path> docyPath,
             String className,
             String packageName) {
         Var exprVar = new Var(genSym.generate("expression"));
-        Span span = new Span(
-                docyPath,
-                quotedExpr.getSpan().getStart(),
-                quotedExpr.getSpan().getEnd());
+        Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),

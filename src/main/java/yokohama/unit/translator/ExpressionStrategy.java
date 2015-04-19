@@ -26,5 +26,11 @@ public interface ExpressionStrategy {
             GenSym genSym); // introduce new environment
     List<Statement> bind(String envVarName, String name, Var rhs, GenSym genSym); // make a binding in the environment
     CatchClause catchAndAssignCause(String causeVarName, GenSym genSym);
-    List<Statement> eval(String varName, String envVarName, QuotedExpr quotedExpr, GenSym genSym, Optional<Path> docyPath, String className, String packageName);
+    List<Statement> eval(
+            String varName,
+            String envVarName,
+            QuotedExpr quotedExpr,
+            GenSym genSym,
+            String className,
+            String packageName);
 }

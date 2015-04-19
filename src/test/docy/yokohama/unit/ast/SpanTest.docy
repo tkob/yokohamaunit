@@ -1,0 +1,35 @@
+*[File]: java.io.File
+*[Optional]: java.util.Optional
+*[Position]: yokohama.unit.ast.Position
+*[Span]: yokohama.unit.ast.Span
+
+# Test: Span.toString
+
+Assert that `sut.toString()` is `expected` for all sut and expected in Table [Fixture for toString].
+
+| sut                                                                                        | expected    |
+| ------------------------------------------------------------------------------------------ | ----------- |
+| new Span(@Optional@empty(),                    new Position(1, 1),   new Position(-1, -1)) | "?:1.1"     |
+| new Span(@Optional@of(new File("f").toPath()), new Position(1, -1),  new Position(1, 1)  ) | "f:1-1.1"   |
+| new Span(@Optional@of(new File("f").toPath()), new Position(1, 1),   new Position(1, -1) ) | "f:1.1-1"   |
+| new Span(@Optional@empty(),                    new Position(1, -1),  new Position(1, 1)  ) | "?:1-1.1"   |
+| new Span(@Optional@of(new File("f").toPath()), new Position(1, 1),   new Position(1, 1)  ) | "f:1.1-1.1" |
+| new Span(@Optional@of(new File("f").toPath()), new Position(-1, -1), new Position(-1, -1)) | "f:?"       |
+| new Span(@Optional@empty(),                    new Position(-1, -1), new Position(-1, -1)) | "?:?"       |
+[Fixture for toString]
+
+# Test: Span.getFileName
+
+Assert that `new Span(path, pos, pos).getFileName()` is `expected` for all path,
+pos and expected in Table [Fixture for getFileName].
+
+| path                                    | pos                  | expected |
+| --------------------------------------- | ---------------------| -------- |
+| @Optional@empty()                       | new Position(-1, -1) | "?"      |
+| @Optional@of(new File("/").toPath())    | new Position(-1, -1) | "?"      |
+| @Optional@of(new File("").toPath())     | new Position(-1, -1) | "?"      |
+| @Optional@of(new File("/f").toPath())   | new Position(-1, -1) | "f"      |
+| @Optional@of(new File("/d/f").toPath()) | new Position(-1, -1) | "f"      |
+| @Optional@of(new File("f").toPath())    | new Position(-1, -1) | "f"      |
+| @Optional@of(new File("d/f").toPath())  | new Position(-1, -1) | "f"      |
+[Fixture for getFileName]

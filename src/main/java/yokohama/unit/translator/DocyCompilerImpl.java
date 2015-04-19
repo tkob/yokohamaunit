@@ -54,7 +54,6 @@ public class DocyCompilerImpl implements DocyCompiler {
         // AST to JUnit AST
         CompilationUnit junit =
                 astToJUnitAstFactory.create(
-                        Optional.of(docyPath),
                         className,
                         packageName,
                         expressionStrategy,

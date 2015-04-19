@@ -132,7 +132,9 @@ task checkDocumentConsistency << {
 check.dependsOn checkDocumentConsistency
 
 task compileDocy(type:Exec) {
-    ext.classpath = configurations.testCompile.join(File.pathSeparator)
+    ext.classpath = configurations.testCompile.join(File.pathSeparator) +
+                    File.pathSeparator + sourceSets.main.output.classesDir +
+                    File.pathSeparator + sourceSets.test.output.classesDir
     ext.classesDir = sourceSets.test.output.classesDir
     ext.baseDir = "$projectDir/src/test/docy"
     ext.sourceSet = fileTree(dir: ext.baseDir, include: '**/*.docy')
