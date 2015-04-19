@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.util.ClassResolver;
 
 @Value
 public class Type {
@@ -91,8 +92,12 @@ public class Type {
         }
     }
 
-    public static Type of(yokohama.unit.ast.Type type) {
-        return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
+    public static Type of(
+            yokohama.unit.ast.Type type,
+            ClassResolver classResolver) {
+        return new Type(
+                NonArrayType.of(type.getNonArrayType(), classResolver),
+                type.getDims());
     }
 
     public static Type fromClass(Class<?> clazz) {
