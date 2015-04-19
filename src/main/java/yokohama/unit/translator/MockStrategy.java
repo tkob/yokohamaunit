@@ -20,7 +20,6 @@ public interface MockStrategy {
             String envVarName,
             ClassResolver classResolver,
             GenSym genSym,
-            Optional<Path> docyPath,
             String className,
             String packageName);
 }

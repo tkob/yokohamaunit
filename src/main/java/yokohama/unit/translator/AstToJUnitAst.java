@@ -441,7 +441,6 @@ public class AstToJUnitAst {
                             envVarName,
                             classResolver,
                             genSym,
-                            docyPath,
                             className,
                             packageName);
                 });
