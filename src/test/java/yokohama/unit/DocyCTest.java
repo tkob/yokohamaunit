@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -119,7 +120,15 @@ public class DocyCTest {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyBoolean(),
+                anyObject()))
                 .thenReturn(true);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
@@ -128,7 +137,15 @@ public class DocyCTest {
         int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), anyObject(), anyObject(), eq(Arrays.asList()));
+        verify(compiler).compile(
+                eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")),
+                anyObject(),
+                eq("Foo"),
+                eq("yokohama.unit"),
+                anyObject(),
+                anyObject(),
+                eq(false),
+                eq(Arrays.asList()));
     }
 
     @Test
@@ -136,7 +153,15 @@ public class DocyCTest {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main\\", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyBoolean(),
+                anyObject()))
                 .thenReturn(true);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
@@ -145,7 +170,15 @@ public class DocyCTest {
         int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), anyObject(), anyObject(), eq(Arrays.asList()));
+        verify(compiler).compile(
+                eq(Paths.get("E:/src/main/yokohama/unit/Foo.docy")),
+                anyObject(),
+                eq("Foo"),
+                eq("yokohama.unit"),
+                anyObject(),
+                anyObject(),
+                eq(false),
+                eq(Arrays.asList()));
     }
 
     @Test
@@ -153,7 +186,15 @@ public class DocyCTest {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyBoolean(),
+                anyObject()))
                 .thenReturn(true);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
@@ -162,7 +203,15 @@ public class DocyCTest {
         int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(eq(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), anyObject(), anyObject(), eq(Arrays.asList()));
+        verify(compiler).compile(
+                eq(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy")),
+                anyObject(),
+                eq("Foo"),
+                eq("yokohama.unit"),
+                anyObject(),
+                anyObject(),
+                eq(false),
+                eq(Arrays.asList()));
     }
 
     @Test
@@ -170,7 +219,15 @@ public class DocyCTest {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main/", "/home/user/src/main/yokohama/unit/Foo.docy"};
         DocyCompiler compiler = mock(DocyCompiler.class);
-        when(compiler.compile(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(compiler.compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyBoolean(),
+                anyObject()))
                 .thenReturn(true);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
@@ -179,7 +236,47 @@ public class DocyCTest {
         int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
-        verify(compiler).compile(eq(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy")), anyObject(), eq("Foo"), eq("yokohama.unit"), anyObject(), anyObject(), eq(Arrays.asList()));
+        verify(compiler).compile(
+                eq(Paths.get("/home/user/src/main/yokohama/unit/Foo.docy")),
+                anyObject(),
+                eq("Foo"),
+                eq("yokohama.unit"),
+                anyObject(),
+                anyObject(),
+                eq(false),
+                eq(Arrays.asList()));
+    }
+
+    @Test
+    public void testRun7() throws IOException {
+        String[] args = { "-j", "Foo.docy" };
+        DocyCompiler compiler = mock(DocyCompiler.class);
+        when(compiler.compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyBoolean(),
+                anyObject()))
+                .thenReturn(true);
+        FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
+        InputStream in = mock(InputStream.class);
+        PrintStream out = mock(PrintStream.class);
+        PrintStream err = mock(PrintStream.class);
+
+        int ignored = new DocyC(compiler, fisFactory).run(in, out, err, args);
+
+        verify(compiler).compile(
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                anyObject(),
+                eq(true),
+                eq(Arrays.asList()));
     }
 
 }

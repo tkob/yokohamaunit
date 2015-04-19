@@ -14,6 +14,7 @@ public interface DocyCompiler {
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
+            boolean emitJava,
             List<String> javacArgs
     ) throws IOException ;
 }

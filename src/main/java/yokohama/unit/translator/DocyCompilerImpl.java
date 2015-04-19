@@ -30,6 +30,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
+            boolean emitJava,
             List<String> javacArgs
     ) throws IOException {
         List<ErrorMessage> errors = new ArrayList<>();
