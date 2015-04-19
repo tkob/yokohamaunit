@@ -18,10 +18,6 @@ import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
 public class TranslatorUtils {
-
-    public static class TranslationException extends RuntimeException {
-    }
-
     private static class ErrorListener extends BaseErrorListener {
         public int numErrors = 0;
         @Override
@@ -53,7 +49,7 @@ public class TranslatorUtils {
         parser.addErrorListener(errorListener);
         GroupContext ctx = parser.group();
         if (errorListener.numErrors > 0) {
-            throw new TranslationException();
+            throw new TranslationException("Error while parsing docy");
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
     }
