@@ -560,6 +560,7 @@ public class AstToJUnitAst {
                                                         new yokohama.unit.ast.QuotedExpr(
                                                                 record.get(name),
                                                                 new yokohama.unit.ast.Span(
+                                                                        Optional.of(Paths.get(fileName)),
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
                                                                         new Position(-1, -1))),
                                                         genSym,
@@ -595,6 +596,7 @@ public class AstToJUnitAst {
                                                     new yokohama.unit.ast.QuotedExpr(
                                                             row.getCell(left + i).getStringCellValue(),
                                                             new yokohama.unit.ast.Span(
+                                                                    Optional.of(Paths.get(fileName)),
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
                                                                     new Position(-1, -1))),
                                                     genSym,
