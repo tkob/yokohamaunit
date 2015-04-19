@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import java.util.function.Function;
+import yokohama.unit.util.ClassResolver;
 
 public interface NonArrayType {
     String getText();
@@ -23,9 +24,11 @@ public interface NonArrayType {
         });
     }
 
-    public static NonArrayType of(yokohama.unit.ast.NonArrayType nonArrayType) {
+    public static NonArrayType of(
+            yokohama.unit.ast.NonArrayType nonArrayType,
+            ClassResolver classResolver) {
         return nonArrayType.accept(
                 primitiveType -> PrimitiveType.of(primitiveType), 
-                classType -> ClassType.of(classType));
+                classType -> ClassType.of(classType, classResolver));
     }
 }

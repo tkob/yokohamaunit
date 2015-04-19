@@ -6,4 +6,5 @@ public interface StatementVisitor<T> {
     T visitVarInitStatement(VarInitStatement varInitStatement);
     T visitTryStatement(TryStatement tryStatement);
     T visitIfStatement(IfStatement IfStatement);
+    T visitReturnStatement(ReturnStatement returnStatement);
 }

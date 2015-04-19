@@ -30,12 +30,14 @@
  *             | VarInitStatement
  *             | TryStatement
  *             | IfStatement
+ *             | ReturnStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
  * VarInitStatement ::= ClassType Expr
  * TryStatement ::= Statement* CatchClause* Statement*
  * IfStatement ::= Statement* Statement*
+ * ReturnStatement ::= Var
  * 
  * CatchClause ::= ClassType Var Statement*
  * </pre>

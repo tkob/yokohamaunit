@@ -7,6 +7,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class Group {
+    private List<Abbreviation> abbreviations;
     private List<Definition> definitions;
     private Span span;
 }

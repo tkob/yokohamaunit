@@ -113,7 +113,14 @@ public class DocyCompilerImplTest {
                         "instance_such_that_1",
                         "instance_such_that_2",
                         "instance_such_that_3",
-                        "instance_such_that_4"))
+                        "instance_such_that_4")),
+        new Fixture(
+                "TestImport.docy",
+                Arrays.asList(
+                        "Test_import_1",
+                        "Test_import_2",
+                        "Test_import_3",
+                        "Test_import_4")),
     };
 
     @DataPoints

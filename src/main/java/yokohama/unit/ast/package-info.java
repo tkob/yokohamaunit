@@ -2,7 +2,7 @@
  * Abstract Syntax Tree.
  * 
  * <pre>
- * Group ::= Definition*
+ * Group ::= Abbreviation* Definition*
  * 
  * Definition ::= Test | FourPhaseTest | Table
  * 

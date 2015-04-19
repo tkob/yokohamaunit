@@ -16,6 +16,7 @@ import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
@@ -40,6 +41,7 @@ import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarExpr;
+import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstTest {
@@ -47,11 +49,11 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslate() {
         String name = "TestGroup";
-        Group group = new Group(Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
+        Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
         String packageName = "com.example";
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         CompilationUnit actual = instance.translate(name, group, packageName);
-        CompilationUnit expected = new CompilationUnit(packageName, new ClassDecl(name, Optional.empty(), Arrays.asList(), Arrays.asList()));
+        CompilationUnit expected = new CompilationUnit(packageName, Arrays.asList(new ClassDecl(true, name, Optional.empty(), Arrays.asList(), Arrays.asList())));
         assertThat(actual, is(expected));
     }
 
@@ -59,8 +61,8 @@ public class AstToJUnitAstTest {
     public void testTranslateTest() {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
         List<Table> tables = Arrays.asList();
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Method> actual = instance.translateTest(test, tables);
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
+        List<Method> actual = instance.translateTest(test, tables, new ClassResolver());
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -73,13 +75,14 @@ public class AstToJUnitAstTest {
         Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), yokohama.unit.ast.Span.dummySpan());
         String testName = "test";
         List<Table> tables = Arrays.asList();
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
+        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables, new ClassResolver());
         List<Method> expected = Arrays.asList(new Method(
                 Arrays.asList(Annotation.TEST),
                 "test_0",
                 Arrays.asList(),
                 Optional.empty(),
+                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,
@@ -99,8 +102,10 @@ public class AstToJUnitAstTest {
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
@@ -108,9 +113,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -120,9 +126,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -145,8 +152,10 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
 
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
@@ -154,9 +163,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -166,9 +176,10 @@ public class AstToJUnitAstTest {
                         new ClassType("ognl.Ognl", Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
-                        Arrays.asList(Type.STRING, Type.OBJECT),
+                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                         Arrays.asList(
                                 new Var("expression2"),
+                                new Var("env"),
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
@@ -197,12 +208,14 @@ public class AstToJUnitAstTest {
                 new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
                 new ThrowsPredicate(
                         new InstanceOfMatcher(
-                                new yokohama.unit.ast.ClassType("b", yokohama.unit.ast.Span.dummySpan()),
+                                new yokohama.unit.ast.ClassType("String", yokohama.unit.ast.Span.dummySpan()),
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
-        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new TryStatement(
                         Arrays.asList(
@@ -211,9 +224,10 @@ public class AstToJUnitAstTest {
                                         new ClassType("ognl.Ognl", Span.dummySpan()),
                                         Arrays.asList(),
                                         "getValue",
-                                        Arrays.asList(Type.STRING, Type.OBJECT),
+                                        Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                                         Arrays.asList(
                                                 new Var("expression"),
+                                                new Var("env"),
                                                 new Var("env")),
                                         Type.OBJECT),
                                         Span.dummySpan()),
@@ -266,7 +280,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE, "actual", new VarExpr("ex"), Span.dummySpan())))
                         ),
                         Arrays.asList()),
-                new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("b"), Span.dummySpan()),
+                new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
                 new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }

@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Kind;
+import yokohama.unit.util.ClassResolver;
 
 @Value
 public class Type {
@@ -15,6 +16,8 @@ public class Type {
     public static final Type CLASS = new Type(new ClassType("java.lang.Class", Span.dummySpan()), 0);
     public static final Type STRING = new Type(new ClassType("java.lang.String", Span.dummySpan()), 0);
     public static final Type MATCHER = new Type(new ClassType("org.hamcrest.Matcher", Span.dummySpan()), 0);
+    public static final Type MAP = new Type(new ClassType("java.util.Map", Span.dummySpan()), 0);
+
     public static final Type BOOLEAN = new Type(new PrimitiveType(Kind.BOOLEAN), 0);
     public static final Type BYTE = new Type(new PrimitiveType(Kind.BYTE), 0);
     public static final Type SHORT = new Type(new PrimitiveType(Kind.SHORT), 0);
@@ -89,8 +92,12 @@ public class Type {
         }
     }
 
-    public static Type of(yokohama.unit.ast.Type type) {
-        return new Type(NonArrayType.of(type.getNonArrayType()), type.getDims());
+    public static Type of(
+            yokohama.unit.ast.Type type,
+            ClassResolver classResolver) {
+        return new Type(
+                NonArrayType.of(type.getNonArrayType(), classResolver),
+                type.getDims());
     }
 
     public static Type fromClass(Class<?> clazz) {

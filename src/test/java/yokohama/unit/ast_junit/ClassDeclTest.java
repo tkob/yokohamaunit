@@ -12,7 +12,7 @@ public class ClassDeclTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        ClassDecl instance = new ClassDecl("TestClass", Optional.empty(), Arrays.asList(), Arrays.asList());
+        ClassDecl instance = new ClassDecl(true, "TestClass", Optional.empty(), Arrays.asList(), Arrays.asList());
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();

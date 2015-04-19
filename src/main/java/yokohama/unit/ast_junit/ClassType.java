@@ -3,6 +3,7 @@ package yokohama.unit.ast_junit;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.Value;
+import yokohama.unit.util.ClassResolver;
 
 @Value
 public class ClassType implements NonArrayType {
@@ -25,9 +26,11 @@ public class ClassType implements NonArrayType {
         return Class.forName(name);
     }
 
-    public static ClassType of(yokohama.unit.ast.ClassType classType) {
+    public static ClassType of(
+            yokohama.unit.ast.ClassType classType,
+            ClassResolver classResolver) {
         return new ClassType(
-                classType.getName(),
+                classType.getCanonicalName(classResolver),
                 new Span(
                         Optional.empty(),
                         classType.getSpan().getStart(),

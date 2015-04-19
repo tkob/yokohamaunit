@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.apache.bcel.Constants;
+import org.apache.bcel.Repository;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BranchInstruction;
@@ -31,12 +33,15 @@ import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.CatchClause;
+import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
-import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.ReturnStatement;
+import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -73,7 +78,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     ifStatement ->
                             Stream.concat(
                                     visitStatements(ifStatement.getThen()),
-                                    visitStatements(ifStatement.getOtherwise())));
+                                    visitStatements(ifStatement.getOtherwise())),
+                    returnStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty());
         }
 
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
@@ -95,29 +101,40 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             List<String> classPath,
             Optional<Path> dest,
             List<String> javacArgs) {
-        ClassGen cg = new ClassGen(
-                packageName.equals("") ? className : packageName + "." + className,
-                "java.lang.Object", // super class
-                docyPath.getFileName().toString(), // source file name
-                Constants.ACC_PUBLIC | Constants.ACC_SUPER,
-                null // implemented interfaces
-        );
-        // set class file version to Java 1.5
-        cg.setMajor(49);
-        cg.setMinor(0);
-        
-        ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
-        cg.addEmptyConstructor(Constants.ACC_PUBLIC);
+        for (ClassDecl classDecl : ast.getClassDecls()) {
+            Optional<ClassType> extended = classDecl.getExtended();
+            List<ClassType> implemented = classDecl.getImplemented();
+            ClassGen cg = new ClassGen(
+                    packageName.equals("") ? classDecl.getName() : packageName + "." + classDecl.getName(),
+                    extended.isPresent()
+                            ? extended.get().getName()
+                            : "java.lang.Object",
+                    docyPath.getFileName().toString(), // source file name
+                    Constants.ACC_PUBLIC | Constants.ACC_SUPER,
+                    implemented.stream()
+                            .map(ClassType::getName)
+                            .collect(Collectors.toList())
+                            .toArray(new String[]{}));
 
-        for (Method method : ast.getClassDecl().getMethods()) {
-            visitTestMethod(method, cg, cp);
-        }
+            // set class file version to Java 1.5
+            cg.setMajor(49);
+            cg.setMinor(0);
 
-        try {
-            Path classFilePath = makeClassFilePath(dest, packageName, className);
-            cg.getJavaClass().dump(classFilePath.toFile());
-        } catch(java.io.IOException e) {
-            System.err.println(e);
+            ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+            cg.addEmptyConstructor(Constants.ACC_PUBLIC);
+
+            for (Method method : classDecl.getMethods()) {
+                visitTestMethod(method, cg, cp);
+            }
+
+            try {
+                Path classFilePath = makeClassFilePath(dest, packageName, classDecl.getName());
+                cg.getJavaClass().dump(classFilePath.toFile());
+                cg.getJavaClass().dump(new java.io.File("build/tmp/" + packageName.replace(".", "/") + "/" + classDecl.getName() + ".class"));
+                Repository.getRepository().storeClass(cg.getJavaClass());
+            } catch(IOException e) {
+                System.err.println(e);
+            }
         }
         return true;
     }
@@ -164,7 +181,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
                 CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(method));
         for (Pair<yokohama.unit.ast_junit.Type,String> pair :
-                ListUtils.union(args, ListUtils.union(varDecls, caughtExVars))) {
+                ListUtils.union(varDecls, caughtExVars)) {
             yokohama.unit.ast_junit.Type type = pair.getFirst();
             String name = pair.getSecond();
             if (locals.containsKey(name))
@@ -172,12 +189,19 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);
             locals.put(name, lv);
         }
+        // populate locals again, since method arguments are not there yet
+        for (LocalVariableGen lv : mg.getLocalVariables()) {
+            String name = lv.getName();
+            locals.put(name, lv);
+        }
 
         for (Statement statement : method.getStatements()) {
             visitStatement(statement, locals, mg, il, factory, cp);
         }
 
-        il.append(InstructionConstants.RETURN);
+        if (!method.getReturnType().isPresent()) {
+            il.append(InstructionConstants.RETURN);
+        }
 
         mg.setMaxStack();
         cg.addMethod(mg.getMethod());
@@ -271,8 +295,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 goto_.setTarget(fi);
 
                 return null;
-            }
-        );
+            },
+            returnStatement -> {
+                visitReturnStatement(returnStatement, locals, il, factory, cp);
+                return null;
+            });
     }
 
     private void visitIsStatement(
@@ -474,6 +501,17 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
         }
         il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+    }
+
+    private void visitReturnStatement(
+            ReturnStatement returnStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen lv = locals.get(returnStatement.getReturned().getName());
+        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+        il.append(InstructionFactory.createReturn(lv.getType()));
     }
 
     static Type typeOf(yokohama.unit.ast_junit.Type type) {

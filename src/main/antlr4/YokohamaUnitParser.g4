@@ -2,7 +2,9 @@ parser grammar YokohamaUnitParser;
 
 options { tokenVocab=YokohamaUnitLexer; }
 
-group: definition* ;
+group: abbreviation* definition* ;
+
+abbreviation: ShortName LongName ;
 
 definition: test
           | fourPhaseTest

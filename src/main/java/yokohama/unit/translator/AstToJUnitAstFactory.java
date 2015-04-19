@@ -2,6 +2,7 @@ package yokohama.unit.translator;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import yokohama.unit.ast.TableExtractVisitor;
 
 public class AstToJUnitAstFactory {
     public AstToJUnitAst create(
@@ -10,6 +11,12 @@ public class AstToJUnitAstFactory {
             String packageName,
             ExpressionStrategy expressionStrategy,
             MockStrategy mockStrategy) {
-        return new AstToJUnitAst(docyPath, className, packageName, expressionStrategy, mockStrategy);
+        return new AstToJUnitAst(
+                docyPath,
+                className,
+                packageName,
+                expressionStrategy,
+                mockStrategy,
+                new TableExtractVisitor());
     }
 }

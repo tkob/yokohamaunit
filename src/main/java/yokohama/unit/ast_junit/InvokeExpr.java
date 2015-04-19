@@ -14,8 +14,8 @@ public class InvokeExpr implements Expr {
     List<Var> args;
     Type returnType; // erasued return type
 
-    public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(varName, " = ", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+    public void getExpr(SBuilder sb, Type varType, String varName) {
+        sb.appendln(varName, " = (", varType.getText(), ")", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
     }
 
     @Override

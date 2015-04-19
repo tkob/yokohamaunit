@@ -13,7 +13,8 @@ public interface Statement {
             Function<IsNotStatement, T> visitIsNotStatement_,
             Function<VarInitStatement, T> visitVarInitStatement_,
             Function<TryStatement, T> visitTryStatement_,
-            Function<IfStatement, T> visitIfStatement_
+            Function<IfStatement, T> visitIfStatement_,
+            Function<ReturnStatement, T> visitReturnStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -39,6 +40,11 @@ public interface Statement {
             @Override
             public T visitIfStatement(IfStatement IfStatement) {
                 return visitIfStatement_.apply(IfStatement);
+            }
+
+            @Override
+            public T visitReturnStatement(ReturnStatement returnStatement) {
+                return visitReturnStatement_.apply(returnStatement);
             }
         });
     }

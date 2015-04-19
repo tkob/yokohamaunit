@@ -13,6 +13,7 @@ EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
 TEARDOWN: 'Teardown' -> mode(PHASE_LEADING);
 BAR: '|' -> mode(IN_TABLE_HEADER) ;
+STARLBRACKET: '*[' -> skip, mode(ABBREVIATION);
 ASSERT: 'Assert' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 THAT: 'that' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 STOP: '.' -> mode(IN_THE_MIDDLE_OF_LINE) ;
@@ -193,6 +194,14 @@ CLOSESINGLEQUOTE2: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 mode IN_BOOK_NAME;
 SingleQuoteName3: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
 CLOSESINGLEQUOTE3: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode ABBREVIATION;
+ShortName: ~[\]\r\n]* ;
+RBRACKETCOLON: ']:' [ \t\r\n]* -> skip, mode(LONG_NAME) ;
+
+mode LONG_NAME;
+LongName: ~[\r\n]* ;
+EXIT_LONG_NAME: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]

@@ -36,8 +36,8 @@ public class VarDeclVisitor {
                 ifStatement ->
                         Stream.concat(
                                 visitStatements(ifStatement.getThen()),
-                                visitStatements(ifStatement.getOtherwise()))
-                );
+                                visitStatements(ifStatement.getOtherwise())),
+                returnStatement ->Stream.<Pair<Type, String>>empty());
     }
 
     public Stream<Pair<Type, String>> visitCatchClause(CatchClause catchClause) { 

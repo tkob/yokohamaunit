@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
@@ -71,11 +72,20 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Group visitGroup(YokohamaUnitParser.GroupContext ctx) {
+        List<Abbreviation> abbreviations =
+                ctx.abbreviation().stream()
+                                .map(this::visitAbbreviation)
+                                .collect(Collectors.toList());
         List<Definition>definitions =
                 ctx.definition().stream()
                                 .map(this::visitDefinition)
                                 .collect(Collectors.toList());
-        return new Group(definitions, getSpan(ctx));
+        return new Group(abbreviations, definitions, getSpan(ctx));
+    }
+
+    @Override
+    public Abbreviation visitAbbreviation(YokohamaUnitParser.AbbreviationContext ctx) {
+        return new Abbreviation(ctx.ShortName().getText(), ctx.LongName().getText(), getSpan(ctx));
     }
 
     @Override
