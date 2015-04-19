@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ClassResolver {
@@ -33,6 +34,14 @@ public class ClassResolver {
     }
 
     public ClassResolver(Iterable<Pair<String, String>> source) {
+        this(source, ClassLoader.getSystemClassLoader());
+    }
+
+    public ClassResolver(Stream<Pair<String, String>> source, ClassLoader classLoader) {
+        this(source.collect(Collectors.toList()), classLoader);
+    }
+
+    public ClassResolver(Stream<Pair<String, String>> source) {
         this(source, ClassLoader.getSystemClassLoader());
     }
 
