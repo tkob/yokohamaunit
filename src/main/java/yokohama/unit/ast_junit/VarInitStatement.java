@@ -2,6 +2,7 @@ package yokohama.unit.ast_junit;
 
 import lombok.Value;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import yokohama.unit.ast.Span;
 import yokohama.unit.util.SBuilder;
 
 @Value
