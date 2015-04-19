@@ -81,10 +81,6 @@ public class AstToJUnitAst {
     MockStrategy mockStrategy;
     TableExtractVisitor tableExtractVisitor;
 
-    Span spanOf(yokohama.unit.ast.Span span) {
-        return new Span(docyPath, span.getStart(), span.getEnd());
-    }
-
     public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
         ClassResolver classResolver = this.translateAbbreviations(group.getAbbreviations());
         List<Definition> definitions = group.getDefinitions();
@@ -231,7 +227,7 @@ public class AstToJUnitAst {
                             instanceOf -> null,
                             instanceSuchThat -> {
                                 throw new TranslationException(
-                                        spanOf(instanceSuchThat.getSpan()).toString() + ": " +
+                                        instanceSuchThat.getSpan().toString() + ": " +
                                         "`instance _ of _ such that` cannot follow `is not`");
                             },
                             nullValue -> null);
@@ -257,7 +253,7 @@ public class AstToJUnitAst {
                                                     Arrays.asList(Type.MATCHER),
                                                     Arrays.asList(new Var(unexpected)),
                                                     Type.MATCHER),
-                                            spanOf(predicate.getSpan())))));
+                                            predicate.getSpan()))));
                 },
                 throwsPredicate -> {
                     String __ = genSym.generate("tmp");
@@ -286,7 +282,7 @@ public class AstToJUnitAst {
                 subjectAndPredicate,
                 matcher instanceof InstanceSuchThatMatcher
                         ? Stream.empty()
-                        : Stream.of(new IsStatement(new Var(actual), new Var(expected), spanOf(predicate.getSpan()))));
+                        : Stream.of(new IsStatement(new Var(actual), new Var(expected), predicate.getSpan())));
     }
 
     Stream<Statement> bindThrown(String actual, List<Statement> statements, GenSym genSym, String envVarName) {
@@ -354,14 +350,14 @@ public class AstToJUnitAst {
                                 lookupClassName(
                                         instanceOf.getClazz().getName(),
                                         classResolver,
-                                        spanOf(instanceOf.getSpan()))),
-                        spanOf(instanceOf.getSpan())));
+                                        instanceOf.getSpan())),
+                        instanceOf.getSpan()));
             },
             (InstanceSuchThatMatcher instanceSuchThat) -> {
                 String bindVarName = instanceSuchThat.getVar().getName();
                 yokohama.unit.ast.ClassType clazz = instanceSuchThat.getClazz();
                 List<Proposition> propositions = instanceSuchThat.getPropositions();
-                Span span = spanOf(instanceSuchThat.getSpan());
+                Span span = instanceSuchThat.getSpan();
 
                 String instanceOfVarName = genSym.generate("instanceOfMatcher");
                 Stream<Statement> instanceOfStatements = Stream.of(
@@ -372,12 +368,12 @@ public class AstToJUnitAst {
                                         lookupClassName(
                                                 clazz.getName(),
                                                 classResolver,
-                                                spanOf(clazz.getSpan()))),
-                                spanOf(clazz.getSpan())),
+                                                clazz.getSpan())),
+                                clazz.getSpan()),
                         new IsStatement(
                                 new Var(actual),
                                 new Var(instanceOfVarName),
-                                spanOf(clazz.getSpan())));
+                                clazz.getSpan()));
 
                 Stream<Statement> bindStatements =
                         expressionStrategy.bind(envVarName, bindVarName, new Var(actual), genSym)
@@ -401,7 +397,7 @@ public class AstToJUnitAst {
                                 Type.MATCHER,
                                 varName,
                                 new NullValueMatcherExpr(),
-                                spanOf(nullValue.getSpan())));
+                                nullValue.getSpan()));
             });
     }
 
@@ -430,7 +426,7 @@ public class AstToJUnitAst {
                                 genSym, docyPath, className, packageName)
                                 .stream(),
                 stubExpr -> {
-                    Span classToStubSpan = spanOf(stubExpr.getClassToStub().getSpan());
+                    Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
                             lookupClassName(
                                     stubExpr.getClassToStub().getName(),
