@@ -13,10 +13,4 @@ public class InstanceOfMatcher implements Matcher {
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitInstanceOf(this);
     }
-
-    @Override
-    public String getDescription() {
-        return "an instance of " + clazz.getName();
-    }
-    
 }

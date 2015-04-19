@@ -5,13 +5,8 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode(exclude={"span"})
-public class Proposition implements Describable {
+public class Proposition {
     private QuotedExpr subject;
     private Predicate predicate;
     private Span span;
-
-    @Override
-    public String getDescription() {
-        return "`" + subject.getText() + "` " + predicate.getDescription();
-    }
 }

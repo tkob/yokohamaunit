@@ -12,9 +12,4 @@ public class NullValueMatcher implements Matcher {
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitNullValue(this);
     }
-
-    @Override
-    public String getDescription() {
-        return "null";
-    }
 }
