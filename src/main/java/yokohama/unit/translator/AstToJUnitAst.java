@@ -137,6 +137,7 @@ public class AstToJUnitAst {
                                                     .flatMap(proposition ->
                                                                 translateProposition(
                                                                         proposition,
+                                                                        classResolver,
                                                                         genSym,
                                                                         env))
                                                     .collect(Collectors.toList()))));
@@ -163,6 +164,7 @@ public class AstToJUnitAst {
                                                                 .flatMap(proposition ->
                                                                         translateProposition(
                                                                                 proposition,
+                                                                                classResolver,
                                                                                 genSym,
                                                                                 env))
                                                                 .collect(Collectors.toList()))));
@@ -192,13 +194,18 @@ public class AstToJUnitAst {
                                                     .flatMap(proposition ->
                                                             translateProposition(
                                                                     proposition,
+                                                                    classResolver,
                                                                     genSym,
                                                                     env)))
                                             .collect(Collectors.toList()))));
                 });
     }
 
-    Stream<Statement> translateProposition(Proposition proposition, GenSym genSym, String envVarName) {
+    Stream<Statement> translateProposition(
+            Proposition proposition,
+            ClassResolver classResolver,
+            GenSym genSym,
+            String envVarName) {
         String actual = genSym.generate("actual");
         String expected = genSym.generate("expected");
         Predicate predicate = proposition.getPredicate();
@@ -208,7 +215,13 @@ public class AstToJUnitAst {
                             expressionStrategy.eval(
                                     actual, envVarName, proposition.getSubject(),
                                     genSym, docyPath, className, packageName).stream(),
-                            translateMatcher(isPredicate.getComplement(), expected, actual, genSym, envVarName));
+                            translateMatcher(
+                                    isPredicate.getComplement(),
+                                    expected,
+                                    actual,
+                                    classResolver,
+                                    genSym,
+                                    envVarName));
                 },
                 isNotPredicate -> {
                     // inhibit `is not instance e of Exception such that...`
@@ -227,7 +240,12 @@ public class AstToJUnitAst {
                                     actual, envVarName, proposition.getSubject(),
                                     genSym, docyPath, className, packageName).stream(),
                             Stream.concat(
-                                    translateMatcher(isNotPredicate.getComplement(), unexpected, actual, genSym, envVarName),
+                                    translateMatcher(isNotPredicate.getComplement(),
+                                            unexpected,
+                                            actual,
+                                            classResolver,
+                                            genSym,
+                                            envVarName),
                                     Stream.of(new VarInitStatement(
                                             Type.MATCHER,
                                             expected,
@@ -250,7 +268,13 @@ public class AstToJUnitAst {
                                             genSym, docyPath, className, packageName),
                                     genSym,
                                     envVarName),
-                            translateMatcher(throwsPredicate.getThrowee(), expected, actual, genSym, envVarName));
+                            translateMatcher(
+                                    throwsPredicate.getThrowee(),
+                                    expected,
+                                    actual,
+                                    classResolver,
+                                    genSym,
+                                    envVarName));
                 }
         );
         Matcher matcher = predicate.accept(
@@ -297,6 +321,7 @@ public class AstToJUnitAst {
             Matcher matcher,
             String varName,
             String actual,
+            ClassResolver classResolver,
             GenSym genSym,
             String envVarName) {
         return matcher.<Stream<Statement>>accept(
@@ -345,7 +370,7 @@ public class AstToJUnitAst {
                         propositions
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, genSym, envVarName));
+                                        translateProposition(proposition, classResolver, genSym, envVarName));
 
                 return Stream.concat(
                         instanceOfStatements,
@@ -569,8 +594,8 @@ public class AstToJUnitAst {
                 .flatMap(assertion ->
                         assertion.getPropositions()
                                 .stream()
-                                .flatMap(proposition -> translateProposition(proposition, genSym, env))
-                );
+                                .flatMap(proposition ->
+                                        translateProposition(proposition, classResolver, genSym, env)));
 
         List<Statement> statements =
                 Stream.concat(

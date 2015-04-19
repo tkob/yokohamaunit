@@ -103,7 +103,9 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
@@ -151,7 +153,9 @@ public class AstToJUnitAstTest {
                 yokohama.unit.ast.Span.dummySpan());
 
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
@@ -209,7 +213,9 @@ public class AstToJUnitAstTest {
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst(Optional.empty(), "C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        List<Statement> actual = instance.translateProposition(proposition, new GenSym(), "env").collect(Collectors.toList());
+        List<Statement> actual =
+                instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
+                        .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(
                 new TryStatement(
                         Arrays.asList(
