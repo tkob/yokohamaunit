@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
