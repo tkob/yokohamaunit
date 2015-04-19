@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -30,6 +31,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
+            boolean emitJava,
             List<String> javacArgs
     ) throws IOException {
         List<ErrorMessage> errors = new ArrayList<>();
@@ -59,6 +61,12 @@ public class DocyCompilerImpl implements DocyCompiler {
                         expressionStrategy,
                         mockStrategy)
                         .translate(className, ast, packageName);
+
+        if (emitJava) {
+            Path javaFilePath 
+                    = TranslatorUtils.makeClassFilePath(dest, packageName, className, ".java");
+            FileUtils.write(javaFilePath.toFile(), junit.getText());
+        }
 
         // JUnit AST to Java code
         return jUnitAstCompiler.compile(docyPath, junit, className, packageName, classPath, dest, javacArgs);

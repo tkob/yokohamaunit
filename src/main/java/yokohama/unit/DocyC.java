@@ -43,6 +43,9 @@ public class DocyC implements Command {
                 .withDescription("Print a synopsis of standard options")
                 .create("help"));
         options.addOption(OptionBuilder
+                .withDescription("Emit Java code")
+                .create("j"));
+        options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("path")
                 .withDescription("Specify where to find user class files and annotation processors")
@@ -128,6 +131,7 @@ public class DocyC implements Command {
             }
             URI baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
             String d = commandLine.getOptionValue("d");
+            boolean emitJava = commandLine.hasOption('j');
             Optional<Path> dest= d == null ? Optional.empty() : Optional.of(Paths.get(d));
             List<String> classPath = getClassPath(commandLine);
             List<String> javacArgs =
@@ -148,6 +152,7 @@ public class DocyC implements Command {
                         packageName,
                         classPath,
                         dest,
+                        emitJava,
                         javacArgs);
                 if (!success) return Command.EXIT_FAILURE;
             }

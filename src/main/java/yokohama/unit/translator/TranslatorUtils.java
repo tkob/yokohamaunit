@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -14,16 +15,11 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import yokohama.unit.ast.Group;
-import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 
 public class TranslatorUtils {
-
-    public static class TranslationException extends RuntimeException {
-    }
-
     private static class ErrorListener extends BaseErrorListener {
         public int numErrors = 0;
         @Override
@@ -55,30 +51,19 @@ public class TranslatorUtils {
         parser.addErrorListener(errorListener);
         GroupContext ctx = parser.group();
         if (errorListener.numErrors > 0) {
-            throw new TranslationException();
+            throw new TranslationException("Error while parsing docy");
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
     }
 
-    public static String docyToJava(
-            final Optional<Path> docyPath,
-            final String docy,
-            final String className,
-            final String packageName) {
-        // Source to AST
-        Group ast = parseDocy(docy);
-
-        // AST to JUnit AST
-        AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
-        CompilationUnit junit =
-                astToJUnitAstFactory.create(
-                        className,
-                        packageName,
-                        new OgnlExpressionStrategy(),
-                        new MockitoMockStrategy()
-                ).translate(className, ast, packageName);
-
-        // JUnit AST to string
-        return junit.getText();
+    public static Path makeClassFilePath(
+            Optional<Path> dest,
+            String packageName,
+            String className,
+            String ext) {
+        Path classFile = (dest.isPresent() ? dest.get(): Paths.get("."))
+                .resolve(Paths.get(packageName.replace('.', '/')))
+                .resolve(className + ext);
+        return classFile;
     }
 }

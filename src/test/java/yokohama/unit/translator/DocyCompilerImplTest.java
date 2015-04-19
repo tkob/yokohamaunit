@@ -157,6 +157,7 @@ public class DocyCompilerImplTest {
                         packageName,
                         Arrays.asList(),
                         Optional.of(Paths.get(dest.getAbsolutePath())),
+                        false,
                         Arrays.asList());
                 boolean expected = true;
                 assertThat(actual, is(expected));
