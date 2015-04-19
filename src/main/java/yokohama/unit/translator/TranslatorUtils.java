@@ -57,7 +57,7 @@ public class TranslatorUtils {
         if (errorListener.numErrors > 0) {
             throw new TranslationException();
         }
-        return new ParseTreeToAstVisitor().visitGroup(ctx);
+        return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
     }
 
     public static String docyToJava(

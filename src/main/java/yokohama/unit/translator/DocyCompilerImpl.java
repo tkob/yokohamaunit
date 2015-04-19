@@ -15,7 +15,7 @@ import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
     DocyParser docyParser;
-    ParseTreeToAstVisitor parseTreeToAstVisitor;
+    ParseTreeToAstVisitorFactory parseTreeToAstVisitorFactory;
     VariableCheckVisitor variableCheckVisitor;
     AstToJUnitAstFactory astToJUnitAstFactory;
     ExpressionStrategy expressionStrategy;
@@ -39,7 +39,8 @@ public class DocyCompilerImpl implements DocyCompiler {
         if (errors.size() > 0) return false;
 
         // ANTLR parse tree to AST
-        Group ast = parseTreeToAstVisitor.visitGroup(ctx);
+        Group ast = parseTreeToAstVisitorFactory.create(Optional.of(docyPath))
+                .visitGroup(ctx);
 
         // Check AST
         List<yokohama.unit.ast.ErrorMessage> errorMessages = variableCheckVisitor.check(ast);

@@ -144,7 +144,7 @@ public class DocyCompilerImplTest {
                 Path docyPath = Paths.get(fixture.docy);
                 DocyCompiler instance = new DocyCompilerImpl(
                         new DocyParserImpl(),
-                        new ParseTreeToAstVisitor(),
+                        new ParseTreeToAstVisitorFactory(),
                         new VariableCheckVisitor(),
                         new AstToJUnitAstFactory(),
                         new OgnlExpressionStrategy(),
