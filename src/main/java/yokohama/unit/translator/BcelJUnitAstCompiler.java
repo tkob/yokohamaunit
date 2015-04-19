@@ -128,7 +128,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
 
             try {
-                Path classFilePath = makeClassFilePath(dest, packageName, classDecl.getName());
+                Path classFilePath =
+                        TranslatorUtils.makeClassFilePath(dest, packageName, classDecl.getName(), ".class");
                 cg.getJavaClass().dump(classFilePath.toFile());
                 cg.getJavaClass().dump(new java.io.File("build/tmp/" + packageName.replace(".", "/") + "/" + classDecl.getName() + ".class"));
                 Repository.getRepository().storeClass(cg.getJavaClass());
@@ -137,13 +138,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
         }
         return true;
-    }
-
-    public Path makeClassFilePath(Optional<Path> dest, String packageName, String className) {
-        Path classFile = (dest.isPresent() ? dest.get(): Paths.get("."))
-                .resolve(Paths.get(packageName.replace('.', '/')))
-                .resolve(className + ".class");
-        return classFile;
     }
 
     private void visitTestMethod(Method method, ClassGen cg, ConstantPoolGen cp) {

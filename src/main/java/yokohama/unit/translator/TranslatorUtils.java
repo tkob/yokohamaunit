@@ -3,6 +3,8 @@ package yokohama.unit.translator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -52,5 +54,16 @@ public class TranslatorUtils {
             throw new TranslationException("Error while parsing docy");
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
+    }
+
+    public static Path makeClassFilePath(
+            Optional<Path> dest,
+            String packageName,
+            String className,
+            String ext) {
+        Path classFile = (dest.isPresent() ? dest.get(): Paths.get("."))
+                .resolve(Paths.get(packageName.replace('.', '/')))
+                .resolve(className + ext);
+        return classFile;
     }
 }
