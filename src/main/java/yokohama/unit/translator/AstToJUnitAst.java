@@ -211,7 +211,7 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             expressionStrategy.eval(
                                     actual, envVarName, proposition.getSubject(),
-                                    genSym, docyPath, className, packageName).stream(),
+                                    genSym, className, packageName).stream(),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
@@ -235,7 +235,7 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             expressionStrategy.eval(
                                     actual, envVarName, proposition.getSubject(),
-                                    genSym, docyPath, className, packageName).stream(),
+                                    genSym, className, packageName).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(),
                                             unexpected,
@@ -262,7 +262,7 @@ public class AstToJUnitAst {
                                     actual,
                                     expressionStrategy.eval(
                                             __, envVarName, proposition.getSubject(),
-                                            genSym, docyPath, className, packageName),
+                                            genSym, className, packageName),
                                     genSym,
                                     envVarName),
                             translateMatcher(
@@ -335,7 +335,7 @@ public class AstToJUnitAst {
                 return Stream.concat(
                         expressionStrategy.eval(
                                 objVar.getName(), envVarName, equalTo.getExpr(),
-                                genSym, docyPath, className, packageName).stream(),
+                                genSym, className, packageName).stream(),
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
@@ -423,7 +423,7 @@ public class AstToJUnitAst {
                 quotedExpr ->
                         expressionStrategy.eval(
                                 varName, envVarName, quotedExpr,
-                                genSym, docyPath, className, packageName)
+                                genSym, className, packageName)
                                 .stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
@@ -556,7 +556,6 @@ public class AstToJUnitAst {
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
                                                                         new Position(-1, -1))),
                                                         genSym,
-                                                        Optional.of(Paths.get(fileName)), 
                                                         className, packageName).stream(),
                                                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
                                     })
@@ -592,7 +591,6 @@ public class AstToJUnitAst {
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
                                                                     new Position(-1, -1))),
                                                     genSym,
-                                                    Optional.of(Paths.get(fileName)), 
                                                     className, packageName).stream(),
                                             expressionStrategy.bind(envVarName, names.get(i), new Var(varName), genSym).stream());
                                 })
@@ -691,7 +689,6 @@ public class AstToJUnitAst {
                                                 envVarName,
                                                 expression,
                                                 genSym,
-                                                docyPath,
                                                 className,
                                                 packageName).stream()));
     }

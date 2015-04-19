@@ -281,7 +281,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String envVarName,
             QuotedExpr quotedExpr,
             GenSym genSym,
-            Optional<Path> docyPath,
             String className,
             String packageName) {
         Var exprVar = new Var(genSym.generate("expression"));
