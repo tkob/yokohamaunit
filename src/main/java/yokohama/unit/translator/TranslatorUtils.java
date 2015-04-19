@@ -3,7 +3,6 @@ package yokohama.unit.translator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -14,7 +13,6 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import yokohama.unit.ast.Group;
-import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
@@ -58,27 +56,5 @@ public class TranslatorUtils {
             throw new TranslationException();
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
-    }
-
-    public static String docyToJava(
-            final Optional<Path> docyPath,
-            final String docy,
-            final String className,
-            final String packageName) {
-        // Source to AST
-        Group ast = parseDocy(docy);
-
-        // AST to JUnit AST
-        AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
-        CompilationUnit junit =
-                astToJUnitAstFactory.create(
-                        className,
-                        packageName,
-                        new OgnlExpressionStrategy(),
-                        new MockitoMockStrategy()
-                ).translate(className, ast, packageName);
-
-        // JUnit AST to string
-        return junit.getText();
     }
 }

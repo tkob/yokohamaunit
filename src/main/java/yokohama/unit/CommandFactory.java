@@ -20,7 +20,6 @@ public class CommandFactory {
                                 new FileInputStreamFactory());
                     }
                 });
-                put("docy2java", () -> new Docy2Java());
             }};
 
     public Command create(String subCommand) {
