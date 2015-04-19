@@ -113,6 +113,7 @@ task checkDocumentConsistency << {
             .list({ f, name ->
                     !name.endsWith("Visitor.java") &&
                     !name.endsWith("Strategy.java") &&
+                    !name.endsWith("Exception.java") &&
                     !name.startsWith("Import") &&
                     !name.endsWith(".original~") &&
                     !name.equals("Span.java") &&
