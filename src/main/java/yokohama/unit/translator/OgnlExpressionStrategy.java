@@ -5,11 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
@@ -32,6 +30,7 @@ import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
+import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
@@ -45,9 +44,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     public Collection<ClassDecl> auxClasses(
             String name,
             Group group,
-            Map<String, String> abbreviationMap) {
-        List<Abbreviation> abbreviations = group.getAbbreviations();
-        if (abbreviations.isEmpty()) return Collections.emptyList();
+            ClassResolver classResolver) {
+        if (classResolver.isEmpty()) return Collections.emptyList();
         /*
         The following interface is implemented:
             public interface ClassResolver {
@@ -66,34 +64,31 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Span.dummySpan()));
 
         Stream<Statement> populateTable =
-                abbreviations.stream()
-                        .flatMap(abbreviation -> {
-                            String shortName = abbreviation.getShortName();
-                            String longName = abbreviation.getLongName();
-                            Var shortNameVar = new Var(genSym.generate(SUtils.toIdent(shortName)));
-                            Var longNameVar = new Var(genSym.generate(SUtils.toIdent(longName)));
-                            return Stream.<Statement>of(new VarInitStatement(
-                                            Type.STRING,
-                                            shortNameVar.getName(),
-                                            new StrLitExpr(shortName),
-                                            Span.dummySpan()),
-                                    new VarInitStatement(
-                                            Type.CLASS,
-                                            longNameVar.getName(),
-                                            new ClassLitExpr(new Type(new ClassType(longName, Span.dummySpan()), 0)),
-                                            Span.dummySpan()),
-                                    new VarInitStatement(
-                                            Type.OBJECT,
-                                            genSym.generate("__"),
-                                            new InvokeExpr(
-                                                    Instruction.INTERFACE,
-                                                    tableVar,
-                                                    "put",
-                                                    Arrays.asList(Type.OBJECT, Type.OBJECT),
-                                                    Arrays.asList(shortNameVar, longNameVar),
-                                                    Type.OBJECT),
-                                            Span.dummySpan()));
-                        });
+                classResolver.flatMap((shortName, longName) -> {
+                    Var shortNameVar = new Var(genSym.generate(SUtils.toIdent(shortName)));
+                    Var longNameVar = new Var(genSym.generate(SUtils.toIdent(longName)));
+                    return Stream.<Statement>of(new VarInitStatement(
+                                    Type.STRING,
+                                    shortNameVar.getName(),
+                                    new StrLitExpr(shortName),
+                                    Span.dummySpan()),
+                            new VarInitStatement(
+                                    Type.CLASS,
+                                    longNameVar.getName(),
+                                    new ClassLitExpr(new Type(new ClassType(longName, Span.dummySpan()), 0)),
+                                    Span.dummySpan()),
+                            new VarInitStatement(
+                                    Type.OBJECT,
+                                    genSym.generate("__"),
+                                    new InvokeExpr(
+                                            Instruction.INTERFACE,
+                                            tableVar,
+                                            "put",
+                                            Arrays.asList(Type.OBJECT, Type.OBJECT),
+                                            Arrays.asList(shortNameVar, longNameVar),
+                                            Type.OBJECT),
+                                    Span.dummySpan()));
+                });
 
         Var returnedVar = new Var(genSym.generate("returned"));
         Var nullValueVar = new Var(genSym.generate("nullValue"));
@@ -154,13 +149,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Optional.of(Type.CLASS),
                 Arrays.asList(new ClassType("java.lang.ClassNotFoundException", Span.dummySpan())),
                 statements);
-        ClassDecl classResolver = new ClassDecl(
+        ClassDecl classResolverClass = new ClassDecl(
                 false,
                 name + "$ClassResolver",
                 Optional.empty(),
                 Arrays.asList(new ClassType("ognl.ClassResolver", Span.dummySpan())),
                 Arrays.asList(method));
-        return Arrays.asList(classResolver);
+        return Arrays.asList(classResolverClass);
     }
 
     @Override
@@ -168,9 +163,9 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String varName,
             String className,
             String packageName,
-            Map<String, String> abbreviationMap,
+            ClassResolver classResolver,
             GenSym genSym) {
-        if (abbreviationMap.isEmpty()) {
+        if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(
                             OGNL_CONTEXT,
