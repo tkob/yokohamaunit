@@ -72,7 +72,6 @@ public class TranslatorUtils {
         AstToJUnitAstFactory astToJUnitAstFactory = new AstToJUnitAstFactory();
         CompilationUnit junit =
                 astToJUnitAstFactory.create(
-                        docyPath,
                         className,
                         packageName,
                         new OgnlExpressionStrategy(),

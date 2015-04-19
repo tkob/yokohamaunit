@@ -74,7 +74,6 @@ import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
 public class AstToJUnitAst {
-    private final Optional<Path> docyPath;
     private final String className;
     private final String packageName;
     ExpressionStrategy expressionStrategy;
