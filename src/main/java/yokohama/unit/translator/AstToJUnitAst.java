@@ -367,7 +367,11 @@ public class AstToJUnitAst {
                         new VarInitStatement(
                                 Type.MATCHER,
                                 instanceOfVarName,
-                                new InstanceOfMatcherExpr(clazz.getName()),
+                                new InstanceOfMatcherExpr(
+                                        lookupClassName(
+                                                clazz.getName(),
+                                                classResolver,
+                                                spanOf(clazz.getSpan()))),
                                 spanOf(clazz.getSpan())),
                         new IsStatement(
                                 new Var(actual),

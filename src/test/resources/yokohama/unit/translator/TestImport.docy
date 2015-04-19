@@ -3,4 +3,8 @@
 # Test: Test import
 
 Assert that `new ArrayList()` is `{}`.
+
 Assert that `new java.util.ArrayList()` is an instance of `ArrayList`.
+
+Assert that `new java.util.ArrayList()` is an instance e of `ArrayList` such
+that `e.size()` is `0`.
