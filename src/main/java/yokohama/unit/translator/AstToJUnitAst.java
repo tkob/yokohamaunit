@@ -338,10 +338,19 @@ public class AstToJUnitAst {
                                 Span.dummySpan())));
             },
             (InstanceOfMatcher instanceOf) -> {
+                String canonicalClassName;
+                try {
+                    canonicalClassName =
+                            classResolver
+                                    .lookup(instanceOf.getClazz().getName())
+                                    .getCanonicalName();
+                } catch (ClassNotFoundException e) {
+                    throw new TranslationException(e);
+                }
                 return Stream.of(new VarInitStatement(
                         Type.MATCHER,
                         varName,
-                        new InstanceOfMatcherExpr(instanceOf.getClazz().getName()),
+                        new InstanceOfMatcherExpr(canonicalClassName),
                         spanOf(instanceOf.getSpan())));
             },
             (InstanceSuchThatMatcher instanceSuchThat) -> {

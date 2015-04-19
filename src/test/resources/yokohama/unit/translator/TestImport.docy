@@ -1,4 +1,6 @@
 *[ArrayList]: java.util.ArrayList
 
 # Test: Test import
+
 Assert that `new ArrayList()` is `{}`.
+Assert that `new java.util.ArrayList()` is an instance of `ArrayList`.

@@ -208,7 +208,7 @@ public class AstToJUnitAstTest {
                 new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
                 new ThrowsPredicate(
                         new InstanceOfMatcher(
-                                new yokohama.unit.ast.ClassType("b", yokohama.unit.ast.Span.dummySpan()),
+                                new yokohama.unit.ast.ClassType("String", yokohama.unit.ast.Span.dummySpan()),
                                 yokohama.unit.ast.Span.dummySpan()),
                         yokohama.unit.ast.Span.dummySpan()),
                 yokohama.unit.ast.Span.dummySpan());
@@ -280,7 +280,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE, "actual", new VarExpr("ex"), Span.dummySpan())))
                         ),
                         Arrays.asList()),
-                new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("b"), Span.dummySpan()),
+                new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
                 new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
