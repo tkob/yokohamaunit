@@ -15,7 +15,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.ThrowsPredicate;
@@ -49,7 +49,7 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslate() {
         String name = "TestGroup";
-        Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.ast.Span.dummySpan());
+        Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.position.Span.dummySpan());
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         CompilationUnit actual = instance.translate(name, group, packageName);
@@ -59,7 +59,7 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateTest() {
-        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan());
+        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.position.Span.dummySpan());
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst("", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         List<Method> actual = instance.translateTest(test, tables, new ClassResolver());
@@ -72,7 +72,7 @@ public class AstToJUnitAstTest {
      */
     @Test
     public void testTranslateAssertion() {
-        Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), yokohama.unit.ast.Span.dummySpan());
+        Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), yokohama.unit.position.Span.dummySpan());
         String testName = "test";
         List<Table> tables = Arrays.asList();
         AstToJUnitAst instance = new AstToJUnitAst("", "", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
@@ -95,13 +95,13 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslateProposition() {
         Proposition proposition = new Proposition(
-                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.position.Span.dummySpan()),
                 new IsPredicate(
                         new EqualToMatcher(
-                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()),
-                                yokohama.unit.ast.Span.dummySpan()),
-                        yokohama.unit.ast.Span.dummySpan()),
-                yokohama.unit.ast.Span.dummySpan());
+                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.position.Span.dummySpan()),
+                                yokohama.unit.position.Span.dummySpan()),
+                        yokohama.unit.position.Span.dummySpan()),
+                yokohama.unit.position.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         List<Statement> actual =
                 instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")
@@ -144,13 +144,13 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslateProposition1() {
         Proposition proposition = new Proposition(
-                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.position.Span.dummySpan()),
                 new IsNotPredicate(
                         new EqualToMatcher(
-                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.ast.Span.dummySpan()),
-                                yokohama.unit.ast.Span.dummySpan()),
-                        yokohama.unit.ast.Span.dummySpan()),
-                yokohama.unit.ast.Span.dummySpan());
+                                new yokohama.unit.ast.QuotedExpr("b", yokohama.unit.position.Span.dummySpan()),
+                                yokohama.unit.position.Span.dummySpan()),
+                        yokohama.unit.position.Span.dummySpan()),
+                yokohama.unit.position.Span.dummySpan());
 
         AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         List<Statement> actual =
@@ -205,13 +205,13 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslateProposition2() {
         Proposition proposition = new Proposition(
-                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.ast.Span.dummySpan()),
+                new yokohama.unit.ast.QuotedExpr("a", yokohama.unit.position.Span.dummySpan()),
                 new ThrowsPredicate(
                         new InstanceOfMatcher(
-                                new yokohama.unit.ast.ClassType("String", yokohama.unit.ast.Span.dummySpan()),
-                                yokohama.unit.ast.Span.dummySpan()),
-                        yokohama.unit.ast.Span.dummySpan()),
-                yokohama.unit.ast.Span.dummySpan());
+                                new yokohama.unit.ast.ClassType("String", yokohama.unit.position.Span.dummySpan()),
+                                yokohama.unit.position.Span.dummySpan()),
+                        yokohama.unit.position.Span.dummySpan()),
+                yokohama.unit.position.Span.dummySpan());
         AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
         List<Statement> actual =
                 instance.translateProposition(proposition, new ClassResolver(), new GenSym(), "env")

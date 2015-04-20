@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.QuotedExpr;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;

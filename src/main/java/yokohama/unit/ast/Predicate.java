@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import java.util.function.Function;
 
 public interface Predicate {

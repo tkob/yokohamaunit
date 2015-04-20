@@ -2,7 +2,7 @@ package yokohama.unit.ast_junit;
 
 import lombok.Value;
 import yokohama.unit.ast.Kind;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 
 @Value
 public class PrimitiveType implements NonArrayType {

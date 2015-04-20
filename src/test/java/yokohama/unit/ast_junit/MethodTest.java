@@ -6,7 +6,7 @@ import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
 
 public class MethodTest {

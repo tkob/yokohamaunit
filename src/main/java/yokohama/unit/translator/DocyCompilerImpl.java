@@ -45,9 +45,9 @@ public class DocyCompilerImpl implements DocyCompiler {
                 .visitGroup(ctx);
 
         // Check AST
-        List<yokohama.unit.ast.ErrorMessage> errorMessages = variableCheckVisitor.check(ast);
+        List<yokohama.unit.position.ErrorMessage> errorMessages = variableCheckVisitor.check(ast);
         if (errorMessages.size() > 0) {
-            for (yokohama.unit.ast.ErrorMessage errorMessage : errorMessages) {
+            for (yokohama.unit.position.ErrorMessage errorMessage : errorMessages) {
                 System.err.println(errorMessage.getSpan() + ": " + errorMessage.getMessage());
             }
             return false;

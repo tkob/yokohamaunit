@@ -1,4 +1,4 @@
-package yokohama.unit.ast;
+package yokohama.unit.position;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;

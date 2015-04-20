@@ -1,5 +1,7 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 import lombok.Getter;
 
 @Getter

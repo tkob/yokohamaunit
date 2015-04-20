@@ -32,7 +32,7 @@ import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;

@@ -11,7 +11,7 @@ public class TableExtractVisitorTest {
     public void testExtractTables() {
         List<Abbreviation> abbreviations = Arrays.asList();
         List<Definition> definitions = Arrays.asList();
-        Group group = new Group(abbreviations, definitions, yokohama.unit.ast.Span.dummySpan());
+        Group group = new Group(abbreviations, definitions, yokohama.unit.position.Span.dummySpan());
         TableExtractVisitor instance = new TableExtractVisitor();
         List<Table> result = instance.extractTables(group);
         assertThat(result.size(), is(0));
@@ -21,16 +21,16 @@ public class TableExtractVisitorTest {
     public void testExtractTables1() {
         List<Abbreviation> abbreviations = Arrays.asList();
         List<Definition> definitions = Arrays.asList(
-                new Table("table 1", Arrays.asList(new Ident("a", yokohama.unit.ast.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan()),
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0, yokohama.unit.ast.Span.dummySpan()),
-                new Table("table 2", Arrays.asList(new Ident("a", yokohama.unit.ast.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan())
+                new Table("table 1", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan()),
+                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0, yokohama.unit.position.Span.dummySpan()),
+                new Table("table 2", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan())
         );
-        Group group = new Group(abbreviations, definitions, yokohama.unit.ast.Span.dummySpan());
+        Group group = new Group(abbreviations, definitions, yokohama.unit.position.Span.dummySpan());
         TableExtractVisitor instance = new TableExtractVisitor();
         List<Table> actual = instance.extractTables(group);
         List<Table> expected = Arrays.asList(
-                new Table("table 1", Arrays.asList(new Ident("a", yokohama.unit.ast.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan()),
-                new Table("table 2", Arrays.asList(new Ident("a", yokohama.unit.ast.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.ast.Span.dummySpan())), yokohama.unit.ast.Span.dummySpan())
+                new Table("table 1", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan()),
+                new Table("table 2", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan())
         );
         assertThat(actual, is(expected));
     }

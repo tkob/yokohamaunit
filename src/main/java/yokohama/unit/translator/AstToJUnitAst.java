@@ -39,11 +39,11 @@ import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
-import yokohama.unit.ast.Position;
+import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
@@ -544,12 +544,10 @@ public class AstToJUnitAst {
                                     .filter(key -> idents.contains(key))
                                     .flatMap(name -> {
                                         String varName = genSym.generate(name);
-                                        return Stream.concat(
-                                                expressionStrategy.eval(
-                                                        varName, envVarName,
+                                        return Stream.concat(expressionStrategy.eval(varName, envVarName,
                                                         new yokohama.unit.ast.QuotedExpr(
                                                                 record.get(name),
-                                                                new yokohama.unit.ast.Span(
+                                                                new yokohama.unit.position.Span(
                                                                         Optional.of(Paths.get(fileName)),
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
                                                                         new Position(-1, -1))),
@@ -579,12 +577,10 @@ public class AstToJUnitAst {
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     String varName = genSym.generate(names.get(i));
-                                    return Stream.concat(
-                                            expressionStrategy.eval(
-                                                    varName, envVarName,
+                                    return Stream.concat(expressionStrategy.eval(varName, envVarName,
                                                     new yokohama.unit.ast.QuotedExpr(
                                                             row.getCell(left + i).getStringCellValue(),
-                                                            new yokohama.unit.ast.Span(
+                                                            new yokohama.unit.position.Span(
                                                                     Optional.of(Paths.get(fileName)),
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
                                                                     new Position(-1, -1))),

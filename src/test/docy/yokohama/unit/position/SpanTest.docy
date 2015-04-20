@@ -1,7 +1,7 @@
 *[File]: java.io.File
 *[Optional]: java.util.Optional
-*[Position]: yokohama.unit.ast.Position
-*[Span]: yokohama.unit.ast.Span
+*[Position]: yokohama.unit.position.Position
+*[Span]: yokohama.unit.position.Span
 
 # Test: Span.toString
 

@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Value;

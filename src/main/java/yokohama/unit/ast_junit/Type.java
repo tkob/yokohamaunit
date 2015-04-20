@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Kind;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 
 @Value

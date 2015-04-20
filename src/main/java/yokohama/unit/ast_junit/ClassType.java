@@ -3,7 +3,7 @@ package yokohama.unit.ast_junit;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.Value;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 
 @Value
