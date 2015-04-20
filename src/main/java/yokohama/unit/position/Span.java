@@ -36,6 +36,18 @@ public class Span {
         return sb.toString();
     }
 
+    public Span of(Path path) {
+        return new Span(Optional.of(path), Position.dummyPos(), Position.dummyPos());
+    }
+
+    public Span of(Path path, Position start) {
+        return new Span(Optional.of(path), start, Position.dummyPos());
+    }
+
+    public Span of(Path path, Position start, Position end) {
+        return new Span(Optional.of(path), start, end);
+    }
+
     private static Span dummySpan =
             new Span(
                     Optional.empty(),
