@@ -51,8 +51,8 @@ public class Span {
     private static Span dummySpan =
             new Span(
                     Optional.empty(),
-                    new Position(-1, -1),
-                    new Position(-1, -1));
+                    Position.dummyPos(),
+                    Position.dummyPos());
     public static Span dummySpan() {
         return dummySpan;
     }
