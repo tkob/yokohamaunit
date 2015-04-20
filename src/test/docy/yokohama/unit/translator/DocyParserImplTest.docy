@@ -1,0 +1,38 @@
+*[ErrorMessage]: yokohama.unit.position.ErrorMessage
+*[File]: java.io.File
+*[Position]: yokohama.unit.position.Position
+*[Span]: yokohama.unit.position.Span
+
+# Test: Lexing error in DocyParserImpl.parse
+
+## Setup
+Let input = `"\n @"`
+and ins = `@org.apache.commons.io.IOUtils@toInputStream(input, "UTF-8")`
+and path = `new File("dummy").toPath()`
+and errors = `new java.util.ArrayList()`
+and parser = `new yokohama.unit.translator.DocyParserImpl()`.
+
+## Exercise
+Do `parser.parse(path, ins, errors)`.
+
+## Verify
+Assert that `errors.size()` is `1`.
+
+Assert that `errors[0].span.start` is `@Position@of(2, 2)`.
+
+# Test: Parsing error in DocyParserImpl.parse
+
+## Setup
+Let input = `"# Test: test\n and"`
+and ins = `@org.apache.commons.io.IOUtils@toInputStream(input, "UTF-8")`
+and path = `new File("dummy").toPath()`
+and errors = `new java.util.ArrayList()`
+and parser = `new yokohama.unit.translator.DocyParserImpl()`.
+
+## Exercise
+Do `parser.parse(path, ins, errors)`.
+
+## Verify
+Assert that `errors.size()` is `1`.
+
+Assert that `errors[0].span.start` is `@Position@of(2, 2)`.

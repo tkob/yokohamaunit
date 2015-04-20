@@ -12,6 +12,7 @@ import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
+import yokohama.unit.position.ErrorMessage;
 
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
@@ -37,7 +38,7 @@ public class DocyCompilerImpl implements DocyCompiler {
         List<ErrorMessage> errors = new ArrayList<>();
 
         // Source to ANTLR parse tree
-        GroupContext ctx = docyParser.parse(ins, errors);
+        GroupContext ctx = docyParser.parse(docyPath, ins, errors);
         if (errors.size() > 0) return false;
 
         // ANTLR parse tree to AST
