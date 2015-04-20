@@ -7,6 +7,10 @@ public class Position {
     private int line;
     private int column;
 
+    public boolean isDummy() {
+        return line < 0 && column < 0;
+    }
+
     public static Position of(int line) {
         return new Position(line, -1);
     }
