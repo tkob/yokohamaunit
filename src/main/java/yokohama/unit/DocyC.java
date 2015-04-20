@@ -164,8 +164,6 @@ public class DocyC implements Command {
             return Command.EXIT_FAILURE;
         } catch (ParseException|IOException e) {
             err.println("docyc: " + e.getMessage());
-            err.println("Usage: docy <options> <source files>");
-            err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
         }
     }
