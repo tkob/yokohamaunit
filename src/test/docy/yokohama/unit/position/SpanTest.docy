@@ -9,13 +9,13 @@ Assert that `sut.toString()` is `expected` for all sut and expected in Table [Fi
 
 | sut                                                                                        | expected    |
 | ------------------------------------------------------------------------------------------ | ----------- |
-| new Span(@Optional@empty(),                    new Position(1, 1),   new Position(-1, -1)) | "?:1.1"     |
-| new Span(@Optional@of(new File("f").toPath()), new Position(1, -1),  new Position(1, 1)  ) | "f:1-1.1"   |
-| new Span(@Optional@of(new File("f").toPath()), new Position(1, 1),   new Position(1, -1) ) | "f:1.1-1"   |
-| new Span(@Optional@empty(),                    new Position(1, -1),  new Position(1, 1)  ) | "?:1-1.1"   |
-| new Span(@Optional@of(new File("f").toPath()), new Position(1, 1),   new Position(1, 1)  ) | "f:1.1-1.1" |
-| new Span(@Optional@of(new File("f").toPath()), new Position(-1, -1), new Position(-1, -1)) | "f:?"       |
-| new Span(@Optional@empty(),                    new Position(-1, -1), new Position(-1, -1)) | "?:?"       |
+| new Span(@Optional@empty(),                    @Position@of(1, 1),   @Position@dummyPos()) | "?:1.1"     |
+| new Span(@Optional@of(new File("f").toPath()), @Position@of(1),      @Position@of(1, 1)  ) | "f:1-1.1"   |
+| new Span(@Optional@of(new File("f").toPath()), @Position@of(1, 1),   @Position@of(1)     ) | "f:1.1-1"   |
+| new Span(@Optional@empty(),                    @Position@of(1),      @Position@of(1, 1)  ) | "?:1-1.1"   |
+| new Span(@Optional@of(new File("f").toPath()), @Position@of(1, 1),   @Position@of(1, 1)  ) | "f:1.1-1.1" |
+| new Span(@Optional@of(new File("f").toPath()), @Position@dummyPos(), @Position@dummyPos()) | "f:?"       |
+| new Span(@Optional@empty(),                    @Position@dummyPos(), @Position@dummyPos()) | "?:?"       |
 [Fixture for toString]
 
 # Test: Span.getFileName
@@ -25,11 +25,11 @@ pos and expected in Table [Fixture for getFileName].
 
 | path                                    | pos                  | expected |
 | --------------------------------------- | ---------------------| -------- |
-| @Optional@empty()                       | new Position(-1, -1) | "?"      |
-| @Optional@of(new File("/").toPath())    | new Position(-1, -1) | "?"      |
-| @Optional@of(new File("").toPath())     | new Position(-1, -1) | "?"      |
-| @Optional@of(new File("/f").toPath())   | new Position(-1, -1) | "f"      |
-| @Optional@of(new File("/d/f").toPath()) | new Position(-1, -1) | "f"      |
-| @Optional@of(new File("f").toPath())    | new Position(-1, -1) | "f"      |
-| @Optional@of(new File("d/f").toPath())  | new Position(-1, -1) | "f"      |
+| @Optional@empty()                       | @Position@dummyPos() | "?"      |
+| @Optional@of(new File("/").toPath())    | @Position@dummyPos() | "?"      |
+| @Optional@of(new File("").toPath())     | @Position@dummyPos() | "?"      |
+| @Optional@of(new File("/f").toPath())   | @Position@dummyPos() | "f"      |
+| @Optional@of(new File("/d/f").toPath()) | @Position@dummyPos() | "f"      |
+| @Optional@of(new File("f").toPath())    | @Position@dummyPos() | "f"      |
+| @Optional@of(new File("d/f").toPath())  | @Position@dummyPos() | "f"      |
 [Fixture for getFileName]
