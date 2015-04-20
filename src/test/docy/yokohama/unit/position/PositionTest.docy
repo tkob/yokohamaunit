@@ -1,0 +1,13 @@
+*[Position]: yokohama.unit.position.Position
+
+# Test: Position.toString
+
+Assert that `sut.toString()` is `expected` for all sut and expected in Table
+[Fixture for toString].
+
+| sut                  | expected |
+| -------------------- | -------- |
+| @Position@dummyPos() | "?"      |
+| @Position@of(123456) | "123456" |
+| @Position@of(12, 34) | "12.34"  |
+[Fixture for toString]
