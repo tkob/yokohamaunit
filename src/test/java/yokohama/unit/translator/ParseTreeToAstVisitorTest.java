@@ -182,7 +182,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitCondition() throws IOException {
-        YokohamaUnitParser.ConditionContext ctx = parser("for all var in Table 'table 1'").condition();
+        YokohamaUnitParser.ConditionContext ctx = parser("for all var in Table [table 1]").condition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Fixture result = instance.visitCondition(ctx);
         assertThat(result, is(instanceOf(TableRef.class)));
