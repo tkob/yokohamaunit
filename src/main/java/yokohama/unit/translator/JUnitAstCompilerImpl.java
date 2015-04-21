@@ -25,7 +25,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     @Override
-    public boolean compile(
+    public List<ErrorMessage> compile(
             Path docyPath,
             CompilationUnit ast,
             String className,
@@ -37,8 +37,12 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
 
         // Compile Java code
         if (compiler == null) {
-            System.err.println("Could not get the system Java compiler. Probably either JAVA_HOME variable is not set or it does not point to JDK directory.");
-            return false;
+            ErrorMessage errorMessage = new ErrorMessage(
+                    "Could not get the system Java compiler. " +
+                    "Probably either JAVA_HOME variable is not set or " +
+                    "it does not point to JDK directory.",
+                    Span.dummySpan());
+            return Arrays.asList(errorMessage);
         }
 
         List<String> args = new ArrayList<>();
@@ -82,6 +86,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
                         return javaCode;
                     }
                 }));
-        return task.call(); 
+        task.call(); 
+        return errors;
     }
 }

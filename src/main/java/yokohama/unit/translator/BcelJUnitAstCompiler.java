@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
+import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
@@ -92,7 +94,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     }
 
     @Override
-    public boolean compile(
+    public List<ErrorMessage> compile(
             Path docyPath,
             CompilationUnit ast,
             String className,
@@ -136,7 +138,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 System.err.println(e);
             }
         }
-        return true;
+        return Collections.emptyList();
     }
 
     private void visitTestMethod(Method method, ClassGen cg, ConstantPoolGen cp) {

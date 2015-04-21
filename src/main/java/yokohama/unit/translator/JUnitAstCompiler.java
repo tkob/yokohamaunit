@@ -4,9 +4,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.position.ErrorMessage;
 
 public interface JUnitAstCompiler {
-    boolean compile(
+    List<ErrorMessage> compile(
             Path docyPath,
             CompilationUnit ast,
             String className,
