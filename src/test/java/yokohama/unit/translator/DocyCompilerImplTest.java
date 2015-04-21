@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import yokohama.unit.ast.VariableCheckVisitor;
+import yokohama.unit.position.ErrorMessage;
 
 @RunWith(Theories.class)
 public class DocyCompilerImplTest {
@@ -150,7 +152,7 @@ public class DocyCompilerImplTest {
                         new OgnlExpressionStrategy(),
                         new MockitoMockStrategy(),
                         jUnitAstCompiler);
-                boolean actual = instance.compile(
+                List<ErrorMessage> actual = instance.compile(
                         docyPath,
                         ins,
                         className,
@@ -159,7 +161,7 @@ public class DocyCompilerImplTest {
                         Optional.of(Paths.get(dest.getAbsolutePath())),
                         false,
                         Arrays.asList());
-                boolean expected = true;
+                List<ErrorMessage> expected = Collections.emptyList();
                 assertThat(actual, is(expected));
             }
 

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.Option;
@@ -129,7 +130,7 @@ public class DocyCTest {
                 anyObject(),
                 anyBoolean(),
                 anyObject()))
-                .thenReturn(true);
+                .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
@@ -162,7 +163,7 @@ public class DocyCTest {
                 anyObject(),
                 anyBoolean(),
                 anyObject()))
-                .thenReturn(true);
+                .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
@@ -195,7 +196,7 @@ public class DocyCTest {
                 anyObject(),
                 anyBoolean(),
                 anyObject()))
-                .thenReturn(true);
+                .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
@@ -228,7 +229,7 @@ public class DocyCTest {
                 anyObject(),
                 anyBoolean(),
                 anyObject()))
-                .thenReturn(true);
+                .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
@@ -260,7 +261,7 @@ public class DocyCTest {
                 anyObject(),
                 anyBoolean(),
                 anyObject()))
-                .thenReturn(true);
+                .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
