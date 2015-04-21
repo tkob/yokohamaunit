@@ -15,7 +15,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -78,7 +77,7 @@ public class AstToJUnitAst {
     MockStrategy mockStrategy;
     TableExtractVisitor tableExtractVisitor;
 
-    public CompilationUnit translate(String name, Group group, @NonNull String packageName) {
+    public CompilationUnit translate(Group group) {
         ClassResolver classResolver = this.translateAbbreviations(group.getAbbreviations());
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
@@ -89,8 +88,8 @@ public class AstToJUnitAst {
                                    fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, classResolver, new GenSym()).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
-        ClassDecl testClass = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
-        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(name, group, classResolver);
+        ClassDecl testClass = new ClassDecl(true, className, Optional.empty(), Arrays.asList(), methods);
+        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(className, group, classResolver);
         List<ClassDecl> classes =
                 Stream.concat(auxClasses.stream(), Stream.of(testClass))
                         .collect(Collectors.toList());

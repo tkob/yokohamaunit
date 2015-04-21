@@ -64,7 +64,7 @@ public class DocyCompilerImpl implements DocyCompiler {
                     packageName,
                     expressionStrategy,
                     mockStrategy)
-                    .translate(className, ast, packageName);
+                    .translate(ast);
         } catch (TranslationException e) {
             return Arrays.asList(e.toErrorMessage());
         }

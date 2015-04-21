@@ -52,7 +52,7 @@ public class AstToJUnitAstTest {
         Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.position.Span.dummySpan());
         String packageName = "com.example";
         AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(), new MockitoMockStrategy(), new TableExtractVisitor());
-        CompilationUnit actual = instance.translate(name, group, packageName);
+        CompilationUnit actual = instance.translate(group);
         CompilationUnit expected = new CompilationUnit(packageName, Arrays.asList(new ClassDecl(true, name, Optional.empty(), Arrays.asList(), Arrays.asList())));
         assertThat(actual, is(expected));
     }
