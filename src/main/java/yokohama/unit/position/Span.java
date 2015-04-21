@@ -44,7 +44,7 @@ public class Span {
         return new Span(Optional.of(path), start, Position.dummyPos());
     }
 
-    static public Span of(Path path, Position start, Position end) {
+    public static Span of(Path path, Position start, Position end) {
         return new Span(Optional.of(path), start, end);
     }
 
