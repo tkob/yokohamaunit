@@ -3,16 +3,23 @@ package yokohama.unit.translator;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Position;
+import yokohama.unit.position.Span;
 
 public class JUnitAstCompilerImpl implements JUnitAstCompiler {
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -45,10 +52,24 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
         }
         args.addAll(javacArgs);
 
+        List<ErrorMessage> errors = new ArrayList<>();
+        DiagnosticListener<JavaFileObject> diagnosticListener = new DiagnosticListener<JavaFileObject>() {
+            @Override
+            public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                if (diagnostic.getKind() != Diagnostic.Kind.ERROR) return;
+                Path path = Paths.get(diagnostic.getSource().toUri());
+                int line = (int)diagnostic.getLineNumber();
+                int column = (int)diagnostic.getColumnNumber();
+                Span span = Span.of(path, Position.of(line, column));
+                ErrorMessage errorMessage = new ErrorMessage(diagnostic.getMessage(null), span);
+                errors.add(errorMessage);
+            }
+        };
+
         CompilationTask task = compiler.getTask(
                 null, /* Writer out */
                 null, /* JavaFileManager fileManager */
-                null, /* DiagnosticListener<? super JavaFileObject> diagnosticListener */
+                diagnosticListener,
                 args,
                 null, /* Iterable<String> classes */
                 Arrays.asList(new SimpleJavaFileObject(
