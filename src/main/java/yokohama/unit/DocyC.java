@@ -20,10 +20,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
@@ -139,16 +141,23 @@ public class DocyC implements Command {
                             Arrays.asList(commandLine.getOptions()),
                             javacOptions);
             @SuppressWarnings("unchecked") List<String> files = commandLine.getArgList();
+
             List<ErrorMessage> errors = files.stream().flatMap(file -> {
                 String className = FilenameUtils.getBaseName(file);
                 Path path = Paths.get(file).toAbsolutePath();
                 URI uri = path.toUri();
                 URI relativeUri = baseDir.relativize(uri).resolve(".");
                 String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
+                InputStream ins;
                 try {
-                    return compiler.compile(
+                    ins = fileInputStreamFactory.create(path);
+                } catch (IOException e) {
+                    Span span = Span.of(path);
+                    return Stream.of(new ErrorMessage(e.getMessage(), span));
+                }
+                return compiler.compile(
                             path,
-                            fileInputStreamFactory.create(path),
+                            ins,
                             className,
                             packageName,
                             classPath,
@@ -156,9 +165,6 @@ public class DocyC implements Command {
                             emitJava,
                             javacArgs)
                             .stream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
             }).collect(Collectors.toList());
 
             if (errors.isEmpty()) {
@@ -174,7 +180,7 @@ public class DocyC implements Command {
             err.println("Usage: docyc <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
-        } catch (Exception e) {
+        } catch (ParseException e) {
             err.println("docyc: " + e.getMessage());
             return Command.EXIT_FAILURE;
         }

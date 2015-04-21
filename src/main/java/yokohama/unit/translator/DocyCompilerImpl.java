@@ -14,6 +14,7 @@ import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
@@ -34,12 +35,17 @@ public class DocyCompilerImpl implements DocyCompiler {
             List<String> classPath,
             Optional<Path> dest,
             boolean emitJava,
-            List<String> javacArgs
-    ) throws IOException {
+            List<String> javacArgs) {
 
         // Source to ANTLR parse tree
         List<ErrorMessage> docyParserErrors = new ArrayList<>();
-        GroupContext ctx = docyParser.parse(docyPath, ins, docyParserErrors);
+        GroupContext ctx;
+        try {
+            ctx = docyParser.parse(docyPath, ins, docyParserErrors);
+        } catch (IOException e) {
+            Span span = Span.of(docyPath);
+            return Arrays.asList(new ErrorMessage(e.getMessage(), span));
+        }
         if (!docyParserErrors.isEmpty()) return docyParserErrors;
 
         // ANTLR parse tree to AST
@@ -66,7 +72,12 @@ public class DocyCompilerImpl implements DocyCompiler {
         if (emitJava) {
             Path javaFilePath 
                     = TranslatorUtils.makeClassFilePath(dest, packageName, className, ".java");
-            FileUtils.write(javaFilePath.toFile(), junit.getText());
+            try {
+                FileUtils.write(javaFilePath.toFile(), junit.getText());
+            } catch (IOException e) {
+                Span span = Span.of(docyPath);
+                return Arrays.asList(new ErrorMessage(e.getMessage(), span));
+            }
         }
 
         // JUnit AST to Java code

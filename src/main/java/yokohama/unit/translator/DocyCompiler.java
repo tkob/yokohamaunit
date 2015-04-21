@@ -17,5 +17,5 @@ public interface DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             List<String> javacArgs
-    ) throws IOException ;
+    );
 }
