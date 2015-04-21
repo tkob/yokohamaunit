@@ -22,8 +22,8 @@ public class DocyCompilerImpl implements DocyCompiler {
     ParseTreeToAstVisitorFactory parseTreeToAstVisitorFactory;
     VariableCheckVisitor variableCheckVisitor;
     AstToJUnitAstFactory astToJUnitAstFactory;
-    ExpressionStrategy expressionStrategy;
-    MockStrategy mockStrategy;
+    ExpressionStrategyFactory expressionStrategyFactory;
+    MockStrategyFactory mockStrategyFactory;
     JUnitAstCompiler jUnitAstCompiler;
 
     @Override
@@ -59,6 +59,8 @@ public class DocyCompilerImpl implements DocyCompiler {
         // AST to JUnit AST
         CompilationUnit junit;
         try {
+            ExpressionStrategy expressionStrategy = expressionStrategyFactory.create();
+            MockStrategy mockStrategy = mockStrategyFactory.create();
             junit = astToJUnitAstFactory.create(
                     className,
                     packageName,
