@@ -24,6 +24,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
@@ -139,30 +141,46 @@ public class DocyC implements Command {
                             Arrays.asList(commandLine.getOptions()),
                             javacOptions);
             @SuppressWarnings("unchecked") List<String> files = commandLine.getArgList();
-            for (String file : files) {
+
+            List<ErrorMessage> errors = files.stream().flatMap(file -> {
                 String className = FilenameUtils.getBaseName(file);
                 Path path = Paths.get(file).toAbsolutePath();
                 URI uri = path.toUri();
                 URI relativeUri = baseDir.relativize(uri).resolve(".");
                 String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
-                boolean success = compiler.compile(
-                        path,
-                        fileInputStreamFactory.create(path),
-                        className,
-                        packageName,
-                        classPath,
-                        dest,
-                        emitJava,
-                        javacArgs);
-                if (!success) return Command.EXIT_FAILURE;
+                InputStream ins;
+                try {
+                    ins = fileInputStreamFactory.create(path);
+                } catch (IOException e) {
+                    Span span = Span.of(path);
+                    return Stream.of(new ErrorMessage(e.getMessage(), span));
+                }
+                return compiler.compile(
+                            path,
+                            ins,
+                            className,
+                            packageName,
+                            classPath,
+                            dest,
+                            emitJava,
+                            javacArgs)
+                            .stream();
+            }).collect(Collectors.toList());
+
+            if (errors.isEmpty()) {
+                return Command.EXIT_SUCCESS;
+            } else {
+                for (ErrorMessage errorMessage : errors) {
+                    err.println(errorMessage);
+                }
+                return Command.EXIT_FAILURE;
             }
-            return Command.EXIT_SUCCESS;
         } catch (UnrecognizedOptionException e) {
             err.println("docyc: invalid flag: " + e.getOption());
             err.println("Usage: docyc <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
-        } catch (ParseException|IOException e) {
+        } catch (ParseException e) {
             err.println("docyc: " + e.getMessage());
             return Command.EXIT_FAILURE;
         }

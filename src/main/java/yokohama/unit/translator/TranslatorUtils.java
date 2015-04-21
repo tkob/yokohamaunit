@@ -51,7 +51,7 @@ public class TranslatorUtils {
         parser.addErrorListener(errorListener);
         GroupContext ctx = parser.group();
         if (errorListener.numErrors > 0) {
-            throw new TranslationException("Error while parsing docy");
+            throw new RuntimeException("Error while parsing docy");
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
     }

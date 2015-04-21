@@ -2,6 +2,7 @@ package yokohama.unit.translator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -13,11 +14,17 @@ import org.antlr.v4.runtime.Recognizer;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
+import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Position;
+import yokohama.unit.position.Span;
 
 public class DocyParserImpl implements DocyParser {
 
     @Override
-    public YokohamaUnitParser.GroupContext parse(InputStream ins, List<? super ErrorMessage> errors)
+    public YokohamaUnitParser.GroupContext parse(
+            Path docyPath,
+            InputStream ins,
+            List<? super ErrorMessage> errors)
             throws IOException {
         BaseErrorListener errorListener = new BaseErrorListener() {
             @Override
@@ -28,7 +35,10 @@ public class DocyParserImpl implements DocyParser {
                     int charPositionInLine,
                     String msg,
                     RecognitionException e) {
-                errors.add(new ErrorMessage(msg));
+                Span span = Span.of(
+                        docyPath,
+                        Position.of(line, charPositionInLine + 1));
+                errors.add(new ErrorMessage(msg, span));
             }
         };
         CharStream stream = new ANTLRInputStream(ins);

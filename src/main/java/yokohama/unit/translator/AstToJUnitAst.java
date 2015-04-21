@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +16,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -226,8 +224,8 @@ public class AstToJUnitAst {
                             instanceOf -> null,
                             instanceSuchThat -> {
                                 throw new TranslationException(
-                                        instanceSuchThat.getSpan().toString() + ": " +
-                                        "`instance _ of _ such that` cannot follow `is not`");
+                                        "`instance _ of _ such that` cannot follow `is not`",
+                                        instanceSuchThat.getSpan());
                             },
                             nullValue -> null);
                     String unexpected = genSym.generate("unexpected");
@@ -317,7 +315,7 @@ public class AstToJUnitAst {
         try {
             return classResolver.lookup(name).getCanonicalName();
         } catch (ClassNotFoundException e) {
-            throw new TranslationException(e);
+            throw new TranslationException(e.getMessage(), span, e);
         }
     }
 
@@ -469,25 +467,29 @@ public class AstToJUnitAst {
                                       .stream()
                                       .map(Ident::getName)
                                       .collect(Collectors.toList());
-        switch(tableRef.getType()) {
-            case INLINE:
-                return translateTable(
-                        tables.stream()
-                              .filter(table -> table.getName().equals(name))
-                              .findFirst()
-                              .get(),
-                        idents,
-                        classResolver,
-                        genSym,
-                        envVarName);
-            case CSV:
-                return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, genSym, envVarName);
-            case TSV:
-                return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym, envVarName);
-            case EXCEL:
-                return parseExcel(name, idents, genSym, envVarName);
+        try {
+            switch(tableRef.getType()) {
+                case INLINE:
+                    return translateTable(
+                            tables.stream()
+                                  .filter(table -> table.getName().equals(name))
+                                  .findFirst()
+                                  .get(),
+                            idents,
+                            classResolver,
+                            genSym,
+                            envVarName);
+                case CSV:
+                    return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, genSym, envVarName);
+                case TSV:
+                    return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym, envVarName);
+                case EXCEL:
+                    return parseExcel(name, idents, genSym, envVarName);
+            }
+            throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
+        } catch (InvalidFormatException | IOException e) {
+            throw new TranslationException(e.getMessage(), tableRef.getSpan(), e);
         }
-        throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
 
     }
 
@@ -532,8 +534,9 @@ public class AstToJUnitAst {
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows(IOException.class)
-    List<List<Statement>> parseCSV(String fileName, CSVFormat format, List<String> idents, GenSym genSym, String envVarName) {
+    List<List<Statement>> parseCSV(
+            String fileName, CSVFormat format, List<String> idents, GenSym genSym, String envVarName)
+            throws IOException {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -560,7 +563,9 @@ public class AstToJUnitAst {
         }
     }
 
-    List<List<Statement>> parseExcel(String fileName, List<String> idents, GenSym genSym, String envVarName) {
+    List<List<Statement>> parseExcel(
+            String fileName, List<String> idents, GenSym genSym, String envVarName)
+            throws InvalidFormatException, IOException {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -590,8 +595,6 @@ public class AstToJUnitAst {
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
-        } catch (InvalidFormatException | IOException e) {
-            throw new TranslationException(e);
         }
     }
 

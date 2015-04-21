@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import yokohama.unit.position.ErrorMessage;
 
 public interface DocyCompiler {
-    boolean compile(
+    List<ErrorMessage> compile(
             Path docyPath,
             InputStream ins,
             String className,
@@ -16,5 +17,5 @@ public interface DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             List<String> javacArgs
-    ) throws IOException ;
+    );
 }
