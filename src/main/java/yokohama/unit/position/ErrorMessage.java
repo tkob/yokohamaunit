@@ -8,4 +8,9 @@ import lombok.Value;
 public class ErrorMessage {
     private String message;
     private Span span;
+
+    @Override
+    public String toString() {
+        return span + ": " + message;
+    }
 }
