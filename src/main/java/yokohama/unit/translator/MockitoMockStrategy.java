@@ -12,6 +12,7 @@ import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
+import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.InvokeExpr;
@@ -36,12 +37,13 @@ public class MockitoMockStrategy implements MockStrategy {
     @Override
     public Stream<Statement> stub(
             String varName,
-            String classToStubName,
-            Span classToStubSpan,
-            List<StubBehavior> behavior,
+            StubExpr stubExpr,
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver) {
+        String classToStubName = stubExpr.getClassToStub().getCanonicalName(classResolver);
+        Span classToStubSpan = stubExpr.getSpan();
+        List<StubBehavior> behavior = stubExpr.getBehavior();
         Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
@@ -100,9 +102,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 stubExpr->
                         this.stub(
                                 returnedVarName,
-                                classToStubName,
-                                classToStubSpan,
-                                stubExpr.getBehavior(),
+                                stubExpr,
                                 expressionStrategy,
                                 envVarName,
                                 classResolver));

@@ -409,9 +409,7 @@ public class AstToJUnitAst {
                                     classToStubSpan);
                     return mockStrategy.stub(
                             varName,
-                            classToStubName,
-                            classToStubSpan,
-                            stubExpr.getBehavior(),
+                            stubExpr,
                             expressionStrategy,
                             envVarName,
                             classResolver);
