@@ -101,9 +101,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 returnedVarName,
                                 envVarName,
                                 quotedExpr,
-                                genSym,
-                                className,
-                                packageName).stream(),
+                                genSym).stream(),
                 stubExpr->
                         this.stub(
                                 returnedVarName,

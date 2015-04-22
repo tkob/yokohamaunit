@@ -59,7 +59,8 @@ public class DocyCompilerImpl implements DocyCompiler {
         // AST to JUnit AST
         CompilationUnit junit;
         try {
-            ExpressionStrategy expressionStrategy = expressionStrategyFactory.create();
+            ExpressionStrategy expressionStrategy =
+                    expressionStrategyFactory.create(className, packageName);
             MockStrategy mockStrategy = mockStrategyFactory.create();
             junit = astToJUnitAstFactory.create(
                     className,

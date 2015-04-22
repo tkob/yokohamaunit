@@ -89,7 +89,7 @@ public class AstToJUnitAst {
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl testClass = new ClassDecl(true, className, Optional.empty(), Arrays.asList(), methods);
-        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(className, group, classResolver);
+        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(classResolver);
         List<ClassDecl> classes =
                 Stream.concat(auxClasses.stream(), Stream.of(testClass))
                         .collect(Collectors.toList());
@@ -124,7 +124,7 @@ public class AstToJUnitAst {
                                     Optional.empty(),
                                     Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                     ListUtils.union(
-                                            expressionStrategy.env(env, className, packageName, classResolver, genSym),
+                                            expressionStrategy.env(env, classResolver, genSym),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                                 translateProposition(
@@ -148,7 +148,7 @@ public class AstToJUnitAst {
                                         Optional.empty(),
                                         Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                         ListUtils.union(
-                                                expressionStrategy.env(env, className, packageName, classResolver, genSym),
+                                                expressionStrategy.env(env, classResolver, genSym),
                                                 ListUtils.union(
                                                         table.get(i),
                                                         propositions
@@ -173,7 +173,7 @@ public class AstToJUnitAst {
                             Optional.empty(),
                             Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                             ListUtils.union(
-                                    expressionStrategy.env(env, className, packageName, classResolver, genSym),
+                                    expressionStrategy.env(env, classResolver, genSym),
                                     Stream.concat(
                                             bindings.getBindings()
                                                     .stream()
@@ -206,8 +206,7 @@ public class AstToJUnitAst {
                 isPredicate -> {
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, envVarName, proposition.getSubject(),
-                                    genSym, className, packageName).stream(),
+                                    actual, envVarName, proposition.getSubject(), genSym).stream(),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
@@ -230,8 +229,7 @@ public class AstToJUnitAst {
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, envVarName, proposition.getSubject(),
-                                    genSym, className, packageName).stream(),
+                                    actual, envVarName, proposition.getSubject(), genSym).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(),
                                             unexpected,
@@ -257,8 +255,7 @@ public class AstToJUnitAst {
                             bindThrown(
                                     actual,
                                     expressionStrategy.eval(
-                                            __, envVarName, proposition.getSubject(),
-                                            genSym, className, packageName),
+                                            __, envVarName, proposition.getSubject(), genSym),
                                     genSym,
                                     envVarName),
                             translateMatcher(
@@ -330,8 +327,7 @@ public class AstToJUnitAst {
                 Var objVar = new Var(genSym.generate("obj"));
                 return Stream.concat(
                         expressionStrategy.eval(
-                                objVar.getName(), envVarName, equalTo.getExpr(),
-                                genSym, className, packageName).stream(),
+                                objVar.getName(), envVarName, equalTo.getExpr(), genSym).stream(),
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
@@ -418,9 +414,7 @@ public class AstToJUnitAst {
         return expr.accept(
                 quotedExpr ->
                         expressionStrategy.eval(
-                                varName, envVarName, quotedExpr,
-                                genSym, className, packageName)
-                                .stream(),
+                                varName, envVarName, quotedExpr, genSym).stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
@@ -553,8 +547,7 @@ public class AstToJUnitAst {
                                                                         Optional.of(Paths.get(fileName)),
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
                                                                         new Position(-1, -1))),
-                                                        genSym,
-                                                        className, packageName).stream(),
+                                                        genSym).stream(),
                                                 expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
                                     })
                                     .collect(Collectors.toList()))
@@ -588,8 +581,7 @@ public class AstToJUnitAst {
                                                                     Optional.of(Paths.get(fileName)),
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
                                                                     new Position(-1, -1))),
-                                                    genSym,
-                                                    className, packageName).stream(),
+                                                    genSym).stream(),
                                             expressionStrategy.bind(envVarName, names.get(i), new Var(varName), genSym).stream());
                                 })
                                 .collect(Collectors.toList()))
@@ -663,7 +655,7 @@ public class AstToJUnitAst {
                 Optional.empty(),
                 Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 ListUtils.union(
-                        expressionStrategy.env(env, className, packageName, classResolver, genSym),
+                        expressionStrategy.env(env, classResolver, genSym),
                         actionsAfter.size() > 0
                                 ?  Arrays.asList(
                                         new TryStatement(
@@ -684,8 +676,6 @@ public class AstToJUnitAst {
                                                 __,
                                                 envVarName,
                                                 expression,
-                                                genSym,
-                                                className,
-                                                packageName).stream()));
+                                                genSym).stream()));
     }
 }

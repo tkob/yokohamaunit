@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import yokohama.unit.ast.Group;
+import lombok.AllArgsConstructor;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast_junit.CatchClause;
@@ -34,16 +34,17 @@ import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
+@AllArgsConstructor
 public class OgnlExpressionStrategy implements ExpressionStrategy {
+    private final String name;
+    private final String packageName;
+
     static final ClassType OGNL = new ClassType("ognl.Ognl", Span.dummySpan());
     static final Type OGNL_CONTEXT = new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0);
     static final ClassType OGNL_EXCEPTION = new ClassType("ognl.OgnlException", Span.dummySpan());
 
     @Override
-    public Collection<ClassDecl> auxClasses(
-            String name,
-            Group group,
-            ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
         if (classResolver.isEmpty()) return Collections.emptyList();
         /*
         The following interface is implemented:
@@ -160,8 +161,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     @Override
     public List<Statement> env(
             String varName,
-            String className,
-            String packageName,
             ClassResolver classResolver,
             GenSym genSym) {
         if (classResolver.isEmpty()) {
@@ -184,7 +183,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                             new Type(new ClassType("ognl.ClassResolver", Span.dummySpan()), 0),
                             classResolverVar.getName(),
                             new NewExpr(packageName.equals("") ? "" : (packageName + ".")
-                                    + className
+                                    + name
                                     + "$ClassResolver"),
                             Span.dummySpan()),
                     new VarInitStatement(
@@ -279,9 +278,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             String varName,
             String envVarName,
             QuotedExpr quotedExpr,
-            GenSym genSym,
-            String className,
-            String packageName) {
+            GenSym genSym) {
         Var exprVar = new Var(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
