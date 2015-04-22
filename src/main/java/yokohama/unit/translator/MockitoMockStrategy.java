@@ -27,6 +27,8 @@ import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
 public class MockitoMockStrategy implements MockStrategy {
+    private final String name;
+    private final String packageName;
     private final GenSym genSym;
 
     private static final ClassType MOCKITO = new ClassType("org.mockito.Mockito", Span.dummySpan());
@@ -39,9 +41,7 @@ public class MockitoMockStrategy implements MockStrategy {
             List<StubBehavior> behavior,
             ExpressionStrategy expressionStrategy,
             String envVarName,
-            ClassResolver classResolver,
-            String className,
-            String packageName) {
+            ClassResolver classResolver) {
         Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
@@ -51,9 +51,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         b,
                         expressionStrategy,
                         envVarName,
-                        classResolver,
-                        className,
-                        packageName));
+                        classResolver));
         return Stream.concat(createMock, defineBehavior);
     }
 
@@ -84,9 +82,7 @@ public class MockitoMockStrategy implements MockStrategy {
             StubBehavior behavior,
             ExpressionStrategy expressionStrategy,
             String envVarName,
-            ClassResolver classResolver,
-            String className,
-            String packageName) {
+            ClassResolver classResolver) {
         Span span = behavior.getSpan();
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
@@ -109,10 +105,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 stubExpr.getBehavior(),
                                 expressionStrategy,
                                 envVarName,
-                                classResolver,
-                                className,
-                                packageName)
-                );
+                                classResolver));
 
         Stream<Type> argTypes;
         Stream<Var> argVars;

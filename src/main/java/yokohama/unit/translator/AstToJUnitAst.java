@@ -414,9 +414,7 @@ public class AstToJUnitAst {
                             stubExpr.getBehavior(),
                             expressionStrategy,
                             envVarName,
-                            classResolver,
-                            className,
-                            packageName);
+                            classResolver);
                 });
     }
 

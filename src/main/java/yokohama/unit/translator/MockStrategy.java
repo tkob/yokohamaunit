@@ -15,7 +15,5 @@ public interface MockStrategy {
             List<StubBehavior> behavior,
             ExpressionStrategy expressionStrategy,
             String envVarName,
-            ClassResolver classResolver,
-            String className,
-            String packageName);
+            ClassResolver classResolver);
 }
