@@ -53,7 +53,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Class classForName(Map context, String className) throws ClassNotFoundException;
             }
         */
-        GenSym genSym = new GenSym();
         Var contextVar = new Var(genSym.generate("context"));
         Var classNameVar = new Var(genSym.generate("className"));
 
