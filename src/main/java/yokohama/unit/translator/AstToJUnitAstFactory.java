@@ -5,13 +5,13 @@ import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstFactory {
     public AstToJUnitAst create(
-            String className,
+            String name,
             String packageName,
             ExpressionStrategy expressionStrategy,
             MockStrategy mockStrategy,
             GenSym genSym) {
         return new AstToJUnitAst(
-                className,
+                name,
                 packageName,
                 expressionStrategy,
                 mockStrategy,

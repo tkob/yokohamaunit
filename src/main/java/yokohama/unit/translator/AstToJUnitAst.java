@@ -71,7 +71,7 @@ import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
 public class AstToJUnitAst {
-    private final String className;
+    private final String name;
     private final String packageName;
     ExpressionStrategy expressionStrategy;
     MockStrategy mockStrategy;
@@ -89,7 +89,7 @@ public class AstToJUnitAst {
                                    fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, classResolver).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
-        ClassDecl testClass = new ClassDecl(true, className, Optional.empty(), Arrays.asList(), methods);
+        ClassDecl testClass = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
         Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(classResolver);
         List<ClassDecl> classes =
                 Stream.concat(auxClasses.stream(), Stream.of(testClass))

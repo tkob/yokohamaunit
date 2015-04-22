@@ -31,7 +31,7 @@ public class DocyCompilerImpl implements DocyCompiler {
     public List<ErrorMessage> compile(
             Path docyPath,
             InputStream ins,
-            String className,
+            String name,
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
@@ -62,11 +62,10 @@ public class DocyCompilerImpl implements DocyCompiler {
         try {
             GenSym genSym = new GenSym();
             ExpressionStrategy expressionStrategy =
-                    expressionStrategyFactory.create(className, packageName, genSym);
+                    expressionStrategyFactory.create(name, packageName, genSym);
             MockStrategy mockStrategy =
-                    mockStrategyFactory.create(className, packageName, genSym);
-            junit = astToJUnitAstFactory.create(
-                    className,
+                    mockStrategyFactory.create(name, packageName, genSym);
+            junit = astToJUnitAstFactory.create(name,
                     packageName,
                     expressionStrategy,
                     mockStrategy,
@@ -78,7 +77,7 @@ public class DocyCompilerImpl implements DocyCompiler {
 
         if (emitJava) {
             Path javaFilePath 
-                    = TranslatorUtils.makeClassFilePath(dest, packageName, className, ".java");
+                    = TranslatorUtils.makeClassFilePath(dest, packageName, name, ".java");
             try {
                 FileUtils.write(javaFilePath.toFile(), junit.getText());
             } catch (IOException e) {
@@ -88,10 +87,9 @@ public class DocyCompilerImpl implements DocyCompiler {
         }
 
         // JUnit AST to Java code
-        return jUnitAstCompiler.compile(
-                docyPath,
+        return jUnitAstCompiler.compile(docyPath,
                 junit,
-                className,
+                name,
                 packageName,
                 classPath,
                 dest,

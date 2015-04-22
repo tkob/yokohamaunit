@@ -10,7 +10,7 @@ public interface JUnitAstCompiler {
     List<ErrorMessage> compile(
             Path docyPath,
             CompilationUnit ast,
-            String className,
+            String name,
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
