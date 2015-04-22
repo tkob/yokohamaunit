@@ -412,7 +412,7 @@ public class AstToJUnitAst {
                             stubExpr,
                             expressionStrategy,
                             envVarName,
-                            classResolver);
+                            classResolver).stream();
                 });
     }
 

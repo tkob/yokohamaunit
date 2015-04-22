@@ -1,6 +1,6 @@
 package yokohama.unit.translator;
 
-import java.util.stream.Stream;
+import java.util.List;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.util.ClassResolver;
@@ -16,7 +16,7 @@ public interface MockStrategy {
      * @param classResolver
      * @return statements that bind the variable name to the stub
      */
-    Stream<Statement> stub(
+    List<Statement> stub(
             String varName,
             StubExpr stubExpr,
             ExpressionStrategy expressionStrategy,

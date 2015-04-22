@@ -35,7 +35,7 @@ public class MockitoMockStrategy implements MockStrategy {
     private static final ClassType MOCKITO = new ClassType("org.mockito.Mockito", Span.dummySpan());
 
     @Override
-    public Stream<Statement> stub(
+    public List<Statement> stub(
             String varName,
             StubExpr stubExpr,
             ExpressionStrategy expressionStrategy,
@@ -54,7 +54,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         expressionStrategy,
                         envVarName,
                         classResolver));
-        return Stream.concat(createMock, defineBehavior);
+        return Stream.concat(createMock, defineBehavior).collect(Collectors.toList());
     }
 
     private Stream<Statement> createMock(
@@ -105,7 +105,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 stubExpr,
                                 expressionStrategy,
                                 envVarName,
-                                classResolver));
+                                classResolver).stream());
 
         Stream<Type> argTypes;
         Stream<Var> argVars;
