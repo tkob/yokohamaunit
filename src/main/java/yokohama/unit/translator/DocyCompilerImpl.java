@@ -15,6 +15,7 @@ import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
+import yokohama.unit.util.GenSym;
 
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
@@ -59,14 +60,16 @@ public class DocyCompilerImpl implements DocyCompiler {
         // AST to JUnit AST
         CompilationUnit junit;
         try {
+            GenSym genSym = new GenSym();
             ExpressionStrategy expressionStrategy =
-                    expressionStrategyFactory.create(className, packageName);
-            MockStrategy mockStrategy = mockStrategyFactory.create();
+                    expressionStrategyFactory.create(className, packageName, genSym);
+            MockStrategy mockStrategy = mockStrategyFactory.create(genSym);
             junit = astToJUnitAstFactory.create(
                     className,
                     packageName,
                     expressionStrategy,
-                    mockStrategy)
+                    mockStrategy,
+                    genSym)
                     .translate(ast);
         } catch (TranslationException e) {
             return Arrays.asList(e.toErrorMessage());

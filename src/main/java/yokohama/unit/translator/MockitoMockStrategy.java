@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
@@ -24,7 +25,10 @@ import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 
+@AllArgsConstructor
 public class MockitoMockStrategy implements MockStrategy {
+    private final GenSym genSym;
+
     private static final ClassType MOCKITO = new ClassType("org.mockito.Mockito", Span.dummySpan());
 
     @Override
@@ -36,10 +40,9 @@ public class MockitoMockStrategy implements MockStrategy {
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver,
-            GenSym genSym,
             String className,
             String packageName) {
-        Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan, genSym);
+        Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         varName,
@@ -49,7 +52,6 @@ public class MockitoMockStrategy implements MockStrategy {
                         expressionStrategy,
                         envVarName,
                         classResolver,
-                        genSym,
                         className,
                         packageName));
         return Stream.concat(createMock, defineBehavior);
@@ -58,8 +60,7 @@ public class MockitoMockStrategy implements MockStrategy {
     private Stream<Statement> createMock(
             String varName,
             String classToStubName,
-            Span classToStubSpan,
-            GenSym genSym) {
+            Span classToStubSpan) {
         Var classToStubVar = new Var(genSym.generate("classToStub"));
         Type clazz = new Type(new ClassType(classToStubName, classToStubSpan), 0);
         return Stream.of(
@@ -84,7 +85,6 @@ public class MockitoMockStrategy implements MockStrategy {
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver,
-            GenSym genSym,
             String className,
             String packageName) {
         Span span = behavior.getSpan();
@@ -100,8 +100,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         expressionStrategy.eval(
                                 returnedVarName,
                                 envVarName,
-                                quotedExpr,
-                                genSym).stream(),
+                                quotedExpr).stream(),
                 stubExpr->
                         this.stub(
                                 returnedVarName,
@@ -111,7 +110,6 @@ public class MockitoMockStrategy implements MockStrategy {
                                 expressionStrategy,
                                 envVarName,
                                 classResolver,
-                                genSym,
                                 className,
                                 packageName)
                 );
@@ -122,7 +120,7 @@ public class MockitoMockStrategy implements MockStrategy {
         if (isVarArg) {
             String varArg = genSym.generate("varArg");
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
-                    .map(argumentType -> mapArgumentType(argumentType, classResolver, genSym))
+                    .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
             argTypes = Stream.concat(
                     argumentTypes.subList(0, argumentTypes.size() - 1)
@@ -150,7 +148,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                     span)));
         } else {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
-                    .map(argumentType -> mapArgumentType(argumentType, classResolver, genSym))
+                    .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
             argTypes = methodPattern.getArgumentTypes().stream().map(type -> Type.of(type, classResolver));
             argVars = pairs.stream().map(Pair::getFirst);
@@ -224,8 +222,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
     private Pair<Var, Stream<Statement>> mapArgumentType(
             yokohama.unit.ast.Type argumentType,
-            ClassResolver classResolver,
-            GenSym genSym) {
+            ClassResolver classResolver) {
         Span span = argumentType.getSpan();
         String argVarName = genSym.generate("arg");
         int dims = argumentType.getDims();

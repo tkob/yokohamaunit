@@ -75,6 +75,7 @@ public class AstToJUnitAst {
     private final String packageName;
     ExpressionStrategy expressionStrategy;
     MockStrategy mockStrategy;
+    GenSym genSym;
     TableExtractVisitor tableExtractVisitor;
 
     public CompilationUnit translate(Group group) {
@@ -85,7 +86,7 @@ public class AstToJUnitAst {
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
                                    test -> translateTest(test, tables, classResolver).stream(),
-                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, classResolver, new GenSym()).stream(),
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, classResolver).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl testClass = new ClassDecl(true, className, Optional.empty(), Arrays.asList(), methods);
@@ -115,7 +116,6 @@ public class AstToJUnitAst {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(() -> {
-                    GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
                                     Arrays.asList(Annotation.TEST),
@@ -124,20 +124,18 @@ public class AstToJUnitAst {
                                     Optional.empty(),
                                     Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                     ListUtils.union(
-                                            expressionStrategy.env(env, classResolver, genSym),
+                                            expressionStrategy.env(env, classResolver),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                                 translateProposition(
                                                                         proposition,
                                                                         classResolver,
-                                                                        genSym,
                                                                         env))
                                                     .collect(Collectors.toList()))));
                 },
                 tableRef -> {
-                    GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
-                    List<List<Statement>> table = translateTableRef(tableRef, tables, classResolver, genSym, env);
+                    List<List<Statement>> table = translateTableRef(tableRef, tables, classResolver, env);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> {
@@ -148,7 +146,7 @@ public class AstToJUnitAst {
                                         Optional.empty(),
                                         Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                                         ListUtils.union(
-                                                expressionStrategy.env(env, classResolver, genSym),
+                                                expressionStrategy.env(env, classResolver),
                                                 ListUtils.union(
                                                         table.get(i),
                                                         propositions
@@ -157,14 +155,12 @@ public class AstToJUnitAst {
                                                                         translateProposition(
                                                                                 proposition,
                                                                                 classResolver,
-                                                                                genSym,
                                                                                 env))
                                                                 .collect(Collectors.toList()))));
                             })
                             .collect(Collectors.toList());
                 },
                 bindings -> {
-                    GenSym genSym = new GenSym();
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
                             Arrays.asList(Annotation.TEST),
@@ -173,7 +169,7 @@ public class AstToJUnitAst {
                             Optional.empty(),
                             Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                             ListUtils.union(
-                                    expressionStrategy.env(env, classResolver, genSym),
+                                    expressionStrategy.env(env, classResolver),
                                     Stream.concat(
                                             bindings.getBindings()
                                                     .stream()
@@ -181,14 +177,12 @@ public class AstToJUnitAst {
                                                             translateBinding(
                                                                     binding,
                                                                     classResolver,
-                                                                    genSym,
                                                                     env)),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                             translateProposition(
                                                                     proposition,
                                                                     classResolver,
-                                                                    genSym,
                                                                     env)))
                                             .collect(Collectors.toList()))));
                 });
@@ -197,7 +191,6 @@ public class AstToJUnitAst {
     Stream<Statement> translateProposition(
             Proposition proposition,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         String actual = genSym.generate("actual");
         String expected = genSym.generate("expected");
@@ -206,13 +199,12 @@ public class AstToJUnitAst {
                 isPredicate -> {
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, envVarName, proposition.getSubject(), genSym).stream(),
+                                    actual, envVarName, proposition.getSubject()).stream(),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
                                     actual,
                                     classResolver,
-                                    genSym,
                                     envVarName));
                 },
                 isNotPredicate -> {
@@ -229,13 +221,12 @@ public class AstToJUnitAst {
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, envVarName, proposition.getSubject(), genSym).stream(),
+                                    actual, envVarName, proposition.getSubject()).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(),
                                             unexpected,
                                             actual,
                                             classResolver,
-                                            genSym,
                                             envVarName),
                                     Stream.of(new VarInitStatement(
                                             Type.MATCHER,
@@ -255,15 +246,13 @@ public class AstToJUnitAst {
                             bindThrown(
                                     actual,
                                     expressionStrategy.eval(
-                                            __, envVarName, proposition.getSubject(), genSym),
-                                    genSym,
+                                            __, envVarName, proposition.getSubject()),
                                     envVarName),
                             translateMatcher(
                                     throwsPredicate.getThrowee(),
                                     expected,
                                     actual,
                                     classResolver,
-                                    genSym,
                                     envVarName));
                 }
         );
@@ -278,7 +267,7 @@ public class AstToJUnitAst {
                         : Stream.of(new IsStatement(new Var(actual), new Var(expected), predicate.getSpan())));
     }
 
-    Stream<Statement> bindThrown(String actual, List<Statement> statements, GenSym genSym, String envVarName) {
+    Stream<Statement> bindThrown(String actual, List<Statement> statements, String envVarName) {
         String e = genSym.generate("ex");
         /*
         Throwable actual;
@@ -298,7 +287,7 @@ public class AstToJUnitAst {
                                 statements,
                                 Arrays.asList(new VarInitStatement(
                                         Type.THROWABLE, actual, new NullExpr(), Span.dummySpan()))),
-                        Arrays.asList(expressionStrategy.catchAndAssignCause(actual, genSym),
+                        Arrays.asList(expressionStrategy.catchAndAssignCause(actual),
                                 new CatchClause(
                                         new ClassType("java.lang.Throwable", Span.dummySpan()),
                                         new Var(e),
@@ -320,14 +309,13 @@ public class AstToJUnitAst {
             String varName,
             String actual,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         return matcher.<Stream<Statement>>accept(
             (EqualToMatcher equalTo) -> {
                 Var objVar = new Var(genSym.generate("obj"));
                 return Stream.concat(
                         expressionStrategy.eval(
-                                objVar.getName(), envVarName, equalTo.getExpr(), genSym).stream(),
+                                objVar.getName(), envVarName, equalTo.getExpr()).stream(),
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
@@ -368,14 +356,13 @@ public class AstToJUnitAst {
                                 clazz.getSpan()));
 
                 Stream<Statement> bindStatements =
-                        expressionStrategy.bind(envVarName, bindVarName, new Var(actual), genSym)
-                                .stream();
+                        expressionStrategy.bind(envVarName, bindVarName, new Var(actual)).stream();
 
                 Stream<Statement> suchThatStatements =
                         propositions
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, classResolver, genSym, envVarName));
+                                        translateProposition(proposition, classResolver, envVarName));
 
                 return Stream.concat(
                         instanceOfStatements,
@@ -396,25 +383,23 @@ public class AstToJUnitAst {
     Stream<Statement> translateBinding(
             yokohama.unit.ast.Binding binding,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         String name = binding.getName().getName();
         String varName = genSym.generate(name);
         return Stream.concat(
-                translateExpr(binding.getValue(), varName, classResolver, genSym, envVarName),
-                expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
+                translateExpr(binding.getValue(), varName, classResolver, envVarName),
+                expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
     }
 
     Stream<Statement> translateExpr(
             yokohama.unit.ast.Expr expr,
             String varName,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         return expr.accept(
                 quotedExpr ->
                         expressionStrategy.eval(
-                                varName, envVarName, quotedExpr, genSym).stream(),
+                                varName, envVarName, quotedExpr).stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
@@ -430,7 +415,6 @@ public class AstToJUnitAst {
                             expressionStrategy,
                             envVarName,
                             classResolver,
-                            genSym,
                             className,
                             packageName);
                 });
@@ -453,7 +437,6 @@ public class AstToJUnitAst {
             TableRef tableRef,
             List<Table> tables,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         String name = tableRef.getName();
         List<String> idents = tableRef.getIdents()
@@ -470,14 +453,13 @@ public class AstToJUnitAst {
                                   .get(),
                             idents,
                             classResolver,
-                            genSym,
                             envVarName);
                 case CSV:
-                    return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, genSym, envVarName);
+                    return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, envVarName);
                 case TSV:
-                    return parseCSV(name, CSVFormat.TDF.withHeader(), idents, genSym, envVarName);
+                    return parseCSV(name, CSVFormat.TDF.withHeader(), idents, envVarName);
                 case EXCEL:
-                    return parseExcel(name, idents, genSym, envVarName);
+                    return parseExcel(name, idents, envVarName);
             }
             throw new IllegalArgumentException("'" + Objects.toString(tableRef) + "' is not a table reference.");
         } catch (InvalidFormatException | IOException e) {
@@ -490,7 +472,6 @@ public class AstToJUnitAst {
             Table table,
             List<String> idents,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         return table.getRows()
                     .stream()
@@ -503,7 +484,6 @@ public class AstToJUnitAst {
                                             .collect(Collectors.toList()),
                                     idents,
                                     classResolver,
-                                    genSym,
                                     envVarName))
                     .collect(Collectors.toList());
     }
@@ -513,7 +493,6 @@ public class AstToJUnitAst {
             List<String> header,
             List<String> idents,
             ClassResolver classResolver,
-            GenSym genSym,
             String envVarName) {
         return IntStream.range(0, header.size())
                 .filter(i -> idents.contains(header.get(i)))
@@ -521,14 +500,14 @@ public class AstToJUnitAst {
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
                     return Stream.concat(
-                            translateExpr(row.getExprs().get(i), varName, classResolver, genSym, envVarName),
-                            expressionStrategy.bind(envVarName, header.get(i), new Var(varName), genSym).stream());
+                            translateExpr(row.getExprs().get(i), varName, classResolver, envVarName),
+                            expressionStrategy.bind(envVarName, header.get(i), new Var(varName)).stream());
                 })
                 .collect(Collectors.toList());
     }
 
     List<List<Statement>> parseCSV(
-            String fileName, CSVFormat format, List<String> idents, GenSym genSym, String envVarName)
+            String fileName, CSVFormat format, List<String> idents, String envVarName)
             throws IOException {
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
@@ -546,9 +525,8 @@ public class AstToJUnitAst {
                                                                 new yokohama.unit.position.Span(
                                                                         Optional.of(Paths.get(fileName)),
                                                                         new Position((int)parser.getCurrentLineNumber(), -1),
-                                                                        new Position(-1, -1))),
-                                                        genSym).stream(),
-                                                expressionStrategy.bind(envVarName, name, new Var(varName), genSym).stream());
+                                                                        new Position(-1, -1)))).stream(),
+                                                expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
                                     })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -556,7 +534,7 @@ public class AstToJUnitAst {
     }
 
     List<List<Statement>> parseExcel(
-            String fileName, List<String> idents, GenSym genSym, String envVarName)
+            String fileName, List<String> idents, String envVarName)
             throws InvalidFormatException, IOException {
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
@@ -580,16 +558,15 @@ public class AstToJUnitAst {
                                                             new yokohama.unit.position.Span(
                                                                     Optional.of(Paths.get(fileName)),
                                                                     new Position(row.getRowNum() + 1, left + i + 1),
-                                                                    new Position(-1, -1))),
-                                                    genSym).stream(),
-                                            expressionStrategy.bind(envVarName, names.get(i), new Var(varName), genSym).stream());
+                                                                    new Position(-1, -1)))).stream(),
+                                            expressionStrategy.bind(envVarName, names.get(i), new Var(varName)).stream());
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
         }
     }
 
-    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, ClassResolver classResolver, GenSym genSym) {
+    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, ClassResolver classResolver) {
         String env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());
@@ -603,8 +580,8 @@ public class AstToJUnitAst {
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
                             return Stream.concat(
-                                    translateExpr(binding.getValue(), varName, classResolver, genSym, env),
-                                    expressionStrategy.bind(env, binding.getName(), new Var(varName), genSym).stream());
+                                    translateExpr(binding.getValue(), varName, classResolver, env),
+                                    expressionStrategy.bind(env, binding.getName(), new Var(varName)).stream());
                         });
             } else {
                 bindings = Stream.empty();
@@ -616,18 +593,18 @@ public class AstToJUnitAst {
         Optional<Stream<Statement>> setupActions =
                 fourPhaseTest.getSetup()
                         .map(Phase::getExecutions)
-                        .map(execition -> translateExecutions(execition, genSym, env));
+                        .map(execition -> translateExecutions(execition, env));
         Optional<Stream<Statement>> exerciseActions =
                 fourPhaseTest.getExercise()
                         .map(Phase::getExecutions)
-                        .map(execution -> translateExecutions(execution, genSym, env));
+                        .map(execution -> translateExecutions(execution, env));
         Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
                         assertion.getPropositions()
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, classResolver, genSym, env)));
+                                        translateProposition(proposition, classResolver, env)));
 
         List<Statement> statements =
                 Stream.concat(
@@ -643,7 +620,7 @@ public class AstToJUnitAst {
         List<Statement> actionsAfter;
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
-            actionsAfter = translateExecutions(teardown.getExecutions(), genSym, env).collect(Collectors.toList());
+            actionsAfter = translateExecutions(teardown.getExecutions(), env).collect(Collectors.toList());
         } else {
             actionsAfter = Arrays.asList();
         }
@@ -655,7 +632,7 @@ public class AstToJUnitAst {
                 Optional.empty(),
                 Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
                 ListUtils.union(
-                        expressionStrategy.env(env, classResolver, genSym),
+                        expressionStrategy.env(env, classResolver),
                         actionsAfter.size() > 0
                                 ?  Arrays.asList(
                                         new TryStatement(
@@ -665,7 +642,7 @@ public class AstToJUnitAst {
                                 : statements)));
     }
 
-    Stream<Statement> translateExecutions(List<Execution> executions, GenSym genSym, String envVarName) {
+    Stream<Statement> translateExecutions(List<Execution> executions, String envVarName) {
         String __ = genSym.generate("__");
         return executions.stream()
                 .flatMap(execution ->
@@ -675,7 +652,6 @@ public class AstToJUnitAst {
                                         expressionStrategy.eval(
                                                 __,
                                                 envVarName,
-                                                expression,
-                                                genSym).stream()));
+                                                expression).stream()));
     }
 }
