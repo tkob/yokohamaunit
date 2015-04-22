@@ -10,13 +10,45 @@ import yokohama.unit.ast_junit.Var;
 import yokohama.unit.util.ClassResolver;
 
 public interface ExpressionStrategy {
+    /**
+     * Supplies auxiliary classes.
+     * 
+     * @param classResolver
+     * @return a collection of auxiliary classes
+     */
     Collection<ClassDecl> auxClasses(ClassResolver classResolver);
 
-    List<Statement> env( String varName, ClassResolver classResolver); // introduce new environment
+    /**
+     * Introduces a new environment.
+     * 
+     * @param varName       a variable name to be bound to the new environment
+     * @param classResolver
+     * @return statements that introduce a new environment
+     */
+    List<Statement> env(String varName, ClassResolver classResolver);
 
-    List<Statement> bind(String envVarName, String name, Var rhs); // make a binding in the environment
+    /**
+     * Bind a variable in the expression language to a value
+     * 
+     * @param envVarName a variable name (in Java) bound to the environment
+     * @param name       a variable name in the expression language to be bound
+     *                    to rhs
+     * @param rhs        a variable (in Java) bound to the value to which the
+     *                    name is to be bound
+     * @return statements that bind name to rhs in the environment of the
+     *          expression language
+     */
+    List<Statement> bind(String envVarName, String name, Var rhs);
 
     CatchClause catchAndAssignCause(String causeVarName);
 
+    /**
+     * Evaluates an expression.
+     * 
+     * @param varName    a variable name to be bound to the result
+     * @param envVarName a variable name bound to the environment
+     * @param quotedExpr an expression to be evaluated
+     * @return statements that evaluates the expression
+     */
     List<Statement> eval(String varName, String envVarName, QuotedExpr quotedExpr);
 }
