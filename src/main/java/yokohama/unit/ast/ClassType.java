@@ -19,14 +19,6 @@ public class ClassType implements NonArrayType {
         }
     }
 
-    public String getCanonicalName(ClassResolver classResolver) {
-        try {
-            return classResolver.lookup(name).getCanonicalName();
-        } catch (ClassNotFoundException e) {
-            throw new AstException(e.getMessage(), span, e);
-        }
-    }
-
     @Override
     public <T> T accept(NonArrayTypeVisitor<T> visitor) {
         return visitor.visitClassType(this);

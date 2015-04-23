@@ -41,7 +41,8 @@ public class MockitoMockStrategy implements MockStrategy {
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver) {
-        String classToStubName =      stubExpr.getClassToStub().getCanonicalName(classResolver);
+        Class<?> classToStub =        stubExpr.getClassToStub().toClass(classResolver);
+        String classToStubName =      classToStub.getCanonicalName();
         Span classToStubSpan =        stubExpr.getSpan();
         List<StubBehavior> behavior = stubExpr.getBehavior();
 
@@ -357,7 +358,9 @@ public class MockitoMockStrategy implements MockStrategy {
                 },
                 classType -> {
                     String clazzVarName = genSym.generate("clazz");
-                    Type type = new Type(new ClassType(classType.getCanonicalName(classResolver), Span.dummySpan()), dims);
+                    Type type = new Type(
+                            new ClassType(classType.toClass(classResolver).getCanonicalName(), Span.dummySpan()),
+                            dims);
                     return Stream.<Statement>of(
                             new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
                             new VarInitStatement(type, argVarName,
