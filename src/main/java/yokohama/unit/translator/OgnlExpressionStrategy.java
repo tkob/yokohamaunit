@@ -271,7 +271,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> eval(String varName, String envVarName, QuotedExpr quotedExpr) {
+    public List<Statement> eval(String varName, QuotedExpr quotedExpr, String envVarName) {
         Var exprVar = new Var(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(

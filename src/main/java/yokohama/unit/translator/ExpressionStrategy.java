@@ -46,9 +46,9 @@ public interface ExpressionStrategy {
      * Evaluates an expression.
      * 
      * @param varName    a variable name to be bound to the result
-     * @param envVarName a variable name bound to the environment
      * @param quotedExpr an expression to be evaluated
+     * @param envVarName a variable name bound to the environment
      * @return statements that evaluates the expression
      */
-    List<Statement> eval(String varName, String envVarName, QuotedExpr quotedExpr);
+    List<Statement> eval(String varName, QuotedExpr quotedExpr, String envVarName);
 }
