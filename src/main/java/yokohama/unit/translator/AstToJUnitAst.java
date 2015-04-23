@@ -90,9 +90,11 @@ public class AstToJUnitAst {
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl testClass = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
-        Collection<ClassDecl> auxClasses = expressionStrategy.auxClasses(classResolver);
+        Stream<ClassDecl> auxClasses = Stream.concat(
+                expressionStrategy.auxClasses(classResolver).stream(),
+                mockStrategy.auxClasses(classResolver).stream());
         List<ClassDecl> classes =
-                Stream.concat(auxClasses.stream(), Stream.of(testClass))
+                Stream.concat(auxClasses, Stream.of(testClass))
                         .collect(Collectors.toList());
         return new CompilationUnit(packageName, classes);
     }

@@ -2,6 +2,8 @@ package yokohama.unit.translator;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,6 +15,7 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
+import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.InvokeExpr;
@@ -33,6 +36,11 @@ public class MockitoMockStrategy implements MockStrategy {
     private final GenSym genSym;
 
     private static final ClassType MOCKITO = new ClassType("org.mockito.Mockito", Span.dummySpan());
+
+    @Override
+    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
+        return Collections.emptyList();
+    }
 
     @Override
     public List<Statement> stub(

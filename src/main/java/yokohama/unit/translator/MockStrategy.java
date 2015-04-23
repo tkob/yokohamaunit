@@ -1,11 +1,21 @@
 package yokohama.unit.translator;
 
+import java.util.Collection;
 import java.util.List;
 import yokohama.unit.ast.StubExpr;
+import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.util.ClassResolver;
 
 public interface MockStrategy {
+    /**
+     * Supplies auxiliary classes.
+     * 
+     * @param classResolver
+     * @return a collection of auxiliary classes
+     */
+    Collection<ClassDecl> auxClasses(ClassResolver classResolver);
+
     /**
      * Create a stub.
      * 
