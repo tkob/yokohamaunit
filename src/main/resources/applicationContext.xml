@@ -7,8 +7,8 @@
     <constructor-arg><bean class="yokohama.unit.translator.ParseTreeToAstVisitorFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.ast.VariableCheckVisitor"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.AstToJUnitAstFactory"/></constructor-arg>
-    <constructor-arg><bean class="yokohama.unit.translator.OgnlExpressionStrategy"/></constructor-arg>
-    <constructor-arg><bean class="yokohama.unit.translator.MockitoMockStrategy"/></constructor-arg>
+    <constructor-arg><bean class="yokohama.unit.translator.OgnlExpressionStrategyFactory"/></constructor-arg>
+    <constructor-arg><bean class="yokohama.unit.translator.MockitoMockStrategyFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.JUnitAstCompilerImpl"/></constructor-arg>
   </bean>
 </beans>

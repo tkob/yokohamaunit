@@ -15,6 +15,7 @@ import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
+import yokohama.unit.util.GenSym;
 
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
@@ -22,15 +23,15 @@ public class DocyCompilerImpl implements DocyCompiler {
     ParseTreeToAstVisitorFactory parseTreeToAstVisitorFactory;
     VariableCheckVisitor variableCheckVisitor;
     AstToJUnitAstFactory astToJUnitAstFactory;
-    ExpressionStrategy expressionStrategy;
-    MockStrategy mockStrategy;
+    ExpressionStrategyFactory expressionStrategyFactory;
+    MockStrategyFactory mockStrategyFactory;
     JUnitAstCompiler jUnitAstCompiler;
 
     @Override
     public List<ErrorMessage> compile(
             Path docyPath,
             InputStream ins,
-            String className,
+            String name,
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
@@ -59,11 +60,16 @@ public class DocyCompilerImpl implements DocyCompiler {
         // AST to JUnit AST
         CompilationUnit junit;
         try {
-            junit = astToJUnitAstFactory.create(
-                    className,
+            GenSym genSym = new GenSym();
+            ExpressionStrategy expressionStrategy =
+                    expressionStrategyFactory.create(name, packageName, genSym);
+            MockStrategy mockStrategy =
+                    mockStrategyFactory.create(name, packageName, genSym);
+            junit = astToJUnitAstFactory.create(name,
                     packageName,
                     expressionStrategy,
-                    mockStrategy)
+                    mockStrategy,
+                    genSym)
                     .translate(ast);
         } catch (TranslationException e) {
             return Arrays.asList(e.toErrorMessage());
@@ -71,7 +77,7 @@ public class DocyCompilerImpl implements DocyCompiler {
 
         if (emitJava) {
             Path javaFilePath 
-                    = TranslatorUtils.makeClassFilePath(dest, packageName, className, ".java");
+                    = TranslatorUtils.makeClassFilePath(dest, packageName, name, ".java");
             try {
                 FileUtils.write(javaFilePath.toFile(), junit.getText());
             } catch (IOException e) {
@@ -81,10 +87,9 @@ public class DocyCompilerImpl implements DocyCompiler {
         }
 
         // JUnit AST to Java code
-        return jUnitAstCompiler.compile(
-                docyPath,
+        return jUnitAstCompiler.compile(docyPath,
                 junit,
-                className,
+                name,
                 packageName,
                 classPath,
                 dest,

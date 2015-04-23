@@ -1,18 +1,21 @@
 package yokohama.unit.translator;
 
 import yokohama.unit.ast.TableExtractVisitor;
+import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstFactory {
     public AstToJUnitAst create(
-            String className,
+            String name,
             String packageName,
             ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy) {
+            MockStrategy mockStrategy,
+            GenSym genSym) {
         return new AstToJUnitAst(
-                className,
+                name,
                 packageName,
                 expressionStrategy,
                 mockStrategy,
+                genSym,
                 new TableExtractVisitor());
     }
 }

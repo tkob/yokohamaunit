@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import yokohama.unit.ast.Group;
+import lombok.AllArgsConstructor;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast_junit.CatchClause;
@@ -34,16 +34,18 @@ import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
+@AllArgsConstructor
 public class OgnlExpressionStrategy implements ExpressionStrategy {
+    private final String name;
+    private final String packageName;
+    private final GenSym genSym;
+
     static final ClassType OGNL = new ClassType("ognl.Ognl", Span.dummySpan());
     static final Type OGNL_CONTEXT = new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0);
     static final ClassType OGNL_EXCEPTION = new ClassType("ognl.OgnlException", Span.dummySpan());
 
     @Override
-    public Collection<ClassDecl> auxClasses(
-            String name,
-            Group group,
-            ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
         if (classResolver.isEmpty()) return Collections.emptyList();
         /*
         The following interface is implemented:
@@ -51,7 +53,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Class classForName(Map context, String className) throws ClassNotFoundException;
             }
         */
-        GenSym genSym = new GenSym();
         Var contextVar = new Var(genSym.generate("context"));
         Var classNameVar = new Var(genSym.generate("className"));
 
@@ -158,12 +159,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> env(
-            String varName,
-            String className,
-            String packageName,
-            ClassResolver classResolver,
-            GenSym genSym) {
+    public List<Statement> env(String varName, ClassResolver classResolver) {
         if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(
@@ -184,7 +180,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                             new Type(new ClassType("ognl.ClassResolver", Span.dummySpan()), 0),
                             classResolverVar.getName(),
                             new NewExpr(packageName.equals("") ? "" : (packageName + ".")
-                                    + className
+                                    + name
                                     + "$ClassResolver"),
                             Span.dummySpan()),
                     new VarInitStatement(
@@ -206,7 +202,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs, GenSym genSym) {
+    public List<Statement> bind(String envVarName, String name, Var rhs) {
         Var nameVar = new Var(genSym.generate(name));
         return Arrays.asList(
                 new VarInitStatement(
@@ -228,7 +224,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public CatchClause catchAndAssignCause(String causeVarName, GenSym genSym) {
+    public CatchClause catchAndAssignCause(String causeVarName) {
         Var caughtVar = new Var(genSym.generate("ex"));
         Var reasonVar = new Var(genSym.generate("reason"));
         Var nullValueVar = new Var(genSym.generate("nullValue"));
@@ -275,13 +271,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> eval(
-            String varName,
-            String envVarName,
-            QuotedExpr quotedExpr,
-            GenSym genSym,
-            String className,
-            String packageName) {
+    public List<Statement> eval(String varName, QuotedExpr quotedExpr, String envVarName) {
         Var exprVar = new Var(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(

@@ -31,7 +31,7 @@ public class ClassType implements NonArrayType {
             yokohama.unit.ast.ClassType classType,
             ClassResolver classResolver) {
         return new ClassType(
-                classType.getCanonicalName(classResolver),
+                classType.toClass(classResolver).getCanonicalName(),
                 new Span(
                         Optional.empty(),
                         classType.getSpan().getStart(),

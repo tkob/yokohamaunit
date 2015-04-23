@@ -28,7 +28,7 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
     public List<ErrorMessage> compile(
             Path docyPath,
             CompilationUnit ast,
-            String className,
+            String name,
             String packageName,
             List<String> classPath,
             Optional<Path> dest,
@@ -70,15 +70,13 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
             }
         };
 
-        CompilationTask task = compiler.getTask(
-                null, /* Writer out */
+        CompilationTask task = compiler.getTask(null, /* Writer out */
                 null, /* JavaFileManager fileManager */
                 diagnosticListener,
                 args,
-                null, /* Iterable<String> classes */
-                Arrays.asList(new SimpleJavaFileObject(
+                null, /* Iterable<String> classes */Arrays.asList(new SimpleJavaFileObject(
                         URI.create("string:///"
-                                + packageName.replace('.','/') + "/" + className
+                                + packageName.replace('.','/') + "/" + name
                                 + Kind.SOURCE.extension),
                         Kind.SOURCE) {
                     @Override

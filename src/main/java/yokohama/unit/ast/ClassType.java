@@ -11,9 +11,9 @@ public class ClassType implements NonArrayType {
     private String name;
     private Span span;
 
-    public String getCanonicalName(ClassResolver classResolver) {
+    public Class<?> toClass(ClassResolver classResolver) {
         try {
-            return classResolver.lookup(name).getCanonicalName();
+            return classResolver.lookup(name);
         } catch (ClassNotFoundException e) {
             throw new AstException(e.getMessage(), span, e);
         }

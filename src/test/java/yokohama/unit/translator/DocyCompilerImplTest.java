@@ -149,8 +149,8 @@ public class DocyCompilerImplTest {
                         new ParseTreeToAstVisitorFactory(),
                         new VariableCheckVisitor(),
                         new AstToJUnitAstFactory(),
-                        new OgnlExpressionStrategy(),
-                        new MockitoMockStrategy(),
+                        new OgnlExpressionStrategyFactory(),
+                        new MockitoMockStrategyFactory(),
                         jUnitAstCompiler);
                 List<ErrorMessage> actual = instance.compile(
                         docyPath,
