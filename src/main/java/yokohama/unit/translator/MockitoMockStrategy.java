@@ -41,9 +41,13 @@ public class MockitoMockStrategy implements MockStrategy {
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver) {
-        String classToStubName = stubExpr.getClassToStub().getCanonicalName(classResolver);
-        Span classToStubSpan = stubExpr.getSpan();
+        String classToStubName =      stubExpr.getClassToStub().getCanonicalName(classResolver);
+        Span classToStubSpan =        stubExpr.getSpan();
         List<StubBehavior> behavior = stubExpr.getBehavior();
+
+        /*
+          Create a mock first, and then define "when...then" behavior.
+        */
         Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
@@ -61,6 +65,7 @@ public class MockitoMockStrategy implements MockStrategy {
             String varName,
             String classToStubName,
             Span classToStubSpan) {
+        // Call Mockito.mock method with the class and bind the variable to the result.
         Var classToStubVar = new Var(genSym.generate("classToStub"));
         Type clazz = new Type(new ClassType(classToStubName, classToStubSpan), 0);
         return Stream.of(
@@ -85,6 +90,15 @@ public class MockitoMockStrategy implements MockStrategy {
             ExpressionStrategy expressionStrategy,
             String envVarName,
             ClassResolver classResolver) {
+        /*
+        Defining behavior consists of four parts:
+        1. Define value to return when the stub method is called (`returned`)
+        2. Invoke the method with appropriate matchers
+           2a. Prepare matchers (`argMatchers`)
+           2b. Invoke the method with the matchers (`invoke`)
+        3. Tell Mockito the return value (`whenReturn`)
+        */
+
         Span span = behavior.getSpan();
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
