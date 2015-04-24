@@ -124,7 +124,7 @@ public class AstToJUnitAst {
                                     methodName,
                                     Arrays.asList(),
                                     Optional.empty(),
-                                    Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                                    Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                                     ListUtils.union(
                                             expressionStrategy.env(env, classResolver),
                                             propositions.stream()
@@ -146,7 +146,7 @@ public class AstToJUnitAst {
                                         methodName + "_" + (i + 1),
                                         Arrays.asList(),
                                         Optional.empty(),
-                                        Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                                        Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                                         ListUtils.union(
                                                 expressionStrategy.env(env, classResolver),
                                                 ListUtils.union(
@@ -169,7 +169,7 @@ public class AstToJUnitAst {
                             methodName,
                             Arrays.asList(),
                             Optional.empty(),
-                            Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                            Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                             ListUtils.union(
                                     expressionStrategy.env(env, classResolver),
                                     Stream.concat(
@@ -234,7 +234,7 @@ public class AstToJUnitAst {
                                             Type.MATCHER,
                                             expected,
                                             new InvokeStaticExpr(
-                                                    new ClassType("org.hamcrest.CoreMatchers", Span.dummySpan()),
+                                                    new ClassType(org.hamcrest.CoreMatchers.class, Span.dummySpan()),
                                                     Arrays.asList(),
                                                     "not",
                                                     Arrays.asList(Type.MATCHER),
@@ -291,7 +291,7 @@ public class AstToJUnitAst {
                                         Type.THROWABLE, actual, new NullExpr(), Span.dummySpan()))),
                         Arrays.asList(expressionStrategy.catchAndAssignCause(actual),
                                 new CatchClause(
-                                        new ClassType("java.lang.Throwable", Span.dummySpan()),
+                                        new ClassType(java.lang.Throwable.class, Span.dummySpan()),
                                         new Var(e),
                                         Arrays.asList(new VarInitStatement(
                                                 Type.THROWABLE, actual, new VarExpr(e), Span.dummySpan())))),
@@ -418,16 +418,16 @@ public class AstToJUnitAst {
                 });
     }
 
-    Type translateType(yokohama.unit.ast.Type type) {
+    Type translateType(yokohama.unit.ast.Type type, ClassResolver classResolver) {
         return new Type(
-                translateNonArrayType(type.getNonArrayType()), type.getDims());
+                translateNonArrayType(type.getNonArrayType(), classResolver), type.getDims());
     }
 
-    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
+    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType, ClassResolver classResolver) {
         return nonArrayType.accept(
                 primitiveType -> new PrimitiveType(primitiveType.getKind()),
                 classType -> new ClassType(
-                        classType.getName(),
+                        classType.toClass(classResolver),
                         classType.getSpan()));
     }
 
@@ -632,7 +632,7 @@ public class AstToJUnitAst {
                 testName,
                 Arrays.asList(),
                 Optional.empty(),
-                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                 ListUtils.union(
                         expressionStrategy.env(env, classResolver),
                         actionsAfter.size() > 0

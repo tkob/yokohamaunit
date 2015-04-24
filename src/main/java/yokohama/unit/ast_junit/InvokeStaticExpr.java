@@ -16,7 +16,7 @@ public class InvokeStaticExpr implements Expr {
 
     public void getExpr(SBuilder sb, Type varType, String varName) {
         sb.appendln(varName, " = (", varType.getText(), ")",
-                clazz.getName(), ".", 
+                clazz.getText(), ".", 
                 typeArgs.size() > 0
                         ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",

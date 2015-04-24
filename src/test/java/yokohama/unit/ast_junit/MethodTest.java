@@ -18,7 +18,7 @@ public class MethodTest {
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
-                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                 Arrays.asList());
         instance.toString(actual);
 
@@ -38,10 +38,10 @@ public class MethodTest {
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
-                Arrays.asList(new ClassType("java.lang.Exception", Span.dummySpan())),
+                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
-                                new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),
+                                new Type(new ClassType(ognl.OgnlContext.class, Span.dummySpan()), 0),
                                 "env",
                                 new NewExpr("ognl.OgnlContext"),
                                 Span.dummySpan()),

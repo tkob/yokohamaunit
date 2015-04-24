@@ -108,12 +108,13 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             ClassGen cg = new ClassGen(
                     packageName.equals("") ? classDecl.getName() : packageName + "." + classDecl.getName(),
                     extended.isPresent()
-                            ? extended.get().getName()
+                            ? extended.get().getClass().getCanonicalName()
                             : "java.lang.Object",
                     docyPath.getFileName().toString(), // source file name
                     Constants.ACC_PUBLIC | Constants.ACC_SUPER,
                     implemented.stream()
-                            .map(ClassType::getName)
+                            .map(ClassType::getClazz)
+                            .map(Class::getCanonicalName)
                             .collect(Collectors.toList())
                             .toArray(new String[]{}));
 

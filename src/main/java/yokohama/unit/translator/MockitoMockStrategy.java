@@ -35,7 +35,7 @@ public class MockitoMockStrategy implements MockStrategy {
     private final String packageName;
     private final GenSym genSym;
 
-    private static final ClassType MOCKITO = new ClassType("org.mockito.Mockito", Span.dummySpan());
+    private static final ClassType MOCKITO = new ClassType(org.mockito.Mockito.class, Span.dummySpan());
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -57,7 +57,7 @@ public class MockitoMockStrategy implements MockStrategy {
         /*
           Create a mock first, and then define "when...then" behavior.
         */
-        Stream<Statement> createMock = createMock(varName, classToStubName, classToStubSpan);
+        Stream<Statement> createMock = createMock(varName, classToStub, classToStubSpan);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         varName,
@@ -72,18 +72,18 @@ public class MockitoMockStrategy implements MockStrategy {
 
     private Stream<Statement> createMock(
             String varName,
-            String classToStubName,
+            Class<?> classToStub,
             Span classToStubSpan) {
         // Call Mockito.mock method with the class and bind the variable to the result.
         Var classToStubVar = new Var(genSym.generate("classToStub"));
-        Type clazz = new Type(new ClassType(classToStubName, classToStubSpan), 0);
+        Type clazz = new Type(new ClassType(classToStub, classToStubSpan), 0);
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
                         new ClassLitExpr(clazz), Span.dummySpan()),
                 new VarInitStatement(clazz, varName,
                         new InvokeStaticExpr(
                                 MOCKITO,
-                                Arrays.asList(new Type(new ClassType(classToStubName, classToStubSpan), 0)),
+                                Arrays.asList(new Type(new ClassType(classToStub, classToStubSpan), 0)),
                                 "mock",
                                 Arrays.asList(Type.CLASS),
                                 Arrays.asList(classToStubVar),
@@ -211,7 +211,7 @@ public class MockitoMockStrategy implements MockStrategy {
         String __ = genSym.generate("__");
         Stream<Statement> whenReturn = Stream.of(
                 new VarInitStatement(
-                        new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0),
+                        new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0),
                         stubbingVarName,
                         new InvokeStaticExpr(
                                 MOCKITO,
@@ -219,7 +219,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 "when",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(invokeVarName)),
-                                new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0)),
+                                new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0)),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
@@ -228,7 +228,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(returnedVarName)),
-                                new Type(new ClassType("org.mockito.stubbing.OngoingStubbing", Span.dummySpan()), 0)),
+                                new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0)),
                         span));
 
         return Stream.concat(returned,
@@ -367,7 +367,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 classType -> {
                     String clazzVarName = genSym.generate("clazz");
                     Type type = new Type(
-                            new ClassType(classType.toClass(classResolver).getCanonicalName(), Span.dummySpan()),
+                            new ClassType(classType.toClass(classResolver), Span.dummySpan()),
                             dims);
                     return Stream.<Statement>of(
                             new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),

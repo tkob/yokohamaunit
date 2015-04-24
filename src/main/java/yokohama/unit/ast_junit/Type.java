@@ -12,12 +12,12 @@ public class Type {
     private NonArrayType nonArrayType;
     private int dims;
 
-    public static final Type OBJECT = new Type(new ClassType("java.lang.Object", Span.dummySpan()), 0);
-    public static final Type THROWABLE = new Type(new ClassType("java.lang.Throwable", Span.dummySpan()), 0);
-    public static final Type CLASS = new Type(new ClassType("java.lang.Class", Span.dummySpan()), 0);
-    public static final Type STRING = new Type(new ClassType("java.lang.String", Span.dummySpan()), 0);
-    public static final Type MATCHER = new Type(new ClassType("org.hamcrest.Matcher", Span.dummySpan()), 0);
-    public static final Type MAP = new Type(new ClassType("java.util.Map", Span.dummySpan()), 0);
+    public static final Type OBJECT = new Type(new ClassType(java.lang.Object.class, Span.dummySpan()), 0);
+    public static final Type THROWABLE = new Type(new ClassType(java.lang.Throwable.class, Span.dummySpan()), 0);
+    public static final Type CLASS = new Type(new ClassType(java.lang.Class.class, Span.dummySpan()), 0);
+    public static final Type STRING = new Type(new ClassType(java.lang.String.class, Span.dummySpan()), 0);
+    public static final Type MATCHER = new Type(new ClassType(org.hamcrest.Matcher.class, Span.dummySpan()), 0);
+    public static final Type MAP = new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0);
 
     public static final Type BOOLEAN = new Type(new PrimitiveType(Kind.BOOLEAN), 0);
     public static final Type BYTE = new Type(new PrimitiveType(Kind.BYTE), 0);
@@ -89,7 +89,7 @@ public class Type {
                             }
                             throw new RuntimeException("should not reach here");
                     },
-                    classType -> classType.toClass());
+                    classType -> classType.getClazz());
         }
     }
 
@@ -116,7 +116,7 @@ public class Type {
             else if (clazz.equals(   Double.TYPE)) { return DOUBLE;  }
             else { throw new RuntimeException("should not reach here"); }
         } else {
-            return new ClassType(clazz.getName(), Span.dummySpan()).toType();
+            return new ClassType(clazz, Span.dummySpan()).toType();
         }
     }
 }

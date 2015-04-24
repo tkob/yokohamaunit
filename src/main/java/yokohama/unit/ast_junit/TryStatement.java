@@ -19,7 +19,7 @@ public class TryStatement implements Statement {
         }
         sb.unshift();
         for (CatchClause catchClause : catchClauses) {
-            String classType = catchClause.getClassType().getName();
+            String classType = catchClause.getClassType().getText();
             String var = catchClause.getVar().getName();
             sb.appendln("} catch(", classType, " ", var, ") {");
             sb.shift();
