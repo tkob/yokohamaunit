@@ -5,16 +5,21 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
+import yokohama.unit.ast.ClassCheckVisitor;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
+import yokohama.unit.util.ClassResolver;
+import yokohama.unit.util.Either;
 import yokohama.unit.util.GenSym;
 
 @AllArgsConstructor
@@ -55,7 +60,18 @@ public class DocyCompilerImpl implements DocyCompiler {
 
         // Check AST
         List<ErrorMessage> variableCheckErrors = variableCheckVisitor.check(ast);
-        if (!variableCheckErrors.isEmpty()) return variableCheckErrors;
+
+        Either<List<ErrorMessage>, ClassResolver> classResolverOrErrors =
+                new ClassCheckVisitor(ClassLoader.getSystemClassLoader())
+                        .check(ast);
+        List<ErrorMessage> classCheckErrors =
+                classResolverOrErrors.leftOptional().orElse(Collections.emptyList());
+
+        if (!variableCheckErrors.isEmpty() || !classCheckErrors.isEmpty()) {
+            return ListUtils.union(variableCheckErrors, classCheckErrors);
+        }
+
+        ClassResolver classResolver = classResolverOrErrors.rightOptional().get();
 
         // AST to JUnit AST
         CompilationUnit junit;

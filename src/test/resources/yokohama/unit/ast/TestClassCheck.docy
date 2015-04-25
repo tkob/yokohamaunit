@@ -1,0 +1,19 @@
+*[NotFound1]: com.example.NotFound1
+*[NotFound2]: com.example.NotFound2
+
+# Test: This test case contains invalid class reference
+
+Assert that `1` is an instance of `com.example.NotFound3`.
+Assert that `1` is an instance x of `com.example.NotFound4` such that `e.m()`
+is `1`.
+
+# Test: Another test case
+
+## Setup
+Let s be a stub of `com.example.NotFound5` such that method
+`m(com.example.NotFound6)` returns `0`.
+
+## Verify
+Assert that `1` is an instance of `com.example.NotFound7`.
+Assert that `1` is an instance x of `com.example.NotFound8` such that `e.m()`
+is `1`.

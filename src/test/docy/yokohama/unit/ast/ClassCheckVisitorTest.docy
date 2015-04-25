@@ -1,0 +1,21 @@
+*[ClassLoader]: java.lang.ClassLoader
+*[Optional]: java.util.Optional
+*[ClassCheckVisitor]: yokohama.unit.ast.ClassCheckVisitor
+*[ErrorMessage]: yokohama.unit.position.ErrorMessage
+
+# Test: ClassCheckVisitor.check
+
+## Setup
+Let docy = `"yokohama/unit/ast/TestClassCheck.docy"` 
+and docyPath = `new java.io.File(docy).toPath()` 
+and ins = `@ClassLoader@getSystemResourceAsStream(docy)` 
+and errors = `new java.util.ArrayList()` 
+and docyParser = `new yokohama.unit.translator.DocyParserImpl()` 
+and ctx = `docyParser.parse(docyPath, ins, errors)` 
+and factory = `new yokohama.unit.translator.ParseTreeToAstVisitorFactory()` 
+and ast = `factory.create(@Optional@of(docyPath)).visitGroup(ctx)` 
+and visitor = `new ClassCheckVisitor(@ClassLoader@getSystemClassLoader())`. 
+
+## Verify
+
+Assert that `visitor.check(ast).leftOptional().get().size()` is `8`.
