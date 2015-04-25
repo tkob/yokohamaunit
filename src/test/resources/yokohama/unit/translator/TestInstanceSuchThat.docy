@@ -1,23 +1,20 @@
 Test: instance such that
 
-Assert that `"Abracadabra"` is an instance s of `String` such that
+Assert that `"Abracadabra"` is an instance s of `java.lang.String` such that
             `s.contains("")` is `true`
         and `s.substring(7)` is `"abra"`
-        and `s.substring(7)` is an instance t of `String` such that
+        and `s.substring(7)` is an instance t of `java.lang.String` such that
             `t.length()` is `4`.
 
-Assert that `"Abracadabra"` is an instance s of `String` such that
+Assert that `"Abracadabra"` is an instance s of `java.lang.String` such that
             `s.toString()` is not `""`.
-
-Assert that `"Abracadabra"` is not an instance s of `String` such that
-            `s.toString()` is `""`.
 
 Assert that `@java.util.Collections@unmodifiableList(l)` is
             an instance u of `java.util.List` such that
                 `u.size()` is `3`
-            and `u.add(4)` throws an instance of `UnsupportedOperationException`
+            and `u.add(4)` throws an instance of `java.lang.UnsupportedOperationException`
       where l = `{1, 2, 3}`.
 
-Assert `1/0` throws an instance e of `ArithmeticException` such that
-`e.initCause(e)` throws an instance e2 of `IllegalArgumentException` such that
-`e2.setStackTrace(null)` throws an instance of `NullPointerException`.
+Assert `1/0` throws an instance e of `java.lang.ArithmeticException` such that
+`e.initCause(e)` throws an instance e2 of `java.lang.IllegalArgumentException` such that
+`e2.setStackTrace(null)` throws an instance of `java.lang.NullPointerException`.

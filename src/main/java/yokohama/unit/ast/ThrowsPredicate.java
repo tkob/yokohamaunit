@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -13,10 +14,4 @@ public class ThrowsPredicate implements Predicate {
     public <T> T accept(PredicateVisitor<T> visitor) {
         return visitor.visitThrowsPredicate(this);
     }
-
-    @Override
-    public String getDescription() {
-        return "throws " + throwee.getDescription();
-    }
-    
 }

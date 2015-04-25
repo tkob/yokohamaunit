@@ -24,10 +24,12 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
-public class CompileDocy implements Command {
+public class DocyC implements Command {
     private final DocyCompiler compiler;
     FileInputStreamFactory fileInputStreamFactory;
 
@@ -42,6 +44,9 @@ public class CompileDocy implements Command {
         options.addOption(OptionBuilder
                 .withDescription("Print a synopsis of standard options")
                 .create("help"));
+        options.addOption(OptionBuilder
+                .withDescription("Emit Java code")
+                .create("j"));
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("path")
@@ -92,17 +97,30 @@ public class CompileDocy implements Command {
         } else if (classpath != null) {
             return Arrays.asList(classpath.split(File.pathSeparator));
         } else {
-            return Arrays.asList();
+            String env = System.getenv("DOCY_CLASSPATH");
+            if (env != null) {
+                return Arrays.asList(System.getenv("DOCY_CLASSPATH").split(File.pathSeparator));
+            } else {
+                return Arrays.asList();
+            }
+
         }
     }
 
     @Override
     public int run(InputStream in, PrintStream out, PrintStream err, String... args) {
-        Options options = constructOptions();
-        List<String> javacOptions =
-            Arrays.asList("nowarn", "verbose", "target");
+        URI baseDir;
+        Optional<Path> dest;
+        boolean emitJava;
+        List<String> classPath;
+        List<String> javacArgs;
+        List<String> files;
 
         try {
+            Options options = constructOptions();
+            List<String> javacOptions =
+                    Arrays.asList("nowarn", "verbose", "target");
+
             CommandLine commandLine = new BasicParser().parse(options, args);
             if (commandLine.hasOption("help")) {
                 PrintWriter pw = new PrintWriter(err);
@@ -120,41 +138,56 @@ public class CompileDocy implements Command {
                 pw.flush();
                 return Command.EXIT_SUCCESS;
             }
-            URI baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
+            baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
             String d = commandLine.getOptionValue("d");
-            Optional<Path> dest= d == null ? Optional.empty() : Optional.of(Paths.get(d));
-            List<String> classPath = getClassPath(commandLine);
-            List<String> javacArgs =
-                    extractOptions(
-                            Arrays.asList(commandLine.getOptions()),
-                            javacOptions);
-            @SuppressWarnings("unchecked") List<String> files = commandLine.getArgList();
-            for (String file : files) {
-                String className = FilenameUtils.getBaseName(file);
-                Path path = Paths.get(file).toAbsolutePath();
-                URI uri = path.toUri();
-                URI relativeUri = baseDir.relativize(uri).resolve(".");
-                String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
-                boolean success = compiler.compile(
-                        path,
-                        fileInputStreamFactory.create(path),
-                        className,
-                        packageName,
-                        classPath,
-                        dest,
-                        javacArgs);
-                if (!success) return Command.EXIT_FAILURE;
-            }
-            return Command.EXIT_SUCCESS;
+            emitJava = commandLine.hasOption('j');
+            dest = d == null ? Optional.empty() : Optional.of(Paths.get(d));
+            classPath = getClassPath(commandLine);
+            javacArgs = extractOptions(
+                    Arrays.asList(commandLine.getOptions()),
+                    javacOptions);
+            files = commandLine.getArgList();
         } catch (UnrecognizedOptionException e) {
             err.println("docyc: invalid flag: " + e.getOption());
             err.println("Usage: docyc <options> <source files>");
             err.println("use -help for a list of possible options");
             return Command.EXIT_FAILURE;
-        } catch (ParseException|IOException e) {
+        } catch (ParseException e) {
             err.println("docyc: " + e.getMessage());
-            err.println("Usage: docy <options> <source files>");
-            err.println("use -help for a list of possible options");
+            return Command.EXIT_FAILURE;
+        }
+
+        List<ErrorMessage> errors = files.stream().flatMap(file -> {
+            String className = FilenameUtils.getBaseName(file);
+            Path path = Paths.get(file).toAbsolutePath();
+            URI uri = path.toUri();
+            URI relativeUri = baseDir.relativize(uri).resolve(".");
+            String packageName = StringUtils.removeEnd(relativeUri.toString(),"/").replace("/", ".");
+            InputStream ins;
+            try {
+                ins = fileInputStreamFactory.create(path);
+            } catch (IOException e) {
+                Span span = Span.of(path);
+                return Stream.of(new ErrorMessage(e.getMessage(), span));
+            }
+            return compiler.compile(
+                        path,
+                        ins,
+                        className,
+                        packageName,
+                        classPath,
+                        dest,
+                        emitJava,
+                        javacArgs)
+                        .stream();
+        }).collect(Collectors.toList());
+
+        if (errors.isEmpty()) {
+            return Command.EXIT_SUCCESS;
+        } else {
+            for (ErrorMessage errorMessage : errors) {
+                err.println(errorMessage);
+            }
             return Command.EXIT_FAILURE;
         }
     }

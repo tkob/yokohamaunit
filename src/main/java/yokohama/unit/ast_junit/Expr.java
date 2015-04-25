@@ -7,15 +7,17 @@ public interface Expr {
 
     default <T> T accept(
             Function<VarExpr, T> visitVarExpr_,
-            Function<MatcherExpr, T> visitMatcherExpr_,
+            Function<InstanceOfMatcherExpr, T> visitInstanceOfMatcherExpr_,
+            Function<NullValueMatcherExpr, T> visitNullValueMatcherExpr_,
+            Function<EqualToMatcherExpr, T> visitEqualToMatcherExpr_,
             Function<NewExpr, T> visitNewExpr_,
             Function<StrLitExpr, T> visitStrLitExpr_,
             Function<NullExpr, T> visitNullExpr_,
             Function<InvokeExpr, T> visitInvokeExpr_,
-            Function<ThisExpr, T> visitThisExpr_,
             Function<InvokeStaticExpr, T> visitInvokeStaticExpr_,
             Function<IntLitExpr, T> visitIntLitExpr_,
-            Function<ClassLitExpr, T> visitClassLitExpr_
+            Function<ClassLitExpr, T> visitClassLitExpr_,
+            Function<EqualOpExpr, T> visitEqualOpExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -23,8 +25,16 @@ public interface Expr {
                 return visitVarExpr_.apply(varExpr);
             }
             @Override
-            public T visitMatcherExpr(MatcherExpr matcherExpr) {
-                return visitMatcherExpr_.apply(matcherExpr);
+            public T visitInstanceOfMatcherExpr(InstanceOfMatcherExpr instanceOfMatcherExpr) {
+                return visitInstanceOfMatcherExpr_.apply(instanceOfMatcherExpr);
+            }
+            @Override
+            public T visitNullValueMatcherExpr(NullValueMatcherExpr nullValueMatcherExpr) {
+                return visitNullValueMatcherExpr_.apply(nullValueMatcherExpr);
+            }
+            @Override
+            public T visitEqualToMatcherExpr(EqualToMatcherExpr equalToMatcherExpr) {
+                return visitEqualToMatcherExpr_.apply(equalToMatcherExpr);
             }
             @Override
             public T visitNewExpr(NewExpr newExpr) {
@@ -43,10 +53,6 @@ public interface Expr {
                 return visitInvokeExpr_.apply(invokeExpr);
             }
             @Override
-            public T visitThisExpr(ThisExpr thisExpr) {
-                return visitThisExpr_.apply(thisExpr);
-            }
-            @Override
             public T visitInvokeStaticExpr(InvokeStaticExpr invokeStaticExpr) {
                 return visitInvokeStaticExpr_.apply(invokeStaticExpr);
             }
@@ -57,6 +63,10 @@ public interface Expr {
             @Override
             public T visitClassLitExpr(ClassLitExpr classLitExpr) {
                 return visitClassLitExpr_.apply(classLitExpr);
+            }
+            @Override
+            public T visitEqualOpExpr(EqualOpExpr equalOpExpr) {
+                return visitEqualOpExpr_.apply(equalOpExpr);
             }
         });
     }

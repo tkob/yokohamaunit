@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -12,10 +13,5 @@ public class IsPredicate implements Predicate {
     @Override
     public <T> T accept(PredicateVisitor<T> visitor) {
         return visitor.visitIsPredicate(this);
-    }
-
-    @Override
-    public String getDescription() {
-        return "is " + complement.getDescription();
     }
 }

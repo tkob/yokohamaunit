@@ -6,11 +6,15 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 @EqualsAndHashCode(callSuper=false)
-public class InstanceOfMatcherExpr extends MatcherExpr {
+public class InstanceOfMatcherExpr implements Expr {
     private String className;
 
-    @Override
-    public void getExpr(SBuilder sb, String varName, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void getExpr(SBuilder sb, String varName) {
         sb.appendln(varName, " = org.hamcrest.CoreMatchers.instanceOf(", className, ".class);");
+    }
+
+    @Override
+    public <T> T accept(ExprVisitor<T> visitor) {
+        return visitor.visitInstanceOfMatcherExpr(this);
     }
 }

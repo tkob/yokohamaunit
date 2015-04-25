@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -13,10 +14,4 @@ public class EqualToMatcher implements Matcher {
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitEqualTo(this);
     }
-
-    @Override
-    public String getDescription() {
-        return "`" + expr.getText() + "`";
-    }
-    
 }

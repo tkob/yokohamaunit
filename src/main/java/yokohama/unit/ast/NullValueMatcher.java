@@ -1,5 +1,6 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -11,10 +12,5 @@ public class NullValueMatcher implements Matcher {
     @Override
     public <T> T accept(MatcherVisitor<T> visitor) {
         return visitor.visitNullValue(this);
-    }
-
-    @Override
-    public String getDescription() {
-        return "null";
     }
 }

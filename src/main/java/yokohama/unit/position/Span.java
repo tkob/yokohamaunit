@@ -1,9 +1,8 @@
-package yokohama.unit.ast_junit;
+package yokohama.unit.position;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import lombok.Value;
-import yokohama.unit.ast.Position;
 
 @Value
 public class Span {
@@ -29,31 +28,31 @@ public class Span {
         StringBuilder sb = new StringBuilder();
         sb.append(sourcePath.isPresent() ? sourcePath.get().toString() : "?");
         sb.append(":");
-        if (start.getLine() < 0) {
-            sb.append("?");
-        } else {
-            sb.append(start.getLine());
-            if (start.getColumn() >= 0) {
-                sb.append(".");
-                sb.append(start.getColumn());
-            }
-            if (end.getLine() >= 0) {
-                sb.append("-");
-                sb.append(end.getLine());
-                if (end.getColumn() >= 0) {
-                    sb.append(".");
-                    sb.append(end.getColumn());
-                }
-            }
+        sb.append(start.toString());
+        if (!end.isDummy()) {
+            sb.append("-");
+            sb.append(end.toString());
         }
         return sb.toString();
+    }
+
+    public static Span of(Path path) {
+        return new Span(Optional.of(path), Position.dummyPos(), Position.dummyPos());
+    }
+
+    public static Span of(Path path, Position start) {
+        return new Span(Optional.of(path), start, Position.dummyPos());
+    }
+
+    public static Span of(Path path, Position start, Position end) {
+        return new Span(Optional.of(path), start, end);
     }
 
     private static Span dummySpan =
             new Span(
                     Optional.empty(),
-                    new Position(-1, -1),
-                    new Position(-1, -1));
+                    Position.dummyPos(),
+                    Position.dummyPos());
     public static Span dummySpan() {
         return dummySpan;
     }

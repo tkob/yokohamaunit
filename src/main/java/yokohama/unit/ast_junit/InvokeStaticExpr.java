@@ -10,10 +10,13 @@ public class InvokeStaticExpr implements Expr {
     ClassType clazz;
     List<Type> typeArgs;
     String methodName;
+    List<Type> argTypes;
     List<Var> args;
+    Type returnType; // erasued return type
 
-    public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(varName, " = ", clazz.getName(), ".", 
+    public void getExpr(SBuilder sb, Type varType, String varName) {
+        sb.appendln(varName, " = (", varType.getText(), ")",
+                clazz.getText(), ".", 
                 typeArgs.size() > 0
                         ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",

@@ -4,7 +4,7 @@ import java.util.function.Function;
 import yokohama.unit.util.SBuilder;
 
 public interface Statement {
-    void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy);
+    void toString(SBuilder sb);
 
     <T> T accept(StatementVisitor<T> visitor);
 
@@ -12,10 +12,9 @@ public interface Statement {
             Function<IsStatement, T> visitIsStatement_,
             Function<IsNotStatement, T> visitIsNotStatement_,
             Function<VarInitStatement, T> visitVarInitStatement_,
-            Function<ReturnIsStatement, T> visitReturnIsStatement_,
-            Function<ReturnIsNotStatement, T> visitReturnIsNotStatement_,
-            Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
-            Function<TryStatement, T> visitTryStatement_
+            Function<TryStatement, T> visitTryStatement_,
+            Function<IfStatement, T> visitIfStatement_,
+            Function<ReturnStatement, T> visitReturnStatement_
     ) {
         return accept(new StatementVisitor<T>() {
             @Override
@@ -34,22 +33,18 @@ public interface Statement {
             }
 
             @Override
-            public T visitReturnIsStatement(ReturnIsStatement returnIsStatement) {
-                return visitReturnIsStatement_.apply(returnIsStatement);
-            }
-
-            @Override
-            public T visitReturnIsNotStatement(ReturnIsNotStatement returnIsNotStatement) {
-                return visitReturnIsNotStatement_.apply(returnIsNotStatement);
-            }
-            @Override
-            public T visitInvokeVoidStatement(InvokeVoidStatement invokeVoidStatement) {
-                return visitInvokeVoidStatement_.apply(invokeVoidStatement);
-            }
-
-            @Override
             public T visitTryStatement(TryStatement tryStatement) {
                 return visitTryStatement_.apply(tryStatement);
+            }
+
+            @Override
+            public T visitIfStatement(IfStatement IfStatement) {
+                return visitIfStatement_.apply(IfStatement);
+            }
+
+            @Override
+            public T visitReturnStatement(ReturnStatement returnStatement) {
+                return visitReturnStatement_.apply(returnStatement);
             }
         });
     }

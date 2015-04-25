@@ -1,22 +1,30 @@
 package yokohama.unit.ast_junit;
 
 import java.util.Arrays;
+import java.util.Optional;
 import org.apache.commons.lang3.text.StrBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
 
-public class TestMethodTest {
+public class MethodTest {
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod("test", Arrays.asList());
-        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+        Method instance = new Method(
+                Arrays.asList(Annotation.TEST),
+                "test",
+                Arrays.asList(),
+                Optional.empty(),
+                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
+                Arrays.asList());
+        instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
-        expected.appendln("public void test() throws Exception {");
+        expected.appendln("public void test() throws java.lang.Exception {");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));
@@ -25,21 +33,26 @@ public class TestMethodTest {
     @Test
     public void testToString_SBuilder1() {
         SBuilder actual = new SBuilder(4);
-        TestMethod instance = new TestMethod(
+        Method instance = new Method(
+                Arrays.asList(Annotation.TEST),
                 "test",
+                Arrays.asList(),
+                Optional.empty(),
+                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
-                                new Type(new ClassType("ognl.OgnlContext", Span.dummySpan()), 0),
+                                new Type(new ClassType(ognl.OgnlContext.class, Span.dummySpan()), 0),
                                 "env",
-                                new NewExpr("ognl.OgnlContext")),
-                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1)),
-                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1)),
-                        new IsStatement(new Var("actual"), new Var("expected"))));
-        instance.toString(actual, new OgnlExpressionStrategy(), new MockitoMockStrategy());
+                                new NewExpr("ognl.OgnlContext"),
+                                Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
+                        new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan())));
+        instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
         expected.appendln("@org.junit.Test");
-        expected.appendln("public void test() throws Exception {");
+        expected.appendln("public void test() throws java.lang.Exception {");
         expected.appendln("    java.lang.Object actual;");
         expected.appendln("    ognl.OgnlContext env;");
         expected.appendln("    java.lang.Object expected;");

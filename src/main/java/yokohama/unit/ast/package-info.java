@@ -2,7 +2,7 @@
  * Abstract Syntax Tree.
  * 
  * <pre>
- * Group ::= Definition*
+ * Group ::= Abbreviation* Definition*
  * 
  * Definition ::= Test | FourPhaseTest | Table
  * 
@@ -29,7 +29,7 @@
  * 
  * Expr ::= QuotedExpr | StubExpr
  * 
- * StubExpr ::= QuotedExpr StubBehavior*
+ * StubExpr ::= ClassType StubBehavior*
  * 
  * StubBehavior ::= MethodPattern Expr
  * 
@@ -52,6 +52,9 @@
  * 
  * Phase ::= LetBindings? Execution?
  * VerifyPhase ::= Assertion+
+ * 
+ * LetBindings ::= LetBinding+
+ * LetBinding ::= Expr
  * 
  * Execution ::= QuotedExpr*
  * 

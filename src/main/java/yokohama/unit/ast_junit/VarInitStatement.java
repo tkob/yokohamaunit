@@ -2,6 +2,7 @@ package yokohama.unit.ast_junit;
 
 import lombok.Value;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
 
 @Value
@@ -9,16 +10,25 @@ public class VarInitStatement implements Statement {
     private final Type type;
     private final String name;
     private final Expr value;
+    private final Span span;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         value.<Void>accept(
                 varExpr -> {
                     sb.appendln(name, " = ", varExpr.getName(), ";");
                     return null;
                 },
-                matcherExpr -> {
-                    matcherExpr.getExpr(sb, name, expressionStrategy, mockStrategy);
+                instanceOfMatcherExpr -> {
+                    instanceOfMatcherExpr.getExpr(sb, name);
+                    return null;
+                },
+                nullValueMatcherExpr -> {
+                    nullValueMatcherExpr.getExpr(sb, name);
+                    return null;
+                },
+                equalToMatcherExpr -> {
+                    equalToMatcherExpr.getExpr(sb, name);
                     return null;
                 },
                 newExpr -> {
@@ -34,15 +44,11 @@ public class VarInitStatement implements Statement {
                     return null;
                 },
                 invokeExpr -> {
-                    invokeExpr.getExpr(sb, name);
-                    return null;
-                },
-                thisExpr -> {
-                    sb.appendln(name, " = this;");
+                    invokeExpr.getExpr(sb, type, name);
                     return null;
                 },
                 invokeStaticExpr -> {
-                    invokeStaticExpr.getExpr(sb, name);
+                    invokeStaticExpr.getExpr(sb, type, name);
                     return null;
                 },
                 intLitExpr -> {
@@ -51,6 +57,10 @@ public class VarInitStatement implements Statement {
                 },
                 classLitExpr -> {
                     sb.appendln(name, " = ", classLitExpr.getType().getText(), ".class;");
+                    return null;
+                },
+                equalOpExpr -> {
+                    sb.appendln(name, " = ", equalOpExpr.getLhs().getName(), " == ", equalOpExpr.getRhs().getName(), ";");
                     return null;
                 });
     }

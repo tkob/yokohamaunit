@@ -2,7 +2,9 @@ parser grammar YokohamaUnitParser;
 
 options { tokenVocab=YokohamaUnitLexer; }
 
-group: definition* ;
+group: abbreviation* definition* ;
+
+abbreviation: ShortName LongName ;
 
 definition: test
           | fourPhaseTest
@@ -58,7 +60,8 @@ letBindings: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
 execution: DO Expr (AND Expr)* STOP ;
 
-tableDef: TABLE TableName header HBAR? rows ;
+tableDef: TableName header HBAR? rows
+        | header HBAR? rows TableName ;
 
 header: BAR (Identifier BAR)* Identifier? NEWLINE;
 

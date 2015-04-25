@@ -13,8 +13,8 @@ public class VarDeclVisitor {
                 .collect(Collectors.toList());
     }
 
-    public Stream<Pair<Type, String>> visitTestMethod(TestMethod testMethod) {
-        return visitStatements(testMethod.getStatements());
+    public Stream<Pair<Type, String>> visitMethod(Method method) {
+        return visitStatements(method.getStatements());
     }
 
     public Stream<Pair<Type, String>> visitStatements(List<Statement> statements) {
@@ -27,15 +27,17 @@ public class VarDeclVisitor {
                 isNotStatement -> Stream.<Pair<Type, String>>empty(),
                 varInitStatement ->
                         Stream.of(new Pair<Type, String>(varInitStatement.getType(), varInitStatement.getName())),
-                returnIsStatement -> Stream.<Pair<Type, String>>empty(),
-                returnIsNotStatement -> Stream.<Pair<Type, String>>empty(),
-                invokeVoidStatement -> Stream.<Pair<Type, String>>empty(),
                 tryStatement ->
                         Stream.concat(
                                 visitStatements(tryStatement.getTryStatements()),
                                 Stream.concat(
                                         tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
-                                        visitStatements(tryStatement.getFinallyStatements()))));
+                                        visitStatements(tryStatement.getFinallyStatements()))),
+                ifStatement ->
+                        Stream.concat(
+                                visitStatements(ifStatement.getThen()),
+                                visitStatements(ifStatement.getOtherwise())),
+                returnStatement ->Stream.<Pair<Type, String>>empty());
     }
 
     public Stream<Pair<Type, String>> visitCatchClause(CatchClause catchClause) { 

@@ -1,8 +1,11 @@
 package yokohama.unit.ast;
 
+import yokohama.unit.position.Span;
 import java.util.function.Function;
 
-public interface Predicate extends Describable {
+public interface Predicate {
+    Span getSpan();
+
     <T> T accept(PredicateVisitor<T> visitor);
 
     default <T> T accept(

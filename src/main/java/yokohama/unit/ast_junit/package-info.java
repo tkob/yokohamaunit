@@ -4,46 +4,40 @@
  * <pre>
  * CompilationUnit ::= ClassDecl
  * 
- * ClassDecl ::= TestMethod*
+ * ClassDecl ::= Method*
  * 
- * TestMethod ::= Statement*
+ * Method ::= Annotation* Type* Type? Statement*
  * 
  * Expr ::= VarExpr
- *        | MatcherExpr
+ *        | InstanceOfMatcherExpr
+ *        | NullValueMatcherExpr
+ *        | EqualToMatcherExpr
  *        | NewExpr
  *        | StrLitExpr
  *        | NullExpr
  *        | InvokeExpr
- *        | ThisExpr
  *        | InvokeStaticExpr
  *        | IntLitExpr
  *        | ClassLitExpr
+ *        | EqualOpExpr
  * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
  * 
- * MatcherExpr ::= InstanceOfMatcherExpr
- *               | NullValueMatcherExpr
- *               | ConjunctionMatcherExpr 
- *               | EqualToMatcherExpr
- *               | SuchThatMatcherExpr 
- * 
  * Statement ::= IsStatement
  *             | IsNotStatement
  *             | VarInitStatement
- *             | ReturnIsStatement
- *             | ReturnIsNotStatement
- *             | InvokeVoidStatement
  *             | TryStatement
+ *             | IfStatement
+ *             | ReturnStatement
  * 
  * IsStatement ::= Var Var
  * IsNotStatement ::= Var Var
  * VarInitStatement ::= ClassType Expr
- * ReturnIsStatement ::= Var Var
- * ReturnIsNotStatement ::= Var Var
- * InvokeVoidStatement ::= Var Var*
  * TryStatement ::= Statement* CatchClause* Statement*
+ * IfStatement ::= Statement* Statement*
+ * ReturnStatement ::= Var
  * 
  * CatchClause ::= ClassType Var Statement*
  * </pre>

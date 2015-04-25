@@ -7,12 +7,15 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class InvokeExpr implements Expr {
+    Instruction instruction;
     Var object;
     String methodName;
+    List<Type> argTypes;
     List<Var> args;
+    Type returnType; // erasued return type
 
-    public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(varName, " = ", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+    public void getExpr(SBuilder sb, Type varType, String varName) {
+        sb.appendln(varName, " = (", varType.getText(), ")", object.getName(), ".", methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
     }
 
     @Override
@@ -20,4 +23,7 @@ public class InvokeExpr implements Expr {
         return visitor.visitInvokeExpr(this);
     }
     
+    public enum Instruction {
+        VIRTUAL, INTERFACE
+    }
 }

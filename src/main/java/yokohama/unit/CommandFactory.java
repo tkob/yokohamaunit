@@ -5,13 +5,21 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.text.StrBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import yokohama.unit.translator.DocyCompilerImpl;
 
 public class CommandFactory {
     private static final Map<String, Supplier<Command>> subCommands =
             new HashMap<String, Supplier<Command>>() {{
-                put("docyc", () -> new CompileDocy(new DocyCompilerImpl(), new FileInputStreamFactory()));
-                put("docy2java", () -> new Docy2Java());
+                put("docyc", () -> {
+                    try (ConfigurableApplicationContext context =
+                            new ClassPathXmlApplicationContext("applicationContext.xml")) {
+                        return new DocyC(
+                                context.getBean(DocyCompilerImpl.class),
+                                new FileInputStreamFactory());
+                    }
+                });
             }};
 
     public Command create(String subCommand) {

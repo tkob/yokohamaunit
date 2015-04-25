@@ -1,66 +1,66 @@
 # Test: Variations of stubbing
 
-Assert that
-        `s.get(true)` is `true`
-    and `s.get(new Byte(42))` is `new Byte(42)`
-    and `s.get(new Short(43))` is `new Short(43)`
-    and `s.get(44)` is `44`
-    and `s.get(45L)` is `45L`
-    and `s.get('a')` is `'a'`
-    and `s.get(3.14F)` is `3.14F`
-    and `s.get(3.15D)` is `3.15D`
-    and `s.get("hello")` is `"hello"`
-    and `s.get(new boolean[0])` is `new boolean[0]`
-    and `s.get(new byte[0])` is `new byte[0]`
-    and `s.get(new short[0])` is `new short[0]`
-    and `s.get(new int[0])` is `new int[0]`
-    and `s.get(new long[0])` is `new long[0]`
-    and `s.get(new char[0])` is `new char[0]`
-    and `s.get(new float[0])` is `new float[0]`
-    and `s.get(new double[0])` is `new double[0]`
-    and `s.get(new String[0])` is `new String[0]`
-    and `s.get(@yokohama.unit.translator.DummyStub@boolean2d)` is `@yokohama.unit.translator.DummyStub@boolean2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@byte2d)` is `@yokohama.unit.translator.DummyStub@byte2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@short2d)` is `@yokohama.unit.translator.DummyStub@short2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@int2d)` is `@yokohama.unit.translator.DummyStub@int2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@long2d)` is `@yokohama.unit.translator.DummyStub@long2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@char2d)` is `@yokohama.unit.translator.DummyStub@char2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@float2d)` is `@yokohama.unit.translator.DummyStub@float2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@double2d)` is `@yokohama.unit.translator.DummyStub@double2d`
-    and `s.get(@yokohama.unit.translator.DummyStub@string2d)` is `@yokohama.unit.translator.DummyStub@string2d`
-    and `s.getVararg(new Object[0])` is `"hello"`
-    and `s.getVararg("hello")` is `"hello"`
-    and `s.getVararg("hello", "hello")` is `"hello"`
-    and `s.getVararg(42, new Object[0])` is `42`
-    and `s.getVararg(42, "hello")` is `42`
-    and `s.getVararg(42, "hello", "hello")` is `42`
-where s is a stub of `yokohama.unit.translator.DummyStub` such that
-        method `get(boolean)` returns `true`
-    and method `get(byte)` returns `new Byte(42)`
-    and method `get(short)` returns `new Short(43)`
-    and method `get(int)` returns `44`
-    and method `get(long)` returns `45L`
-    and method `get(char)` returns `'a'`
-    and method `get(float)` returns `3.14F`
-    and method `get(double)` returns `3.15D`
-    and method `get(String)` returns `"hello"`
-    and method `get(boolean[])` returns `new boolean[0]`
-    and method `get(byte[])` returns `new byte[0]`
-    and method `get(short[])` returns `new short[0]`
-    and method `get(int[])` returns `new int[0]`
-    and method `get(long[])` returns `new long[0]`
-    and method `get(char[])` returns `new char[0]`
-    and method `get(float[])` returns `new float[0]`
-    and method `get(double[])` returns `new double[0]`
-    and method `get(String[])` returns `new String[0]`
-    and method `get(boolean[][])` returns `@yokohama.unit.translator.DummyStub@boolean2d`
-    and method `get(byte[][])` returns `@yokohama.unit.translator.DummyStub@byte2d`
-    and method `get(short[][])` returns `@yokohama.unit.translator.DummyStub@short2d`
-    and method `get(int[][])` returns `@yokohama.unit.translator.DummyStub@int2d`
-    and method `get(long[][])` returns `@yokohama.unit.translator.DummyStub@long2d`
-    and method `get(char[][])` returns `@yokohama.unit.translator.DummyStub@char2d`
-    and method `get(float[][])` returns `@yokohama.unit.translator.DummyStub@float2d`
-    and method `get(double[][])` returns `@yokohama.unit.translator.DummyStub@double2d`
-    and method `get(String[][])` returns `@yokohama.unit.translator.DummyStub@string2d`
-    and method `getVararg(Object...)` returns `"hello"`
-    and method `getVararg(int, Object...)` returns `42`.
+Assert that  
+        `s.get(true)` is `true`  
+    and `s.get(new Byte(42))` is `new Byte(42)`  
+    and `s.get(new Short(43))` is `new Short(43)`  
+    and `s.get(44)` is `44`  
+    and `s.get(45L)` is `45L`  
+    and `s.get('a')` is `'a'`  
+    and `s.get(3.14F)` is `3.14F`  
+    and `s.get(3.15D)` is `3.15D`  
+    and `s.get("hello")` is `"hello"`  
+    and `s.get(new boolean[0])` is `new boolean[0]`  
+    and `s.get(new byte[0])` is `new byte[0]`  
+    and `s.get(new short[0])` is `new short[0]`  
+    and `s.get(new int[0])` is `new int[0]`  
+    and `s.get(new long[0])` is `new long[0]`  
+    and `s.get(new char[0])` is `new char[0]`  
+    and `s.get(new float[0])` is `new float[0]`  
+    and `s.get(new double[0])` is `new double[0]`  
+    and `s.get(new String[0])` is `new String[0]`  
+    and `s.get(@yokohama.unit.translator.DummyStub@boolean2d)` is `@yokohama.unit.translator.DummyStub@boolean2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@byte2d)` is `@yokohama.unit.translator.DummyStub@byte2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@short2d)` is `@yokohama.unit.translator.DummyStub@short2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@int2d)` is `@yokohama.unit.translator.DummyStub@int2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@long2d)` is `@yokohama.unit.translator.DummyStub@long2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@char2d)` is `@yokohama.unit.translator.DummyStub@char2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@float2d)` is `@yokohama.unit.translator.DummyStub@float2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@double2d)` is `@yokohama.unit.translator.DummyStub@double2d`  
+    and `s.get(@yokohama.unit.translator.DummyStub@string2d)` is `@yokohama.unit.translator.DummyStub@string2d`  
+    and `s.getVararg(new java.lang.Object[0])` is `"hello"`  
+    and `s.getVararg("hello")` is `"hello"`  
+    and `s.getVararg("hello", "hello")` is `"hello"`  
+    and `s.getVararg(42, new java.lang.Object[0])` is `42`  
+    and `s.getVararg(42, "hello")` is `42`  
+    and `s.getVararg(42, "hello", "hello")` is `42`  
+where s is a stub of `yokohama.unit.translator.DummyStub` such that  
+        method `get(boolean)` returns `true`  
+    and method `get(byte)` returns `new Byte(42)`  
+    and method `get(short)` returns `new Short(43)`  
+    and method `get(int)` returns `44`  
+    and method `get(long)` returns `45L`  
+    and method `get(char)` returns `'a'`  
+    and method `get(float)` returns `3.14F`  
+    and method `get(double)` returns `3.15D`  
+    and method `get(java.lang.String)` returns `"hello"`  
+    and method `get(boolean[])` returns `new boolean[0]`  
+    and method `get(byte[])` returns `new byte[0]`  
+    and method `get(short[])` returns `new short[0]`  
+    and method `get(int[])` returns `new int[0]`  
+    and method `get(long[])` returns `new long[0]`  
+    and method `get(char[])` returns `new char[0]`  
+    and method `get(float[])` returns `new float[0]`  
+    and method `get(double[])` returns `new double[0]`  
+    and method `get(java.lang.String[])` returns `new String[0]`  
+    and method `get(boolean[][])` returns `@yokohama.unit.translator.DummyStub@boolean2d`  
+    and method `get(byte[][])` returns `@yokohama.unit.translator.DummyStub@byte2d`  
+    and method `get(short[][])` returns `@yokohama.unit.translator.DummyStub@short2d`  
+    and method `get(int[][])` returns `@yokohama.unit.translator.DummyStub@int2d`  
+    and method `get(long[][])` returns `@yokohama.unit.translator.DummyStub@long2d`  
+    and method `get(char[][])` returns `@yokohama.unit.translator.DummyStub@char2d`  
+    and method `get(float[][])` returns `@yokohama.unit.translator.DummyStub@float2d`  
+    and method `get(double[][])` returns `@yokohama.unit.translator.DummyStub@double2d`  
+    and method `get(java.lang.String[][])` returns `@yokohama.unit.translator.DummyStub@string2d`  
+    and method `getVararg(java.lang.Object...)` returns `"hello"`  
+    and method `getVararg(int, java.lang.Object...)` returns `42`.

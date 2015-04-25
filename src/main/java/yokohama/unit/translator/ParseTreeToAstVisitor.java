@@ -1,12 +1,15 @@
 package yokohama.unit.translator;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
@@ -32,12 +35,12 @@ import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.NullValueMatcher;
-import yokohama.unit.ast.Position;
+import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
-import yokohama.unit.ast.Span;
+import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.Table;
@@ -51,31 +54,43 @@ import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
 import yokohama.unit.util.Pair;
 
+@AllArgsConstructor
 public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> implements YokohamaUnitParserVisitor<Object> 
 {
+    private final Optional<Path> docyPath;
+
     public Span getSpan(ParserRuleContext ctx) {
         Token startToken = ctx.getStart();
         Token stopToken = ctx.getStop();
         Position startPosition = new Position(startToken.getLine(), startToken.getCharPositionInLine() + 1);
         Position endPosition = new Position(stopToken.getLine(), stopToken.getCharPositionInLine() + stopToken.getText().length() + 1);
-        Span span = new Span(startPosition, endPosition);
+        Span span = new Span(docyPath, startPosition, endPosition);
         return span;
     }
     public Span nodeSpan(TerminalNode terminalNode) {
         Token token = terminalNode.getSymbol();
         Position startPosition = new Position(token.getLine(), token.getCharPositionInLine() + 1);
         Position endPosition = new Position(token.getLine(), token.getCharPositionInLine() + token.getText().length() + 1);
-        Span span = new Span(startPosition, endPosition);
+        Span span = new Span(docyPath, startPosition, endPosition);
         return span;
     }
 
     @Override
     public Group visitGroup(YokohamaUnitParser.GroupContext ctx) {
+        List<Abbreviation> abbreviations =
+                ctx.abbreviation().stream()
+                                .map(this::visitAbbreviation)
+                                .collect(Collectors.toList());
         List<Definition>definitions =
                 ctx.definition().stream()
                                 .map(this::visitDefinition)
                                 .collect(Collectors.toList());
-        return new Group(definitions, getSpan(ctx));
+        return new Group(abbreviations, definitions, getSpan(ctx));
+    }
+
+    @Override
+    public Abbreviation visitAbbreviation(YokohamaUnitParser.AbbreviationContext ctx) {
+        return new Abbreviation(ctx.ShortName().getText(), ctx.LongName().getText(), getSpan(ctx));
     }
 
     @Override

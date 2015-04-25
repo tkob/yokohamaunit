@@ -1,15 +1,24 @@
 package yokohama.unit.translator;
 
-import java.nio.file.Path;
-import java.util.Optional;
+import yokohama.unit.ast.TableExtractVisitor;
+import yokohama.unit.util.ClassResolver;
+import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstFactory {
     public AstToJUnitAst create(
-            Optional<Path> docyPath,
-            String className,
+            String name,
             String packageName,
             ExpressionStrategy expressionStrategy,
-            MockStrategy mockStrategy) {
-        return new AstToJUnitAst(docyPath, className, packageName, expressionStrategy, mockStrategy);
+            MockStrategy mockStrategy,
+            GenSym genSym,
+            ClassResolver classResolver) {
+        return new AstToJUnitAst(
+                name,
+                packageName,
+                expressionStrategy,
+                mockStrategy,
+                genSym,
+                classResolver,
+                new TableExtractVisitor());
     }
 }

@@ -1,5 +1,6 @@
 package yokohama.unit.util;
 
+import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -45,6 +46,19 @@ public class GenSymTest {
 
         // Verify
         assertThat(actual, is("prefix"));
+    }
+    
+    @Test
+    public void testGenerate3() {
+        // Setup
+        String prefix = "prefix";
+        GenSym instance = new GenSym(Arrays.asList("prefix"));
+
+        // Exercise
+        String actual = instance.generate(prefix);
+
+        // Verify
+        assertThat(actual, is("prefix2"));
     }
     
 }

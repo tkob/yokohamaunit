@@ -11,20 +11,20 @@ public class TryStatement implements Statement {
     private final List<Statement> finallyStatements;
 
     @Override
-    public void toString(SBuilder sb, ExpressionStrategy expressionStrategy, MockStrategy mockStrategy) {
+    public void toString(SBuilder sb) {
         sb.appendln("try {");
         sb.shift();
         for (Statement statement : tryStatements) {
-            statement.toString(sb, expressionStrategy, mockStrategy);
+            statement.toString(sb);
         }
         sb.unshift();
         for (CatchClause catchClause : catchClauses) {
-            String classType = catchClause.getClassType().getName();
+            String classType = catchClause.getClassType().getText();
             String var = catchClause.getVar().getName();
             sb.appendln("} catch(", classType, " ", var, ") {");
             sb.shift();
             for (Statement statement : catchClause.getStatements()) {
-                statement.toString(sb, expressionStrategy, mockStrategy);
+                statement.toString(sb);
             }
             sb.unshift();
         }
@@ -32,7 +32,7 @@ public class TryStatement implements Statement {
             sb.appendln("} finally {");
             sb.shift();
             for (Statement statement : finallyStatements) {
-                statement.toString(sb, expressionStrategy, mockStrategy);
+                statement.toString(sb);
             }
             sb.unshift();
         }

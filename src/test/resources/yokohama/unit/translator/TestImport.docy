@@ -1,0 +1,15 @@
+*[ArrayList]: java.util.ArrayList
+*[Collection]: java.util.Collection
+
+# Test: Test import
+
+Assert that `new ArrayList()` is `{}`.
+
+Assert that `new java.util.ArrayList()` is an instance of `ArrayList`.
+
+Assert that `new java.util.ArrayList()` is an instance e of `ArrayList` such
+that `e.size()` is `0`.
+
+Assert that `l.size()` is `123` where l is a stub of `ArrayList` such that
+method `size()` returns `123` and method `containsAll(Collection)` returns
+`true`.
