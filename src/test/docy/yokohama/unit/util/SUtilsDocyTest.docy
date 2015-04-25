@@ -1,7 +1,9 @@
+*[SUtils]: yokohama.unit.util.SUtils
+
 # Test: Test SUtils.toIdent
 
-Assert `@yokohama.unit.util.SUtils@toIdent(before)` is `after`
-for all before and after in Table [Fixture].
+Assert `@SUtils@toIdent(before)` is `after` for all before and after in Table
+[Fixture].
 
 |before   |after  |
 |-------- |------ |
