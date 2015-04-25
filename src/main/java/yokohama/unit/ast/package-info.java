@@ -29,7 +29,7 @@
  * 
  * Expr ::= QuotedExpr | StubExpr
  * 
- * StubExpr ::= QuotedExpr StubBehavior*
+ * StubExpr ::= ClassType StubBehavior*
  * 
  * StubBehavior ::= MethodPattern Expr
  * 
