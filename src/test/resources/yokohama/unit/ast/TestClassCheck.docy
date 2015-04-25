@@ -1,0 +1,42 @@
+*[NotFound1]: com.example.NotFound1
+*[NotFound2]: com.example.NotFound2
+*[List]: java.util.List
+
+# Test: This test case contains invalid class reference
+
+Assert that `1` is an instance of `com.example.NotFound3`.
+
+Assert that `1` is an instance x of `com.example.NotFound4` such that `e.m()`
+is `1`.
+
+Assert that `1` is an instance of `NotFound1`.
+
+Assert that `1` is an instance x of `NotFound2` such that `e.m()` is `1`.
+
+Assert that `{}` is an instance of `java.util.List`.
+
+Assert that `{}` is an instance x of `List` such that `e` is `1`.
+
+# Test: Another test case
+
+## Setup
+
+Let s be a stub of `com.example.NotFound5` such that method
+ `m(com.example.NotFound6)` returns `0`
+and s be a stub of `NotFound1` such that method `m(NotFound2)` returns `0`
+and s be a stub of `List` such that method `m(List)` returns `0`.
+
+## Verify
+
+Assert that `1` is an instance of `com.example.NotFound7`.
+
+Assert that `1` is an instance x of `com.example.NotFound8` such that `e.m()`
+is `1`.
+
+Assert that `1` is an instance of `NotFound1`.
+
+Assert that `1` is an instance x of `NotFound2` such that `e.m()` is `1`.
+
+Assert that `{}` is an instance of `java.util.List`.
+
+Assert that `{}` is an instance x of `List` such that `e` is `1`.
