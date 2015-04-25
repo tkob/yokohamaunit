@@ -53,6 +53,9 @@
  * Phase ::= LetBindings? Execution?
  * VerifyPhase ::= Assertion+
  * 
+ * LetBindings ::= LetBinding+
+ * LetBinding ::= Expr
+ * 
  * Execution ::= QuotedExpr*
  * 
  * Table ::= Ident* Row*
