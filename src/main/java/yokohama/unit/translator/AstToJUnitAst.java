@@ -76,17 +76,17 @@ public class AstToJUnitAst {
     ExpressionStrategy expressionStrategy;
     MockStrategy mockStrategy;
     GenSym genSym;
+    ClassResolver classResolver;
     TableExtractVisitor tableExtractVisitor;
 
     public CompilationUnit translate(Group group) {
-        ClassResolver classResolver = this.translateAbbreviations(group.getAbbreviations());
         List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
         List<Method> methods =
                 definitions.stream()
                            .flatMap(definition -> definition.accept(
-                                   test -> translateTest(test, tables, classResolver).stream(),
-                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables, classResolver).stream(),
+                                   test -> translateTest(test, tables).stream(),
+                                   fourPhaseTest -> translateFourPhaseTest(fourPhaseTest, tables).stream(),
                                    table -> Stream.empty()))
                            .collect(Collectors.toList());
         ClassDecl testClass = new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
@@ -99,22 +99,18 @@ public class AstToJUnitAst {
         return new CompilationUnit(packageName, classes);
     }
 
-    private ClassResolver translateAbbreviations(List<Abbreviation> abbreviations) {
-        return new ClassResolver(abbreviations.stream().map(Abbreviation::toPair));
-    }
-    
-    List<Method> translateTest(Test test, final List<Table> tables, ClassResolver classResolver) {
+    List<Method> translateTest(Test test, final List<Table> tables) {
         final String name = test.getName();
         List<Assertion> assertions = test.getAssertions();
         List<Method> methods = 
                 IntStream.range(0, assertions.size())
                         .mapToObj(Integer::new)
-                        .flatMap(i -> translateAssertion(assertions.get(i), i + 1, name, tables, classResolver).stream())
+                        .flatMap(i -> translateAssertion(assertions.get(i), i + 1, name, tables).stream())
                         .collect(Collectors.toList());
         return methods;
     }
 
-    List<Method> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables, ClassResolver classResolver) {
+    List<Method> translateAssertion(Assertion assertion, int index, String testName, List<Table> tables) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(() -> {
@@ -131,13 +127,12 @@ public class AstToJUnitAst {
                                                     .flatMap(proposition ->
                                                                 translateProposition(
                                                                         proposition,
-                                                                        classResolver,
                                                                         env))
                                                     .collect(Collectors.toList()))));
                 },
                 tableRef -> {
                     String env = genSym.generate("env");
-                    List<List<Statement>> table = translateTableRef(tableRef, tables, classResolver, env);
+                    List<List<Statement>> table = translateTableRef(tableRef, tables, env);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> {
@@ -156,7 +151,6 @@ public class AstToJUnitAst {
                                                                 .flatMap(proposition ->
                                                                         translateProposition(
                                                                                 proposition,
-                                                                                classResolver,
                                                                                 env))
                                                                 .collect(Collectors.toList()))));
                             })
@@ -178,22 +172,17 @@ public class AstToJUnitAst {
                                                     .flatMap(binding ->
                                                             translateBinding(
                                                                     binding,
-                                                                    classResolver,
                                                                     env)),
                                             propositions.stream()
                                                     .flatMap(proposition ->
                                                             translateProposition(
                                                                     proposition,
-                                                                    classResolver,
                                                                     env)))
                                             .collect(Collectors.toList()))));
                 });
     }
 
-    Stream<Statement> translateProposition(
-            Proposition proposition,
-            ClassResolver classResolver,
-            String envVarName) {
+    Stream<Statement> translateProposition(Proposition proposition, String envVarName) {
         String actual = genSym.generate("actual");
         String expected = genSym.generate("expected");
         Predicate predicate = proposition.getPredicate();
@@ -206,7 +195,6 @@ public class AstToJUnitAst {
                                     isPredicate.getComplement(),
                                     expected,
                                     actual,
-                                    classResolver,
                                     envVarName));
                 },
                 isNotPredicate -> {
@@ -228,7 +216,6 @@ public class AstToJUnitAst {
                                     translateMatcher(isNotPredicate.getComplement(),
                                             unexpected,
                                             actual,
-                                            classResolver,
                                             envVarName),
                                     Stream.of(new VarInitStatement(
                                             Type.MATCHER,
@@ -254,7 +241,6 @@ public class AstToJUnitAst {
                                     throwsPredicate.getThrowee(),
                                     expected,
                                     actual,
-                                    classResolver,
                                     envVarName));
                 }
         );
@@ -298,7 +284,7 @@ public class AstToJUnitAst {
                         Arrays.asList()));
     }
 
-    private String lookupClassName(String name, ClassResolver classResolver, Span span) {
+    private String lookupClassName(String name, Span span) {
         try {
             return classResolver.lookup(name).getCanonicalName();
         } catch (ClassNotFoundException e) {
@@ -310,7 +296,6 @@ public class AstToJUnitAst {
             Matcher matcher,
             String varName,
             String actual,
-            ClassResolver classResolver,
             String envVarName) {
         return matcher.<Stream<Statement>>accept(
             (EqualToMatcher equalTo) -> {
@@ -331,7 +316,6 @@ public class AstToJUnitAst {
                         new InstanceOfMatcherExpr(
                                 lookupClassName(
                                         instanceOf.getClazz().getName(),
-                                        classResolver,
                                         instanceOf.getSpan())),
                         instanceOf.getSpan()));
             },
@@ -349,7 +333,6 @@ public class AstToJUnitAst {
                                 new InstanceOfMatcherExpr(
                                         lookupClassName(
                                                 clazz.getName(),
-                                                classResolver,
                                                 clazz.getSpan())),
                                 clazz.getSpan()),
                         new IsStatement(
@@ -364,7 +347,7 @@ public class AstToJUnitAst {
                         propositions
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, classResolver, envVarName));
+                                        translateProposition(proposition, envVarName));
 
                 return Stream.concat(
                         instanceOfStatements,
@@ -382,21 +365,17 @@ public class AstToJUnitAst {
             });
     }
 
-    Stream<Statement> translateBinding(
-            yokohama.unit.ast.Binding binding,
-            ClassResolver classResolver,
-            String envVarName) {
+    Stream<Statement> translateBinding(yokohama.unit.ast.Binding binding, String envVarName) {
         String name = binding.getName().getName();
         String varName = genSym.generate(name);
         return Stream.concat(
-                translateExpr(binding.getValue(), varName, classResolver, envVarName),
+                translateExpr(binding.getValue(), varName, envVarName),
                 expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
     }
 
     Stream<Statement> translateExpr(
             yokohama.unit.ast.Expr expr,
             String varName,
-            ClassResolver classResolver,
             String envVarName) {
         return expr.accept(
                 quotedExpr ->
@@ -407,7 +386,6 @@ public class AstToJUnitAst {
                     String classToStubName =
                             lookupClassName(
                                     stubExpr.getClassToStub().getName(),
-                                    classResolver,
                                     classToStubSpan);
                     return mockStrategy.stub(
                             varName,
@@ -418,12 +396,12 @@ public class AstToJUnitAst {
                 });
     }
 
-    Type translateType(yokohama.unit.ast.Type type, ClassResolver classResolver) {
+    Type translateType(yokohama.unit.ast.Type type) {
         return new Type(
-                translateNonArrayType(type.getNonArrayType(), classResolver), type.getDims());
+                translateNonArrayType(type.getNonArrayType()), type.getDims());
     }
 
-    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType, ClassResolver classResolver) {
+    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
         return nonArrayType.accept(
                 primitiveType -> new PrimitiveType(primitiveType.getKind()),
                 classType -> new ClassType(
@@ -434,7 +412,6 @@ public class AstToJUnitAst {
     List<List<Statement>> translateTableRef(
             TableRef tableRef,
             List<Table> tables,
-            ClassResolver classResolver,
             String envVarName) {
         String name = tableRef.getName();
         List<String> idents = tableRef.getIdents()
@@ -450,7 +427,6 @@ public class AstToJUnitAst {
                                   .findFirst()
                                   .get(),
                             idents,
-                            classResolver,
                             envVarName);
                 case CSV:
                     return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, envVarName);
@@ -469,7 +445,6 @@ public class AstToJUnitAst {
     List<List<Statement>> translateTable(
             Table table,
             List<String> idents,
-            ClassResolver classResolver,
             String envVarName) {
         return table.getRows()
                     .stream()
@@ -481,7 +456,6 @@ public class AstToJUnitAst {
                                             .map(Ident::getName)
                                             .collect(Collectors.toList()),
                                     idents,
-                                    classResolver,
                                     envVarName))
                     .collect(Collectors.toList());
     }
@@ -490,7 +464,6 @@ public class AstToJUnitAst {
             Row row,
             List<String> header,
             List<String> idents,
-            ClassResolver classResolver,
             String envVarName) {
         return IntStream.range(0, header.size())
                 .filter(i -> idents.contains(header.get(i)))
@@ -498,7 +471,7 @@ public class AstToJUnitAst {
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
                     return Stream.concat(
-                            translateExpr(row.getExprs().get(i), varName, classResolver, envVarName),
+                            translateExpr(row.getExprs().get(i), varName, envVarName),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName)).stream());
                 })
                 .collect(Collectors.toList());
@@ -568,7 +541,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables, ClassResolver classResolver) {
+    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
         String env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());
@@ -582,7 +555,7 @@ public class AstToJUnitAst {
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
                             return Stream.concat(
-                                    translateExpr(binding.getValue(), varName, classResolver, env),
+                                    translateExpr(binding.getValue(), varName, env),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName)).stream());
                         });
             } else {
@@ -606,7 +579,7 @@ public class AstToJUnitAst {
                         assertion.getPropositions()
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, classResolver, env)));
+                                        translateProposition(proposition, env)));
 
         List<Statement> statements =
                 Stream.concat(
