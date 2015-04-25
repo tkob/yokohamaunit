@@ -18,4 +18,4 @@ and visitor = `new ClassCheckVisitor(@ClassLoader@getSystemClassLoader())`.
 
 ## Verify
 
-Assert that `visitor.check(ast).leftOptional().get().size()` is `8`.
+Assert that `visitor.check(ast).leftOptional().get().size()` is `14`.
