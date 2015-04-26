@@ -37,6 +37,8 @@ import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeExpr;
+import yokohama.unit.ast_junit.InvokeStaticVoidStatement;
+import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Method;
@@ -80,7 +82,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                             Stream.concat(
                                     visitStatements(ifStatement.getThen()),
                                     visitStatements(ifStatement.getOtherwise())),
-                    returnStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty());
+                    returnStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    invokeVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    invokeStaticVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty());
         }
 
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
@@ -294,6 +298,14 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             },
             returnStatement -> {
                 visitReturnStatement(returnStatement, locals, il, factory, cp);
+                return null;
+            },
+            invokeVoidStatement -> {
+                visitInvokeVoidStatement(invokeVoidStatement, locals, il, factory, cp);
+                return null;
+            },
+            invokeStaticVoidStatement -> {
+                visitInvokeStaticVoidStatement(invokeStaticVoidStatement, locals, il, factory, cp);
                 return null;
             });
     }
@@ -534,5 +546,54 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     typeOf(new yokohama.unit.ast_junit.Type(type.getNonArrayType() , 0)),
                     dims);
         }
+    }
+
+    private void visitInvokeVoidStatement(
+            InvokeVoidStatement invokeVoidStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        // first push target object
+        LocalVariableGen object = locals.get(invokeVoidStatement.getObject().getName());
+        il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
+        // push arguments
+        for (Var arg : invokeVoidStatement.getArgs()) {
+            LocalVariableGen lv = locals.get(arg.getName());
+            il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+        }
+        // then call method
+        il.append(factory.createInvoke(
+                object.getType().toString(),
+                invokeVoidStatement.getMethodName(),
+                Type.VOID,
+                invokeVoidStatement.getArgTypes().stream()
+                        .map(BcelJUnitAstCompiler::typeOf)
+                        .collect(Collectors.toList())
+                        .toArray(new Type[]{}),
+                invokeVoidStatement.getInstruction() == InvokeExpr.Instruction.VIRTUAL
+                        ? Constants.INVOKEVIRTUAL
+                        : Constants.INVOKEINTERFACE));                
+    }
+
+    private void visitInvokeStaticVoidStatement(
+            InvokeStaticVoidStatement invokeStaticVoidStatement,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        for (Var arg : invokeStaticVoidStatement.getArgs()) {
+            LocalVariableGen lv = locals.get(arg.getName());
+            il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+        }
+        il.append(factory.createInvoke(
+                invokeStaticVoidStatement.getClazz().getText(),
+                invokeStaticVoidStatement.getMethodName(),
+                Type.VOID,
+                invokeStaticVoidStatement.getArgTypes().stream()
+                        .map(BcelJUnitAstCompiler::typeOf)
+                        .collect(Collectors.toList())
+                        .toArray(new Type[]{}),
+                Constants.INVOKESTATIC));
     }
 }

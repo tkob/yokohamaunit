@@ -1,0 +1,14 @@
+# Test: Division by zero does not throw an Exception in EL
+Assert that `1 / 0` is `Double.POSITIVE_INFINITY`.
+
+# Test: Applying null to a method does not throw NPE in EL
+Assert that `null.toString()` is null.
+
+# Test: IndexOutOfBoundsException
+Assert that `"".charAt(1)` throws an instance of `IndexOutOfBoundsException`.
+
+# Test: ElException
+Assert that `"".noSuchMethod()` throws an instance of `javax.el.ELException`.
+
+# Test: No exception
+Assert that `1 + 1` throws nothing.
