@@ -140,6 +140,27 @@ public class DocyCompilerImplTest {
                         "Test_import_2",
                         "Test_import_3",
                         "Test_import_4")),
+        new Fixture(
+                "ElTestNull.docy",
+                new ElExpressionStrategyFactory(),
+                Arrays.asList("Null_test_1", "Null_test_2")),
+        new Fixture(
+                "ElTestThrows.docy",
+                new ElExpressionStrategyFactory(),
+                Arrays.asList(
+                        "Division_by_zero_does_not_throw_an_Exception_in_EL_1",
+                        "Applying_null_to_a_method_does_not_throw_NPE_in_EL_1",
+                        "ElException_1",
+                        "IndexOutOfBoundsException_1",
+                        "No_exception_1")),
+        new Fixture(
+                "ElTestImport.docy",
+                new ElExpressionStrategyFactory(),
+                Arrays.asList(
+                        "Test_import_1",
+                        "Test_import_2",
+                        "Test_import_3",
+                        "Test_import_4")),
     };
 
     @DataPoints
