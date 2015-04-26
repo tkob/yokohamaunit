@@ -1,7 +1,6 @@
 package yokohama.unit.translator;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
+import org.apache.commons.io.FilenameUtils;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Position;
@@ -74,10 +74,9 @@ public class JUnitAstCompilerImpl implements JUnitAstCompiler {
                 null, /* JavaFileManager fileManager */
                 diagnosticListener,
                 args,
-                null, /* Iterable<String> classes */Arrays.asList(new SimpleJavaFileObject(
-                        URI.create("string:///"
-                                + packageName.replace('.','/') + "/" + name
-                                + Kind.SOURCE.extension),
+                null, /* Iterable<String> classes */
+                Arrays.asList(new SimpleJavaFileObject(
+                        Paths.get(FilenameUtils.removeExtension(docyPath.toString()) + ".java").toUri(),
                         Kind.SOURCE) {
                     @Override
                     public CharSequence getCharContent(boolean ignoreEncodingErrors) {
