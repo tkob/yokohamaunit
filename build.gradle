@@ -35,7 +35,6 @@ configurations {
 dependencies {
     // You can read more about how to add dependency here:
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
-    testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.7'
     providedCompile group: "org.projectlombok", name: "lombok", version: "1.14.8"
     compile group: 'junit', name: 'junit', version: '4.10'
     compile group: 'org.mockito', name: 'mockito-all', version: '1.10.8'
@@ -49,6 +48,7 @@ dependencies {
     compile group: 'ognl', name: 'ognl', version: '3.0.8'
     providedCompile 'javax.el:javax.el-api:3.0.0'
     compile 'org.glassfish:javax.el:3.0.0'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.7'
     compile 'com.google.code.findbugs:bcel-findbugs:6.0'
     compile 'org.springframework:spring-context:4.1.6.RELEASE'
     compile group: 'log4j', name: 'log4j', version: '1.2.17'

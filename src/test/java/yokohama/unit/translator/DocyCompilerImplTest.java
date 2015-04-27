@@ -161,6 +161,27 @@ public class DocyCompilerImplTest {
                         "Test_import_2",
                         "Test_import_3",
                         "Test_import_4")),
+        new Fixture(
+                "GroovyTestNull.docy",
+                new GroovyExpressionStrategyFactory(),
+                Arrays.asList("Null_test_1", "Null_test_2")),
+        new Fixture(
+                "GroovyTestThrows.docy",
+                new GroovyExpressionStrategyFactory(),
+                Arrays.asList(
+                        "Division_by_zero_1",
+                        "Applying_null_to_toString_does_not_throw_NPE_in_Groovy_1",
+                        "GroovyRuntimeException_1",
+                        "UnsupportedEncodingException_1",
+                        "No_exception_1")),
+        new Fixture(
+                "GroovyTestImport.docy",
+                new GroovyExpressionStrategyFactory(),
+                Arrays.asList(
+                        "Test_import_1",
+                        "Test_import_2",
+                        "Test_import_3",
+                        "Test_import_4")),
     };
 
     @DataPoints
