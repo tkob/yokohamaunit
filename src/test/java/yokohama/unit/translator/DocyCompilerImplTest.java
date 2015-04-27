@@ -49,19 +49,19 @@ public class DocyCompilerImplTest {
     @DataPoints
     public static Fixture[] PARAMs = {
         new Fixture(
-                "TestIs.docy",
+                "OgnlTestIs.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Simple_Arithmetic_1")),
         new Fixture(
-                "TestIsNot.docy",
+                "OgnlTestIsNot.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Simple_Arithmetic_1")),
         new Fixture(
-                "TestNull.docy",
+                "OgnlTestNull.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Null_test_1", "Null_test_2")),
         new Fixture(
-                "TestThrows.docy",
+                "OgnlTestThrows.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "Division_by_zero_1",
@@ -70,19 +70,19 @@ public class DocyCompilerImplTest {
                         "UnsupportedEncodingException_1",
                         "No_exception_1")),
         new Fixture(
-                "TestMultiplePropositions.docy",
+                "OgnlTestMultiplePropositions.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Multiple_propositions_1")),
         new Fixture(
-                "TestMultipleAssertions.docy",
+                "OgnlTestMultipleAssertions.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Multiple_assertions_1", "Multiple_assertions_2")),
         new Fixture(
-                "TestBindings.docy",
+                "OgnlTestBindings.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("String_startsWith_returns_true_if_the_prefix_is_empty_1")),
         new Fixture(
-                "TestTable.docy",
+                "OgnlTestTable.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "String_startsWith_1_1",
@@ -92,40 +92,40 @@ public class DocyCompilerImplTest {
                         "String_endsWith_1_2",
                         "String_endsWith_1_3")),
         new Fixture(
-                "TestCSV.docy",
+                "OgnlTestCSV.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "String_startsWith_1_1",
                         "String_startsWith_1_2",
                         "String_startsWith_1_3")),
         new Fixture(
-                "TestExcel.docy",
+                "OgnlTestExcel.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "String_startsWith_1_1",
                         "String_startsWith_1_2",
                         "String_startsWith_1_3")),
         new Fixture(
-                "TestFourPhase.docy",
+                "OgnlTestFourPhase.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("AtomicInteger_incrementAndGet_increments_the_content")),
         new Fixture(
-                "TestFourPhaseWithTeardown.docy",
+                "OgnlTestFourPhaseWithTeardown.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("The_size_of_a_new_temporary_file_is_zero")),
         new Fixture(
-                "TestStub.docy",
+                "OgnlTestStub.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "Submit_a_task_and_get_the_result_1",
                         "Collections_unmodifiableMap_preserves_lookup_1",
                         "StringBuilder_append_CharSequence_int_int_calls_CharSequence_charAt")),
         new Fixture(
-                "TestStubVariations.docy",
+                "OgnlTestStubVariations.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList("Variations_of_stubbing_1")),
         new Fixture(
-                "TestInstanceSuchThat.docy",
+                "OgnlTestInstanceSuchThat.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "instance_such_that_1",
@@ -133,7 +133,7 @@ public class DocyCompilerImplTest {
                         "instance_such_that_3",
                         "instance_such_that_4")),
         new Fixture(
-                "TestImport.docy",
+                "OgnlTestImport.docy",
                 new OgnlExpressionStrategyFactory(),
                 Arrays.asList(
                         "Test_import_1",
