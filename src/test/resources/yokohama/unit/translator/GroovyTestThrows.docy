@@ -1,0 +1,14 @@
+# Test: Division by zero
+Assert that `1 / 0` throws an instance of `java.lang.ArithmeticException`.
+
+# Test: Applying null to toString does not throw NPE in Groovy
+Assert that `null.toString()` throws nothing.
+
+# Test: UnsupportedEncodingException
+Assert that `"".getBytes("")` throws an instance of `java.io.UnsupportedEncodingException`.
+
+# Test: GroovyRuntimeException
+Assert that `)` throws an instance of `groovy.lang.GroovyRuntimeException`.
+
+# Test: No exception
+Assert that `1 + 1` throws nothing.
