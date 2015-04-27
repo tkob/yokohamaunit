@@ -404,11 +404,19 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);
+                // push arguments
+                for (Var arg : newExpr.getArgs()) {
+                    LocalVariableGen lv = locals.get(arg.getName());
+                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                }
                 il.append(factory.createInvoke(
                         newExpr.getType(),
                         "<init>",
                         Type.VOID,
-                        Type.NO_ARGS,
+                        newExpr.getArgTypes().stream()
+                                .map(BcelJUnitAstCompiler::typeOf)
+                                .collect(Collectors.toList())
+                                .toArray(new Type[]{}),
                         Constants.INVOKESPECIAL));
                 return new ObjectType(newExpr.getType());
             },

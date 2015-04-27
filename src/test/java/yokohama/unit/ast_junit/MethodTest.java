@@ -43,7 +43,7 @@ public class MethodTest {
                         new VarInitStatement(
                                 new Type(new ClassType(ognl.OgnlContext.class, Span.dummySpan()), 0),
                                 "env",
-                                new NewExpr("ognl.OgnlContext"),
+                                new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),

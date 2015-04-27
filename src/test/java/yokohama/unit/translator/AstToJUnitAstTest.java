@@ -90,7 +90,7 @@ public class AstToJUnitAstTest {
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT,
                                 "env",
-                                new NewExpr("ognl.OgnlContext"),
+                                new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()))));
         assertThat(actual, is(expected));
     }

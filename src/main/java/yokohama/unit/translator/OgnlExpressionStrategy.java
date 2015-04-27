@@ -60,7 +60,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         Stream<Statement> createTable = Stream.of(new VarInitStatement(
                         new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0),
                         tableVar.getName(),
-                        new NewExpr("java.util.HashMap"),
+                        new NewExpr(
+                                "java.util.HashMap",
+                                Arrays.asList(),
+                                Arrays.asList()),
                         Span.dummySpan()));
 
         Stream<Statement> populateTable =
@@ -171,7 +174,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                     new VarInitStatement(
                             OGNL_CONTEXT,
                             varName,
-                            new NewExpr("ognl.OgnlContext"),
+                            new NewExpr(
+                                    "ognl.OgnlContext",
+                                    Arrays.asList(),
+                                    Arrays.asList()),
                             Span.dummySpan()));
         } else {
             Var rootVar = new Var(genSym.generate("root"));
@@ -185,9 +191,12 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                     new VarInitStatement(
                             new Type(new ClassType(ognl.ClassResolver.class, Span.dummySpan()), 0),
                             classResolverVar.getName(),
-                            new NewExpr(packageName.equals("") ? "" : (packageName + ".")
-                                    + name
-                                    + "$ClassResolver"),
+                            new NewExpr(
+                                    packageName.equals("")
+                                            ? ""
+                                            : (packageName + ".") + name + "$ClassResolver",
+                                    Arrays.asList(),
+                                    Arrays.asList()),
                             Span.dummySpan()),
                     new VarInitStatement(
                             OGNL_CONTEXT,

@@ -56,7 +56,10 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                 new VarInitStatement(
                         EL_PROCESSOR,
                         varName,
-                        new NewExpr("javax.el.ELProcessor"),
+                        new NewExpr(
+                                "javax.el.ELProcessor",
+                                Arrays.asList(),
+                                Arrays.asList()),
                         Span.dummySpan()),
                 new VarInitStatement(
                         EL_MANAGER,
