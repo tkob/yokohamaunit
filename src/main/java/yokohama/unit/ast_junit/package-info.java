@@ -20,6 +20,7 @@
  *        | IntLitExpr
  *        | ClassLitExpr
  *        | EqualOpExpr
+ *        | ArrayExpr
  * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType

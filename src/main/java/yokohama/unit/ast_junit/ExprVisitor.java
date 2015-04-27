@@ -13,4 +13,5 @@ public interface ExprVisitor<T> {
     T visitIntLitExpr(IntLitExpr intLitExpr);
     T visitClassLitExpr(ClassLitExpr classLitExpr);
     T visitEqualOpExpr(EqualOpExpr equalOpExpr);
+    T visitArrayExpr(ArrayExpr arrayExpr);
 }

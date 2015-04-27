@@ -24,6 +24,10 @@ public interface NonArrayType {
         });
     }
 
+    default public Type toType() {
+        return new Type(this, 0);
+    }
+
     public static NonArrayType of(
             yokohama.unit.ast.NonArrayType nonArrayType,
             ClassResolver classResolver) {

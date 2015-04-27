@@ -62,6 +62,10 @@ public class VarInitStatement implements Statement {
                 equalOpExpr -> {
                     sb.appendln(name, " = ", equalOpExpr.getLhs().getName(), " == ", equalOpExpr.getRhs().getName(), ";");
                     return null;
+                },
+                arrayExpr -> {
+                    arrayExpr.getExpr(sb, type, name);
+                    return null;
                 });
     }
 

@@ -32,6 +32,7 @@ import org.apache.bcel.generic.Type;
 import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.Annotation;
+import yokohama.unit.ast_junit.ArrayExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -508,7 +509,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 goto_.setTarget(endIf);
 
                 return Type.BOOLEAN;
-            });
+            },
+            arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp));
         if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
             ReferenceType fromType_ = (ReferenceType)fromType;
             ReferenceType type_ = (ReferenceType)type;
@@ -517,6 +519,29 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             }
         }
         il.append(InstructionFactory.createStore(var.getType(), var.getIndex()));
+    }
+
+    private Type visitArrayExpr(
+            ArrayExpr arrayExpr,
+            Map<String, LocalVariableGen> locals,
+            InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        Type componentType = typeOf(arrayExpr.getType().getNonArrayType().toType());
+        List<Var> contents = arrayExpr.getContents();
+        il.append(new PUSH(cp, contents.size()));
+        il.append(factory.createNewArray(
+                componentType,
+                (short)arrayExpr.getType().getDims()));
+        for (int i = 0; i < contents.size(); i++) {
+            il.append(InstructionConstants.DUP);
+            Var content = contents.get(i);
+            LocalVariableGen lv = locals.get(content.getName());
+            il.append(new PUSH(cp, i));
+            il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+            il.append(InstructionFactory.createArrayStore(componentType));
+        }
+        return typeOf(arrayExpr.getType());
     }
 
     private void visitReturnStatement(
