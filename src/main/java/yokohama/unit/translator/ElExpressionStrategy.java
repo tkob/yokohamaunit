@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -115,12 +116,12 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public CatchClause catchAndAssignCause(String causeVarName) {
+    public Optional<CatchClause> catchAndAssignCause(String causeVarName) {
         Var caughtVar = new Var(genSym.generate("ex"));
         Var reasonVar = new Var(genSym.generate("reason"));
         Var nullValueVar = new Var(genSym.generate("nullValue"));
         Var condVar = new Var(genSym.generate("cond"));
-        return new CatchClause(
+        return Optional.of(new CatchClause(
                 EL_EXCEPTION,
                 caughtVar,
                 Arrays.asList(
@@ -158,7 +159,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                                 Type.THROWABLE,
                                                 causeVarName,
                                                 new VarExpr(reasonVar.getName()),
-                                                Span.dummySpan())))));
+                                                Span.dummySpan()))))));
     }
 
     @Override

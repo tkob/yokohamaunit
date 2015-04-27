@@ -2,6 +2,7 @@ package yokohama.unit.translator;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -40,7 +41,7 @@ public interface ExpressionStrategy {
      */
     List<Statement> bind(String envVarName, String name, Var rhs);
 
-    CatchClause catchAndAssignCause(String causeVarName);
+    Optional<CatchClause> catchAndAssignCause(String causeVarName);
 
     /**
      * Evaluates an expression.

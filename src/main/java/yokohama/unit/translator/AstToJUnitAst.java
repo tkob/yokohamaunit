@@ -67,6 +67,7 @@ import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
+import yokohama.unit.util.Optionals;
 import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
@@ -275,12 +276,14 @@ public class AstToJUnitAst {
                                 statements,
                                 Arrays.asList(new VarInitStatement(
                                         Type.THROWABLE, actual, new NullExpr(), Span.dummySpan()))),
-                        Arrays.asList(expressionStrategy.catchAndAssignCause(actual),
-                                new CatchClause(
+                        Stream.concat(
+                                Optionals.toStream(expressionStrategy.catchAndAssignCause(actual)),
+                                Stream.of(new CatchClause(
                                         new ClassType(java.lang.Throwable.class, Span.dummySpan()),
                                         new Var(e),
                                         Arrays.asList(new VarInitStatement(
-                                                Type.THROWABLE, actual, new VarExpr(e), Span.dummySpan())))),
+                                                Type.THROWABLE, actual, new VarExpr(e), Span.dummySpan())))))
+                                .collect(Collectors.toList()),
                         Arrays.asList()));
     }
 
