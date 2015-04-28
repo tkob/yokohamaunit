@@ -4,7 +4,7 @@
 
 # Test: Test makeClassFilePath
 
-Assert `@TranslatorUtils@makeClassFilePath(@Optional@of(new File(dest).toPath()), packageName, className, ".class")`
+Assert `TranslatorUtils.makeClassFilePath(Optional.of(new File(dest).toPath()), packageName, className, ".class")`
     is `new File(expected).toPath()`
 for all dest, packageName, className and expected in Table [Fixture].
 
@@ -18,5 +18,5 @@ for all dest, packageName, className and expected in Table [Fixture].
 
 # Test: makeClassFilePath uses dot as prefix path when dest argument is empty.
 
-Assert `@TranslatorUtils@makeClassFilePath(@Optional@empty(), "com.example", "Hello", ".class")`
+Assert `TranslatorUtils.makeClassFilePath(Optional.empty(), "com.example", "Hello", ".class")`
     is `new File("./com/example/Hello.class").toPath()`.

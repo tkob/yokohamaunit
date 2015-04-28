@@ -2,7 +2,7 @@
 
 # Test: Test SUtils.toIdent
 
-Assert `@SUtils@toIdent(before)` is `after` for all before and after in Table
+Assert `SUtils.toIdent(before)` is `after` for all before and after in Table
 [Fixture].
 
 |before   |after  |
