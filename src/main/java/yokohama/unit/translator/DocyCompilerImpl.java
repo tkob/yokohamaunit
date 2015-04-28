@@ -1,7 +1,11 @@
 package yokohama.unit.translator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import yokohama.unit.ast.ClassCheckVisitor;
@@ -32,6 +37,11 @@ public class DocyCompilerImpl implements DocyCompiler {
     MockStrategyFactory mockStrategyFactory;
     JUnitAstCompiler jUnitAstCompiler;
 
+    @SneakyThrows(MalformedURLException.class)
+    private URL toURL(String cp) {
+        return new File(cp).toURI().toURL();
+    }
+    
     @Override
     public List<ErrorMessage> compile(
             Path docyPath,
@@ -42,6 +52,10 @@ public class DocyCompilerImpl implements DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             List<String> javacArgs) {
+        // Make a class loader
+        ClassLoader classLoader = new URLClassLoader(
+                classPath.stream().map(this::toURL).toArray(i -> new URL[i]),
+                ClassLoader.getSystemClassLoader());
 
         // Source to ANTLR parse tree
         List<ErrorMessage> docyParserErrors = new ArrayList<>();
@@ -62,8 +76,7 @@ public class DocyCompilerImpl implements DocyCompiler {
         List<ErrorMessage> variableCheckErrors = variableCheckVisitor.check(ast);
 
         Either<List<ErrorMessage>, ClassResolver> classResolverOrErrors =
-                new ClassCheckVisitor(ClassLoader.getSystemClassLoader())
-                        .check(ast);
+                new ClassCheckVisitor(classLoader).check(ast);
         List<ErrorMessage> classCheckErrors =
                 classResolverOrErrors.leftOptional().orElse(Collections.emptyList());
 
