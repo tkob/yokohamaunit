@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUSH;
 import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
+import org.apache.bcel.util.ClassPath;
+import org.apache.bcel.util.SyntheticRepository;
 import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast_junit.Annotation;
@@ -107,6 +110,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             List<String> classPath,
             Optional<Path> dest,
             List<String> javacArgs) {
+        String joinedCp =
+                classPath.stream().collect(Collectors.joining(File.pathSeparator));
+        Repository.setRepository(
+                SyntheticRepository.getInstance(new ClassPath(joinedCp)));
+
         for (ClassDecl classDecl : ast.getClassDecls()) {
             Optional<ClassType> extended = classDecl.getExtended();
             List<ClassType> implemented = classDecl.getImplemented();
