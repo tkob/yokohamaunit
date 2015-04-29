@@ -50,7 +50,7 @@ public class ClassCheckVisitor {
                 bindingsOrErrors.stream().flatMap(Either::rightStream);
         Stream<ErrorMessage> errors =
                 bindingsOrErrors.stream().flatMap(Either::leftStream);
-        return new Pair<>(new ClassResolver(bindings), errors);
+        return new Pair<>(new ClassResolver(bindings, classLoader), errors);
     }
 }
 
