@@ -146,7 +146,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 Path classFilePath =
                         TranslatorUtils.makeClassFilePath(dest, packageName, classDecl.getName(), ".class");
                 cg.getJavaClass().dump(classFilePath.toFile());
-                cg.getJavaClass().dump(new java.io.File("build/tmp/" + packageName.replace(".", "/") + "/" + classDecl.getName() + ".class"));
                 Repository.getRepository().storeClass(cg.getJavaClass());
             } catch(IOException e) {
                 System.err.println(e);
