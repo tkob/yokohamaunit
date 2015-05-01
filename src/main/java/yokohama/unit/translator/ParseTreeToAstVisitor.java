@@ -450,4 +450,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         return new ClassType(name, getSpan(ctx));
     }
 
+    @Override
+    public Object visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object visitReceiver(YokohamaUnitParser.ReceiverContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

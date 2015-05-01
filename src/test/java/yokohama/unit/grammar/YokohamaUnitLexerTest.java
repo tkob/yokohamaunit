@@ -65,6 +65,7 @@ public class YokohamaUnitLexerTest {
         new Fixture("|a|b|\n-----\n", Arrays.asList("|", "a", "|", "b", "|", "\n", "-----\n")),
         new Fixture("|a|b\n-----\n|c|d\n", Arrays.asList("|", "a", "|", "b", "\n", "-----\n", "|", "c", "|", "d", "\n")),
         new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|==\n")),
+        new Fixture("an invocation of `java.util.Option.of()`", Arrays.asList("an invocation of", "java", ".", "util", ".", "Option", ".", "of", "(", ")")),
     };
 
     @Theory
