@@ -45,6 +45,7 @@ AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> mode(AFTER_METH
 NULL: 'null' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 NOTHING: 'nothing' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* ;
+Integer: IntegerLiteral ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
 NEW_LINE : ('\r'? '\n')+ -> skip ;
@@ -82,6 +83,7 @@ AN_INVOCATION_OF2: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> type(AN_INVOCA
 NULL2: 'null' -> type(NULL) ;
 NOTHING2: 'nothing' -> type(NOTHING) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
+Integer2: IntegerLiteral -> type(Integer);
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE2: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
 NEW_LINE2 : ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
@@ -218,3 +220,37 @@ IdentPart: ~[\uD800-\uDBFF]
          | [\uD800-\uDBFF] [\uDC00-\uDFFF]
 		   {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
          ;
+
+fragment
+IntegerLiteral: DecimalIntegerLiteral 
+              | HexIntegerLiteral 
+              | OctalIntegerLiteral 
+              | BinaryIntegerLiteral
+              ;
+
+fragment
+DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix? ;
+
+fragment
+HexIntegerLiteral: HexNumeral IntegerTypeSuffix? ;
+
+fragment
+OctalIntegerLiteral: OctalNumeral IntegerTypeSuffix? ;
+
+fragment
+BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix? ;
+
+fragment
+IntegerTypeSuffix: [lL] ;
+
+fragment
+DecimalNumeral: '0' | [1-9] ([_0-9]* [0-9])? ;
+
+fragment
+HexNumeral: '0' [xX] [0-9a-fA-F] ([_0-9a-fA-F]* [0-9a-fA-F])? ;
+ 
+fragment
+OctalNumeral: '0' [_0-7]* [0-7] ;
+
+fragment
+BinaryNumeral: '0' [bB] [01] ([_01]* [01])? ;

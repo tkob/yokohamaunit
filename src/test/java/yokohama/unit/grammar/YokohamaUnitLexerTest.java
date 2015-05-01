@@ -66,6 +66,21 @@ public class YokohamaUnitLexerTest {
         new Fixture("|a|b\n-----\n|c|d\n", Arrays.asList("|", "a", "|", "b", "\n", "-----\n", "|", "c", "|", "d", "\n")),
         new Fixture("|a\n|==\n", Arrays.asList("|", "a", "\n", "|==\n")),
         new Fixture("an invocation of `java.util.Option.of()`", Arrays.asList("an invocation of", "java", ".", "util", ".", "Option", ".", "of", "(", ")")),
+        new Fixture("0", Arrays.asList("0")),
+        new Fixture("2147483647", Arrays.asList("2147483647")),
+        new Fixture("2147483648", Arrays.asList("2147483648")),
+        new Fixture("0x7fff_ffff", Arrays.asList("0x7fff_ffff")),
+        new Fixture("0177_7777_7777", Arrays.asList("0177_7777_7777")),
+        new Fixture("0b0111_1111_1111_1111_1111_1111_1111_1111", Arrays.asList("0b0111_1111_1111_1111_1111_1111_1111_1111")),
+        new Fixture("0x8000_0000", Arrays.asList("0x8000_0000")),
+        new Fixture("0200_0000_0000", Arrays.asList("0200_0000_0000")),
+        new Fixture("0b1000_0000_0000_0000_0000_0000_0000_0000", Arrays.asList("0b1000_0000_0000_0000_0000_0000_0000_0000")),
+        new Fixture("0xffff_ffff", Arrays.asList("0xffff_ffff")),
+        new Fixture("0377_7777_7777", Arrays.asList("0377_7777_7777")),
+        new Fixture("0b1111_1111_1111_1111_1111_1111_1111_1111", Arrays.asList("0b1111_1111_1111_1111_1111_1111_1111_1111")),
+        new Fixture("0x_f", Arrays.asList("0", "x_f")),
+        new Fixture("0b_0", Arrays.asList("0", "b_0")),
+        new Fixture("0_7", Arrays.asList("0_7")),
     };
 
     @Theory
