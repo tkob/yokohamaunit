@@ -134,7 +134,10 @@ class ClassExprCheckVisitor {
     private Stream<ErrorMessage> visitExpr(Expr expr) {
         return expr.accept(
                 quotedExpr -> Stream.<ErrorMessage>empty(),
-                stubExpr -> visitStubExpr(stubExpr));
+                stubExpr -> visitStubExpr(stubExpr),
+                invocationExpr -> {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                });
     }
 
     private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {

@@ -27,7 +27,7 @@
  * InstanceOfMatcher ::= ClassType
  * InstanceSuchThatMatcher ::= ClassType Proposition+
  * 
- * Expr ::= QuotedExpr | StubExpr
+ * Expr ::= QuotedExpr | StubExpr | InvocationExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 
@@ -38,6 +38,8 @@
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType
  * PrimitiveType ::= Kind
+ * 
+ * InvocationExpr ::= MethodPattern Expr*
  * 
  * Fixture ::= | TableRef | Bindings
  * 

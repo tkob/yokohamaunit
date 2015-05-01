@@ -129,7 +129,10 @@ public class MockitoMockStrategy implements MockStrategy {
                                 stubExpr,
                                 expressionStrategy,
                                 envVarName,
-                                classResolver).stream());
+                                classResolver).stream(),
+                invocationExpr -> {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                });
 
         Stream<Type> argTypes;
         Stream<Var> argVars;

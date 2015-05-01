@@ -394,6 +394,9 @@ public class AstToJUnitAst {
                             expressionStrategy,
                             envVarName,
                             classResolver).stream();
+                },
+                invocationExpr -> {
+                    throw new UnsupportedOperationException("Not supported yet.");
                 });
     }
 
