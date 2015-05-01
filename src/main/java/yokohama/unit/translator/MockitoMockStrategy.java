@@ -121,6 +121,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         expressionStrategy.eval(
                                 returnedVarName,
                                 quotedExpr,
+                                returnType.toClass(),
                                 envVarName).stream(),
                 stubExpr->
                         this.stub(

@@ -182,7 +182,11 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> eval(String varName, QuotedExpr quotedExpr, String envVarName) {
+    public List<Statement> eval(
+            String varName,
+            QuotedExpr quotedExpr,
+            Class<?> expectedType,
+            String envVarName) {
         Var exprVar = new Var(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(

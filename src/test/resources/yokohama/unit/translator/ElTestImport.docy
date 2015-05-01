@@ -11,5 +11,5 @@ Assert that `ArrayList()` is an instance e of `ArrayList` such
 that `e.size()` is `Integer(0)`.
 
 Assert that `l.size()` is `Integer(123)` where l is a stub of
-`ArrayList` such that method `size()` returns `Integer(123)` and method
+`ArrayList` such that method `size()` returns `123` and method
 `containsAll(Collection)` returns `true`.

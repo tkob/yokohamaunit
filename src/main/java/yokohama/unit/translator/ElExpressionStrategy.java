@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.IfStatement;
@@ -163,19 +164,28 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> eval(String varName, QuotedExpr quotedExpr, String envVarName) {
+    public List<Statement> eval(
+            String varName,
+            QuotedExpr quotedExpr,
+            Class<?> expectedType,
+            String envVarName) {
         Var exprVar = new Var(genSym.generate("expression"));
+        Var expectedTypeVar = new Var(genSym.generate("expectedType"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                new VarInitStatement(
+                        Type.CLASS, expectedTypeVar.getName(),
+                        new ClassLitExpr(Type.fromClass(expectedType).box()),
+                        Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, varName,
                         new InvokeExpr(
                                 Instruction.VIRTUAL,
                                 new Var(envVarName),
-                                "eval",
-                                Arrays.asList(Type.STRING),
-                                Arrays.asList(exprVar),
+                                "getValue",
+                                Arrays.asList(Type.STRING, Type.CLASS),
+                                Arrays.asList(exprVar, expectedTypeVar),
                                 Type.OBJECT),
                         span));
     }

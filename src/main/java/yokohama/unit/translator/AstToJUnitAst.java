@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
@@ -191,7 +189,7 @@ public class AstToJUnitAst {
                 isPredicate -> {
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, proposition.getSubject(), envVarName).stream(),
+                                    actual, proposition.getSubject(), Object.class, envVarName).stream(),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
@@ -212,7 +210,7 @@ public class AstToJUnitAst {
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
                             expressionStrategy.eval(
-                                    actual, proposition.getSubject(), envVarName).stream(),
+                                    actual, proposition.getSubject(), Object.class, envVarName).stream(),
                             Stream.concat(
                                     translateMatcher(isNotPredicate.getComplement(),
                                             unexpected,
@@ -236,7 +234,7 @@ public class AstToJUnitAst {
                             bindThrown(
                                     actual,
                                     expressionStrategy.eval(
-                                            __, proposition.getSubject(), envVarName),
+                                            __, proposition.getSubject(), Object.class, envVarName),
                                     envVarName),
                             translateMatcher(
                                     throwsPredicate.getThrowee(),
@@ -305,7 +303,7 @@ public class AstToJUnitAst {
                 Var objVar = new Var(genSym.generate("obj"));
                 return Stream.concat(
                         expressionStrategy.eval(
-                                objVar.getName(), equalTo.getExpr(), envVarName).stream(),
+                                objVar.getName(), equalTo.getExpr(), Object.class, envVarName).stream(),
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,
@@ -383,7 +381,7 @@ public class AstToJUnitAst {
         return expr.accept(
                 quotedExpr ->
                         expressionStrategy.eval(
-                                varName, quotedExpr, envVarName).stream(),
+                                varName, quotedExpr, Object.class, envVarName).stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
@@ -501,7 +499,7 @@ public class AstToJUnitAst {
                                                                 Optional.of(Paths.get(fileName)),
                                                                 new Position((int)parser.getCurrentLineNumber(), -1),
                                                                 new Position(-1, -1))),
-                                                envVarName).stream(),
+                                                Object.class, envVarName).stream(),
                                                 expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
                                     })
                                     .collect(Collectors.toList()))
@@ -536,7 +534,7 @@ public class AstToJUnitAst {
                                                             Optional.of(Paths.get(fileName)),
                                                             new Position(row.getRowNum() + 1, left + i + 1),
                                                             new Position(-1, -1))),
-                                            envVarName).stream(),
+                                            Object.class, envVarName).stream(),
                                             expressionStrategy.bind(envVarName, names.get(i), new Var(varName)).stream());
                                 })
                                 .collect(Collectors.toList()))
@@ -628,6 +626,6 @@ public class AstToJUnitAst {
                                 .stream()
                                 .flatMap(expression ->
                                         expressionStrategy.eval(
-                                                __, expression, envVarName).stream()));
+                                                __, expression, Object.class, envVarName).stream()));
     }
 }
