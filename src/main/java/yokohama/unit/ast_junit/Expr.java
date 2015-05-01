@@ -16,6 +16,7 @@ public interface Expr {
             Function<InvokeExpr, T> visitInvokeExpr_,
             Function<InvokeStaticExpr, T> visitInvokeStaticExpr_,
             Function<IntLitExpr, T> visitIntLitExpr_,
+            Function<LongLitExpr, T> visitLongLitExpr_,
             Function<ClassLitExpr, T> visitClassLitExpr_,
             Function<EqualOpExpr, T> visitEqualOpExpr_,
             Function<ArrayExpr, T> visitArrayExpr_
@@ -60,6 +61,10 @@ public interface Expr {
             @Override
             public T visitIntLitExpr(IntLitExpr intLitExpr) {
                 return visitIntLitExpr_.apply(intLitExpr);
+            }
+            @Override
+            public T visitLongLitExpr(LongLitExpr longLitExpr) {
+                return visitLongLitExpr_.apply(longLitExpr);
             }
             @Override
             public T visitClassLitExpr(ClassLitExpr classLitExpr) {

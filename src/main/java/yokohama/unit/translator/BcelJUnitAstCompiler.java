@@ -483,6 +483,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(new PUSH(cp, intLitExpr.getValue()));
                 return Type.INT;
             },
+            longLitExpr -> {
+                il.append(new PUSH(cp, longLitExpr.getValue()));
+                return Type.LONG;
+            },
             classLitExpr -> {
                 yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
                 il.append(new PUSH(cp, new ObjectType(
