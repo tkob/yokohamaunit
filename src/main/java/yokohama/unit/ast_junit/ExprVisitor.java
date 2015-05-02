@@ -14,6 +14,7 @@ public interface ExprVisitor<T> {
     T visitLongLitExpr(LongLitExpr longLitExpr);
     T visitFloatLitExpr(FloatLitExpr floatLitExpr);
     T visitDoubleLitExpt(DoubleLitExpr doubleLitExpr);
+    T visitBooleanLitExpr(BooleanLitExpr booleanLitExpr);
     T visitClassLitExpr(ClassLitExpr classLitExpr);
     T visitEqualOpExpr(EqualOpExpr equalOpExpr);
     T visitArrayExpr(ArrayExpr arrayExpr);

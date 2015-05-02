@@ -19,6 +19,7 @@ public interface Expr {
             Function<LongLitExpr, T> visitLongLitExpr_,
             Function<FloatLitExpr, T> visitFloatLitExpr_,
             Function<DoubleLitExpr, T> visitDoubleLitExpr_,
+            Function<BooleanLitExpr, T> visitBooleanLitExpr_,
             Function<ClassLitExpr, T> visitClassLitExpr_,
             Function<EqualOpExpr, T> visitEqualOpExpr_,
             Function<ArrayExpr, T> visitArrayExpr_
@@ -75,6 +76,10 @@ public interface Expr {
             @Override
             public T visitDoubleLitExpt(DoubleLitExpr doubleLitExpr) {
                 return visitDoubleLitExpr_.apply(doubleLitExpr);
+            }
+            @Override
+            public T visitBooleanLitExpr(BooleanLitExpr booleanLitExpr) {
+                return visitBooleanLitExpr_.apply(booleanLitExpr);
             }
             @Override
             public T visitClassLitExpr(ClassLitExpr classLitExpr) {

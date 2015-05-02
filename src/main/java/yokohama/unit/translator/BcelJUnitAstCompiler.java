@@ -495,6 +495,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(new PUSH(cp, doubleLitExpr.getValue()));
                 return Type.DOUBLE;
             },
+            booleanLitExpr -> {
+                il.append(new PUSH(cp, booleanLitExpr.getValue()));
+                return Type.BOOLEAN;
+            },
             classLitExpr -> {
                 yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
                 il.append(new PUSH(cp, new ObjectType(
