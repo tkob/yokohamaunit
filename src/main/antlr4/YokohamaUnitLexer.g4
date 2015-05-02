@@ -123,7 +123,7 @@ Quoted: ~["]+ ;
 CLOSEDOUBLEQUOTE: '"' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_SINGLEQUOTE;
-Char: (~['\r\n] | '\\\'')+ ;
+Char: (~['\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
 CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_BACKTICK;
@@ -309,3 +309,24 @@ HexSignificand: HexNumeral '.'?
  
 fragment
 BinaryExponent: [pP] SignedInteger ;
+
+fragment
+UnicodeEscape: '\\' 'u'+ [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] ;
+
+fragment
+EscapeSequence: '\\b'  // (backspace BS, Unicode \u0008) 
+              | '\\t'  // (horizontal tab HT, Unicode \u0009) 
+              | '\\n'  // (linefeed LF, Unicode \u000a) 
+              | '\\f'  // (form feed FF, Unicode \u000c) 
+              | '\\r'  // (carriage return CR, Unicode \u000d)
+              | '\\"'  // (double quote ", Unicode \u0022) 
+              | '\\\'' // (single quote ', Unicode \u0027) 
+              | '\\\\' // (backslash \, Unicode \u005c) 
+              | OctalEscape // (octal value, Unicode \u0000 to \u00ff) 
+              ;
+fragment
+OctalEscape: '\\' [0-7]
+           | '\\' [0-7] [0-7]
+           | '\\' [0-3] [0-7] [0-7]
+           ;
+
