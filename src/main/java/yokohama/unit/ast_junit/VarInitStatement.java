@@ -59,6 +59,14 @@ public class VarInitStatement implements Statement {
                     sb.appendln(name, " = ", longLitExpr.getValue(), "L;");
                     return null;
                 },
+                floatLitExpr -> {
+                    sb.appendln(name, " = ", floatLitExpr.getValue(), "f;");
+                    return null;
+                },
+                doubleLitExpr -> {
+                    sb.appendln(name, " = ", doubleLitExpr.getValue(), "d;");
+                    return null;
+                },
                 classLitExpr -> {
                     sb.appendln(name, " = ", classLitExpr.getType().getText(), ".class;");
                     return null;
