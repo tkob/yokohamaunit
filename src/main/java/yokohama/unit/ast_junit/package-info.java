@@ -22,6 +22,7 @@
  *        | FloatLitExpr
  *        | DoubleLitExpr
  *        | BooleanLitExpr
+ *        | CharLitExpr
  *        | ClassLitExpr
  *        | EqualOpExpr
  *        | ArrayExpr

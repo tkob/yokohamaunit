@@ -1,6 +1,7 @@
 package yokohama.unit.ast_junit;
 
 import lombok.Value;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
@@ -69,6 +70,11 @@ public class VarInitStatement implements Statement {
                 },
                 booleanLitExpr -> {
                     sb.appendln(name, " = ", booleanLitExpr.getValue(), ";");
+                    return null;
+                },
+                charLitExpr -> {
+                    // We use escapeEcmaScript instead of escapeJava for single quoted to be escaped
+                    sb.appendln(name, " = '", escapeEcmaScript(String.valueOf(charLitExpr.getValue())), "';");
                     return null;
                 },
                 classLitExpr -> {

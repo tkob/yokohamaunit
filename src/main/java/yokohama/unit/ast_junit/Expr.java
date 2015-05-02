@@ -20,6 +20,7 @@ public interface Expr {
             Function<FloatLitExpr, T> visitFloatLitExpr_,
             Function<DoubleLitExpr, T> visitDoubleLitExpr_,
             Function<BooleanLitExpr, T> visitBooleanLitExpr_,
+            Function<CharLitExpr, T> visitCharLitExpr_,
             Function<ClassLitExpr, T> visitClassLitExpr_,
             Function<EqualOpExpr, T> visitEqualOpExpr_,
             Function<ArrayExpr, T> visitArrayExpr_
@@ -80,6 +81,10 @@ public interface Expr {
             @Override
             public T visitBooleanLitExpr(BooleanLitExpr booleanLitExpr) {
                 return visitBooleanLitExpr_.apply(booleanLitExpr);
+            }
+            @Override
+            public T visitCharLitExpr(CharLitExpr charLitExpr) {
+                return visitCharLitExpr_.apply(charLitExpr);
             }
             @Override
             public T visitClassLitExpr(ClassLitExpr classLitExpr) {
