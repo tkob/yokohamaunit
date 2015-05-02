@@ -27,7 +27,14 @@
  * InstanceOfMatcher ::= ClassType
  * InstanceSuchThatMatcher ::= ClassType Proposition+
  * 
- * Expr ::= QuotedExpr | StubExpr | InvocationExpr
+ * Expr ::= QuotedExpr
+ *        | StubExpr
+ *        | InvocationExpr
+ *        | IntegerExpr
+ *        | FloatingPointExpr
+ *        | BooleanExpr
+ *        | CharExpr
+ *        | StringExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

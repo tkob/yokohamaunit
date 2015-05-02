@@ -68,7 +68,15 @@ header: BAR (Identifier BAR)* Identifier? NEWLINE;
 rows: row+ ;
 row: BAR (Expr BAR)* Expr? NEWLINE  ;
 
-expr: Expr | stubExpr | invokeExpr ;
+expr: Expr
+    | stubExpr
+    | invokeExpr
+    | integerExpr
+    | floatingPointExpr
+    | booleanExpr
+    | charExpr
+    | stringExpr
+    ;
 
 stubExpr: A_STUB_OF classType ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
 stubBehavior: METHOD methodPattern RETURNS expr ;
@@ -82,3 +90,13 @@ classType: Identifier (DOT Identifier)* ;
 
 invokeExpr: AN_INVOCATION_OF receiver DOT methodPattern ;
 receiver: Identifier (DOT Identifier)* ;
+
+integerExpr: MINUS? Integer ;
+
+floatingPointExpr: MINUS? FloatingPoint ;
+
+booleanExpr: TRUE | FALSE ;
+
+charExpr: Char ;
+
+stringExpr: Str | EMPTY_STRING ;

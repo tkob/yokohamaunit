@@ -18,8 +18,10 @@ import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
+import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
@@ -46,7 +48,7 @@ public class MockitoMockStrategy implements MockStrategy {
     public List<Statement> stub(
             String varName,
             StubExpr stubExpr,
-            ExpressionStrategy expressionStrategy,
+            AstToJUnitAst astToJUnitAst,
             String envVarName,
             ClassResolver classResolver) {
         Class<?> classToStub =        stubExpr.getClassToStub().toClass(classResolver);
@@ -64,7 +66,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         classToStubName,
                         classToStubSpan,
                         b,
-                        expressionStrategy,
+                        astToJUnitAst,
                         envVarName,
                         classResolver));
         return Stream.concat(createMock, defineBehavior).collect(Collectors.toList());
@@ -96,7 +98,7 @@ public class MockitoMockStrategy implements MockStrategy {
             String classToStubName,
             Span classToStubSpan,
             StubBehavior behavior,
-            ExpressionStrategy expressionStrategy,
+            AstToJUnitAst astToJUnitAst,
             String envVarName,
             ClassResolver classResolver) {
         /*
@@ -116,23 +118,11 @@ public class MockitoMockStrategy implements MockStrategy {
         Type returnType = getReturnType(classToStubName, methodName, argumentTypes, isVarArg, classResolver);
 
         String returnedVarName = genSym.generate("returned");
-        Stream<Statement> returned = behavior.getToBeReturned().accept(
-                quotedExpr ->
-                        expressionStrategy.eval(
-                                returnedVarName,
-                                quotedExpr,
-                                returnType.toClass(),
-                                envVarName).stream(),
-                stubExpr->
-                        this.stub(
-                                returnedVarName,
-                                stubExpr,
-                                expressionStrategy,
-                                envVarName,
-                                classResolver).stream(),
-                invocationExpr -> {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                });
+        Stream<Statement> returned = astToJUnitAst.translateExpr(
+                behavior.getToBeReturned(),
+                returnedVarName,
+                returnType.toClass(),
+                envVarName);
 
         Stream<Type> argTypes;
         Stream<Var> argVars;

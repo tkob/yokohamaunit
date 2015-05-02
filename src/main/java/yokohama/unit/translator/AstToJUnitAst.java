@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,9 +23,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
+import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
+import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
@@ -38,26 +42,35 @@ import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.Annotation;
+import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
+import yokohama.unit.ast_junit.CharLitExpr;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.DoubleLitExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
+import yokohama.unit.ast_junit.FloatLitExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
+import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
@@ -370,18 +383,19 @@ public class AstToJUnitAst {
         String name = binding.getName().getName();
         String varName = genSym.generate(name);
         return Stream.concat(
-                translateExpr(binding.getValue(), varName, envVarName),
+                translateExpr(binding.getValue(), varName, Object.class, envVarName),
                 expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
     }
 
     Stream<Statement> translateExpr(
             yokohama.unit.ast.Expr expr,
             String varName,
+            Class<?> expectedType,
             String envVarName) {
         return expr.accept(
                 quotedExpr ->
                         expressionStrategy.eval(
-                                varName, quotedExpr, Object.class, envVarName).stream(),
+                                varName, quotedExpr, expectedType, envVarName).stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
@@ -391,13 +405,162 @@ public class AstToJUnitAst {
                     return mockStrategy.stub(
                             varName,
                             stubExpr,
-                            expressionStrategy,
+                            this,
                             envVarName,
                             classResolver).stream();
                 },
                 invocationExpr -> {
                     throw new UnsupportedOperationException("Not supported yet.");
+                },
+                integerExpr -> integerExpr.match(
+                        intValue -> {
+                            Var intLitVar = new Var(genSym.generate("intLit"));
+                            return Stream.<Statement>of(
+                                    new VarInitStatement(
+                                            Type.INT,
+                                            intLitVar.getName(),
+                                            new IntLitExpr(intValue),
+                                            integerExpr.getSpan()),
+                                    new VarInitStatement(
+                                            Type.INT.box(),
+                                            varName,
+                                            new InvokeStaticExpr(
+                                                    ClassType.INTEGER,
+                                                    Collections.emptyList(),
+                                                    "valueOf",
+                                                    Arrays.asList(Type.INT),
+                                                    Arrays.asList(intLitVar),
+                                                    Type.INT.box()),
+                                            integerExpr.getSpan()));
+                        },
+                        longValue -> {
+                            Var longLitVar = new Var(genSym.generate("longLit"));
+                            return Stream.<Statement>of(
+                                    new VarInitStatement(
+                                            Type.LONG,
+                                            longLitVar.getName(),
+                                            new LongLitExpr(longValue),
+                                            integerExpr.getSpan()),
+                                    new VarInitStatement(
+                                            Type.LONG.box(),
+                                            varName,
+                                            new InvokeStaticExpr(
+                                                    ClassType.LONG,
+                                                    Collections.emptyList(),
+                                                    "valueOf",
+                                                    Arrays.asList(Type.LONG),
+                                                    Arrays.asList(longLitVar),
+                                                    Type.LONG.box()),
+                                            integerExpr.getSpan()));
+                        }),
+                floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName),
+                booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName),
+                charExpr -> translateCharExpr(charExpr, varName, envVarName),
+                stringExpr -> translateStringExpr(stringExpr, varName, envVarName));
+    }
+
+    Stream<Statement> translateFloatingPointExpr(
+            FloatingPointExpr floatingPointExpr,
+            String varName,
+            String envVarName) {
+        return floatingPointExpr.match(
+                floatValue -> {
+                    Var floatLitVar = new Var(genSym.generate("floatLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.FLOAT,
+                                    floatLitVar.getName(),
+                                    new FloatLitExpr(floatValue),
+                                    floatingPointExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.FLOAT.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.FLOAT,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.FLOAT),
+                                            Arrays.asList(floatLitVar),
+                                            Type.FLOAT.box()),
+                                    floatingPointExpr.getSpan()));
+                },
+                doubleValue -> {
+                    Var doubleLitVar = new Var(genSym.generate("doubleLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.DOUBLE,
+                                    doubleLitVar.getName(),
+                                    new DoubleLitExpr(doubleValue),
+                                    floatingPointExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.DOUBLE.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.DOUBLE,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.DOUBLE),
+                                            Arrays.asList(doubleLitVar),
+                                            Type.DOUBLE.box()),
+                                    floatingPointExpr.getSpan()));
                 });
+    }
+
+    Stream<Statement> translateBooleanExpr(
+            BooleanExpr booleanExpr, String varName, String envVarName) {
+        boolean booleanValue = booleanExpr.getValue();
+        Var booleanLitVar = new Var(genSym.generate("booleanLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.BOOLEAN,
+                                    booleanLitVar.getName(),
+                                    new BooleanLitExpr(booleanValue),
+                                    booleanExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.BOOLEAN.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.BOOLEAN,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.BOOLEAN),
+                                            Arrays.asList(booleanLitVar),
+                                            Type.BOOLEAN.box()),
+                                    booleanExpr.getSpan()));
+    }
+
+    Stream<Statement> translateCharExpr(
+            CharExpr charExpr, String varName, String envVarName) {
+        char charValue = charExpr.getValue();
+        Var charLitVar = new Var(genSym.generate("charLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.CHAR,
+                                    charLitVar.getName(),
+                                    new CharLitExpr(charValue),
+                                    charExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.CHAR.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.CHARACTER,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.CHAR),
+                                            Arrays.asList(charLitVar),
+                                            Type.CHAR.box()),
+                                    charExpr.getSpan()));
+    }
+
+    Stream<Statement> translateStringExpr(
+            StringExpr stringExpr, String varName, String envVarName) {
+        String strValue = stringExpr.getValue();
+        return Stream.<Statement>of(
+                new VarInitStatement(
+                        Type.STRING,
+                        varName,
+                        new StrLitExpr(strValue),
+                        stringExpr.getSpan()));
     }
 
     Type translateType(yokohama.unit.ast.Type type) {
@@ -475,7 +638,7 @@ public class AstToJUnitAst {
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
                     return Stream.concat(
-                            translateExpr(row.getExprs().get(i), varName, envVarName),
+                            translateExpr(row.getExprs().get(i), varName, Object.class, envVarName),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName)).stream());
                 })
                 .collect(Collectors.toList());
@@ -559,7 +722,7 @@ public class AstToJUnitAst {
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
                             return Stream.concat(
-                                    translateExpr(binding.getValue(), varName, env),
+                                    translateExpr(binding.getValue(), varName, Object.class, env),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName)).stream());
                         });
             } else {

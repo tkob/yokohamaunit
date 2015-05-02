@@ -13,17 +13,21 @@ import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
+import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
+import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
+import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -40,6 +44,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
@@ -376,7 +381,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Expr visitExpr(YokohamaUnitParser.ExprContext ctx) {
         return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
-                                  : visitStubExpr(ctx.stubExpr());
+                                  : (Expr)visitChildren(ctx);
     }
 
     @Override
@@ -460,4 +465,33 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public IntegerExpr visitIntegerExpr(YokohamaUnitParser.IntegerExprContext ctx) {
+        boolean positive = ctx.MINUS() == null;
+        String literal = ctx.Integer().getText();
+        return new IntegerExpr(positive, literal, getSpan(ctx));
+    }
+
+    @Override
+    public FloatingPointExpr visitFloatingPointExpr(YokohamaUnitParser.FloatingPointExprContext ctx) {
+        boolean positive = ctx.MINUS() == null;
+        String literal = ctx.FloatingPoint().getText();
+        return new FloatingPointExpr(positive, literal, getSpan(ctx));
+    }
+
+    @Override
+    public BooleanExpr visitBooleanExpr(YokohamaUnitParser.BooleanExprContext ctx) {
+        return new BooleanExpr(ctx.FALSE() == null, getSpan(ctx));
+    }
+
+    @Override
+    public CharExpr visitCharExpr(YokohamaUnitParser.CharExprContext ctx) {
+        return new CharExpr(ctx.Char().getText(), getSpan(ctx));
+    }
+
+    @Override
+    public StringExpr visitStringExpr(YokohamaUnitParser.StringExprContext ctx) {
+        String literal = ctx.EMPTY_STRING() != null ? "" : ctx.Str().getText();
+        return new StringExpr(literal, getSpan(ctx));
+    }
 }

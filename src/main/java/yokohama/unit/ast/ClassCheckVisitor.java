@@ -137,7 +137,12 @@ class ClassExprCheckVisitor {
                 stubExpr -> visitStubExpr(stubExpr),
                 invocationExpr -> {
                     throw new UnsupportedOperationException("Not supported yet.");
-                });
+                },
+                integerExpr -> Stream.<ErrorMessage>empty(),
+                floatingPointExpr -> Stream.<ErrorMessage>empty(),
+                booleanExpr -> Stream.<ErrorMessage>empty(),
+                charExpr -> Stream.<ErrorMessage>empty(),
+                stringExpr -> Stream.<ErrorMessage>empty());
     }
 
     private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {

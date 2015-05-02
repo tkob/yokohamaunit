@@ -44,9 +44,16 @@ AN_INSTANCE: 'an' [ \t\r\n]+ 'instance' -> mode(AFTER_AN_INSTANCE) ;
 AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> mode(AFTER_METHOD) ;
 NULL: 'null' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 NOTHING: 'nothing' -> mode(IN_THE_MIDDLE_OF_LINE) ;
-Identifier:	IdentStart IdentPart* ;
+TRUE: 'true' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+FALSE: 'false' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+Identifier:	IdentStart IdentPart* -> mode(IN_THE_MIDDLE_OF_LINE) ;
+Integer: IntegerLiteral -> mode(IN_THE_MIDDLE_OF_LINE) ;
+FloatingPoint: FloatingPointLiteral -> mode(IN_THE_MIDDLE_OF_LINE) ;
+MINUS: '-' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+EMPTY_STRING: '""' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
+OPENSINGLEQUOTE: '\'' -> skip, mode(IN_SINGLEQUOTE) ;
 NEW_LINE : ('\r'? '\n')+ -> skip ;
 WS : [ \t]+ -> skip ;
 
@@ -81,9 +88,16 @@ AN_INSTANCE2: 'an' [ \t\r\n]+ 'instance' -> type(AN_INSTANCE), mode(AFTER_AN_INS
 AN_INVOCATION_OF2: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> type(AN_INVOCATION_OF), mode(AFTER_METHOD) ;
 NULL2: 'null' -> type(NULL) ;
 NOTHING2: 'nothing' -> type(NOTHING) ;
+TRUE2: 'true' -> type(TRUE) ;
+FALSE2: 'false' -> type(FALSE) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
+Integer2: IntegerLiteral -> type(Integer);
+FloatingPoint2: FloatingPointLiteral -> type(FloatingPoint);
+MINUS2: '-' -> type(MINUS) ;
+EMPTY_STRING2: '""' -> type(EMPTY_STRING) ;
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE2: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
+OPENSINGLEQUOTE2: '\'' -> skip, mode(IN_SINGLEQUOTE) ;
 NEW_LINE2 : ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 WS2 : [ \t]+ -> skip ;
 
@@ -107,8 +121,12 @@ PhaseDescription: ~[\r\n]+ ;
 NEW_LINE_PHASE: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_DOUBLEQUOTE;
-Quoted: ~["]+ ;
+Str: (~["\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
 CLOSEDOUBLEQUOTE: '"' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode IN_SINGLEQUOTE;
+Char: (~['\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
+CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_BACKTICK;
 Expr: ~[`]+ /*-> type(Expr)*/ ;
@@ -178,11 +196,11 @@ LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
 SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
 
 mode AFTER_CSV;
-OPENSINGLEQUOTE2: '\'' -> skip, mode(IN_FILE_NAME) ;
+OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
 SPACETABNEWLINE7: [ \t\r\n]+ -> skip ;
 
 mode AFTER_EXCEL;
-OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_BOOK_NAME) ;
+OPENSINGLEQUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
 SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
 
 mode IN_TABLE_NAME;
@@ -218,3 +236,99 @@ IdentPart: ~[\uD800-\uDBFF]
          | [\uD800-\uDBFF] [\uDC00-\uDFFF]
 		   {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
          ;
+
+fragment
+IntegerLiteral: DecimalIntegerLiteral 
+              | HexIntegerLiteral 
+              | OctalIntegerLiteral 
+              | BinaryIntegerLiteral
+              ;
+
+fragment
+DecimalIntegerLiteral: DecimalNumeral IntegerTypeSuffix? ;
+
+fragment
+HexIntegerLiteral: HexNumeral IntegerTypeSuffix? ;
+
+fragment
+OctalIntegerLiteral: OctalNumeral IntegerTypeSuffix? ;
+
+fragment
+BinaryIntegerLiteral: BinaryNumeral IntegerTypeSuffix? ;
+
+fragment
+IntegerTypeSuffix: [lL] ;
+
+fragment
+DecimalNumeral: '0' | [1-9] ([_0-9]* [0-9])? ;
+
+fragment
+HexNumeral: '0' [xX] HexDigits ;
+ 
+fragment
+HexDigits: [0-9a-fA-F] ([_0-9a-fA-F]* [0-9a-fA-F])? ;
+
+fragment
+OctalNumeral: '0' [_0-7]* [0-7] ;
+
+fragment
+BinaryNumeral: '0' [bB] [01] ([_01]* [01])? ;
+
+fragment
+FloatingPointLiteral: DecimalFloatingPointLiteral
+                    | HexadecimalFloatingPointLiteral
+                    ;
+
+fragment
+DecimalFloatingPointLiteral: Digits '.' Digits ExponentPart? FloatTypeSuffix?
+                           | Digits '.' ExponentPart FloatTypeSuffix?
+                           | Digits '.' ExponentPart? FloatTypeSuffix
+                             /* the above rules differ from the Java spec:
+                                fp literals which end with dot are not allowd */
+                           | '.' Digits ExponentPart? FloatTypeSuffix?
+                           | Digits ExponentPart FloatTypeSuffix?
+                           | Digits ExponentPart? FloatTypeSuffix 
+                           ;
+fragment
+Digits: [0-9] ([_0-9]* [0-9])? ;
+
+fragment
+ExponentPart: [eE] SignedInteger ;
+ 
+fragment
+SignedInteger: ('+' | '-')? Digits ;
+
+fragment
+FloatTypeSuffix: [fFdD] ;
+
+fragment
+HexadecimalFloatingPointLiteral: HexSignificand BinaryExponent FloatTypeSuffix? ;
+
+fragment
+HexSignificand: HexNumeral '.'?
+              | '0' [xX] HexDigits? . HexDigits
+              ;
+ 
+fragment
+BinaryExponent: [pP] SignedInteger ;
+
+fragment
+UnicodeEscape: '\\' 'u'+ [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] ;
+
+fragment
+EscapeSequence: '\\b'  // (backspace BS, Unicode \u0008) 
+              | '\\t'  // (horizontal tab HT, Unicode \u0009) 
+              | '\\n'  // (linefeed LF, Unicode \u000a) 
+              | '\\f'  // (form feed FF, Unicode \u000c) 
+              | '\\r'  // (carriage return CR, Unicode \u000d)
+              | '\\"'  // (double quote ", Unicode \u0022) 
+              | '\\\'' // (single quote ', Unicode \u0027) 
+              | '\\\\' // (backslash \, Unicode \u005c) 
+              | OctalEscape // (octal value, Unicode \u0000 to \u00ff) 
+              ;
+fragment
+OctalEscape: '\\' [0-7]
+           | '\\' [0-7] [0-7]
+           | '\\' [0-3] [0-7] [0-7]
+           ;
+
