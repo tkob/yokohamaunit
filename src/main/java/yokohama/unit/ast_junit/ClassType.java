@@ -11,6 +11,7 @@ public class ClassType implements NonArrayType {
     private Span span;
 
     public static final ClassType TEST = new ClassType(org.junit.Test.class, Span.dummySpan());
+    public static final ClassType STRING = new ClassType(String.class, Span.dummySpan());
 
     public static final ClassType BOOLEAN   = new ClassType(Boolean.class,   Span.dummySpan());
     public static final ClassType BYTE      = new ClassType(Byte.class,      Span.dummySpan());
