@@ -46,6 +46,7 @@ NULL: 'null' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 NOTHING: 'nothing' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* ;
 Integer: IntegerLiteral ;
+FloatingPoint: FloatingPointLiteral ;
 MINUS: '-' ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
@@ -85,6 +86,7 @@ NULL2: 'null' -> type(NULL) ;
 NOTHING2: 'nothing' -> type(NOTHING) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
 Integer2: IntegerLiteral -> type(Integer);
+FloatingPoint2: FloatingPointLiteral -> type(FloatingPoint);
 MINUS2: '-' -> type(MINUS) ;
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE2: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
@@ -249,10 +251,51 @@ fragment
 DecimalNumeral: '0' | [1-9] ([_0-9]* [0-9])? ;
 
 fragment
-HexNumeral: '0' [xX] [0-9a-fA-F] ([_0-9a-fA-F]* [0-9a-fA-F])? ;
+HexNumeral: '0' [xX] HexDigits ;
  
+fragment
+HexDigits: [0-9a-fA-F] ([_0-9a-fA-F]* [0-9a-fA-F])? ;
+
 fragment
 OctalNumeral: '0' [_0-7]* [0-7] ;
 
 fragment
 BinaryNumeral: '0' [bB] [01] ([_01]* [01])? ;
+
+fragment
+FloatingPointLiteral: DecimalFloatingPointLiteral
+                    | HexadecimalFloatingPointLiteral
+                    ;
+
+fragment
+DecimalFloatingPointLiteral: Digits '.' Digits ExponentPart? FloatTypeSuffix?
+                           | Digits '.' ExponentPart FloatTypeSuffix?
+                           | Digits '.' ExponentPart? FloatTypeSuffix
+                             /* the above rules differ from the Java spec:
+                                fp literals which end with dot are not allowd */
+                           | '.' Digits ExponentPart? FloatTypeSuffix?
+                           | Digits ExponentPart FloatTypeSuffix?
+                           | Digits ExponentPart? FloatTypeSuffix 
+                           ;
+fragment
+Digits: [0-9] ([_0-9]* [0-9])? ;
+
+fragment
+ExponentPart: [eE] SignedInteger ;
+ 
+fragment
+SignedInteger: ('+' | '-')? Digits ;
+
+fragment
+FloatTypeSuffix: [fFdD] ;
+
+fragment
+HexadecimalFloatingPointLiteral: HexSignificand BinaryExponent FloatTypeSuffix? ;
+
+fragment
+HexSignificand: HexNumeral '.'?
+              | '0' [xX] HexDigits? . HexDigits
+              ;
+ 
+fragment
+BinaryExponent: [pP] SignedInteger ;
