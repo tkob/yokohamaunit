@@ -26,6 +26,7 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
+import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
@@ -49,7 +50,9 @@ import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
+import yokohama.unit.ast_junit.DoubleLitExpr;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
+import yokohama.unit.ast_junit.FloatLitExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
@@ -374,18 +377,19 @@ public class AstToJUnitAst {
         String name = binding.getName().getName();
         String varName = genSym.generate(name);
         return Stream.concat(
-                translateExpr(binding.getValue(), varName, envVarName),
+                translateExpr(binding.getValue(), varName, Object.class, envVarName),
                 expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
     }
 
     Stream<Statement> translateExpr(
             yokohama.unit.ast.Expr expr,
             String varName,
+            Class<?> expectedType,
             String envVarName) {
         return expr.accept(
                 quotedExpr ->
                         expressionStrategy.eval(
-                                varName, quotedExpr, Object.class, envVarName).stream(),
+                                varName, quotedExpr, expectedType, envVarName).stream(),
                 stubExpr -> {
                     Span classToStubSpan = stubExpr.getClassToStub().getSpan();
                     String classToStubName =
@@ -395,7 +399,7 @@ public class AstToJUnitAst {
                     return mockStrategy.stub(
                             varName,
                             stubExpr,
-                            expressionStrategy,
+                            this,
                             envVarName,
                             classResolver).stream();
                 },
@@ -442,7 +446,55 @@ public class AstToJUnitAst {
                                                     Arrays.asList(longLitVar),
                                                     Type.LONG.box()),
                                             integerExpr.getSpan()));
-                        }));
+                        }),
+                floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName));
+    }
+
+    Stream<Statement> translateFloatingPointExpr(
+            FloatingPointExpr floatingPointExpr,
+            String varName,
+            String envVarName) {
+        return floatingPointExpr.match(
+                floatValue -> {
+                    Var floatLitVar = new Var(genSym.generate("floatLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.FLOAT,
+                                    floatLitVar.getName(),
+                                    new FloatLitExpr(floatValue),
+                                    floatingPointExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.FLOAT.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.FLOAT,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.FLOAT),
+                                            Arrays.asList(floatLitVar),
+                                            Type.FLOAT.box()),
+                                    floatingPointExpr.getSpan()));
+                },
+                doubleValue -> {
+                    Var doubleLitVar = new Var(genSym.generate("doubleLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.DOUBLE,
+                                    doubleLitVar.getName(),
+                                    new DoubleLitExpr(doubleValue),
+                                    floatingPointExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.DOUBLE.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.DOUBLE,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.DOUBLE),
+                                            Arrays.asList(doubleLitVar),
+                                            Type.DOUBLE.box()),
+                                    floatingPointExpr.getSpan()));
+                });
     }
 
     Type translateType(yokohama.unit.ast.Type type) {
@@ -520,7 +572,7 @@ public class AstToJUnitAst {
                 .flatMap(i -> {
                     String varName = genSym.generate(header.get(i));
                     return Stream.concat(
-                            translateExpr(row.getExprs().get(i), varName, envVarName),
+                            translateExpr(row.getExprs().get(i), varName, Object.class, envVarName),
                             expressionStrategy.bind(envVarName, header.get(i), new Var(varName)).stream());
                 })
                 .collect(Collectors.toList());
@@ -604,7 +656,7 @@ public class AstToJUnitAst {
                         .flatMap(binding -> {
                             String varName = genSym.generate(binding.getName());
                             return Stream.concat(
-                                    translateExpr(binding.getValue(), varName, env),
+                                    translateExpr(binding.getValue(), varName, Object.class, env),
                                     expressionStrategy.bind(env, binding.getName(), new Var(varName)).stream());
                         });
             } else {

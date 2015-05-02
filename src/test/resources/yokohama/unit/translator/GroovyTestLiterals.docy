@@ -58,3 +58,41 @@ Assert that `n` is `-1L` where n = 017_7777_7777_7777_7777_7777L.
 
 Assert that `n` is `-1L` where n =
 0b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111L.
+
+# Test: Use floating point literals (float)
+
+Assert `n` is `Float.MAX_VALUE` where n = 3.4028235e38f. 
+
+Assert `n` is `Float.MIN_VALUE` where n = 1.40e-45f. 
+
+Assert `n` is `Float.parseFloat("1e1f")` where n = 1e1f.
+
+Assert `n` is `Float.parseFloat("2.f")` where n = 2.f.
+
+Assert `n` is `Float.parseFloat(".3f")` where n = .3f.
+
+Assert `n` is `Float.parseFloat("0f")` where n = 0f.
+
+Assert `n` is `Float.parseFloat("3.14f")` where n = 3.14f.
+
+Assert `n` is `Float.parseFloat("6.022137e+23f")` where n = 6.022137e+23f.
+
+# Test: Use floating point literals (double)
+
+Assert `n` is `Double.MAX_VALUE` where n = 1.7976931348623157e308. 
+
+Assert `n` is `Double.MIN_VALUE` where n = 4.9e-324. 
+
+Assert `n` is `Double.parseDouble("1e1")` where n = 1e1.
+
+Assert `n` is `Double.parseDouble("2.0")` where n = 2.0.
+
+Assert `n` is `Double.parseDouble(".3")` where n = .3.
+
+Assert `n` is `Double.parseDouble("0.0")` where n = 0.0.
+
+Assert `n` is `Double.parseDouble("3.14")` where n = 3.14.
+
+Assert `n` is `Double.parseDouble("1e-9d")` where n = 1e-9d.
+
+Assert `n` is `Double.parseDouble("1e137")` where n = 1e137.

@@ -19,6 +19,7 @@ import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
 import yokohama.unit.ast.Fixture;
+import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
@@ -466,5 +467,12 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         boolean positive = ctx.MINUS() == null;
         String literal = ctx.Integer().getText();
         return new IntegerExpr(positive, literal, getSpan(ctx));
+    }
+
+    @Override
+    public FloatingPointExpr visitFloatingPointExpr(YokohamaUnitParser.FloatingPointExprContext ctx) {
+        boolean positive = ctx.MINUS() == null;
+        String literal = ctx.FloatingPoint().getText();
+        return new FloatingPointExpr(positive, literal, getSpan(ctx));
     }
 }

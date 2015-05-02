@@ -9,7 +9,8 @@ public interface Expr {
             Function<QuotedExpr, T> visitQuotedExpr_,
             Function<StubExpr, T> visitStubExpr_,
             Function<InvocationExpr, T> visitInvocationExpr_,
-            Function<IntegerExpr, T> visitIntegerExpr_
+            Function<IntegerExpr, T> visitIntegerExpr_,
+            Function<FloatingPointExpr, T> visitFloatingPointExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -27,6 +28,10 @@ public interface Expr {
             @Override
             public T visitIntegerExpr(IntegerExpr integerExpr) {
                 return visitIntegerExpr_.apply(integerExpr);
+            }
+            @Override
+            public T visitFloatingPointExpr(FloatingPointExpr floatingPointExpr) {
+                return visitFloatingPointExpr_.apply(floatingPointExpr);
             }
         });
     }

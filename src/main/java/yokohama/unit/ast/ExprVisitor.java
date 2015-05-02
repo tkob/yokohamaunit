@@ -5,4 +5,5 @@ public interface ExprVisitor<T> {
     T visitStubExpr(StubExpr stubExpr);
     T visitInvocationExpr(InvocationExpr invocationExpr);
     T visitIntegerExpr(IntegerExpr integerExpr);
+    T visitFloatingPointExpr(FloatingPointExpr floatingPointExpr);
 }
