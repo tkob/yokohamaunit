@@ -6,4 +6,5 @@ public interface ExprVisitor<T> {
     T visitInvocationExpr(InvocationExpr invocationExpr);
     T visitIntegerExpr(IntegerExpr integerExpr);
     T visitFloatingPointExpr(FloatingPointExpr floatingPointExpr);
+    T visitBooleanExpr(BooleanExpr booleanExpr);
 }

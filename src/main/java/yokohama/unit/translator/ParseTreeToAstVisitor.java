@@ -13,6 +13,7 @@ import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
+import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
@@ -474,5 +475,10 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         boolean positive = ctx.MINUS() == null;
         String literal = ctx.FloatingPoint().getText();
         return new FloatingPointExpr(positive, literal, getSpan(ctx));
+    }
+
+    @Override
+    public BooleanExpr visitBooleanExpr(YokohamaUnitParser.BooleanExprContext ctx) {
+        return new BooleanExpr(ctx.FALSE() == null, getSpan(ctx));
     }
 }

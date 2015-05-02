@@ -228,7 +228,9 @@ public class DocyCompilerImplTest {
                         "Use_floating_point_literals_double_6",
                         "Use_floating_point_literals_double_7",
                         "Use_floating_point_literals_double_8",
-                        "Use_floating_point_literals_double_9")),
+                        "Use_floating_point_literals_double_9",
+                        "Use_boolean_literals_1",
+                        "Use_boolean_literals_2")),
     };
 
     @DataPoints

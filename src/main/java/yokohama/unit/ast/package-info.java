@@ -32,6 +32,7 @@
  *        | InvocationExpr
  *        | IntegerExpr
  *        | FloatingPointExpr
+ *        | BooleanExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

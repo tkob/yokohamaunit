@@ -96,3 +96,9 @@ Assert `n` is `Double.parseDouble("3.14")` where n = 3.14.
 Assert `n` is `Double.parseDouble("1e-9d")` where n = 1e-9d.
 
 Assert `n` is `Double.parseDouble("1e137")` where n = 1e137.
+
+# Test: Use boolean literals
+
+Assert `n` is `true` where n is true.
+
+Assert `n` is `false` where n is false.

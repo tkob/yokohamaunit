@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
+import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -46,6 +47,7 @@ import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.Annotation;
+import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
@@ -447,7 +449,8 @@ public class AstToJUnitAst {
                                                     Type.LONG.box()),
                                             integerExpr.getSpan()));
                         }),
-                floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName));
+                floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName),
+                booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName));
     }
 
     Stream<Statement> translateFloatingPointExpr(
@@ -495,6 +498,29 @@ public class AstToJUnitAst {
                                             Type.DOUBLE.box()),
                                     floatingPointExpr.getSpan()));
                 });
+    }
+
+    Stream<Statement> translateBooleanExpr(
+            BooleanExpr booleanExpr, String varName, String envVarName) {
+        boolean booleanValue = booleanExpr.getValue();
+        Var booleanLitVar = new Var(genSym.generate("booleanLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.BOOLEAN,
+                                    booleanLitVar.getName(),
+                                    new BooleanLitExpr(booleanValue),
+                                    booleanExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.BOOLEAN.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.BOOLEAN,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.BOOLEAN),
+                                            Arrays.asList(booleanLitVar),
+                                            Type.BOOLEAN.box()),
+                                    booleanExpr.getSpan()));
     }
 
     Type translateType(yokohama.unit.ast.Type type) {
