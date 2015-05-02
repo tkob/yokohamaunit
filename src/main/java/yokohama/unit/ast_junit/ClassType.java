@@ -12,6 +12,15 @@ public class ClassType implements NonArrayType {
 
     public static final ClassType TEST = new ClassType(org.junit.Test.class, Span.dummySpan());
 
+    public static final ClassType BOOLEAN   = new ClassType(Boolean.class,   Span.dummySpan());
+    public static final ClassType BYTE      = new ClassType(Byte.class,      Span.dummySpan());
+    public static final ClassType SHORT     = new ClassType(Short.class,     Span.dummySpan());
+    public static final ClassType INTEGER   = new ClassType(Integer.class,   Span.dummySpan());
+    public static final ClassType LONG      = new ClassType(Long.class,      Span.dummySpan());
+    public static final ClassType CHARACTER = new ClassType(Character.class, Span.dummySpan());
+    public static final ClassType FLOAT     = new ClassType(Float.class,     Span.dummySpan());
+    public static final ClassType DOUBLE    = new ClassType(Double.class,    Span.dummySpan());
+
     @Override
     public String getText() {
         return clazz.getCanonicalName();
