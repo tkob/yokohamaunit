@@ -42,6 +42,7 @@ import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
@@ -69,6 +70,7 @@ import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
@@ -453,7 +455,8 @@ public class AstToJUnitAst {
                         }),
                 floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName),
                 booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName),
-                charExpr -> translateCharExpr(charExpr, varName, envVarName));
+                charExpr -> translateCharExpr(charExpr, varName, envVarName),
+                stringExpr -> translateStringExpr(stringExpr, varName, envVarName));
     }
 
     Stream<Statement> translateFloatingPointExpr(
@@ -547,6 +550,17 @@ public class AstToJUnitAst {
                                             Arrays.asList(charLitVar),
                                             Type.CHAR.box()),
                                     charExpr.getSpan()));
+    }
+
+    Stream<Statement> translateStringExpr(
+            StringExpr stringExpr, String varName, String envVarName) {
+        String strValue = stringExpr.getValue();
+        return Stream.<Statement>of(
+                new VarInitStatement(
+                        Type.STRING,
+                        varName,
+                        new StrLitExpr(strValue),
+                        stringExpr.getSpan()));
     }
 
     Type translateType(yokohama.unit.ast.Type type) {

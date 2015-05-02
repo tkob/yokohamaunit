@@ -34,6 +34,7 @@
  *        | FloatingPointExpr
  *        | BooleanExpr
  *        | CharExpr
+ *        | StringExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

@@ -116,3 +116,11 @@ Assert `n` is `Character.MAX_VALUE` where n is '\uFFFF'.
 Assert `n` is `'\177' as char` where n is '\177'.
 
 Assert `n` is `'™' as char` where n is '™'.
+
+# Test: Use string literals
+
+Assert `n` is `''` where n is "".
+
+Assert `n` is `'"'` where n is "\"".
+
+Assert `n` is `'This is a string'` where n is "This is a string".

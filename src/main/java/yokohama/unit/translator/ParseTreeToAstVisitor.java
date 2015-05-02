@@ -44,6 +44,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
@@ -486,5 +487,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public CharExpr visitCharExpr(YokohamaUnitParser.CharExprContext ctx) {
         return new CharExpr(ctx.Char().getText(), getSpan(ctx));
+    }
+
+    @Override
+    public StringExpr visitStringExpr(YokohamaUnitParser.StringExprContext ctx) {
+        String literal = ctx.EMPTY_STRING() != null ? "" : ctx.Str().getText();
+        return new StringExpr(literal, getSpan(ctx));
     }
 }
