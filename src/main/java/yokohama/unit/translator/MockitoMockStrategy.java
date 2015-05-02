@@ -18,8 +18,10 @@ import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
+import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
@@ -132,7 +134,22 @@ public class MockitoMockStrategy implements MockStrategy {
                                 classResolver).stream(),
                 invocationExpr -> {
                     throw new UnsupportedOperationException("Not supported yet.");
-                });
+                },
+                integerExpr -> integerExpr.match(
+                        intValue ->
+                                Stream.<Statement>of(
+                                        new VarInitStatement(
+                                                Type.INT,
+                                                varName,
+                                                new IntLitExpr(intValue),
+                                                integerExpr.getSpan())),
+                        longValue ->
+                                Stream.<Statement>of(
+                                        new VarInitStatement(
+                                                Type.LONG,
+                                                varName,
+                                                new LongLitExpr(longValue),
+                                                integerExpr.getSpan()))));
 
         Stream<Type> argTypes;
         Stream<Var> argVars;

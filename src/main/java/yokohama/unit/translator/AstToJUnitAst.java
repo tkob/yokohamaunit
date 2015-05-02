@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,9 +51,12 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
+import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
+import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
@@ -397,7 +401,48 @@ public class AstToJUnitAst {
                 },
                 invocationExpr -> {
                     throw new UnsupportedOperationException("Not supported yet.");
-                });
+                },
+                integerExpr -> integerExpr.match(
+                        intValue -> {
+                            Var intLitVar = new Var(genSym.generate("intLit"));
+                            return Stream.<Statement>of(
+                                    new VarInitStatement(
+                                            Type.INT,
+                                            intLitVar.getName(),
+                                            new IntLitExpr(intValue),
+                                            integerExpr.getSpan()),
+                                    new VarInitStatement(
+                                            Type.INT.box(),
+                                            varName,
+                                            new InvokeStaticExpr(
+                                                    ClassType.INTEGER,
+                                                    Collections.emptyList(),
+                                                    "valueOf",
+                                                    Arrays.asList(Type.INT),
+                                                    Arrays.asList(intLitVar),
+                                                    Type.INT.box()),
+                                            integerExpr.getSpan()));
+                        },
+                        longValue -> {
+                            Var longLitVar = new Var(genSym.generate("longLit"));
+                            return Stream.<Statement>of(
+                                    new VarInitStatement(
+                                            Type.LONG,
+                                            longLitVar.getName(),
+                                            new LongLitExpr(longValue),
+                                            integerExpr.getSpan()),
+                                    new VarInitStatement(
+                                            Type.LONG.box(),
+                                            varName,
+                                            new InvokeStaticExpr(
+                                                    ClassType.LONG,
+                                                    Collections.emptyList(),
+                                                    "valueOf",
+                                                    Arrays.asList(Type.LONG),
+                                                    Arrays.asList(longLitVar),
+                                                    Type.LONG.box()),
+                                            integerExpr.getSpan()));
+                        }));
     }
 
     Type translateType(yokohama.unit.ast.Type type) {

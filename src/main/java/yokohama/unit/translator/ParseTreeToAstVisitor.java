@@ -24,6 +24,7 @@ import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
+import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -376,7 +377,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Expr visitExpr(YokohamaUnitParser.ExprContext ctx) {
         return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
-                                  : visitStubExpr(ctx.stubExpr());
+                                  : (Expr)visitChildren(ctx);
     }
 
     @Override
@@ -460,4 +461,10 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public IntegerExpr visitIntegerExpr(YokohamaUnitParser.IntegerExprContext ctx) {
+        boolean positive = ctx.MINUS() == null;
+        String literal = ctx.Integer().getText();
+        return new IntegerExpr(positive, literal, getSpan(ctx));
+    }
 }

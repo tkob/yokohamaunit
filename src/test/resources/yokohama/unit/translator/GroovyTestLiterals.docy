@@ -1,0 +1,60 @@
+# Test: Use integer literals (int)
+
+Assert that `n + m` is `8` where n = 12 and m = -4.
+
+Assert that `n * m` is `0` where n = 12 and m = 0.
+
+Assert that `n` is `Integer.MAX_VALUE` where n = 2147483647.
+
+Assert that `n` is `Integer.MAX_VALUE` where n = 0x7fff_ffff.
+
+Assert that `n` is `Integer.MAX_VALUE` where n = 0177_7777_7777.
+
+Assert that `n` is `Integer.MAX_VALUE` where n =
+0b0111_1111_1111_1111_1111_1111_1111_1111.
+
+Assert that `n` is `Integer.MIN_VALUE` where n = -2147483648.
+
+Assert that `n` is `Integer.MIN_VALUE` where n = 0x8000_0000.
+
+Assert that `n` is `Integer.MIN_VALUE` where n = 0200_0000_0000.
+
+Assert that `n` is `Integer.MIN_VALUE` where n =
+0b1000_0000_0000_0000_0000_0000_0000_0000.
+
+Assert that `n` is `-1` where n = 0xffff_ffff.
+
+Assert that `n` is `-1` where n = 0377_7777_7777.
+
+Assert that `n` is `-1` where n = 0b1111_1111_1111_1111_1111_1111_1111_1111.
+
+# Test: Use integer literals (long)
+
+Assert that `n + m` is `8L` where n = 12L and m = -4L.
+
+Assert that `n * m` is `0L` where n = 12L and m = 0L.
+
+Assert that `n` is `Long.MAX_VALUE` where n = 9223372036854775807L.
+
+Assert that `n` is `Long.MAX_VALUE` where n = 0x7fff_ffff_ffff_ffffL.
+
+Assert that `n` is `Long.MAX_VALUE` where n = 07_7777_7777_7777_7777_7777L.
+
+Assert that `n` is `Long.MAX_VALUE` where n =
+0b0111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111L.
+
+Assert that `n` is `Long.MIN_VALUE` where n = -9223372036854775808L.
+
+Assert that `n` is `Long.MIN_VALUE` where n = 0x8000_0000_0000_0000L.
+
+Assert that `n` is `Long.MIN_VALUE` where n = 010_0000_0000_0000_0000_0000L.
+
+Assert that `n` is `Long.MIN_VALUE` where n =
+0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L.
+
+Assert that `n` is `-1L` where n = 0xffff_ffff_ffff_ffffL .
+
+Assert that `n` is `-1L` where n = 017_7777_7777_7777_7777_7777L.
+
+Assert that `n` is `-1L` where n =
+0b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111L.
