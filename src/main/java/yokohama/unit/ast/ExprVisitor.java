@@ -7,4 +7,5 @@ public interface ExprVisitor<T> {
     T visitIntegerExpr(IntegerExpr integerExpr);
     T visitFloatingPointExpr(FloatingPointExpr floatingPointExpr);
     T visitBooleanExpr(BooleanExpr booleanExpr);
+    T visitCharExpr(CharExpr charExpr);
 }

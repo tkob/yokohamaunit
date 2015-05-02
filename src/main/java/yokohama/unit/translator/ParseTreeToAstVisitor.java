@@ -14,6 +14,7 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
@@ -480,5 +481,10 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public BooleanExpr visitBooleanExpr(YokohamaUnitParser.BooleanExprContext ctx) {
         return new BooleanExpr(ctx.FALSE() == null, getSpan(ctx));
+    }
+
+    @Override
+    public CharExpr visitCharExpr(YokohamaUnitParser.CharExprContext ctx) {
+        return new CharExpr(ctx.Char().getText(), getSpan(ctx));
     }
 }

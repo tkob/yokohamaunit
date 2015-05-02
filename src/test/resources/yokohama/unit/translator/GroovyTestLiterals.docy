@@ -102,3 +102,17 @@ Assert `n` is `Double.parseDouble("1e137")` where n = 1e137.
 Assert `n` is `true` where n is true.
 
 Assert `n` is `false` where n is false.
+
+# Test: Use character literals
+
+Assert `n` is `'\\' as char` where n is '\\'.
+
+Assert `n` is `'\'' as char` where n is '\''.
+
+Assert `n` is `'\u03a9' as char` where n is '\u03a9'.
+
+Assert `n` is `Character.MAX_VALUE` where n is '\uFFFF'.
+
+Assert `n` is `'\177' as char` where n is '\177'.
+
+Assert `n` is `'™' as char` where n is '™'.

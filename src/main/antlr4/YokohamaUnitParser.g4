@@ -74,6 +74,7 @@ expr: Expr
     | integerExpr
     | floatingPointExpr
     | booleanExpr
+    | charExpr
     ;
 
 stubExpr: A_STUB_OF classType ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
@@ -94,3 +95,5 @@ integerExpr: MINUS? Integer ;
 floatingPointExpr: MINUS? FloatingPoint ;
 
 booleanExpr: TRUE | FALSE ;
+
+charExpr: Char ;

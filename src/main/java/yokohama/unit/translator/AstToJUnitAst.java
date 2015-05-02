@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -49,6 +50,7 @@ import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
+import yokohama.unit.ast_junit.CharLitExpr;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
@@ -450,7 +452,8 @@ public class AstToJUnitAst {
                                             integerExpr.getSpan()));
                         }),
                 floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName),
-                booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName));
+                booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName),
+                charExpr -> translateCharExpr(charExpr, varName, envVarName));
     }
 
     Stream<Statement> translateFloatingPointExpr(
@@ -521,6 +524,29 @@ public class AstToJUnitAst {
                                             Arrays.asList(booleanLitVar),
                                             Type.BOOLEAN.box()),
                                     booleanExpr.getSpan()));
+    }
+
+    Stream<Statement> translateCharExpr(
+            CharExpr charExpr, String varName, String envVarName) {
+        char charValue = charExpr.getValue();
+        Var charLitVar = new Var(genSym.generate("charLit"));
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.CHAR,
+                                    charLitVar.getName(),
+                                    new CharLitExpr(charValue),
+                                    charExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.CHAR.box(),
+                                    varName,
+                                    new InvokeStaticExpr(
+                                            ClassType.CHARACTER,
+                                            Collections.emptyList(),
+                                            "valueOf",
+                                            Arrays.asList(Type.CHAR),
+                                            Arrays.asList(charLitVar),
+                                            Type.CHAR.box()),
+                                    charExpr.getSpan()));
     }
 
     Type translateType(yokohama.unit.ast.Type type) {

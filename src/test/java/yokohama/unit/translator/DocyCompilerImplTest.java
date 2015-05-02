@@ -230,7 +230,13 @@ public class DocyCompilerImplTest {
                         "Use_floating_point_literals_double_8",
                         "Use_floating_point_literals_double_9",
                         "Use_boolean_literals_1",
-                        "Use_boolean_literals_2")),
+                        "Use_boolean_literals_2",
+                        "Use_character_literals_1",
+                        "Use_character_literals_2",
+                        "Use_character_literals_3",
+                        "Use_character_literals_4",
+                        "Use_character_literals_5",
+                        "Use_character_literals_6")),
     };
 
     @DataPoints

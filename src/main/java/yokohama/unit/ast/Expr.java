@@ -11,7 +11,8 @@ public interface Expr {
             Function<InvocationExpr, T> visitInvocationExpr_,
             Function<IntegerExpr, T> visitIntegerExpr_,
             Function<FloatingPointExpr, T> visitFloatingPointExpr_,
-            Function<BooleanExpr, T> visitBooleanExpr_
+            Function<BooleanExpr, T> visitBooleanExpr_,
+            Function<CharExpr, T> visitCharExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -37,6 +38,10 @@ public interface Expr {
             @Override
             public T visitBooleanExpr(BooleanExpr booleanExpr) {
                 return visitBooleanExpr_.apply(booleanExpr);
+            }
+            @Override
+            public T visitCharExpr(CharExpr charExpr) {
+                return visitCharExpr_.apply(charExpr);
             }
         });
     }
