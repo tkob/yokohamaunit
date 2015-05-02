@@ -137,6 +137,9 @@ public class YokohamaUnitLexerTest {
         new Fixture("0x0.0p1d", Arrays.asList("0x0.0p1d")),
         new Fixture("0x0.0p+1d", Arrays.asList("0x0.0p+1d")),
         new Fixture("0x0.0p-1d", Arrays.asList("0x0.0p-1d")),
+        // Character
+        new Fixture("'\\''", Arrays.asList("\\'")),
+        new Fixture("'a'", Arrays.asList("a")),
     };
 
     @Theory

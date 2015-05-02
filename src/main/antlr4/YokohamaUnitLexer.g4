@@ -52,6 +52,7 @@ FloatingPoint: FloatingPointLiteral -> mode(IN_THE_MIDDLE_OF_LINE) ;
 MINUS: '-' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
+OPENSINGLEQUOTE: '\'' -> skip, mode(IN_SINGLEQUOTE) ;
 NEW_LINE : ('\r'? '\n')+ -> skip ;
 WS : [ \t]+ -> skip ;
 
@@ -94,6 +95,7 @@ FloatingPoint2: FloatingPointLiteral -> type(FloatingPoint);
 MINUS2: '-' -> type(MINUS) ;
 OPENBACKTICK2: '`' -> skip, mode(IN_BACKTICK) ;
 OPENDOUBLEQUOTE2: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
+OPENSINGLEQUOTE2: '\'' -> skip, mode(IN_SINGLEQUOTE) ;
 NEW_LINE2 : ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 WS2 : [ \t]+ -> skip ;
 
@@ -119,6 +121,10 @@ NEW_LINE_PHASE: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 mode IN_DOUBLEQUOTE;
 Quoted: ~["]+ ;
 CLOSEDOUBLEQUOTE: '"' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
+
+mode IN_SINGLEQUOTE;
+Char: (~['\r\n] | '\\\'')+ ;
+CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_BACKTICK;
 Expr: ~[`]+ /*-> type(Expr)*/ ;
@@ -188,11 +194,11 @@ LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
 SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
 
 mode AFTER_CSV;
-OPENSINGLEQUOTE2: '\'' -> skip, mode(IN_FILE_NAME) ;
+OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
 SPACETABNEWLINE7: [ \t\r\n]+ -> skip ;
 
 mode AFTER_EXCEL;
-OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_BOOK_NAME) ;
+OPENSINGLEQUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
 SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
 
 mode IN_TABLE_NAME;
