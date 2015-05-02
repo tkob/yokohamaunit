@@ -44,6 +44,8 @@ AN_INSTANCE: 'an' [ \t\r\n]+ 'instance' -> mode(AFTER_AN_INSTANCE) ;
 AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> mode(AFTER_METHOD) ;
 NULL: 'null' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 NOTHING: 'nothing' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+TRUE: 'true' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+FALSE: 'false' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Identifier:	IdentStart IdentPart* -> mode(IN_THE_MIDDLE_OF_LINE) ;
 Integer: IntegerLiteral -> mode(IN_THE_MIDDLE_OF_LINE) ;
 FloatingPoint: FloatingPointLiteral -> mode(IN_THE_MIDDLE_OF_LINE) ;
@@ -84,6 +86,8 @@ AN_INSTANCE2: 'an' [ \t\r\n]+ 'instance' -> type(AN_INSTANCE), mode(AFTER_AN_INS
 AN_INVOCATION_OF2: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n] 'of' -> type(AN_INVOCATION_OF), mode(AFTER_METHOD) ;
 NULL2: 'null' -> type(NULL) ;
 NOTHING2: 'nothing' -> type(NOTHING) ;
+TRUE2: 'true' -> type(TRUE) ;
+FALSE2: 'false' -> type(FALSE) ;
 Identifier2 : IdentStart IdentPart* -> type(Identifier);
 Integer2: IntegerLiteral -> type(Integer);
 FloatingPoint2: FloatingPointLiteral -> type(FloatingPoint);
