@@ -140,6 +140,9 @@ public class YokohamaUnitLexerTest {
         // Character
         new Fixture("'\\''", Arrays.asList("\\'")),
         new Fixture("'a'", Arrays.asList("a")),
+        // String
+        new Fixture("\"\\\"\"", Arrays.asList("\\\"")),
+        new Fixture("\"abc\"", Arrays.asList("abc")),
     };
 
     @Theory

@@ -119,7 +119,7 @@ PhaseDescription: ~[\r\n]+ ;
 NEW_LINE_PHASE: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_DOUBLEQUOTE;
-Quoted: ~["]+ ;
+Str: (~["\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
 CLOSEDOUBLEQUOTE: '"' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 
 mode IN_SINGLEQUOTE;
