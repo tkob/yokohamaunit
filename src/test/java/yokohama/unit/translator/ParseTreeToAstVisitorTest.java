@@ -18,6 +18,8 @@ import org.junit.Test;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
+import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -26,16 +28,22 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
+import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsPredicate;
+import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.Phase;
+import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
+import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
@@ -647,6 +655,78 @@ public class ParseTreeToAstVisitorTest {
                         Arrays.asList(
                                 new QuotedExpr("this", Span.dummySpan()),
                                 new QuotedExpr("that", Span.dummySpan())),
+                        Span.dummySpan());
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitInvokeExpr() throws IOException {
+        YokohamaUnitParser.InvokeExprContext ctx =
+                parser("an invocation of `java.lang.String.endsWith(String)` on s with \"end\"").invokeExpr();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
+        InvocationExpr actual = instance.visitInvokeExpr(ctx);
+        InvocationExpr expected =
+                new InvocationExpr(
+                        new ClassType("java.lang.String", Span.dummySpan()),
+                        new MethodPattern(
+                                "endsWith",
+                                Arrays.asList(
+                                        new Type(
+                                                new ClassType("String", Span.dummySpan()),
+                                                0,
+                                                Span.dummySpan())
+                                ),
+                                false,
+                                Span.dummySpan()),
+                        Optional.of(new Ident("s", Span.dummySpan())),
+                        Arrays.asList(new StringExpr("end", Span.dummySpan())),
+                        Span.dummySpan());
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitInvokeExpr2() throws IOException {
+        YokohamaUnitParser.InvokeExprContext ctx =
+                parser("an invocation of `String.isEmpty()` on s").invokeExpr();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
+        InvocationExpr actual = instance.visitInvokeExpr(ctx);
+        InvocationExpr expected =
+                new InvocationExpr(
+                        new ClassType("String", Span.dummySpan()),
+                        new MethodPattern(
+                                "isEmpty",
+                                Arrays.asList(),
+                                false,
+                                Span.dummySpan()),
+                        Optional.of(new Ident("s", Span.dummySpan())),
+                        Arrays.asList(),
+                        Span.dummySpan());
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testVisitInvokeExpr3() throws IOException {
+        YokohamaUnitParser.InvokeExprContext ctx =
+                parser("an invocation of `String.valueOf(boolean)` with false").invokeExpr();
+        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
+        InvocationExpr actual = instance.visitInvokeExpr(ctx);
+        InvocationExpr expected =
+                new InvocationExpr(
+                        new ClassType("String", Span.dummySpan()),
+                        new MethodPattern(
+                                "valueOf",
+                                Arrays.asList(
+                                        new Type(
+                                                new PrimitiveType(
+                                                        Kind.BOOLEAN,
+                                                        Span.dummySpan()),
+                                                0,
+                                                Span.dummySpan())
+                                ),
+                                false,
+                                Span.dummySpan()),
+                        Optional.empty(),
+                        Arrays.asList(new BooleanExpr(false, Span.dummySpan())),
                         Span.dummySpan());
         assertThat(actual, is(expected));
     }

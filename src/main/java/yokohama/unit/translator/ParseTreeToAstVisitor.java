@@ -58,6 +58,7 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
+import yokohama.unit.util.Optionals;
 import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
@@ -458,12 +459,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public InvocationExpr visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        ClassType classType = visitClassType(ctx.classType());
+        MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
+        Optional<Ident> receiver = Optionals.fromNullable(ctx.Identifier())
+                        .map(node -> new Ident(node.getText(), nodeSpan(node)));
+        List<Expr> args = ctx.argumentExpr().stream()
+                .map(this::visitArgumentExpr)
+                .collect(Collectors.toList());
+        return new InvocationExpr(classType, methodPattern, receiver, args, getSpan(ctx));
     }
 
     @Override
     public Expr visitArgumentExpr(YokohamaUnitParser.ArgumentExprContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return (Expr)visitChildren(ctx);
     }
 
     @Override
