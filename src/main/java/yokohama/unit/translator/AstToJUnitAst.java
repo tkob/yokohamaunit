@@ -396,19 +396,13 @@ public class AstToJUnitAst {
                 quotedExpr ->
                         expressionStrategy.eval(
                                 varName, quotedExpr, expectedType, envVarName).stream(),
-                stubExpr -> {
-                    Span classToStubSpan = stubExpr.getClassToStub().getSpan();
-                    String classToStubName =
-                            lookupClassName(
-                                    stubExpr.getClassToStub().getName(),
-                                    classToStubSpan);
-                    return mockStrategy.stub(
+                stubExpr ->
+                        mockStrategy.stub(
                             varName,
                             stubExpr,
                             this,
                             envVarName,
-                            classResolver).stream();
-                },
+                            classResolver).stream(),
                 invocationExpr -> {
                     throw new UnsupportedOperationException("Not supported yet.");
                 },
@@ -510,46 +504,46 @@ public class AstToJUnitAst {
             BooleanExpr booleanExpr, String varName, String envVarName) {
         boolean booleanValue = booleanExpr.getValue();
         Var booleanLitVar = new Var(genSym.generate("booleanLit"));
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
-                                    Type.BOOLEAN,
-                                    booleanLitVar.getName(),
-                                    new BooleanLitExpr(booleanValue),
-                                    booleanExpr.getSpan()),
-                            new VarInitStatement(
-                                    Type.BOOLEAN.box(),
-                                    varName,
-                                    new InvokeStaticExpr(
-                                            ClassType.BOOLEAN,
-                                            Collections.emptyList(),
-                                            "valueOf",
-                                            Arrays.asList(Type.BOOLEAN),
-                                            Arrays.asList(booleanLitVar),
-                                            Type.BOOLEAN.box()),
-                                    booleanExpr.getSpan()));
+        return Stream.<Statement>of(
+                new VarInitStatement(
+                        Type.BOOLEAN,
+                        booleanLitVar.getName(),
+                        new BooleanLitExpr(booleanValue),
+                        booleanExpr.getSpan()),
+                new VarInitStatement(
+                        Type.BOOLEAN.box(),
+                        varName,
+                        new InvokeStaticExpr(
+                                ClassType.BOOLEAN,
+                                Collections.emptyList(),
+                                "valueOf",
+                                Arrays.asList(Type.BOOLEAN),
+                                Arrays.asList(booleanLitVar),
+                                Type.BOOLEAN.box()),
+                        booleanExpr.getSpan()));
     }
 
     Stream<Statement> translateCharExpr(
             CharExpr charExpr, String varName, String envVarName) {
         char charValue = charExpr.getValue();
         Var charLitVar = new Var(genSym.generate("charLit"));
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
-                                    Type.CHAR,
-                                    charLitVar.getName(),
-                                    new CharLitExpr(charValue),
-                                    charExpr.getSpan()),
-                            new VarInitStatement(
-                                    Type.CHAR.box(),
-                                    varName,
-                                    new InvokeStaticExpr(
-                                            ClassType.CHARACTER,
-                                            Collections.emptyList(),
-                                            "valueOf",
-                                            Arrays.asList(Type.CHAR),
-                                            Arrays.asList(charLitVar),
-                                            Type.CHAR.box()),
-                                    charExpr.getSpan()));
+        return Stream.<Statement>of(
+                new VarInitStatement(
+                        Type.CHAR,
+                        charLitVar.getName(),
+                        new CharLitExpr(charValue),
+                        charExpr.getSpan()),
+                new VarInitStatement(
+                        Type.CHAR.box(),
+                        varName,
+                        new InvokeStaticExpr(
+                                ClassType.CHARACTER,
+                                Collections.emptyList(),
+                                "valueOf",
+                                Arrays.asList(Type.CHAR),
+                                Arrays.asList(charLitVar),
+                                Type.CHAR.box()),
+                        charExpr.getSpan()));
     }
 
     Stream<Statement> translateStringExpr(
