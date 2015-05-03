@@ -13,4 +13,8 @@ public class Optionals {
     public static <T> Stream<T> toStream(Optional<T> optional) {
         return optional.isPresent() ? Stream.of(optional.get()) : Stream.empty();
     }
+
+    public static <T> Optional<T> fromNullable(T value) {
+        return value == null ? Optional.empty() : Optional.of(value);
+    }
 }
