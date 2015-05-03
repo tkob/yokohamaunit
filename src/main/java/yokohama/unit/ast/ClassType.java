@@ -8,7 +8,7 @@ import yokohama.unit.util.ClassResolver;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class ClassType implements NonArrayType {
-    private String name;
+    private String name; // may be fully qualified name or abbreviation
     private Span span;
 
     public Class<?> toClass(ClassResolver classResolver) {
