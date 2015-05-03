@@ -28,6 +28,7 @@ import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
+import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -456,12 +457,12 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Object visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
+    public InvocationExpr visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object visitReceiver(YokohamaUnitParser.ReceiverContext ctx) {
+    public Expr visitArgumentExpr(YokohamaUnitParser.ArgumentExprContext ctx) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

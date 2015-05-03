@@ -88,8 +88,17 @@ nonArrayType: primitiveType | classType ;
 primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
-invokeExpr: AN_INVOCATION_OF receiver DOT methodPattern ;
-receiver: Identifier (DOT Identifier)* ;
+invokeExpr: AN_INVOCATION_OF classType DOT methodPattern
+            ( ON Identifier )?
+            ( WITH argumentExpr (COMMA argumentExpr)* )? ;
+
+argumentExpr: Expr
+            | integerExpr
+            | floatingPointExpr
+            | booleanExpr
+            | charExpr
+            | stringExpr
+            ;
 
 integerExpr: MINUS? Integer ;
 
