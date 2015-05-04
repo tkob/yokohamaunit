@@ -404,7 +404,7 @@ public class AstToJUnitAst {
                 quotedExpr -> {
                     Type returnType = Type.OBJECT;
                     Stream<Statement> statements = expressionStrategy.eval(
-                            exprVar.getName(), quotedExpr, expectedType, envVarName).stream();
+                            exprVar.getName(), quotedExpr, Type.fromClass(expectedType).box().toClass(), envVarName).stream();
                     return new Pair<>(returnType, statements);
                 },
                 stubExpr -> {
