@@ -23,4 +23,13 @@ public class Pair<T, U> {
                 .mapToObj(i -> new Pair<T, U>(firsts.get(i), seconds.get(i)))
                 .collect(Collectors.toList());
     }
+
+    public static <T, U> Pair<List<T>, List<U>> unzip(List<Pair<T, U>> list) {
+        List<T> firsts =
+                list.stream().map(Pair::getFirst).collect(Collectors.toList());
+        List<U> seconds =
+                list.stream().map(Pair::getSecond).collect(Collectors.toList());
+
+        return new Pair<>(firsts, seconds);
+    }
 }
