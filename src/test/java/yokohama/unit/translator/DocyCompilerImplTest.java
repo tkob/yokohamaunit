@@ -250,7 +250,10 @@ public class DocyCompilerImplTest {
                         "invokevirtual_with_no_argument_4",
                         "invokevirtual_with_no_argument_5",
                         "List_remove_is_overloaded_on_arguments_1",
-                        "List_remove_is_overloaded_on_arguments_2")),
+                        "List_remove_is_overloaded_on_arguments_2",
+                        "invokestatic_with_no_argument_1",
+                        "Integer_valueOf_is_overloaded_1",
+                        "Integer_valueOf_is_overloaded_2")),
     };
 
     @DataPoints

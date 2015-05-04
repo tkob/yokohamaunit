@@ -552,7 +552,18 @@ public class AstToJUnitAst {
                             Span.dummySpan())));
         } else {
             // invokestatic
-            throw new UnsupportedOperationException();
+            invocation = Stream.of(
+                    new VarInitStatement(
+                            returnType,
+                            varName,
+                            new InvokeStaticExpr(
+                                    ClassType.of(classType, classResolver),
+                                    Collections.emptyList(),
+                                    methodName,
+                                    argTypes.stream().map(type -> Type.of(type, classResolver)).collect(Collectors.toList()),
+                                    argVars,
+                                    returnType),
+                            Span.dummySpan()));
         }
 
         return new Pair<>(returnType, Stream.concat(setupStatements,invocation));

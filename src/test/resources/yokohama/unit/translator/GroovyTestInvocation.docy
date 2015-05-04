@@ -1,4 +1,5 @@
 *[ArrayList]: java.util.ArrayList
+*[Collections]: java.util.Collections
 *[List]: java.util.List
 
 # Test: invokevirtual with no argument
@@ -25,3 +26,15 @@ invocation of `List.remove(int)` on list with 2.
 
 Assert `hit` is `true` where list is `[10, 20, 30, 2]` and hit is an invocation
 of `List.remove(Object)` on list with 2.
+
+# Test: invokestatic with no argument
+
+Assert `nil` is `[]` where nil is an invocation of `Collections.emptyList()`.
+
+# Test: Integer.valueOf is overloaded
+
+Assert `intValue` is `123` where i is `123 as Object` and intValue is an
+invocation of `Integer.valueOf(int)` with `i`.
+
+Assert `intValue` is `123` where i is `"123" as Object` and intValue is an
+invocation of `Integer.valueOf(String)` with `i`.
