@@ -1,0 +1,19 @@
+*[ArrayList]: java.util.ArrayList
+*[List]: java.util.List
+
+# Test: invokevirtual with no argument
+
+Assert `len` is `5` where s is `"Hello"` and len is an invocation of
+ `String.length()` on s.
+
+Assert `intValue` is `5` where n is `5` and intValue is an invocation of
+`Integer.intValue()` on n.
+
+Assert `intValue` is `5` where n is `5` and intValue is an invocation of
+`Number.intValue()` on n.
+
+Assert `size` is `0` where list is `new ArrayList()` and size is an
+invocation of `ArrayList.size()` on list.
+
+Assert `size` is `0` where list is `new ArrayList()` and size is an
+invocation of `List.size()` on list.

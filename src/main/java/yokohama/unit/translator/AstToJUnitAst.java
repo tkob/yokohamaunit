@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -34,16 +35,17 @@ import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
+import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
+import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
 import yokohama.unit.ast.Phase;
-import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.StringExpr;
-import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
@@ -60,11 +62,12 @@ import yokohama.unit.ast_junit.EqualToMatcherExpr;
 import yokohama.unit.ast_junit.FloatLitExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IntLitExpr;
+import yokohama.unit.ast_junit.InvokeExpr;
+import yokohama.unit.ast_junit.InvokeExpr.Instruction;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
-import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
@@ -76,9 +79,13 @@ import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
+import yokohama.unit.position.Position;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
+import yokohama.unit.util.Lists;
 import yokohama.unit.util.Optionals;
+import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
 @AllArgsConstructor
@@ -392,65 +399,185 @@ public class AstToJUnitAst {
             String varName,
             Class<?> expectedType,
             String envVarName) {
-        return expr.accept(
-                quotedExpr ->
-                        expressionStrategy.eval(
-                                varName, quotedExpr, expectedType, envVarName).stream(),
-                stubExpr ->
-                        mockStrategy.stub(
-                            varName,
-                            stubExpr,
-                            this,
-                            envVarName,
-                            classResolver).stream(),
-                invocationExpr -> {
-                    throw new UnsupportedOperationException("Not supported yet.");
+        Var exprVar = new Var(genSym.generate("expr"));
+        Pair<Type, Stream<Statement>> returnTypeAndStatements = expr.accept(
+                quotedExpr -> {
+                    Type returnType = Type.OBJECT;
+                    Stream<Statement> statements = expressionStrategy.eval(
+                            exprVar.getName(), quotedExpr, expectedType, envVarName).stream();
+                    return new Pair<>(returnType, statements);
                 },
-                integerExpr -> integerExpr.match(
-                        intValue -> {
-                            Var intLitVar = new Var(genSym.generate("intLit"));
-                            return Stream.<Statement>of(
-                                    new VarInitStatement(
-                                            Type.INT,
-                                            intLitVar.getName(),
-                                            new IntLitExpr(intValue),
-                                            integerExpr.getSpan()),
-                                    new VarInitStatement(
-                                            Type.INT.box(),
-                                            varName,
-                                            new InvokeStaticExpr(
-                                                    ClassType.INTEGER,
-                                                    Collections.emptyList(),
-                                                    "valueOf",
-                                                    Arrays.asList(Type.INT),
-                                                    Arrays.asList(intLitVar),
-                                                    Type.INT.box()),
-                                            integerExpr.getSpan()));
-                        },
-                        longValue -> {
-                            Var longLitVar = new Var(genSym.generate("longLit"));
-                            return Stream.<Statement>of(
-                                    new VarInitStatement(
-                                            Type.LONG,
-                                            longLitVar.getName(),
-                                            new LongLitExpr(longValue),
-                                            integerExpr.getSpan()),
-                                    new VarInitStatement(
-                                            Type.LONG.box(),
-                                            varName,
-                                            new InvokeStaticExpr(
-                                                    ClassType.LONG,
-                                                    Collections.emptyList(),
-                                                    "valueOf",
-                                                    Arrays.asList(Type.LONG),
-                                                    Arrays.asList(longLitVar),
-                                                    Type.LONG.box()),
-                                            integerExpr.getSpan()));
-                        }),
-                floatingPointExpr -> translateFloatingPointExpr(floatingPointExpr, varName, envVarName),
-                booleanExpr -> translateBooleanExpr(booleanExpr, varName, envVarName),
-                charExpr -> translateCharExpr(charExpr, varName, envVarName),
-                stringExpr -> translateStringExpr(stringExpr, varName, envVarName));
+                stubExpr -> {
+                    Type returnType = Type.of(
+                            new yokohama.unit.ast.Type(stubExpr.getClassToStub(), 0, Span.dummySpan()),
+                            classResolver);
+                    Stream<Statement> statements = mockStrategy.stub(
+                            exprVar.getName(), stubExpr, this, envVarName, classResolver).stream();
+                    return new Pair<>(returnType, statements);
+                },
+                invocationExpr -> {
+                    return translateInvocationExpr(
+                            invocationExpr, exprVar.getName(), envVarName);
+                },
+                integerExpr -> {
+                    Type returnType = integerExpr.match(
+                            intValue -> Type.INT,
+                            longValue -> Type.LONG);
+                    Stream<Statement> statements = integerExpr.match(
+                            intValue -> {
+                                return Stream.<Statement>of(
+                                        new VarInitStatement(
+                                                Type.INT,
+                                                exprVar.getName(),
+                                                new IntLitExpr(intValue),
+                                                integerExpr.getSpan()));
+                            },
+                            longValue -> {
+                                return Stream.<Statement>of(
+                                        new VarInitStatement(
+                                                Type.LONG,
+                                                exprVar.getName(),
+                                                new LongLitExpr(longValue),
+                                                integerExpr.getSpan()));
+                            });
+                    return new Pair<>(returnType, statements);
+                },
+                floatingPointExpr -> {
+                    Type returnType = floatingPointExpr.match(
+                            floatValue -> Type.FLOAT,
+                            doubleValue -> Type.DOUBLE);
+                    Stream<Statement> statements =
+                            translateFloatingPointExpr(floatingPointExpr, exprVar.getName(), envVarName);
+                    return new Pair<>(returnType, statements);
+                },
+                booleanExpr -> {
+                    Type returnType = Type.BOOLEAN;
+                    Stream<Statement> statements =
+                            translateBooleanExpr(booleanExpr, exprVar.getName(), envVarName);
+                    return new Pair<>(returnType, statements);
+                },
+                charExpr -> {
+                    Type returnType = Type.CHAR;
+                    Stream<Statement> statements =
+                            translateCharExpr(charExpr, exprVar.getName(), envVarName);
+                    return new Pair<>(returnType, statements);
+                },
+                stringExpr -> {
+                    Type returnType = Type.STRING;
+                    Stream<Statement> statements =
+                            translateStringExpr(stringExpr, exprVar.getName(), envVarName);
+                    return new Pair<>(returnType, statements);
+                });
+
+        // box or unbox if needed
+        Stream<Statement> boxing =
+                boxOrUnbox(
+                        Type.fromClass(expectedType),
+                        varName,
+                        returnTypeAndStatements.getFirst(),
+                        exprVar);
+
+        return Stream.concat(returnTypeAndStatements.getSecond(), boxing);
+    }
+
+    Pair<Type, Stream<Statement>> translateInvocationExpr(
+            InvocationExpr invocationExpr,
+            String varName,
+            String envVarName) {
+        yokohama.unit.ast.ClassType classType = invocationExpr.getClassType();
+        Class<?> clazz = classType.toClass(classResolver);
+        MethodPattern methodPattern = invocationExpr.getMethodPattern();
+        String methodName = methodPattern.getName();
+        List<yokohama.unit.ast.Type> argTypes = methodPattern.getArgumentTypes();
+        boolean isVarArg = methodPattern.isVarArg();
+        Optional<Ident> receiver = invocationExpr.getReceiver();
+        List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();
+
+        Type returnType = getReturnType(classType, methodName, argTypes, isVarArg);
+
+        List<Pair<Var, Stream<Statement>>> setupArgs;
+        if (isVarArg) {
+            // extend argument types if args are variable length
+            List<yokohama.unit.ast.Type> extendedArgTypes = isVarArg
+                    ? ListUtils.union(argTypes,
+                            Lists.repeat(Lists.last(argTypes),
+                                    args.size() - argTypes.size()))
+                    : argTypes;
+            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
+                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
+                            extendedArgTypes, args);
+            throw new UnsupportedOperationException();
+        } else {
+            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
+                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
+                            argTypes, args);
+            setupArgs = pairs.stream().map(pair -> pair.map((t, arg) -> {
+                        // evaluate actual args and coerce to parameter types
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Type paramType = Type.of(t, classResolver);
+                        Stream<Statement> expr = translateExpr(
+                                arg, argVar.getName(), paramType.toClass(), envVarName);
+                        return new Pair<>(argVar, expr);
+                    })).collect(Collectors.toList());
+        }
+        List<Var> argVars = Pair.unzip(setupArgs).getFirst();
+        Stream<Statement> setupStatements =
+                setupArgs.stream().flatMap(Pair::getSecond);
+
+        Stream<Statement> invocation;
+        if (receiver.isPresent()) {
+            // invokevirtual
+            Type receiverType = Type.fromClass(clazz);
+            Var receiverVar = new Var(genSym.generate("receiver"));
+            Stream<Statement> getReceiver =
+                    expressionStrategy.eval(
+                            receiverVar.getName(),
+                            new QuotedExpr(receiver.get().getName(), Span.dummySpan()),
+                            receiverType.toClass(),
+                            envVarName)
+                            .stream();
+            invocation = Stream.concat(getReceiver, Stream.of(
+                    new VarInitStatement(
+                            returnType,
+                            varName,
+                            new InvokeExpr(
+                                    clazz.isInterface()
+                                            ? Instruction.INTERFACE
+                                            : Instruction.VIRTUAL,
+                                    receiverVar,
+                                    methodName,
+                                    argTypes.stream().map(type -> Type.of(type, classResolver)).collect(Collectors.toList()),
+                                    argVars,
+                                    returnType),
+                            Span.dummySpan())));
+        } else {
+            // invokestatic
+            throw new UnsupportedOperationException();
+        }
+
+        return new Pair<>(returnType, Stream.concat(setupStatements,invocation));
+    }
+
+    @SneakyThrows(NoSuchMethodException.class)
+    public Type getReturnType(
+            yokohama.unit.ast.ClassType classType,
+            String methodName,
+            List<yokohama.unit.ast.Type> argumentTypes,
+            boolean isVarArg) {
+        Class<?> clazz = classType.toClass(classResolver);
+        java.lang.reflect.Method method = clazz.getMethod(
+                methodName,
+                (isVarArg
+                        ? ListUtils.union(
+                                argumentTypes.subList(0, argumentTypes.size() - 1),
+                                Arrays.asList(
+                                        argumentTypes.get(argumentTypes.size() - 1).toArray())) 
+                        : argumentTypes).stream()
+                        .map(type -> Type.of(type, classResolver))
+                        .map(Type::toClass)
+                        .collect(Collectors.toList())
+                        .toArray(new Class[]{}));
+        return Type.fromClass(method.getReturnType());
     }
 
     Stream<Statement> translateFloatingPointExpr(
@@ -459,43 +586,19 @@ public class AstToJUnitAst {
             String envVarName) {
         return floatingPointExpr.match(
                 floatValue -> {
-                    Var floatLitVar = new Var(genSym.generate("floatLit"));
                     return Stream.<Statement>of(
                             new VarInitStatement(
                                     Type.FLOAT,
-                                    floatLitVar.getName(),
-                                    new FloatLitExpr(floatValue),
-                                    floatingPointExpr.getSpan()),
-                            new VarInitStatement(
-                                    Type.FLOAT.box(),
                                     varName,
-                                    new InvokeStaticExpr(
-                                            ClassType.FLOAT,
-                                            Collections.emptyList(),
-                                            "valueOf",
-                                            Arrays.asList(Type.FLOAT),
-                                            Arrays.asList(floatLitVar),
-                                            Type.FLOAT.box()),
+                                    new FloatLitExpr(floatValue),
                                     floatingPointExpr.getSpan()));
                 },
                 doubleValue -> {
-                    Var doubleLitVar = new Var(genSym.generate("doubleLit"));
                     return Stream.<Statement>of(
                             new VarInitStatement(
                                     Type.DOUBLE,
-                                    doubleLitVar.getName(),
-                                    new DoubleLitExpr(doubleValue),
-                                    floatingPointExpr.getSpan()),
-                            new VarInitStatement(
-                                    Type.DOUBLE.box(),
                                     varName,
-                                    new InvokeStaticExpr(
-                                            ClassType.DOUBLE,
-                                            Collections.emptyList(),
-                                            "valueOf",
-                                            Arrays.asList(Type.DOUBLE),
-                                            Arrays.asList(doubleLitVar),
-                                            Type.DOUBLE.box()),
+                                    new DoubleLitExpr(doubleValue),
                                     floatingPointExpr.getSpan()));
                 });
     }
@@ -503,46 +606,22 @@ public class AstToJUnitAst {
     Stream<Statement> translateBooleanExpr(
             BooleanExpr booleanExpr, String varName, String envVarName) {
         boolean booleanValue = booleanExpr.getValue();
-        Var booleanLitVar = new Var(genSym.generate("booleanLit"));
         return Stream.<Statement>of(
                 new VarInitStatement(
                         Type.BOOLEAN,
-                        booleanLitVar.getName(),
-                        new BooleanLitExpr(booleanValue),
-                        booleanExpr.getSpan()),
-                new VarInitStatement(
-                        Type.BOOLEAN.box(),
                         varName,
-                        new InvokeStaticExpr(
-                                ClassType.BOOLEAN,
-                                Collections.emptyList(),
-                                "valueOf",
-                                Arrays.asList(Type.BOOLEAN),
-                                Arrays.asList(booleanLitVar),
-                                Type.BOOLEAN.box()),
+                        new BooleanLitExpr(booleanValue),
                         booleanExpr.getSpan()));
     }
 
     Stream<Statement> translateCharExpr(
             CharExpr charExpr, String varName, String envVarName) {
         char charValue = charExpr.getValue();
-        Var charLitVar = new Var(genSym.generate("charLit"));
         return Stream.<Statement>of(
                 new VarInitStatement(
                         Type.CHAR,
-                        charLitVar.getName(),
-                        new CharLitExpr(charValue),
-                        charExpr.getSpan()),
-                new VarInitStatement(
-                        Type.CHAR.box(),
                         varName,
-                        new InvokeStaticExpr(
-                                ClassType.CHARACTER,
-                                Collections.emptyList(),
-                                "valueOf",
-                                Arrays.asList(Type.CHAR),
-                                Arrays.asList(charLitVar),
-                                Type.CHAR.box()),
+                        new CharLitExpr(charValue),
                         charExpr.getSpan()));
     }
 
@@ -555,6 +634,117 @@ public class AstToJUnitAst {
                         varName,
                         new StrLitExpr(strValue),
                         stringExpr.getSpan()));
+    }
+
+    public Stream<Statement> boxOrUnbox(
+            Type toType, String toVarName, Type fromType, Var fromVar) {
+        return fromType.<Stream<Statement>>matchPrimitiveOrNot(
+                primitiveType -> {
+                    return fromPrimitive(
+                            toType, toVarName, primitiveType, fromVar);
+                },
+                nonPrimitiveType -> {
+                    return fromNonPrimtive(toType, toVarName, fromVar);
+                });
+    }
+    
+    private Stream<Statement> fromPrimitive(
+            Type toType, String toVarName, PrimitiveType fromType, Var fromVar) {
+        return toType.<Stream<Statement>>matchPrimitiveOrNot(
+                primitiveType -> {
+                    return Stream.of(
+                            new VarInitStatement(
+                                    toType,
+                                    toVarName,
+                                    new VarExpr(fromVar.getName()),
+                                    Span.dummySpan()));
+                },
+                nonPrimitiveType -> {
+                    return Stream.of(new VarInitStatement(
+                            nonPrimitiveType,
+                            toVarName,
+                            new InvokeStaticExpr(
+                                    fromType.box(),
+                                    Arrays.asList(),
+                                    "valueOf",
+                                    Arrays.asList(fromType.toType()),
+                                    Arrays.asList(fromVar),
+                                    fromType.box().toType()),
+                            Span.dummySpan()));
+
+                });
+    }
+
+    private Stream<Statement> fromNonPrimtive(
+            Type toType, String toVarName, Var fromVar) {
+        // precondition: fromVar is not primitive
+        return toType.<Stream<Statement>>matchPrimitiveOrNot(
+                primitiveType -> {
+                    Var boxVar = new Var(genSym.generate("box"));
+                    Type boxType;
+                    String unboxMethodName;
+                    switch (primitiveType.getKind()) {
+                        case BOOLEAN:
+                            boxType = primitiveType.box().toType();
+                            unboxMethodName = "booleanValue";
+                            break;
+                        case BYTE:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "byteValue";
+                            break;
+                        case SHORT:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "shortValue";
+                            break;
+                        case INT:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "intValue";
+                            break;
+                        case LONG:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "longValue";
+                            break;
+                        case CHAR:
+                            boxType = primitiveType.box().toType();
+                            unboxMethodName = "charValue";
+                            break;
+                        case FLOAT:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "floatValue";
+                            break;
+                        case DOUBLE:
+                            boxType = Type.fromClass(Number.class);
+                            unboxMethodName = "doubleValue";
+                            break;
+                        default:
+                            throw new RuntimeException("should not reach here");
+                    }
+                    return Stream.of(
+                            new VarInitStatement(
+                                    boxType,
+                                    boxVar.getName(),
+                                    new VarExpr(fromVar.getName()),
+                                    Span.dummySpan()),
+                            new VarInitStatement(
+                                    toType,
+                                    toVarName,
+                                    new InvokeExpr(
+                                            Instruction.VIRTUAL,
+                                            fromVar,
+                                            unboxMethodName,
+                                            Collections.emptyList(),
+                                            Collections.emptyList(),
+                                            toType),
+                                    Span.dummySpan()));
+                },
+                nonPrimitiveType -> {
+                    return Stream.of(
+                            new VarInitStatement(
+                                    nonPrimitiveType,
+                                    toVarName,
+                                    new VarExpr(fromVar.getName()),
+                                    Span.dummySpan()));
+                });
     }
 
     Type translateType(yokohama.unit.ast.Type type) {

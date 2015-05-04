@@ -240,6 +240,15 @@ public class DocyCompilerImplTest {
                         "Use_string_literals_1",
                         "Use_string_literals_2",
                         "Use_string_literals_3")),
+        new Fixture(
+                "GroovyTestInvocation.docy",
+                new GroovyExpressionStrategyFactory(),
+                Arrays.asList(
+                        "invokevirtual_with_no_argument_1",
+                        "invokevirtual_with_no_argument_2",
+                        "invokevirtual_with_no_argument_3",
+                        "invokevirtual_with_no_argument_4",
+                        "invokevirtual_with_no_argument_5")),
     };
 
     @DataPoints
