@@ -1,4 +1,5 @@
 *[Lists]: yokohama.unit.util.Lists
+*[Optional]: java.util.Optional
 
 # Test: Tests for Lists.repeat
 
@@ -7,3 +8,17 @@ Assert that `Lists.repeat("hello", 0)` is `[]`.
 Assert that `Lists.repeat("hello", 1)` is `["hello"]`.
 
 Assert that `Lists.repeat("hello", 2)` is `["hello", "hello"]`.
+
+# Test: Tests for Lists.last and Lists.lastOpt
+
+Assert that `Lists.last([])` throws an instance of `IndexOutOfBoundsException`.
+
+Assert that `Lists.last(["a"])` is `"a"`.
+
+Assert that `Lists.last(["a", "b"])` is `"b"`.
+
+Assert that `Lists.lastOpt([])` is `Optional.empty()`.
+
+Assert that `Lists.lastOpt(["a"])` is `Optional.of("a")`.
+
+Assert that `Lists.lastOpt(["a", "b"])` is `Optional.of("b")`.
