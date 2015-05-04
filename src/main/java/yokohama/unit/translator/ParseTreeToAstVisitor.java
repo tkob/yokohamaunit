@@ -471,7 +471,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Expr visitArgumentExpr(YokohamaUnitParser.ArgumentExprContext ctx) {
-        return (Expr)visitChildren(ctx);
+        return ctx.Expr() != null
+                ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
+                :(Expr)visitChildren(ctx);
     }
 
     @Override
