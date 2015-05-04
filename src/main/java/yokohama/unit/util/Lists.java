@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public class Lists {
     public static <T> List<T> repeat(T obj, int times) {
-        Object[] array = new Object[times];
+        @SuppressWarnings("unchecked") T[] array = (T[])new Object[times];
         Arrays.fill(array, obj);
-        return Arrays.asList((T[])array);
+        return Arrays.asList(array);
     }
 
     public static <T> T last(List<T> list) {
