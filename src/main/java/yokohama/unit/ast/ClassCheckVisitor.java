@@ -135,9 +135,7 @@ class ClassExprCheckVisitor {
         return expr.accept(
                 quotedExpr -> Stream.<ErrorMessage>empty(),
                 stubExpr -> visitStubExpr(stubExpr),
-                invocationExpr -> {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                },
+                invocationExpr -> visitInvocationExpr(invocationExpr),
                 integerExpr -> Stream.<ErrorMessage>empty(),
                 floatingPointExpr -> Stream.<ErrorMessage>empty(),
                 booleanExpr -> Stream.<ErrorMessage>empty(),
@@ -149,6 +147,14 @@ class ClassExprCheckVisitor {
         return Stream.concat(
                 visitClassType(stubExpr.getClassToStub()),
                 stubExpr.getBehavior().stream().flatMap(this::visitBehavior));
+    }
+
+    private Stream<ErrorMessage> visitInvocationExpr(InvocationExpr invocationExpr) {
+        return Stream.concat(
+                visitClassType(invocationExpr.getClassType()),
+                Stream.concat(
+                        visitMethodPattern(invocationExpr.getMethodPattern()),
+                        invocationExpr.getArgs().stream().flatMap(this::visitExpr)));
     }
 
     private Stream<ErrorMessage> visitBehavior(StubBehavior behavior) {
