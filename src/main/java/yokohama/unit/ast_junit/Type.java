@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,17 @@ public class Type {
         return dims == 0 && nonArrayType.accept(
                 primitiveType -> true,
                 classType -> false);
+    }
+
+    public <T> T matchPrimitiveOrNot(
+            Function<PrimitiveType, T> primf, Function<Type, T> nonprimf) {
+        if (dims > 0) {
+            return nonprimf.apply(this);
+        } else {
+            return nonArrayType.accept(
+                primitiveType -> primf.apply(primitiveType),
+                classType -> nonprimf.apply(this));
+        }
     }
 
     public Type toArray() {
