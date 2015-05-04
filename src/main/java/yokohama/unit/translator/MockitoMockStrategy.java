@@ -121,7 +121,7 @@ public class MockitoMockStrategy implements MockStrategy {
         Stream<Statement> returned = astToJUnitAst.translateExpr(
                 behavior.getToBeReturned(),
                 returnedVarName,
-                returnType.toClass(),
+                returnType.box().toClass(),
                 envVarName);
 
         Stream<Type> argTypes;
