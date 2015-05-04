@@ -48,6 +48,12 @@ public class Type {
                 classType -> false);
     }
 
+    public boolean isInterface() {
+        return dims == 0 && nonArrayType.accept(
+                primitiveType -> false,
+                classType -> classType.isInterface());
+    }
+
     public <T> T matchPrimitiveOrNot(
             Function<PrimitiveType, T> primf, Function<Type, T> nonprimf) {
         if (dims > 0) {

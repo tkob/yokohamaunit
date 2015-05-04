@@ -27,6 +27,10 @@ public class ClassType implements NonArrayType {
         return clazz.getCanonicalName();
     }
 
+    public boolean isInterface() {
+        return clazz.isInterface();
+    }
+
     public Type toType() {
         return new Type(this, 0);
     }
