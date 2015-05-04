@@ -248,7 +248,9 @@ public class DocyCompilerImplTest {
                         "invokevirtual_with_no_argument_2",
                         "invokevirtual_with_no_argument_3",
                         "invokevirtual_with_no_argument_4",
-                        "invokevirtual_with_no_argument_5")),
+                        "invokevirtual_with_no_argument_5",
+                        "List_remove_is_overloaded_on_arguments_1",
+                        "List_remove_is_overloaded_on_arguments_2")),
     };
 
     @DataPoints

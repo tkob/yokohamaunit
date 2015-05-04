@@ -17,3 +17,11 @@ invocation of `ArrayList.size()` on list.
 
 Assert `size` is `0` where list is `new ArrayList()` and size is an
 invocation of `List.size()` on list.
+
+# Test: List.remove is overloaded on arguments
+
+Assert `previous` is `30` where list is `[10, 20, 30, 2]` and previous is an
+invocation of `List.remove(int)` on list with 2.
+
+Assert `hit` is `true` where list is `[10, 20, 30, 2]` and hit is an invocation
+of `List.remove(Object)` on list with 2.
