@@ -1,0 +1,9 @@
+*[Lists]: yokohama.unit.util.Lists
+
+# Test: Tests for Lists.repeat
+
+Assert that `Lists.repeat("hello", 0)` is `[]`.
+
+Assert that `Lists.repeat("hello", 1)` is `["hello"]`.
+
+Assert that `Lists.repeat("hello", 2)` is `["hello", "hello"]`.
