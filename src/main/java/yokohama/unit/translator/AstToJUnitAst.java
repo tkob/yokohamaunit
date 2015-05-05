@@ -494,7 +494,9 @@ public class AstToJUnitAst {
         Optional<Ident> receiver = invocationExpr.getReceiver();
         List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();
 
-        Type returnType = getReturnType(classType, methodName, argTypes, isVararg);
+        Type returnType = Type.of(
+                methodPattern.getReturnType(classType, classResolver),
+                classResolver);
 
         List<Pair<Var, Stream<Statement>>> setupArgs;
         if (isVararg) {
@@ -568,28 +570,6 @@ public class AstToJUnitAst {
         }
 
         return new Pair<>(returnType, Stream.concat(setupStatements,invocation));
-    }
-
-    @SneakyThrows(NoSuchMethodException.class)
-    public Type getReturnType(
-            yokohama.unit.ast.ClassType classType,
-            String methodName,
-            List<yokohama.unit.ast.Type> argTypes,
-            boolean isVararg) {
-        Class<?> clazz = classType.toClass(classResolver);
-        List<yokohama.unit.ast.Type> argTypesVarArgErased =
-                isVararg
-                ? Lists.mapInitAndLast(argTypes, Function.identity(),
-                        type -> type.toArray())
-                : argTypes;
-        java.lang.reflect.Method method =
-                clazz.getMethod(
-                        methodName,
-                        argTypesVarArgErased.stream()
-                                .map(type -> Type.of(type, classResolver))
-                                .map(Type::toClass)
-                                .toArray(n -> new Class[n]));
-        return Type.fromClass(method.getReturnType());
     }
 
     Stream<Statement> translateFloatingPointExpr(
