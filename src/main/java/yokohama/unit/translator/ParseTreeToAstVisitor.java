@@ -461,7 +461,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public InvocationExpr visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
         ClassType classType = visitClassType(ctx.classType());
         MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
-        Optional<Ident> receiver = Optionals.fromNullable(ctx.Identifier())
+        Optional<Ident> receiver = Optional.ofNullable(ctx.Identifier())
                         .map(node -> new Ident(node.getText(), nodeSpan(node)));
         List<Expr> args = ctx.argumentExpr().stream()
                 .map(this::visitArgumentExpr)
