@@ -164,7 +164,7 @@ class ClassExprCheckVisitor {
     }
 
     private Stream<ErrorMessage> visitMethodPattern(MethodPattern methodPattern) {
-        return methodPattern.getArgumentTypes().stream().flatMap(this::visitType);
+        return methodPattern.getParamTypes().stream().flatMap(this::visitType);
     }
 
     private Stream<ErrorMessage> visitType(Type type) {

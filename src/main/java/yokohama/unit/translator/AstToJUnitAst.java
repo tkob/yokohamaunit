@@ -489,7 +489,7 @@ public class AstToJUnitAst {
         Class<?> clazz = classType.toClass(classResolver);
         MethodPattern methodPattern = invocationExpr.getMethodPattern();
         String methodName = methodPattern.getName();
-        List<yokohama.unit.ast.Type> argTypes = methodPattern.getArgumentTypes();
+        List<yokohama.unit.ast.Type> argTypes = methodPattern.getParamTypes();
         boolean isVarArg = methodPattern.isVarArg();
         Optional<Ident> receiver = invocationExpr.getReceiver();
         List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();

@@ -114,7 +114,7 @@ public class MockitoMockStrategy implements MockStrategy {
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
         boolean isVarArg = methodPattern.isVarArg();
-        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getArgumentTypes();
+        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
         Type returnType = getReturnType(classToStubName, methodName, argumentTypes, isVarArg, classResolver);
 
         String returnedVarName = genSym.generate("returned");
@@ -160,7 +160,7 @@ public class MockitoMockStrategy implements MockStrategy {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
-            argTypes = methodPattern.getArgumentTypes().stream().map(type -> Type.of(type, classResolver));
+            argTypes = methodPattern.getParamTypes().stream().map(type -> Type.of(type, classResolver));
             argVars = pairs.stream().map(Pair::getFirst);
             argMatchers = pairs.stream().flatMap(Pair::getSecond);
         }

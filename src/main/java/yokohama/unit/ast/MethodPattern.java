@@ -9,7 +9,7 @@ import lombok.Value;
 @EqualsAndHashCode(exclude={"span"})
 public class MethodPattern {
     private String name;
-    private List<Type> argumentTypes;
+    private List<Type> paramTypes;
     private boolean varArg;
     private Span span;
 }
