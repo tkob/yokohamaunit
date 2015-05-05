@@ -3,6 +3,8 @@ package yokohama.unit.ast;
 import yokohama.unit.position.Span;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
+import yokohama.unit.util.ClassResolver;
 
 @Value
 @EqualsAndHashCode(exclude={"span"})
@@ -22,6 +24,27 @@ public class Type {
 
     public Type toArray() {
         return new Type(nonArrayType, dims + 1, span);
+    }
+
+    public String getFieldDescriptor(ClassResolver calssResolver) {
+        String brackets = StringUtils.repeat('[', dims);
+        return brackets + nonArrayType.accept(
+                primitiveType -> primitiveType.getFieldDescriptor(),
+                classType -> classType.getFieldDescriptor(calssResolver));
+    }
+
+    public Class<?> toClass(ClassResolver classResolver) {
+        if (dims > 0) {
+            try {
+                return Class.forName(getFieldDescriptor(classResolver));
+            } catch (ClassNotFoundException e) {
+                throw new AstException(e.getMessage(), span, e);
+            }
+        } else {
+            return nonArrayType.accept(
+                    primitiveType -> primitiveType.toClass() ,
+                    classType -> classType.toClass(classResolver));
+        }
     }
 
     public static Type fromClass(Class<?> clazz) {

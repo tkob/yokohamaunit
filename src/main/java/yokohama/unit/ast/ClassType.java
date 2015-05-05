@@ -11,6 +11,10 @@ public class ClassType implements NonArrayType {
     private String name; // may be fully qualified name or abbreviation
     private Span span;
 
+    public String getFieldDescriptor(ClassResolver classResolver) {
+        return "L" + toClass(classResolver).getCanonicalName() + ";";
+    }
+
     public Class<?> toClass(ClassResolver classResolver) {
         try {
             return classResolver.lookup(name);
