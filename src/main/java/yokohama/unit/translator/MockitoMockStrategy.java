@@ -113,9 +113,9 @@ public class MockitoMockStrategy implements MockStrategy {
         Span span = behavior.getSpan();
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
-        boolean isVarArg = methodPattern.isVarArg();
+        boolean isVararg = methodPattern.isVararg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
-        Type returnType = getReturnType(classToStubName, methodName, argumentTypes, isVarArg, classResolver);
+        Type returnType = getReturnType(classToStubName, methodName, argumentTypes, isVararg, classResolver);
 
         String returnedVarName = genSym.generate("returned");
         Stream<Statement> returned = astToJUnitAst.translateExpr(
@@ -127,7 +127,7 @@ public class MockitoMockStrategy implements MockStrategy {
         Stream<Type> argTypes;
         Stream<Var> argVars;
         Stream<Statement> argMatchers;
-        if (isVarArg) {
+        if (isVararg) {
             String varArg = genSym.generate("varArg");
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
@@ -383,12 +383,11 @@ public class MockitoMockStrategy implements MockStrategy {
             String classToStubName,
             String methodName,
             List<yokohama.unit.ast.Type> argumentTypes,
-            boolean isVarArg,
+            boolean isVararg,
             ClassResolver classResolver) {
         Class<?> clazz = Class.forName(classToStubName);
-        Method method = clazz.getMethod(
-                methodName,
-                (isVarArg
+        Method method = clazz.getMethod(methodName,
+                (isVararg
                         ? ListUtils.union(
                                 argumentTypes.subList(0, argumentTypes.size() - 1),
                                 Arrays.asList(

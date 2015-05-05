@@ -490,16 +490,16 @@ public class AstToJUnitAst {
         MethodPattern methodPattern = invocationExpr.getMethodPattern();
         String methodName = methodPattern.getName();
         List<yokohama.unit.ast.Type> argTypes = methodPattern.getParamTypes();
-        boolean isVarArg = methodPattern.isVarArg();
+        boolean isVararg = methodPattern.isVararg();
         Optional<Ident> receiver = invocationExpr.getReceiver();
         List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();
 
-        Type returnType = getReturnType(classType, methodName, argTypes, isVarArg);
+        Type returnType = getReturnType(classType, methodName, argTypes, isVararg);
 
         List<Pair<Var, Stream<Statement>>> setupArgs;
-        if (isVarArg) {
+        if (isVararg) {
             // extend argument types if args are variable length
-            List<yokohama.unit.ast.Type> extendedArgTypes = isVarArg
+            List<yokohama.unit.ast.Type> extendedArgTypes = isVararg
                     ? ListUtils.union(argTypes,
                             Lists.repeat(Lists.last(argTypes),
                                     args.size() - argTypes.size()))
@@ -575,10 +575,10 @@ public class AstToJUnitAst {
             yokohama.unit.ast.ClassType classType,
             String methodName,
             List<yokohama.unit.ast.Type> argTypes,
-            boolean isVarArg) {
+            boolean isVararg) {
         Class<?> clazz = classType.toClass(classResolver);
         List<yokohama.unit.ast.Type> argTypesVarArgErased =
-                isVarArg
+                isVararg
                 ? Lists.mapInitAndLast(argTypes, Function.identity(),
                         type -> type.toArray())
                 : argTypes;

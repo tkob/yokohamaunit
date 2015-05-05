@@ -10,6 +10,6 @@ import lombok.Value;
 public class MethodPattern {
     private String name;
     private List<Type> paramTypes;
-    private boolean varArg;
+    private boolean vararg;
     private Span span;
 }
