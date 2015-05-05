@@ -1,6 +1,11 @@
 *[ArrayList]: java.util.ArrayList
+*[Arrays]: java.util.Arrays
+*[Collection]: java.util.Collection
 *[Collections]: java.util.Collections
+*[File]: java.io.File
+*[IntStream]: java.util.stream.IntStream
 *[List]: java.util.List
+*[Paths]: java.nio.file.Paths
 
 # Test: invokevirtual with no argument
 
@@ -38,3 +43,17 @@ invocation of `Integer.valueOf(int)` with `i`.
 
 Assert `intValue` is `123` where i is `"123" as Object` and intValue is an
 invocation of `Integer.valueOf(String)` with `i`.
+
+# Test: Invoking methods with vararg
+
+Assert `list` is `["a", "b", "c"]` where list is an invocation of
+`Arrays.asList(Object...)` with "a", "b", "c".
+
+Assert `modified` is `true` where list is `new ArrayList()` and modified is an
+invocation of `Collections.addAll(Collection, Object...)` with `list`, "a", "b".
+
+Assert `path` is `new File("a/b/c").toPath()` where path is an invocation of
+`Paths.get(String, String...)` with "a", "b", "c".
+
+Assert `stream.sum()` is `6` where stream is an invocation of
+ `IntStream.of(int...)` with 1, 2, 3.

@@ -253,7 +253,11 @@ public class DocyCompilerImplTest {
                         "List_remove_is_overloaded_on_arguments_2",
                         "invokestatic_with_no_argument_1",
                         "Integer_valueOf_is_overloaded_1",
-                        "Integer_valueOf_is_overloaded_2")),
+                        "Integer_valueOf_is_overloaded_2",
+                        "Invoking_methods_with_vararg_1",
+                        "Invoking_methods_with_vararg_2",
+                        "Invoking_methods_with_vararg_3",
+                        "Invoking_methods_with_vararg_4")),
     };
 
     @DataPoints

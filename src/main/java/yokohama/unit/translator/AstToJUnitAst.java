@@ -50,6 +50,7 @@ import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast_junit.Annotation;
+import yokohama.unit.ast_junit.ArrayExpr;
 import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CharLitExpr;
@@ -498,16 +499,46 @@ public class AstToJUnitAst {
 
         List<Pair<Var, Stream<Statement>>> setupArgs;
         if (isVararg) {
-            // extend argument types if args are variable length
-            List<yokohama.unit.ast.Type> extendedArgTypes = isVararg
-                    ? ListUtils.union(argTypes,
-                            Lists.repeat(Lists.last(argTypes),
-                                    args.size() - argTypes.size()))
-                    : argTypes;
-            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
-                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
-                            extendedArgTypes, args);
-            throw new UnsupportedOperationException();
+            int splitAt = argTypes.size() - 1;
+            List<Pair<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
+                    Pair.zip(
+                            argTypes,
+                            Lists.split(args, splitAt).map((nonVarargs, varargs) ->
+                                    ListUtils.union(
+                                            Lists.map(nonVarargs, Arrays::asList),
+                                            Arrays.asList(varargs))));
+            setupArgs = Lists.mapInitAndLast(
+                    typesAndArgs,
+                    typeAndArg -> typeAndArg.map((t, arg) -> {
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Type paramType = Type.of(t, classResolver);
+                        Stream<Statement> expr = translateExpr(
+                                arg.get(0), argVar.getName(), paramType.toClass(), envVarName);
+                        return new Pair<>(argVar, expr);
+                    }),
+                    typeAndArg -> typeAndArg.map((t, varargs) -> {
+                        Type paramType = Type.of(t, classResolver);
+                        List<Pair<Var, Stream<Statement>>> exprs = varargs.stream().map(
+                                vararg -> {
+                                    Var varargVar = new Var(genSym.generate("vararg"));
+                                    Stream<Statement> expr = translateExpr(
+                                            vararg,
+                                            varargVar.getName(),
+                                            paramType.toClass(),
+                                            envVarName);
+                                    return new Pair<>(varargVar, expr);
+                                }).collect(Collectors.toList());
+                        List<Var> varargVars = Pair.unzip(exprs).getFirst();
+                        Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Stream<Statement> arrayStatement = Stream.of(
+                                new VarInitStatement(
+                                        paramType.toArray(),
+                                        argVar.getName(),
+                                        new ArrayExpr(paramType.toArray(), varargVars),
+                                        Span.dummySpan()));
+                        return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
+                    }));
         } else {
             List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
                     Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
@@ -547,7 +578,10 @@ public class AstToJUnitAst {
                                             : Instruction.VIRTUAL,
                                     receiverVar,
                                     methodName,
-                                    Type.listOf(argTypes, classResolver),
+                                    Lists.mapInitAndLast(
+                                            Type.listOf(argTypes, classResolver),
+                                            type -> type,
+                                            type -> isVararg ? type.toArray(): type),
                                     argVars,
                                     returnType),
                             Span.dummySpan())));
@@ -561,7 +595,10 @@ public class AstToJUnitAst {
                                     ClassType.of(classType, classResolver),
                                     Collections.emptyList(),
                                     methodName,
-                                    Type.listOf(argTypes, classResolver),
+                                    Lists.mapInitAndLast(
+                                            Type.listOf(argTypes, classResolver),
+                                            type -> type,
+                                            type -> isVararg ? type.toArray(): type),
                                     argVars,
                                     returnType),
                             Span.dummySpan()));
