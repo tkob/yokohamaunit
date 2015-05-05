@@ -10,13 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -549,7 +547,7 @@ public class AstToJUnitAst {
                                             : Instruction.VIRTUAL,
                                     receiverVar,
                                     methodName,
-                                    argTypes.stream().map(type -> Type.of(type, classResolver)).collect(Collectors.toList()),
+                                    Type.listOf(argTypes, classResolver),
                                     argVars,
                                     returnType),
                             Span.dummySpan())));
@@ -563,7 +561,7 @@ public class AstToJUnitAst {
                                     ClassType.of(classType, classResolver),
                                     Collections.emptyList(),
                                     methodName,
-                                    argTypes.stream().map(type -> Type.of(type, classResolver)).collect(Collectors.toList()),
+                                    Type.listOf(argTypes, classResolver),
                                     argVars,
                                     returnType),
                             Span.dummySpan()));
