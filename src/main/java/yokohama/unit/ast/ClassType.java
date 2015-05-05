@@ -15,6 +15,10 @@ public class ClassType implements NonArrayType {
         return "L" + toClass(classResolver).getCanonicalName() + ";";
     }
 
+    public Type toType() {
+        return new Type(this, 0, span);
+    }
+    
     public Class<?> toClass(ClassResolver classResolver) {
         try {
             return classResolver.lookup(name);

@@ -35,6 +35,10 @@ public class PrimitiveType implements NonArrayType {
                 span);
     }
 
+    public Type toType() {
+        return new Type(this, 0, span);
+    }
+    
     public Class<?> toClass() {
         switch (kind) {
             case BOOLEAN: return Boolean.TYPE;
