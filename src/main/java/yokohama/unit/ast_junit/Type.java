@@ -1,6 +1,8 @@
 package yokohama.unit.ast_junit;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
@@ -117,6 +119,14 @@ public class Type {
         return new Type(
                 NonArrayType.of(type.getNonArrayType(), classResolver),
                 type.getDims());
+    }
+
+    public static List<Type> listOf(
+            List<yokohama.unit.ast.Type> types,
+            ClassResolver classResolver) {
+        return types.stream()
+                .map(type -> Type.of(type, classResolver))
+                .collect(Collectors.toList());
     }
 
     public static Type fromClass(Class<?> clazz) {
