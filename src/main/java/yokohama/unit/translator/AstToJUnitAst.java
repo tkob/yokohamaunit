@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -573,21 +574,21 @@ public class AstToJUnitAst {
     public Type getReturnType(
             yokohama.unit.ast.ClassType classType,
             String methodName,
-            List<yokohama.unit.ast.Type> argumentTypes,
+            List<yokohama.unit.ast.Type> argTypes,
             boolean isVarArg) {
         Class<?> clazz = classType.toClass(classResolver);
-        java.lang.reflect.Method method = clazz.getMethod(
-                methodName,
-                (isVarArg
-                        ? ListUtils.union(
-                                argumentTypes.subList(0, argumentTypes.size() - 1),
-                                Arrays.asList(
-                                        argumentTypes.get(argumentTypes.size() - 1).toArray())) 
-                        : argumentTypes).stream()
-                        .map(type -> Type.of(type, classResolver))
-                        .map(Type::toClass)
-                        .collect(Collectors.toList())
-                        .toArray(new Class[]{}));
+        List<yokohama.unit.ast.Type> argTypesVarArgErased =
+                isVarArg
+                ? Lists.mapInitAndLast(argTypes, Function.identity(),
+                        type -> type.toArray())
+                : argTypes;
+        java.lang.reflect.Method method =
+                clazz.getMethod(
+                        methodName,
+                        argTypesVarArgErased.stream()
+                                .map(type -> Type.of(type, classResolver))
+                                .map(Type::toClass)
+                                .toArray(n -> new Class[n]));
         return Type.fromClass(method.getReturnType());
     }
 
