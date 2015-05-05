@@ -27,6 +27,16 @@ public class Lists {
         }
     }
 
+    public static <T> Pair<List<T>, List<T>> split(List<T> list, int pos) {
+        List<T> left = list.subList(0, pos);
+        List<T> right = list.subList(pos, list.size());
+        return new Pair<>(left, right);
+    }
+
+    public static <T, U> List<U> map(List<T> list, Function<T, U> f) {
+        return list.stream().map(f).collect(Collectors.toList());
+    }
+
     public static <T, U> List<U> mapInitAndLast(
             List<T> list, Function<T, U> initf, Function<T, U> lastf) {
         if (list.isEmpty()) return Collections.emptyList();
