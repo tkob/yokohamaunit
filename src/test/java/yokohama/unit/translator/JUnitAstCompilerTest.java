@@ -53,18 +53,14 @@ public class JUnitAstCompilerTest {
                                         Optional.empty(),
                                         Arrays.asList(
                                                 new ClassType(
-                                                        java.util.concurrent.Callable.class,
-                                                        Span.dummySpan())),
+                                                        java.util.concurrent.Callable.class)),
                                         Arrays.asList(
                                                 new Method(
                                                         Collections.emptyList(),
                                                         "call",
                                                         Collections.emptyList(),
                                                         Optional.of(Type.OBJECT),
-                                                        Arrays.asList(
-                                                                new ClassType(
-                                                                        java.lang.Exception.class,
-                                                                        Span.dummySpan())),
+                                                        Arrays.asList(ClassType.EXCEPTION),
                                                         Arrays.asList(
                                                                 new VarInitStatement(
                                                                         Type.STRING,

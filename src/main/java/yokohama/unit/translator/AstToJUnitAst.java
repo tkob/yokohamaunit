@@ -145,10 +145,7 @@ public class AstToJUnitAst {
                             methodName,
                             Arrays.asList(),
                             Optional.empty(),
-                            Arrays.asList(
-                                    new ClassType(
-                                            java.lang.Exception.class,
-                                            Span.dummySpan())),
+                            Arrays.asList(ClassType.EXCEPTION),
                             ListUtils.union(
                                     expressionStrategy.env(env, classResolver),
                                     propositions.stream()
@@ -170,10 +167,7 @@ public class AstToJUnitAst {
                                         methodName + "_" + (i + 1),
                                         Arrays.asList(),
                                         Optional.empty(),
-                                        Arrays.asList(
-                                                new ClassType(
-                                                        java.lang.Exception.class,
-                                                        Span.dummySpan())),
+                                        Arrays.asList(ClassType.EXCEPTION),
                                         ListUtils.union(
                                                 expressionStrategy.env(env, classResolver),
                                                 ListUtils.union(
@@ -195,10 +189,7 @@ public class AstToJUnitAst {
                             methodName,
                             Arrays.asList(),
                             Optional.empty(),
-                            Arrays.asList(
-                                    new ClassType(
-                                            java.lang.Exception.class,
-                                            Span.dummySpan())),
+                            Arrays.asList(ClassType.EXCEPTION),
                             ListUtils.union(
                                     expressionStrategy.env(env, classResolver),
                                     Stream.concat(
@@ -835,9 +826,7 @@ public class AstToJUnitAst {
     NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
         return nonArrayType.accept(
                 primitiveType -> new PrimitiveType(primitiveType.getKind()),
-                classType -> new ClassType(
-                        classType.toClass(classResolver),
-                        classType.getSpan()));
+                classType -> ClassType.of(classType, classResolver));
     }
 
     List<List<Statement>> translateTableRef(

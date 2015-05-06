@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
@@ -32,9 +34,8 @@ public class MockitoMockStrategy implements MockStrategy {
     private final String packageName;
     private final GenSym genSym;
 
-    private static final ClassType MOCKITO = new ClassType(org.mockito.Mockito.class, Span.dummySpan());
-    private static final ClassType ONGOING_STUBBING =
-            new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan());
+    static final ClassType MOCKITO = new ClassType(Mockito.class);
+    static final ClassType ONGOING_STUBBING = new ClassType(OngoingStubbing.class);
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -354,7 +355,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 classType -> {
                     String clazzVarName = genSym.generate("clazz");
                     Type type = new Type(
-                            new ClassType(classType.toClass(classResolver), Span.dummySpan()),
+                            ClassType.of(classType, classResolver),
                             dims);
                     return Stream.<Statement>of(
                             new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
