@@ -229,7 +229,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.STRING,
                         nameVar.getName(),
                         new StrLitExpr(ident.getName()),
-                        Span.dummySpan()),
+                        ident.getSpan()),
                 new VarInitStatement(
                         Type.OBJECT,
                         genSym.generate("__"),

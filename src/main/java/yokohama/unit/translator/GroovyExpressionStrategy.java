@@ -157,7 +157,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                         Type.STRING,
                         nameVar.getName(),
                         new StrLitExpr(ident.getName()),
-                        Span.dummySpan()),
+                        ident.getSpan()),
                 new InvokeVoidStatement(
                         GROOVY_SHELL,
                         new Var(envVarName),

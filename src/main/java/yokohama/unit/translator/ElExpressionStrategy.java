@@ -109,7 +109,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         Type.STRING,
                         nameVar.getName(),
                         new StrLitExpr(ident.getName()),
-                        Span.dummySpan()),
+                        ident.getSpan()),
                 new InvokeVoidStatement(
                         EL_PROCESSOR,
                         new Var(envVarName),
