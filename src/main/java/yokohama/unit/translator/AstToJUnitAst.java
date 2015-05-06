@@ -322,8 +322,11 @@ public class AstToJUnitAst {
             (EqualToMatcher equalTo) -> {
                 Var objVar = new Var(genSym.generate("obj"));
                 return Stream.concat(
-                        expressionStrategy.eval(
-                                objVar.getName(), equalTo.getExpr(), Object.class, envVarName).stream(),
+                        translateExpr(
+                                equalTo.getExpr(),
+                                objVar.getName(),
+                                Object.class,
+                                envVarName),
                         Stream.of(new VarInitStatement(
                                 Type.MATCHER,
                                 varName,

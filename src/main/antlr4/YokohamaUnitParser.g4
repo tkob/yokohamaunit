@@ -29,7 +29,7 @@ isNotPredicate: IS NOT matcher ;
 throwsPredicate: THROWS matcher ;
 
 matcher: equalTo | instanceOf | instanceSuchThat | nullValue ;
-equalTo: Expr ;
+equalTo: argumentExpr ;
 instanceOf: AN_INSTANCE_OF classType ;
 instanceSuchThat: AN_INSTANCE Identifier OF classType SUCH THAT proposition (AND proposition)*;
 nullValue: NULL | NOTHING ;

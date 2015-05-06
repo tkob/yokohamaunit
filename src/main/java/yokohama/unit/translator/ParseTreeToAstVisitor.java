@@ -177,7 +177,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Matcher visitEqualTo(YokohamaUnitParser.EqualToContext ctx) {
-        return new EqualToMatcher(new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr())), getSpan(ctx));
+        return new EqualToMatcher(
+                visitArgumentExpr(ctx.argumentExpr()), getSpan(ctx));
     }
 
     @Override

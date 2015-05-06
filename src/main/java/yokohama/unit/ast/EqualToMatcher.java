@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class EqualToMatcher implements Matcher {
-    private QuotedExpr expr;
+    private Expr expr;
     private Span span;
 
     @Override

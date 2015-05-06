@@ -126,7 +126,7 @@ public class AstToJUnitAstTest {
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
+                new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class, Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
@@ -137,6 +137,8 @@ public class AstToJUnitAstTest {
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
+                new VarInitStatement(
+                        Type.OBJECT, "obj", new VarExpr("expr"), Span.dummySpan()),
                 // is `b`
                 new VarInitStatement(
                         Type.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
@@ -177,7 +179,7 @@ public class AstToJUnitAstTest {
                         Span.dummySpan()),
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "obj", new InvokeStaticExpr(
+                new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class, Span.dummySpan()),
                         Arrays.asList(),
                         "getValue",
@@ -188,6 +190,8 @@ public class AstToJUnitAstTest {
                                 new Var("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
+                new VarInitStatement(
+                        Type.OBJECT, "obj", new VarExpr("expr"), Span.dummySpan()),
                 // is not `b`
                 new VarInitStatement(
                         Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
