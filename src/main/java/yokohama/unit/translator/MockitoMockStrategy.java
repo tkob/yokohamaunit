@@ -75,7 +75,7 @@ public class MockitoMockStrategy implements MockStrategy {
         Type clazz = Type.of(classToStub.toType(), classResolver);
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
-                        new ClassLitExpr(clazz), Span.dummySpan()),
+                        new ClassLitExpr(clazz), classToStub.getSpan()),
                 new VarInitStatement(clazz, varName,
                         new InvokeStaticExpr(
                                 MOCKITO,
@@ -84,7 +84,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(Type.CLASS),
                                 Arrays.asList(classToStubVar),
                                 Type.OBJECT),
-                       classToStub.getSpan()));
+                        Span.dummySpan()));
     }
 
     private Stream<Statement> defineBehavior(
