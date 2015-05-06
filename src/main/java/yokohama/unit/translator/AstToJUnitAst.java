@@ -819,17 +819,6 @@ public class AstToJUnitAst {
                 stringExpr -> Type.STRING);
     }
 
-    Type translateType(yokohama.unit.ast.Type type) {
-        return new Type(
-                translateNonArrayType(type.getNonArrayType()), type.getDims());
-    }
-
-    NonArrayType translateNonArrayType(yokohama.unit.ast.NonArrayType nonArrayType) {
-        return nonArrayType.accept(
-                primitiveType -> new PrimitiveType(primitiveType.getKind()),
-                classType -> ClassType.of(classType, classResolver));
-    }
-
     List<List<Statement>> translateTableRef(
             TableRef tableRef,
             List<Table> tables,
