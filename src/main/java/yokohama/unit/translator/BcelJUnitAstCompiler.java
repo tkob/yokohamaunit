@@ -40,7 +40,6 @@ import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
-import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticVoidStatement;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.IsNotStatement;
@@ -449,16 +448,16 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 }
                 // then call method
                 il.append(factory.createInvoke(
-                        object.getType().toString(), // TODO: ?
+                        invokeExpr.getClassType().getText(),
                         invokeExpr.getMethodName(),
                         returnType,
                         invokeExpr.getArgTypes().stream()
                                 .map(BcelJUnitAstCompiler::typeOf)
                                 .collect(Collectors.toList())
                                 .toArray(new Type[]{}),
-                        invokeExpr.getInstruction() == InvokeExpr.Instruction.VIRTUAL
-                                ? Constants.INVOKEVIRTUAL
-                                : Constants.INVOKEINTERFACE));                
+                        invokeExpr.getClassType().isInterface()
+                                ? Constants.INVOKEINTERFACE                
+                                : Constants.INVOKEVIRTUAL));
 
                 return returnType;
             },
@@ -624,16 +623,16 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         }
         // then call method
         il.append(factory.createInvoke(
-                object.getType().toString(),
+                invokeVoidStatement.getClassType().getText(),
                 invokeVoidStatement.getMethodName(),
                 Type.VOID,
                 invokeVoidStatement.getArgTypes().stream()
                         .map(BcelJUnitAstCompiler::typeOf)
                         .collect(Collectors.toList())
                         .toArray(new Type[]{}),
-                invokeVoidStatement.getInstruction() == InvokeExpr.Instruction.VIRTUAL
-                        ? Constants.INVOKEVIRTUAL
-                        : Constants.INVOKEINTERFACE));                
+                invokeVoidStatement.getClassType().isInterface()
+                        ? Constants.INVOKEINTERFACE
+                        : Constants.INVOKEVIRTUAL));                
     }
 
     private void visitInvokeStaticVoidStatement(

@@ -16,7 +16,6 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InvokeExpr;
-import yokohama.unit.ast_junit.InvokeExpr.Instruction;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
@@ -37,8 +36,8 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     private final String packageName;
     private final GenSym genSym;
 
-    static final Type EL_PROCESSOR = new Type(new ClassType(javax.el.ELProcessor.class, Span.dummySpan()), 0);
-    static final Type EL_MANAGER = new Type(new ClassType(javax.el.ELManager.class, Span.dummySpan()), 0);
+    static final ClassType EL_PROCESSOR = new ClassType(javax.el.ELProcessor.class, Span.dummySpan());
+    static final ClassType EL_MANAGER = new ClassType(javax.el.ELManager.class, Span.dummySpan());
     static final ClassType EL_EXCEPTION = new ClassType(javax.el.ELException.class, Span.dummySpan());
 
     @Override
@@ -56,7 +55,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         Var managerVar = new Var(genSym.generate("manager"));
         Stream<Statement> newElp = Stream.of(
                 new VarInitStatement(
-                        EL_PROCESSOR,
+                        EL_PROCESSOR.toType(),
                         varName,
                         new NewExpr(
                                 "javax.el.ELProcessor",
@@ -64,15 +63,15 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList()),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        EL_MANAGER,
+                        EL_MANAGER.toType(),
                         managerVar.getName(),
                         new InvokeExpr(
-                                Instruction.VIRTUAL,
+                                EL_PROCESSOR,
                                 new Var(varName),
                                 "getELManager",
                                 Arrays.asList(),
                                 Arrays.asList(),
-                                EL_MANAGER),
+                                EL_MANAGER.toType()),
                         Span.dummySpan()));
         Stream<Statement> importClasses = classResolver.<String>map((s, l) -> l)
                 .flatMap(longName -> {
@@ -84,7 +83,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                     new StrLitExpr(longName),
                                     Span.dummySpan()),
                             new InvokeVoidStatement(
-                                    Instruction.VIRTUAL,
+                                    EL_MANAGER,
                                     managerVar,
                                     "importClass",
                                     Arrays.asList(Type.STRING),
@@ -108,7 +107,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         new StrLitExpr(name),
                         Span.dummySpan()),
                 new InvokeVoidStatement(
-                        Instruction.VIRTUAL,
+                        EL_PROCESSOR,
                         new Var(envVarName),
                         "defineBean",
                         Arrays.asList(Type.STRING, Type.OBJECT),
@@ -130,7 +129,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                 Type.THROWABLE,
                                 reasonVar.getName(),
                                 new InvokeExpr(
-                                        InvokeExpr.Instruction.VIRTUAL,
+                                        EL_EXCEPTION,
                                         caughtVar,
                                         "getCause",
                                         Arrays.asList(),
@@ -181,7 +180,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         Span.dummySpan()),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
-                                Instruction.VIRTUAL,
+                                EL_PROCESSOR,
                                 new Var(envVarName),
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.CLASS),

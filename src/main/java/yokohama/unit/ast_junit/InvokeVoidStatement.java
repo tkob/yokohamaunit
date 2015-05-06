@@ -3,13 +3,12 @@ package yokohama.unit.ast_junit;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
-import yokohama.unit.ast_junit.InvokeExpr.Instruction;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
 
 @Value
 public class InvokeVoidStatement implements Statement {
-    Instruction instruction;
+    ClassType classType;
     Var object;
     String methodName;
     List<Type> argTypes;

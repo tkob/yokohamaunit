@@ -88,7 +88,7 @@ public class AstToJUnitAstTest {
                 Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
                 Arrays.asList(
                         new VarInitStatement(
-                                OgnlExpressionStrategy.OGNL_CONTEXT,
+                                OgnlExpressionStrategy.OGNL_CONTEXT.toType(),
                                 "env",
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()))));
@@ -251,7 +251,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE,
                                                         "reason",
                                                         new InvokeExpr(
-                                                                InvokeExpr.Instruction.VIRTUAL,
+                                                                OgnlExpressionStrategy.OGNL_EXCEPTION,
                                                                 new Var("ex2"),
                                                                 "getReason",
                                                                 Arrays.asList(),

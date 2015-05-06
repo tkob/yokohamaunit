@@ -17,7 +17,6 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.EqualOpExpr;
 import yokohama.unit.ast_junit.IfStatement;
 import yokohama.unit.ast_junit.InvokeExpr;
-import yokohama.unit.ast_junit.InvokeExpr.Instruction;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.NewExpr;
@@ -41,8 +40,9 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     private final GenSym genSym;
 
     static final ClassType OGNL = new ClassType(ognl.Ognl.class, Span.dummySpan());
-    static final Type OGNL_CONTEXT = new Type(new ClassType(ognl.OgnlContext.class, Span.dummySpan()), 0);
+    static final ClassType OGNL_CONTEXT = new ClassType(ognl.OgnlContext.class, Span.dummySpan());
     static final ClassType OGNL_EXCEPTION = new ClassType(ognl.OgnlException.class, Span.dummySpan());
+    static final ClassType MAP = new ClassType(java.util.Map.class, Span.dummySpan());
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -58,13 +58,13 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
         Var tableVar = new Var(genSym.generate("table"));
         Stream<Statement> createTable = Stream.of(new VarInitStatement(
-                        new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0),
-                        tableVar.getName(),
-                        new NewExpr(
-                                "java.util.HashMap",
-                                Arrays.asList(),
-                                Arrays.asList()),
-                        Span.dummySpan()));
+                MAP.toType(),
+                tableVar.getName(),
+                new NewExpr(
+                        "java.util.HashMap",
+                        Arrays.asList(),
+                        Arrays.asList()),
+                Span.dummySpan()));
 
         Stream<Statement> populateTable =
                 classResolver.flatMap((shortName, longName) -> {
@@ -90,7 +90,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Type.OBJECT,
                                     genSym.generate("__"),
                                     new InvokeExpr(
-                                            Instruction.INTERFACE,
+                                            MAP,
                                             tableVar,
                                             "put",
                                             Arrays.asList(Type.OBJECT, Type.OBJECT),
@@ -108,7 +108,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.CLASS,
                         returnedVar.getName(),
                         new InvokeExpr(
-                                Instruction.INTERFACE,
+                                MAP,
                                 tableVar,
                                 "get",
                                 Arrays.asList(Type.OBJECT),
@@ -153,7 +153,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Arrays.asList(
                         new Pair<Type, String>(Type.STRING, classNameVar.getName()),
                         new Pair<Type, String>(
-                                new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0),
+                                MAP.toType(),
                                 contextVar.getName())),
                 Optional.of(Type.CLASS),
                 Arrays.asList(new ClassType(java.lang.ClassNotFoundException.class, Span.dummySpan())),
@@ -172,7 +172,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(
-                            OGNL_CONTEXT,
+                            OGNL_CONTEXT.toType(),
                             varName,
                             new NewExpr(
                                     "ognl.OgnlContext",
@@ -199,7 +199,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Arrays.asList()),
                             Span.dummySpan()),
                     new VarInitStatement(
-                            OGNL_CONTEXT,
+                            OGNL_CONTEXT.toType(),
                             varName,
                             new InvokeStaticExpr(
                                     OGNL,
@@ -211,7 +211,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Arrays.asList(
                                             rootVar,
                                             classResolverVar),
-                                    new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0)),
+                                    MAP.toType()),
                             Span.dummySpan()));
         }
     }
@@ -229,7 +229,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.OBJECT,
                         genSym.generate("__"),
                         new InvokeExpr(
-                                InvokeExpr.Instruction.VIRTUAL,
+                                OGNL_CONTEXT,
                                 new Var(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
@@ -252,7 +252,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Type.THROWABLE,
                                 reasonVar.getName(),
                                 new InvokeExpr(
-                                        InvokeExpr.Instruction.VIRTUAL,
+                                        OGNL_EXCEPTION,
                                         caughtVar,
                                         "getReason",
                                         Arrays.asList(),

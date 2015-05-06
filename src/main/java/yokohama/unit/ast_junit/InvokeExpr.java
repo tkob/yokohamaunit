@@ -7,7 +7,7 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class InvokeExpr implements Expr {
-    Instruction instruction;
+    ClassType classType;
     Var object;
     String methodName;
     List<Type> argTypes;
@@ -21,9 +21,5 @@ public class InvokeExpr implements Expr {
     @Override
     public <T> T accept(ExprVisitor<T> visitor) {
         return visitor.visitInvokeExpr(this);
-    }
-    
-    public enum Instruction {
-        VIRTUAL, INTERFACE
     }
 }

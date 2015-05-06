@@ -33,6 +33,8 @@ public class MockitoMockStrategy implements MockStrategy {
     private final GenSym genSym;
 
     private static final ClassType MOCKITO = new ClassType(org.mockito.Mockito.class, Span.dummySpan());
+    private static final ClassType ONGOING_STUBBING =
+            new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan());
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -165,9 +167,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 Stream.of(
                         new VarInitStatement(returnType, invokeTmpVarName, 
                                 new InvokeExpr(
-                                        classToStub.toClass(classResolver).isInterface()
-                                                ? InvokeExpr.Instruction.INTERFACE
-                                                : InvokeExpr.Instruction.VIRTUAL,
+                                        ClassType.of(classToStub, classResolver),
                                         new Var(varName),
                                         methodName,
                                         argTypes.collect(Collectors.toList()),
@@ -198,7 +198,7 @@ public class MockitoMockStrategy implements MockStrategy {
         String __ = genSym.generate("__");
         Stream<Statement> whenReturn = Stream.of(
                 new VarInitStatement(
-                        new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0),
+                        ONGOING_STUBBING.toType(),
                         stubbingVarName,
                         new InvokeStaticExpr(
                                 MOCKITO,
@@ -206,16 +206,16 @@ public class MockitoMockStrategy implements MockStrategy {
                                 "when",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(invokeVarName)),
-                                new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0)),
+                                ONGOING_STUBBING.toType()),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
-                                InvokeExpr.Instruction.INTERFACE,
+                                ONGOING_STUBBING,
                                 new Var(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(returnedVarName)),
-                                new Type(new ClassType(org.mockito.stubbing.OngoingStubbing.class, Span.dummySpan()), 0)),
+                                ONGOING_STUBBING.toType()),
                         span));
 
         return Stream.concat(returned,

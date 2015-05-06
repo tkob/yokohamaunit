@@ -36,7 +36,6 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
-import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
@@ -63,7 +62,6 @@ import yokohama.unit.ast_junit.FloatLitExpr;
 import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
-import yokohama.unit.ast_junit.InvokeExpr.Instruction;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
@@ -575,7 +573,6 @@ public class AstToJUnitAst {
         Stream<Statement> invocation;
         if (receiver.isPresent()) {
             // invokevirtual
-            Type receiverType = Type.fromClass(clazz);
             Var receiverVar = new Var(genSym.generate("receiver"));
             Stream<Statement> getReceiver = translateExpr(
                     receiver.get(),receiverVar.getName(), clazz, envVarName);
@@ -584,9 +581,7 @@ public class AstToJUnitAst {
                             returnType,
                             varName,
                             new InvokeExpr(
-                                    clazz.isInterface()
-                                            ? Instruction.INTERFACE
-                                            : Instruction.VIRTUAL,
+                                    ClassType.of(classType, classResolver),
                                     receiverVar,
                                     methodName,
                                     Lists.mapInitAndLast(
@@ -742,39 +737,39 @@ public class AstToJUnitAst {
         return toType.<Stream<Statement>>matchPrimitiveOrNot(
                 primitiveType -> {
                     Var boxVar = new Var(genSym.generate("box"));
-                    Type boxType;
+                    ClassType boxType;
                     String unboxMethodName;
                     switch (primitiveType.getKind()) {
                         case BOOLEAN:
-                            boxType = primitiveType.box().toType();
+                            boxType = primitiveType.box();
                             unboxMethodName = "booleanValue";
                             break;
                         case BYTE:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "byteValue";
                             break;
                         case SHORT:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "shortValue";
                             break;
                         case INT:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "intValue";
                             break;
                         case LONG:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "longValue";
                             break;
                         case CHAR:
-                            boxType = primitiveType.box().toType();
+                            boxType = primitiveType.box();
                             unboxMethodName = "charValue";
                             break;
                         case FLOAT:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "floatValue";
                             break;
                         case DOUBLE:
-                            boxType = Type.fromClass(Number.class);
+                            boxType = ClassType.fromClass(Number.class);
                             unboxMethodName = "doubleValue";
                             break;
                         default:
@@ -782,7 +777,7 @@ public class AstToJUnitAst {
                     }
                     return Stream.of(
                             new VarInitStatement(
-                                    boxType,
+                                    boxType.toType(),
                                     boxVar.getName(),
                                     new VarExpr(fromVar.getName()),
                                     Span.dummySpan()),
@@ -790,7 +785,7 @@ public class AstToJUnitAst {
                                     toType,
                                     toVarName,
                                     new InvokeExpr(
-                                            Instruction.VIRTUAL,
+                                            boxType,
                                             fromVar,
                                             unboxMethodName,
                                             Collections.emptyList(),
