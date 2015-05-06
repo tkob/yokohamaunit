@@ -300,7 +300,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                        new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeStaticExpr(
                                 new ClassType(ognl.Ognl.class),
@@ -312,6 +312,6 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                         new Var(envVarName),
                                         new Var(envVarName)),
                                 Type.OBJECT),
-                        span));
+                        Span.dummySpan()));
     }
 }

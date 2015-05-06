@@ -176,7 +176,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                        new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(
                         Type.CLASS, expectedTypeVar.getName(),
                         new ClassLitExpr(Type.fromClass(expectedType).box()),
@@ -189,6 +189,6 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING, Type.CLASS),
                                 Arrays.asList(exprVar, expectedTypeVar),
                                 Type.OBJECT),
-                        span));
+                        Span.dummySpan()));
     }
 }

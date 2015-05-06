@@ -182,7 +182,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                        new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 GROOVY_SHELL,
@@ -191,6 +191,6 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING),
                                 Arrays.asList(exprVar),
                                 Type.OBJECT),
-                        span));
+                        Span.dummySpan()));
     }
 }
