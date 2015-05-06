@@ -15,12 +15,12 @@ public class Type {
     private NonArrayType nonArrayType;
     private int dims;
 
-    public static final Type OBJECT = new Type(new ClassType(java.lang.Object.class, Span.dummySpan()), 0);
-    public static final Type THROWABLE = new Type(new ClassType(java.lang.Throwable.class, Span.dummySpan()), 0);
-    public static final Type CLASS = new Type(new ClassType(java.lang.Class.class, Span.dummySpan()), 0);
-    public static final Type STRING = new Type(new ClassType(java.lang.String.class, Span.dummySpan()), 0);
-    public static final Type MATCHER = new Type(new ClassType(org.hamcrest.Matcher.class, Span.dummySpan()), 0);
-    public static final Type MAP = new Type(new ClassType(java.util.Map.class, Span.dummySpan()), 0);
+    public static final Type OBJECT = new Type(new ClassType(Object.class), 0);
+    public static final Type THROWABLE = new Type(new ClassType(Throwable.class), 0);
+    public static final Type CLASS = new Type(new ClassType(Class.class), 0);
+    public static final Type STRING = new Type(new ClassType(String.class), 0);
+    public static final Type MATCHER = new Type(new ClassType(org.hamcrest.Matcher.class), 0);
+    public static final Type MAP = new Type(new ClassType(java.util.Map.class), 0);
 
     public static final Type BOOLEAN = new Type(new PrimitiveType(Kind.BOOLEAN), 0);
     public static final Type BYTE = new Type(new PrimitiveType(Kind.BYTE), 0);

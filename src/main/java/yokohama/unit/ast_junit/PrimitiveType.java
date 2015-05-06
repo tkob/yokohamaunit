@@ -15,22 +15,14 @@ public class PrimitiveType implements NonArrayType {
 
     public ClassType box() {
         switch (kind) {
-            case BOOLEAN:
-                return new ClassType(java.lang.Boolean.class, Span.dummySpan());
-            case BYTE:
-                return new ClassType(java.lang.Byte.class, Span.dummySpan());
-            case SHORT:
-                return new ClassType(java.lang.Short.class, Span.dummySpan());
-            case INT:
-                return new ClassType(java.lang.Integer.class, Span.dummySpan());
-            case LONG:
-                return new ClassType(java.lang.Long.class, Span.dummySpan());
-            case CHAR:
-                return new ClassType(java.lang.Character.class, Span.dummySpan());
-            case FLOAT:
-                return new ClassType(java.lang.Float.class, Span.dummySpan());
-            case DOUBLE:
-                return new ClassType(java.lang.Double.class, Span.dummySpan());
+            case BOOLEAN: return new ClassType(Boolean.class);
+            case BYTE:    return new ClassType(Byte.class);
+            case SHORT:   return new ClassType(Short.class);
+            case INT:     return new ClassType(Integer.class);
+            case LONG:    return new ClassType(Long.class);
+            case CHAR:    return new ClassType(Character.class);
+            case FLOAT:   return new ClassType(Float.class);
+            case DOUBLE:  return new ClassType(Double.class);
         }
         throw new RuntimeException("should not reach here");
     }

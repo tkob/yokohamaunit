@@ -1,30 +1,28 @@
 package yokohama.unit.ast_junit;
 
-import java.util.Optional;
 import lombok.Value;
-import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 
 @Value
 public class ClassType implements NonArrayType {
     private Class<?> clazz;
-    private Span span;
 
-    public static final ClassType TEST = new ClassType(org.junit.Test.class, Span.dummySpan());
-    public static final ClassType CORE_MATCHERS = new ClassType(org.hamcrest.CoreMatchers.class, Span.dummySpan());
+    public static final ClassType TEST = new ClassType(org.junit.Test.class);
+    public static final ClassType CORE_MATCHERS =
+            new ClassType(org.hamcrest.CoreMatchers.class);
 
-    public static final ClassType STRING = new ClassType(String.class, Span.dummySpan());
-    public static final ClassType THROWABLE = new ClassType(java.lang.Throwable.class, Span.dummySpan());
-    public static final ClassType EXCEPTION = new ClassType(java.lang.Exception.class, Span.dummySpan());
+    public static final ClassType STRING = new ClassType(String.class);
+    public static final ClassType THROWABLE = new ClassType(Throwable.class);
+    public static final ClassType EXCEPTION = new ClassType(Exception.class);
 
-    public static final ClassType BOOLEAN   = new ClassType(Boolean.class,   Span.dummySpan());
-    public static final ClassType BYTE      = new ClassType(Byte.class,      Span.dummySpan());
-    public static final ClassType SHORT     = new ClassType(Short.class,     Span.dummySpan());
-    public static final ClassType INTEGER   = new ClassType(Integer.class,   Span.dummySpan());
-    public static final ClassType LONG      = new ClassType(Long.class,      Span.dummySpan());
-    public static final ClassType CHARACTER = new ClassType(Character.class, Span.dummySpan());
-    public static final ClassType FLOAT     = new ClassType(Float.class,     Span.dummySpan());
-    public static final ClassType DOUBLE    = new ClassType(Double.class,    Span.dummySpan());
+    public static final ClassType BOOLEAN   = new ClassType(Boolean.class);
+    public static final ClassType BYTE      = new ClassType(Byte.class);
+    public static final ClassType SHORT     = new ClassType(Short.class);
+    public static final ClassType INTEGER   = new ClassType(Integer.class);
+    public static final ClassType LONG      = new ClassType(Long.class);
+    public static final ClassType CHARACTER = new ClassType(Character.class);
+    public static final ClassType FLOAT     = new ClassType(Float.class);
+    public static final ClassType DOUBLE    = new ClassType(Double.class);
 
     @Override
     public String getText() {
@@ -42,17 +40,11 @@ public class ClassType implements NonArrayType {
     public static ClassType of(
             yokohama.unit.ast.ClassType classType,
             ClassResolver classResolver) {
-        return new ClassType(
-                classType.toClass(classResolver),
-                new Span(
-                        Optional.empty(),
-                        classType.getSpan().getStart(),
-                        classType.getSpan().getEnd()));
-
+        return new ClassType(classType.toClass(classResolver));
     }
 
     public static ClassType fromClass(Class<?> clazz) {
-        return new ClassType(clazz, Span.dummySpan());
+        return new ClassType(clazz);
     }
 
     @Override

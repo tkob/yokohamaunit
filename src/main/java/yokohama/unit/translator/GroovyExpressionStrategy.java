@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import groovy.lang.GroovyShell;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +9,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.CompilationCustomizer;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.ArrayExpr;
 import yokohama.unit.ast_junit.CatchClause;
@@ -32,19 +37,13 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     private final String packageName;
     private final GenSym genSym;
 
-    static final Type COMPILATION_CUSTOMIZER = new Type(
-            new ClassType(
-                    org.codehaus.groovy.control.customizers.CompilationCustomizer.class,
-                    Span.dummySpan()),
-            0);
-    static final ClassType IMPORT_CUSTOMIZER = new ClassType(
-            org.codehaus.groovy.control.customizers.ImportCustomizer.class,
-            Span.dummySpan());
-    static final ClassType COMPILER_CONFIGURATION = new ClassType(
-            org.codehaus.groovy.control.CompilerConfiguration.class,
-            Span.dummySpan());
-    static final ClassType GROOVY_SHELL =
-            new ClassType(groovy.lang.GroovyShell.class, Span.dummySpan());
+    static final Type COMPILATION_CUSTOMIZER =
+            new Type(new ClassType(CompilationCustomizer.class), 0);
+    static final ClassType IMPORT_CUSTOMIZER =
+            new ClassType(ImportCustomizer.class);
+    static final ClassType COMPILER_CONFIGURATION =
+            new ClassType(CompilerConfiguration.class);
+    static final ClassType GROOVY_SHELL = new ClassType(GroovyShell.class);
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -149,17 +148,16 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs) {
+    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
         /*
         env.setVariable(name, rhs);
         */
-        Var nameVar = new Var(genSym.generate(name));
-        return Arrays.asList(
-                new VarInitStatement(
+        Var nameVar = new Var(genSym.generate(ident.getName()));
+        return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name),
-                        Span.dummySpan()),
+                        new StrLitExpr(ident.getName()),
+                        ident.getSpan()),
                 new InvokeVoidStatement(
                         GROOVY_SHELL,
                         new Var(envVarName),
@@ -184,7 +182,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                        new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 GROOVY_SHELL,
@@ -193,6 +191,6 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING),
                                 Arrays.asList(exprVar),
                                 Type.OBJECT),
-                        span));
+                        Span.dummySpan()));
     }
 }

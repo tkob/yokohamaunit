@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.el.ELException;
+import javax.el.ELManager;
+import javax.el.ELProcessor;
 import lombok.AllArgsConstructor;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -36,9 +40,9 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     private final String packageName;
     private final GenSym genSym;
 
-    static final ClassType EL_PROCESSOR = new ClassType(javax.el.ELProcessor.class, Span.dummySpan());
-    static final ClassType EL_MANAGER = new ClassType(javax.el.ELManager.class, Span.dummySpan());
-    static final ClassType EL_EXCEPTION = new ClassType(javax.el.ELException.class, Span.dummySpan());
+    static final ClassType EL_PROCESSOR = new ClassType(ELProcessor.class);
+    static final ClassType EL_MANAGER = new ClassType(ELManager.class);
+    static final ClassType EL_EXCEPTION = new ClassType(ELException.class);
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -95,17 +99,17 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs) {
+    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
         /*
         env.defineBean(name, rhs);
         */
-        Var nameVar = new Var(genSym.generate(name));
+        Var nameVar = new Var(genSym.generate(ident.getName()));
         return Arrays.asList(
                 new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name),
-                        Span.dummySpan()),
+                        new StrLitExpr(ident.getName()),
+                        ident.getSpan()),
                 new InvokeVoidStatement(
                         EL_PROCESSOR,
                         new Var(envVarName),
@@ -173,7 +177,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
-                        new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
+                        new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(
                         Type.CLASS, expectedTypeVar.getName(),
                         new ClassLitExpr(Type.fromClass(expectedType).box()),
@@ -186,6 +190,6 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING, Type.CLASS),
                                 Arrays.asList(exprVar, expectedTypeVar),
                                 Type.OBJECT),
-                        span));
+                        Span.dummySpan()));
     }
 }

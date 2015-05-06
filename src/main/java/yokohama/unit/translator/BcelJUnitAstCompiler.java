@@ -51,6 +51,7 @@ import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.ErrorMessage;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
@@ -224,15 +225,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             ConstantPoolGen cp) {
         statement.<Void>accept(
             isStatement -> {
-                visitIsStatement(isStatement, locals, il, factory, cp);
+                visitIsStatement(isStatement, locals, mg, il, factory, cp);
                 return null;
             },
             isNotStatement -> {
-                visitIsNotStatement(isNotStatement, locals, il, factory, cp);
+                visitIsNotStatement(isNotStatement, locals, mg, il, factory, cp);
                 return null;
             },
             varInitStatement -> {
-                visitVarInitStatement(varInitStatement, locals, il, factory, cp);
+                visitVarInitStatement(varInitStatement, locals, mg, il, factory, cp);
                 return null;
             },
             tryStatement -> {
@@ -308,11 +309,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return null;
             },
             invokeVoidStatement -> {
-                visitInvokeVoidStatement(invokeVoidStatement, locals, il, factory, cp);
+                visitInvokeVoidStatement(invokeVoidStatement, locals, mg, il, factory, cp);
                 return null;
             },
             invokeStaticVoidStatement -> {
-                visitInvokeStaticVoidStatement(invokeStaticVoidStatement, locals, il, factory, cp);
+                visitInvokeStaticVoidStatement(invokeStaticVoidStatement, locals, mg, il, factory, cp);
                 return null;
             });
     }
@@ -320,12 +321,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitIsStatement(
             IsStatement isStatement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
         LocalVariableGen subject = locals.get(isStatement.getSubject().getName());
         LocalVariableGen complement = locals.get(isStatement.getComplement().getName());
-        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        InstructionHandle ih =
+                il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        addLineNumber(mg, ih, isStatement.getSpan());
         il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
         il.append(
                 factory.createInvoke(
@@ -339,12 +343,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitIsNotStatement(
             IsNotStatement isNotStatement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
         LocalVariableGen subject = locals.get(isNotStatement.getSubject().getName());
         LocalVariableGen complement = locals.get(isNotStatement.getComplement().getName());
-        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        InstructionHandle ih =
+                il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+        addLineNumber(mg, ih, isNotStatement.getSpan());
         il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
         il.append(
                 factory.createInvoke(
@@ -366,9 +373,12 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitVarInitStatement(
             VarInitStatement varInitStatement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
+        InstructionHandle ih = il.append(InstructionFactory.NOP);
+        addLineNumber(mg, ih, varInitStatement.getSpan());
         LocalVariableGen var = locals.get(varInitStatement.getName());
         Type type = typeOf(varInitStatement.getType());
         Type fromType = varInitStatement.getValue().<Type>accept(
@@ -610,12 +620,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitInvokeVoidStatement(
             InvokeVoidStatement invokeVoidStatement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
         // first push target object
         LocalVariableGen object = locals.get(invokeVoidStatement.getObject().getName());
-        il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
+        InstructionHandle ih =
+                il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
+        addLineNumber(mg, ih, invokeVoidStatement.getSpan());
         // push arguments
         for (Var arg : invokeVoidStatement.getArgs()) {
             LocalVariableGen lv = locals.get(arg.getName());
@@ -638,9 +651,12 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     private void visitInvokeStaticVoidStatement(
             InvokeStaticVoidStatement invokeStaticVoidStatement,
             Map<String, LocalVariableGen> locals,
+            MethodGen mg,
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
+        InstructionHandle ih = il.append(InstructionFactory.NOP);
+        addLineNumber(mg, ih, invokeStaticVoidStatement.getSpan());
         for (Var arg : invokeStaticVoidStatement.getArgs()) {
             LocalVariableGen lv = locals.get(arg.getName());
             il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
@@ -654,5 +670,12 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         .collect(Collectors.toList())
                         .toArray(new Type[]{}),
                 Constants.INVOKESTATIC));
+    }
+
+    private void addLineNumber(MethodGen mg, InstructionHandle ih, Span span) {
+        int line = span.getStart().getLine();
+        if (line > -1) {
+            mg.addLineNumber(ih, line);
+        }
     }
 }

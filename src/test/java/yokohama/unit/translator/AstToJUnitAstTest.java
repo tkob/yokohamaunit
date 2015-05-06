@@ -85,7 +85,7 @@ public class AstToJUnitAstTest {
                 "test_0",
                 Arrays.asList(),
                 Optional.empty(),
-                Arrays.asList(new ClassType(java.lang.Exception.class, Span.dummySpan())),
+                Arrays.asList(new ClassType(java.lang.Exception.class)),
                 Arrays.asList(
                         new VarInitStatement(
                                 OgnlExpressionStrategy.OGNL_CONTEXT.toType(),
@@ -114,7 +114,7 @@ public class AstToJUnitAstTest {
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType(ognl.Ognl.class, Span.dummySpan()),
+                        new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
                         Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
@@ -127,7 +127,7 @@ public class AstToJUnitAstTest {
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
-                        new ClassType(ognl.Ognl.class, Span.dummySpan()),
+                        new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
                         Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
@@ -167,7 +167,7 @@ public class AstToJUnitAstTest {
                 // `a`
                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "actual", new InvokeStaticExpr(
-                        new ClassType(ognl.Ognl.class, Span.dummySpan()),
+                        new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
                         Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
@@ -180,7 +180,7 @@ public class AstToJUnitAstTest {
                 // `b`
                 new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
                 new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
-                        new ClassType(ognl.Ognl.class, Span.dummySpan()),
+                        new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
                         Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
@@ -199,7 +199,7 @@ public class AstToJUnitAstTest {
                         Type.MATCHER,
                         "expected",
                         new InvokeStaticExpr(
-                                new ClassType(org.hamcrest.CoreMatchers.class, Span.dummySpan()),
+                                new ClassType(org.hamcrest.CoreMatchers.class),
                                 Arrays.asList(),
                                 "not",
                                 Arrays.asList(Type.MATCHER),
@@ -231,7 +231,7 @@ public class AstToJUnitAstTest {
                         Arrays.asList(
                                 new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
                                 new VarInitStatement(Type.OBJECT, "tmp", new InvokeStaticExpr(
-                                        new ClassType(ognl.Ognl.class, Span.dummySpan()),
+                                        new ClassType(ognl.Ognl.class),
                                         Arrays.asList(),
                                         "getValue",
                                         Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
@@ -244,7 +244,7 @@ public class AstToJUnitAstTest {
                                 new VarInitStatement(Type.THROWABLE, "actual", new NullExpr(), Span.dummySpan())),
                         Arrays.asList(
                                 new CatchClause(
-                                        new ClassType(ognl.OgnlException.class, Span.dummySpan()),
+                                        new ClassType(ognl.OgnlException.class),
                                         new Var("ex2"),
                                         Arrays.asList(
                                                 new VarInitStatement(
@@ -283,7 +283,7 @@ public class AstToJUnitAstTest {
                                                                         new VarExpr("reason"),
                                                                         Span.dummySpan()))))),
                                 new CatchClause(
-                                        new ClassType(java.lang.Throwable.class, Span.dummySpan()),
+                                        new ClassType(java.lang.Throwable.class),
                                         new Var("ex"),
                                         Arrays.asList(
                                                 new VarInitStatement(
