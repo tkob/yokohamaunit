@@ -362,7 +362,7 @@ public class AstToJUnitAst {
                                 Type.MATCHER,
                                 varName,
                                 new EqualToMatcherExpr(objVar),
-                                Span.dummySpan())));
+                                equalTo.getSpan())));
             },
             (InstanceOfMatcher instanceOf) -> {
                 return Stream.of(new VarInitStatement(
