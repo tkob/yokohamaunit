@@ -134,13 +134,27 @@ class ClassExprCheckVisitor {
     private Stream<ErrorMessage> visitExpr(Expr expr) {
         return expr.accept(
                 quotedExpr -> Stream.<ErrorMessage>empty(),
-                stubExpr -> visitStubExpr(stubExpr));
+                stubExpr -> visitStubExpr(stubExpr),
+                invocationExpr -> visitInvocationExpr(invocationExpr),
+                integerExpr -> Stream.<ErrorMessage>empty(),
+                floatingPointExpr -> Stream.<ErrorMessage>empty(),
+                booleanExpr -> Stream.<ErrorMessage>empty(),
+                charExpr -> Stream.<ErrorMessage>empty(),
+                stringExpr -> Stream.<ErrorMessage>empty());
     }
 
     private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {
         return Stream.concat(
                 visitClassType(stubExpr.getClassToStub()),
                 stubExpr.getBehavior().stream().flatMap(this::visitBehavior));
+    }
+
+    private Stream<ErrorMessage> visitInvocationExpr(InvocationExpr invocationExpr) {
+        return Stream.concat(
+                visitClassType(invocationExpr.getClassType()),
+                Stream.concat(
+                        visitMethodPattern(invocationExpr.getMethodPattern()),
+                        invocationExpr.getArgs().stream().flatMap(this::visitExpr)));
     }
 
     private Stream<ErrorMessage> visitBehavior(StubBehavior behavior) {
@@ -150,7 +164,7 @@ class ClassExprCheckVisitor {
     }
 
     private Stream<ErrorMessage> visitMethodPattern(MethodPattern methodPattern) {
-        return methodPattern.getArgumentTypes().stream().flatMap(this::visitType);
+        return methodPattern.getParamTypes().stream().flatMap(this::visitType);
     }
 
     private Stream<ErrorMessage> visitType(Type type) {

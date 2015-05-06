@@ -179,7 +179,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         Type.CLASS, expectedTypeVar.getName(),
                         new ClassLitExpr(Type.fromClass(expectedType).box()),
                         Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, varName,
+                new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 Instruction.VIRTUAL,
                                 new Var(envVarName),

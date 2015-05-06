@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,11 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import org.apache.commons.collections4.ListUtils;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
-import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -25,6 +21,7 @@ import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.Var;
 import yokohama.unit.ast_junit.VarInitStatement;
+import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
@@ -46,25 +43,21 @@ public class MockitoMockStrategy implements MockStrategy {
     public List<Statement> stub(
             String varName,
             StubExpr stubExpr,
-            ExpressionStrategy expressionStrategy,
+            AstToJUnitAst astToJUnitAst,
             String envVarName,
             ClassResolver classResolver) {
-        Class<?> classToStub =        stubExpr.getClassToStub().toClass(classResolver);
-        String classToStubName =      classToStub.getCanonicalName();
-        Span classToStubSpan =        stubExpr.getSpan();
         List<StubBehavior> behavior = stubExpr.getBehavior();
 
         /*
           Create a mock first, and then define "when...then" behavior.
         */
-        Stream<Statement> createMock = createMock(varName, classToStub, classToStubSpan);
+        Stream<Statement> createMock = createMock(varName, stubExpr.getClassToStub(), classResolver);
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         varName,
-                        classToStubName,
-                        classToStubSpan,
+                        stubExpr.getClassToStub(),
                         b,
-                        expressionStrategy,
+                        astToJUnitAst,
                         envVarName,
                         classResolver));
         return Stream.concat(createMock, defineBehavior).collect(Collectors.toList());
@@ -72,31 +65,30 @@ public class MockitoMockStrategy implements MockStrategy {
 
     private Stream<Statement> createMock(
             String varName,
-            Class<?> classToStub,
-            Span classToStubSpan) {
+            yokohama.unit.ast.ClassType classToStub,
+            ClassResolver classResolver) {
         // Call Mockito.mock method with the class and bind the variable to the result.
         Var classToStubVar = new Var(genSym.generate("classToStub"));
-        Type clazz = new Type(new ClassType(classToStub, classToStubSpan), 0);
+        Type clazz = Type.of(classToStub.toType(), classResolver);
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
                         new ClassLitExpr(clazz), Span.dummySpan()),
                 new VarInitStatement(clazz, varName,
                         new InvokeStaticExpr(
                                 MOCKITO,
-                                Arrays.asList(new Type(new ClassType(classToStub, classToStubSpan), 0)),
+                                Arrays.asList(clazz),
                                 "mock",
                                 Arrays.asList(Type.CLASS),
                                 Arrays.asList(classToStubVar),
                                 Type.OBJECT),
-                       classToStubSpan));
+                       classToStub.getSpan()));
     }
 
     private Stream<Statement> defineBehavior(
             String varName,
-            String classToStubName,
-            Span classToStubSpan,
+            yokohama.unit.ast.ClassType classToStub,
             StubBehavior behavior,
-            ExpressionStrategy expressionStrategy,
+            AstToJUnitAst astToJUnitAst,
             String envVarName,
             ClassResolver classResolver) {
         /*
@@ -111,30 +103,24 @@ public class MockitoMockStrategy implements MockStrategy {
         Span span = behavior.getSpan();
         MethodPattern methodPattern = behavior.getMethodPattern();
         String methodName = methodPattern.getName();
-        boolean isVarArg = methodPattern.isVarArg();
-        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getArgumentTypes();
-        Type returnType = getReturnType(classToStubName, methodName, argumentTypes, isVarArg, classResolver);
+        boolean isVararg = methodPattern.isVararg();
+        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
+
+        Type returnType = Type.of(
+                methodPattern.getReturnType(classToStub, classResolver),
+                classResolver);
 
         String returnedVarName = genSym.generate("returned");
-        Stream<Statement> returned = behavior.getToBeReturned().accept(
-                quotedExpr ->
-                        expressionStrategy.eval(
-                                returnedVarName,
-                                quotedExpr,
-                                returnType.toClass(),
-                                envVarName).stream(),
-                stubExpr->
-                        this.stub(
-                                returnedVarName,
-                                stubExpr,
-                                expressionStrategy,
-                                envVarName,
-                                classResolver).stream());
+        Stream<Statement> returned = astToJUnitAst.translateExpr(
+                behavior.getToBeReturned(),
+                returnedVarName,
+                returnType.box().toClass(),
+                envVarName);
 
         Stream<Type> argTypes;
         Stream<Var> argVars;
         Stream<Statement> argMatchers;
-        if (isVarArg) {
+        if (isVararg) {
             String varArg = genSym.generate("varArg");
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
@@ -167,7 +153,7 @@ public class MockitoMockStrategy implements MockStrategy {
             List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
-            argTypes = methodPattern.getArgumentTypes().stream().map(type -> Type.of(type, classResolver));
+            argTypes = methodPattern.getParamTypes().stream().map(type -> Type.of(type, classResolver));
             argVars = pairs.stream().map(Pair::getFirst);
             argMatchers = pairs.stream().flatMap(Pair::getSecond);
         }
@@ -179,7 +165,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 Stream.of(
                         new VarInitStatement(returnType, invokeTmpVarName, 
                                 new InvokeExpr(
-                                        isInterface(classToStubName)
+                                        classToStub.toClass(classResolver).isInterface()
                                                 ? InvokeExpr.Instruction.INTERFACE
                                                 : InvokeExpr.Instruction.VIRTUAL,
                                         new Var(varName),
@@ -383,33 +369,5 @@ public class MockitoMockStrategy implements MockStrategy {
                                     Span.dummySpan()));
                 });
         return new Pair<>(new Var(argVarName), statements);
-    }
-
-    @SneakyThrows
-    private Type getReturnType(
-            String classToStubName,
-            String methodName,
-            List<yokohama.unit.ast.Type> argumentTypes,
-            boolean isVarArg,
-            ClassResolver classResolver) {
-        Class<?> clazz = Class.forName(classToStubName);
-        Method method = clazz.getMethod(
-                methodName,
-                (isVarArg
-                        ? ListUtils.union(
-                                argumentTypes.subList(0, argumentTypes.size() - 1),
-                                Arrays.asList(
-                                        argumentTypes.get(argumentTypes.size() - 1).toArray())) 
-                        : argumentTypes).stream()
-                        .map(type -> Type.of(type, classResolver))
-                        .map(Type::toClass)
-                        .collect(Collectors.toList())
-                        .toArray(new Class[]{}));
-        return Type.fromClass(method.getReturnType());
-    }
-
-    @SneakyThrows(ClassNotFoundException.class)
-    private boolean isInterface(String className) {
-        return Class.forName(className).isInterface();
     }
 }

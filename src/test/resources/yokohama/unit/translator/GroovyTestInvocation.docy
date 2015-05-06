@@ -1,0 +1,59 @@
+*[ArrayList]: java.util.ArrayList
+*[Arrays]: java.util.Arrays
+*[Collection]: java.util.Collection
+*[Collections]: java.util.Collections
+*[File]: java.io.File
+*[IntStream]: java.util.stream.IntStream
+*[List]: java.util.List
+*[Paths]: java.nio.file.Paths
+
+# Test: invokevirtual with no argument
+
+Assert `len` is `5` where s is `"Hello"` and len is an invocation of
+ `String.length()` on `s`.
+
+Assert `intValue` is `5` where n is `5` and intValue is an invocation of
+`Integer.intValue()` on `n`.
+
+Assert `intValue` is `5` where n is `5` and intValue is an invocation of
+`Number.intValue()` on `n`.
+
+Assert `size` is `0` where list is `new ArrayList()` and size is an
+invocation of `ArrayList.size()` on `list`.
+
+Assert `size` is `0` where list is `new ArrayList()` and size is an
+invocation of `List.size()` on `list`.
+
+# Test: List.remove is overloaded on arguments
+
+Assert `previous` is `30` where list is `[10, 20, 30, 2]` and previous is an
+invocation of `List.remove(int)` on `list` with 2.
+
+Assert `hit` is `true` where list is `[10, 20, 30, 2]` and hit is an invocation
+of `List.remove(Object)` on `list` with 2.
+
+# Test: invokestatic with no argument
+
+Assert `nil` is `[]` where nil is an invocation of `Collections.emptyList()`.
+
+# Test: Integer.valueOf is overloaded
+
+Assert `intValue` is `123` where i is `123 as Object` and intValue is an
+invocation of `Integer.valueOf(int)` with `i`.
+
+Assert `intValue` is `123` where i is `"123" as Object` and intValue is an
+invocation of `Integer.valueOf(String)` with `i`.
+
+# Test: Invoking methods with vararg
+
+Assert `list` is `["a", "b", "c"]` where list is an invocation of
+`Arrays.asList(Object...)` with "a", "b", "c".
+
+Assert `modified` is `true` where list is `new ArrayList()` and modified is an
+invocation of `Collections.addAll(Collection, Object...)` with `list`, "a", "b".
+
+Assert `path` is `new File("a/b/c").toPath()` where path is an invocation of
+`Paths.get(String, String...)` with "a", "b", "c".
+
+Assert `stream.sum()` is `6` where stream is an invocation of
+ `IntStream.of(int...)` with 1, 2, 3.

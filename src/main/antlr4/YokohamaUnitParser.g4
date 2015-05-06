@@ -21,7 +21,7 @@ propositions: proposition (AND THAT? proposition)* ;
 
 proposition: subject predicate ;
 
-subject: Expr ;
+subject: Expr | invokeExpr ;
 
 predicate: isPredicate | isNotPredicate | throwsPredicate ;
 isPredicate: IS matcher ;
@@ -68,7 +68,15 @@ header: BAR (Identifier BAR)* Identifier? NEWLINE;
 rows: row+ ;
 row: BAR (Expr BAR)* Expr? NEWLINE  ;
 
-expr: Expr | stubExpr ;
+expr: Expr
+    | stubExpr
+    | invokeExpr
+    | integerExpr
+    | floatingPointExpr
+    | booleanExpr
+    | charExpr
+    | stringExpr
+    ;
 
 stubExpr: A_STUB_OF classType ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
 stubBehavior: METHOD methodPattern RETURNS expr ;
@@ -80,3 +88,24 @@ nonArrayType: primitiveType | classType ;
 primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
+invokeExpr: AN_INVOCATION_OF classType DOT methodPattern
+            ( ON Expr )?
+            ( WITH argumentExpr (COMMA argumentExpr)* )? ;
+
+argumentExpr: Expr
+            | integerExpr
+            | floatingPointExpr
+            | booleanExpr
+            | charExpr
+            | stringExpr
+            ;
+
+integerExpr: MINUS? Integer ;
+
+floatingPointExpr: MINUS? FloatingPoint ;
+
+booleanExpr: TRUE | FALSE ;
+
+charExpr: Char ;
+
+stringExpr: Str | EMPTY_STRING ;

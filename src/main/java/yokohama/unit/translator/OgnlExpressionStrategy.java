@@ -296,7 +296,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         return Arrays.asList(
                 new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, varName,
+                new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeStaticExpr(
                                 new ClassType(ognl.Ognl.class, Span.dummySpan()),
                                 Arrays.asList(),

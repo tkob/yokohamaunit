@@ -1,0 +1,73 @@
+*[Lists]: yokohama.unit.util.Lists
+*[Optional]: java.util.Optional
+*[Stream]: java.util.stream.Stream
+
+# Test: Tests for Lists.repeat
+
+Assert that `Lists.repeat("hello", 0)` is `[]`.
+
+Assert that `Lists.repeat("hello", 1)` is `["hello"]`.
+
+Assert that `Lists.repeat("hello", 2)` is `["hello", "hello"]`.
+
+# Test: Tests for Lists.last and Lists.lastOpt
+
+Assert that `Lists.last([])` throws an instance of `IndexOutOfBoundsException`.
+
+Assert that `Lists.last(["a"])` is `"a"`.
+
+Assert that `Lists.last(["a", "b"])` is `"b"`.
+
+Assert that `Lists.lastOpt([])` is `Optional.empty()`.
+
+Assert that `Lists.lastOpt(["a"])` is `Optional.of("a")`.
+
+Assert that `Lists.lastOpt(["a", "b"])` is `Optional.of("b")`.
+
+# Test: Tests for List.mapInitAndLast
+
+Assert `Lists.mapInitAndLast([], {it -> it}, {it -> it})` is `[]`.
+
+Assert `Lists.mapInitAndLast([1], {it -> it}, {it -> it + 1})` is `[2]`.
+
+Assert `Lists.mapInitAndLast([1, 2], {it -> it}, {it -> it + 1})` is `[1, 3]`.
+
+Assert `Lists.mapInitAndLast([1, 2, 3], {it -> it}, {it -> it + 1})` is
+`[1, 2, 4]`.
+
+# Test: Tests for List.flatMapInitAndLast
+
+Assert `Lists.flatMapInitAndLast([], initf, lastf)` is `[]`
+where initf = `{it -> Stream.of(it)}` and lastf = `{it -> Stream.of(it, it)}`.
+
+Assert `Lists.flatMapInitAndLast([1], initf, lastf)` is `[1, 1]`
+where initf = `{it -> Stream.of(it)}` and lastf = `{it -> Stream.of(it, it)}`.
+
+Assert `Lists.flatMapInitAndLast([1, 2], initf, lastf)` is `[1, 2, 2]`
+where initf = `{it -> Stream.of(it)}` and lastf = `{it -> Stream.of(it, it)}`.
+
+Assert `Lists.flatMapInitAndLast([1, 2, 3], initf, lastf)` is `[1, 2, 3, 3]`
+where initf = `{it -> Stream.of(it)}` and lastf = `{it -> Stream.of(it, it)}`.
+
+# Test: Tests for List.mapFirstAndRest
+
+Assert `Lists.mapFirstAndRest([], {it -> it}, {it -> it})` is `[]`.
+
+Assert `Lists.mapFirstAndRest([1], {it -> it + 1}, {it -> it})` is `[2]`.
+
+Assert `Lists.mapFirstAndRest([3, 2, 1], {it -> it + 1}, {it -> it})` is
+ `[4, 2, 1]`.
+
+# Test: Tests for List.flatMapFirstAndRest
+
+Assert `Lists.flatMapFirstAndRest([], firstf, restf)` is `[]`
+where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.
+
+Assert `Lists.flatMapFirstAndRest([1], firstf, restf)` is `[1, 1]`
+where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.
+
+Assert `Lists.flatMapFirstAndRest([1, 2], firstf, restf)` is `[1, 1, 2]`
+where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.
+
+Assert `Lists.flatMapFirstAndRest([1, 2, 3], firstf, restf)` is `[1, 1, 2, 3]`
+where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.

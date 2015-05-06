@@ -18,6 +18,11 @@
  *        | InvokeExpr
  *        | InvokeStaticExpr
  *        | IntLitExpr
+ *        | LongLitExpr
+ *        | FloatLitExpr
+ *        | DoubleLitExpr
+ *        | BooleanLitExpr
+ *        | CharLitExpr
  *        | ClassLitExpr
  *        | EqualOpExpr
  *        | ArrayExpr
