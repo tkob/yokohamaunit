@@ -583,7 +583,7 @@ public class AstToJUnitAst {
                                             type -> isVararg ? type.toArray(): type),
                                     argVars,
                                     returnType),
-                            Span.dummySpan())));
+                            invocationExpr.getSpan())));
         } else {
             // invokestatic
             invocation = Stream.of(
@@ -600,7 +600,7 @@ public class AstToJUnitAst {
                                             type -> isVararg ? type.toArray(): type),
                                     argVars,
                                     returnType),
-                            Span.dummySpan()));
+                            invocationExpr.getSpan()));
         }
 
         return Stream.concat(setupStatements,invocation);
