@@ -11,6 +11,7 @@ import javax.el.ELException;
 import javax.el.ELManager;
 import javax.el.ELProcessor;
 import lombok.AllArgsConstructor;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -98,16 +99,16 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs) {
+    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
         /*
         env.defineBean(name, rhs);
         */
-        Var nameVar = new Var(genSym.generate(name));
+        Var nameVar = new Var(genSym.generate(ident.getName()));
         return Arrays.asList(
                 new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name),
+                        new StrLitExpr(ident.getName()),
                         Span.dummySpan()),
                 new InvokeVoidStatement(
                         EL_PROCESSOR,

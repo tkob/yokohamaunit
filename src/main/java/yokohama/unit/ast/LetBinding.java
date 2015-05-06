@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class LetBinding {
-    private String name;
+    private Ident name;
     private Expr value;
     private Span span;
 }

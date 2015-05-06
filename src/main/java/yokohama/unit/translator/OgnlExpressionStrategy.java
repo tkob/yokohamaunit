@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast_junit.CatchClause;
@@ -222,13 +223,12 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs) {
-        Var nameVar = new Var(genSym.generate(name));
-        return Arrays.asList(
-                new VarInitStatement(
+    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
+        Var nameVar = new Var(genSym.generate(ident.getName()));
+        return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name),
+                        new StrLitExpr(ident.getName()),
                         Span.dummySpan()),
                 new VarInitStatement(
                         Type.OBJECT,

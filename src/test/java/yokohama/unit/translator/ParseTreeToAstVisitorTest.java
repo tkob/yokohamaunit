@@ -390,7 +390,7 @@ public class ParseTreeToAstVisitorTest {
                         Arrays.asList(new LetStatement(
                                 Arrays.asList(
                                         new LetBinding(
-                                                "x",
+                                                new Ident("x", Span.dummySpan()),
                                                 new QuotedExpr("1", Span.dummySpan()),
                                                 Span.dummySpan())),
                                 Span.dummySpan())),
@@ -456,7 +456,7 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
                                 new LetBinding(
-                                        "x",
+                                        new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
                         Span.dummySpan())),
@@ -492,7 +492,7 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
                                 new LetBinding(
-                                        "x",
+                                        new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
                         Span.dummySpan())),
@@ -606,11 +606,11 @@ public class ParseTreeToAstVisitorTest {
                 new LetStatement(
                         Arrays.asList(
                                 new LetBinding(
-                                        "x",
+                                        new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan()),
                                 new LetBinding(
-                                        "y",
+                                        new Ident("y", Span.dummySpan()),
                                         new QuotedExpr("2", Span.dummySpan()),
                                         Span.dummySpan())),
                         Span.dummySpan());
@@ -624,7 +624,7 @@ public class ParseTreeToAstVisitorTest {
         LetBinding actual = instance.visitLetBinding(ctx);
         LetBinding expected =
                 new LetBinding(
-                        "x",
+                        new Ident("x", Span.dummySpan()),
                         new QuotedExpr("1", Span.dummySpan()),
                         Span.dummySpan());
         assertThat(actual, is(expected));

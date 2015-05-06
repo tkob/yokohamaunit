@@ -370,7 +370,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public LetBinding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
         return new LetBinding(
-                ctx.Identifier().getText(),
+                new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitExpr(ctx.expr()),
                 getSpan(ctx));
     }

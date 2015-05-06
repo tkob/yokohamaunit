@@ -3,6 +3,7 @@ package yokohama.unit.translator;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
@@ -39,7 +40,7 @@ public interface ExpressionStrategy {
      * @return statements that bind name to rhs in the environment of the
      *          expression language
      */
-    List<Statement> bind(String envVarName, String name, Var rhs);
+    List<Statement> bind(String envVarName, Ident ident, Var rhs);
 
     Optional<CatchClause> catchAndAssignCause(String causeVarName);
 

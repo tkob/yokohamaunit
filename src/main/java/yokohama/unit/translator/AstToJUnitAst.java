@@ -8,8 +8,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -372,7 +375,7 @@ public class AstToJUnitAst {
                         instanceOf.getSpan()));
             },
             (InstanceSuchThatMatcher instanceSuchThat) -> {
-                String bindVarName = instanceSuchThat.getVar().getName();
+                Ident bindVar = instanceSuchThat.getVar();
                 yokohama.unit.ast.ClassType clazz = instanceSuchThat.getClazz();
                 List<Proposition> propositions = instanceSuchThat.getPropositions();
                 Span span = instanceSuchThat.getSpan();
@@ -393,8 +396,7 @@ public class AstToJUnitAst {
                                 clazz.getSpan()));
 
                 Stream<Statement> bindStatements =
-                        expressionStrategy.bind(
-                                envVarName, bindVarName, new Var(actual)).stream();
+                        expressionStrategy.bind(envVarName, bindVar, new Var(actual)).stream();
 
                 Stream<Statement> suchThatStatements =
                         propositions
@@ -420,8 +422,8 @@ public class AstToJUnitAst {
 
     Stream<Statement> translateBinding(
             yokohama.unit.ast.Binding binding, String envVarName) {
-        String name = binding.getName().getName();
-        String varName = genSym.generate(name);
+        Ident name = binding.getName();
+        String varName = genSym.generate(name.getName());
         return Stream.concat(
                 translateExpr(
                         binding.getValue(), varName, Object.class, envVarName),
@@ -834,7 +836,7 @@ public class AstToJUnitAst {
             List<Table> tables,
             String envVarName) {
         String name = tableRef.getName();
-        List<String> idents = Lists.map(tableRef.getIdents(), Ident::getName);
+        List<Ident> idents = tableRef.getIdents();
         try {
             switch(tableRef.getType()) {
                 case INLINE:
@@ -864,32 +866,25 @@ public class AstToJUnitAst {
 
     List<List<Statement>> translateTable(
             Table table,
-            List<String> idents,
+            List<Ident> idents,
             String envVarName) {
         return table.getRows()
-                    .stream()
-                    .map(row ->
-                            translateRow(
-                                    row,
-                                    table.getHeader()
-                                            .stream()
-                                            .map(Ident::getName)
-                                            .collect(Collectors.toList()),
-                                    idents,
-                                    envVarName))
-                    .collect(Collectors.toList());
+                .stream()
+                .map(row ->
+                        translateRow(row, table.getHeader(), idents, envVarName))
+                .collect(Collectors.toList());
     }
 
     List<Statement> translateRow(
             Row row,
-            List<String> header,
-            List<String> idents,
+            List<Ident> header,
+            List<Ident> idents,
             String envVarName) {
         return IntStream.range(0, header.size())
                 .filter(i -> idents.contains(header.get(i)))
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
-                    String varName = genSym.generate(header.get(i));
+                    String varName = genSym.generate(header.get(i).getName());
                     return Stream.concat(
                             translateExpr(
                                     row.getExprs().get(i), varName, Object.class, envVarName),
@@ -900,8 +895,12 @@ public class AstToJUnitAst {
     }
 
     List<List<Statement>> parseCSV(
-            String fileName, CSVFormat format, List<String> idents, String envVarName)
+            String fileName, CSVFormat format, List<Ident> idents, String envVarName)
             throws IOException {
+        Map<String, Ident> nameToIdent = idents.stream()
+                .collect(() -> new TreeMap<>(),
+                        (map, ident) -> map.put(ident.getName(), ident),
+                        (m1, m2) -> m1.putAll(m2));
         try (   final InputStream in = getClass().getResourceAsStream(fileName);
                 final Reader reader = new InputStreamReader(in, "UTF-8");
                 final CSVParser parser = new CSVParser(reader, format)) {
@@ -909,19 +908,19 @@ public class AstToJUnitAst {
                     .map(record ->
                             parser.getHeaderMap().keySet()
                                     .stream()
-                                    .filter(key -> idents.contains(key))
-                                    .flatMap(name -> {
-                                        String varName = genSym.generate(name);
-                                        return Stream.concat(expressionStrategy.eval(
-                                                varName,
+                                    .filter(key -> idents.stream().anyMatch(ident -> ident.getName().equals(key)))
+                                    .map(key -> nameToIdent.get(key))
+                                    .flatMap(ident -> {
+                                        String varName = genSym.generate(ident.getName());
+                                        return Stream.concat(expressionStrategy.eval(varName,
                                                 new yokohama.unit.ast.QuotedExpr(
-                                                        record.get(name),
+                                                        record.get(ident.getName()),
                                                         new yokohama.unit.position.Span(
                                                                 Optional.of(Paths.get(fileName)),
                                                                 new Position((int)parser.getCurrentLineNumber(), -1),
                                                                 new Position(-1, -1))),
                                                 Object.class, envVarName).stream(),
-                                                expressionStrategy.bind(envVarName, name, new Var(varName)).stream());
+                                                expressionStrategy.bind(envVarName, ident, new Var(varName)).stream());
                                     })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -929,8 +928,12 @@ public class AstToJUnitAst {
     }
 
     List<List<Statement>> parseExcel(
-            String fileName, List<String> idents, String envVarName)
+            String fileName, List<Ident> idents, String envVarName)
             throws InvalidFormatException, IOException {
+        Map<String, Ident> nameToIdent = idents.stream()
+                .collect(() -> new TreeMap<>(),
+                        (map, ident) -> map.put(ident.getName(), ident),
+                        (m1, m2) -> m1.putAll(m2));
         try (InputStream in = getClass().getResourceAsStream(fileName)) {
             final Workbook book = WorkbookFactory.create(in);
             final Sheet sheet = book.getSheetAt(0);
@@ -943,9 +946,10 @@ public class AstToJUnitAst {
                     .skip(1)
                     .map(row -> 
                         IntStream.range(0, names.size())
-                                .filter(i -> idents.contains(names.get(i)))
+                                .filter(i -> idents.stream().anyMatch(ident -> ident.getName().equals(names.get(i))))
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
+                                    Ident ident = nameToIdent.get(names.get(i));
                                     String varName = genSym.generate(names.get(i));
                                     return Stream.concat(expressionStrategy.eval(
                                             varName,
@@ -956,7 +960,7 @@ public class AstToJUnitAst {
                                                             new Position(row.getRowNum() + 1, left + i + 1),
                                                             new Position(-1, -1))),
                                             Object.class, envVarName).stream(),
-                                            expressionStrategy.bind(envVarName, names.get(i), new Var(varName)).stream());
+                                            expressionStrategy.bind(envVarName, ident, new Var(varName)).stream());
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -975,7 +979,7 @@ public class AstToJUnitAst {
                             letStatement.getBindings().stream()
                                     .flatMap(binding -> {
                                         String varName =
-                                                genSym.generate(binding.getName());
+                                                genSym.generate(binding.getName().getName());
                                         return Stream.concat(
                                                 translateExpr(
                                                         binding.getValue(),

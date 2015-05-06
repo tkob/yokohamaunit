@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.ArrayExpr;
 import yokohama.unit.ast_junit.CatchClause;
@@ -147,16 +148,15 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, String name, Var rhs) {
+    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
         /*
         env.setVariable(name, rhs);
         */
-        Var nameVar = new Var(genSym.generate(name));
-        return Arrays.asList(
-                new VarInitStatement(
+        Var nameVar = new Var(genSym.generate(ident.getName()));
+        return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
-                        new StrLitExpr(name),
+                        new StrLitExpr(ident.getName()),
                         Span.dummySpan()),
                 new InvokeVoidStatement(
                         GROOVY_SHELL,
