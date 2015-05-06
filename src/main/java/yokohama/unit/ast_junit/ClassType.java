@@ -11,7 +11,11 @@ public class ClassType implements NonArrayType {
     private Span span;
 
     public static final ClassType TEST = new ClassType(org.junit.Test.class, Span.dummySpan());
+    public static final ClassType CORE_MATCHERS = new ClassType(org.hamcrest.CoreMatchers.class, Span.dummySpan());
+
     public static final ClassType STRING = new ClassType(String.class, Span.dummySpan());
+    public static final ClassType THROWABLE = new ClassType(java.lang.Throwable.class, Span.dummySpan());
+    public static final ClassType EXCEPTION = new ClassType(java.lang.Exception.class, Span.dummySpan());
 
     public static final ClassType BOOLEAN   = new ClassType(Boolean.class,   Span.dummySpan());
     public static final ClassType BYTE      = new ClassType(Byte.class,      Span.dummySpan());
