@@ -34,6 +34,7 @@ import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
+import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.LetBindings;
 import yokohama.unit.ast.Matcher;
@@ -426,23 +427,8 @@ public class AstToJUnitAst {
                     Type returnType = integerExpr.match(
                             intValue -> Type.INT,
                             longValue -> Type.LONG);
-                    Stream<Statement> statements = integerExpr.match(
-                            intValue -> {
-                                return Stream.<Statement>of(
-                                        new VarInitStatement(
-                                                Type.INT,
-                                                exprVar.getName(),
-                                                new IntLitExpr(intValue),
-                                                integerExpr.getSpan()));
-                            },
-                            longValue -> {
-                                return Stream.<Statement>of(
-                                        new VarInitStatement(
-                                                Type.LONG,
-                                                exprVar.getName(),
-                                                new LongLitExpr(longValue),
-                                                integerExpr.getSpan()));
-                            });
+                    Stream<Statement> statements =
+                            translateIntegerExpr(integerExpr, exprVar.getName(), envVarName);
                     return new Pair<>(returnType, statements);
                 },
                 floatingPointExpr -> {
@@ -603,6 +589,29 @@ public class AstToJUnitAst {
         }
 
         return new Pair<>(returnType, Stream.concat(setupStatements,invocation));
+    }
+
+    Stream<Statement> translateIntegerExpr(
+            IntegerExpr integerExpr,
+            String varName,
+            String envVarName) {
+        return integerExpr.match(
+                intValue -> {
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.INT,
+                                    varName,
+                                    new IntLitExpr(intValue),
+                                    integerExpr.getSpan()));
+                },
+                longValue -> {
+                    return Stream.<Statement>of(
+                            new VarInitStatement(
+                                    Type.LONG,
+                                    varName,
+                                    new LongLitExpr(longValue),
+                                    integerExpr.getSpan()));
+                });
     }
 
     Stream<Statement> translateFloatingPointExpr(
