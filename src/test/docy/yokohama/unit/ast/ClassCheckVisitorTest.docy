@@ -6,15 +6,23 @@
 # Test: ClassCheckVisitor.check
 
 ## Setup
-Let docy = `"yokohama/unit/ast/TestClassCheck.docy"` 
-and docyPath = `new java.io.File(docy).toPath()` 
-and ins = `ClassLoader.getSystemResourceAsStream(docy)` 
-and errors = `new java.util.ArrayList()` 
-and docyParser = `new yokohama.unit.translator.DocyParserImpl()` 
-and ctx = `docyParser.parse(docyPath, ins, errors)` 
-and factory = `new yokohama.unit.translator.ParseTreeToAstVisitorFactory()` 
-and ast = `factory.create(Optional.of(docyPath)).visitGroup(ctx)` 
-and visitor = `new ClassCheckVisitor(ClassLoader.getSystemClassLoader())`. 
+Let docy = `"yokohama/unit/ast/TestClassCheck.docy"`.
+
+Let docyPath = `new java.io.File(docy).toPath()`.
+
+Let ins = `ClassLoader.getSystemResourceAsStream(docy)`.
+
+Let errors = `new java.util.ArrayList()`.
+
+Let docyParser = `new yokohama.unit.translator.DocyParserImpl()`.
+
+Let ctx = `docyParser.parse(docyPath, ins, errors)`.
+
+Let factory = `new yokohama.unit.translator.ParseTreeToAstVisitorFactory()`.
+
+Let ast = `factory.create(Optional.of(docyPath)).visitGroup(ctx)`.
+
+Let visitor = `new ClassCheckVisitor(ClassLoader.getSystemClassLoader())`. 
 
 ## Verify
 

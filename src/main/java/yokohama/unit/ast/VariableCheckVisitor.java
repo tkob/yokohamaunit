@@ -108,12 +108,13 @@ public class VariableCheckVisitor {
     private Stream<ErrorMessage> checkFourPhaseTest(FourPhaseTest fourPhaseTest, FList<String> env) {
         List<Ident> setupIdents = Optionals.<Phase, Stream<Ident>>match(fourPhaseTest.getSetup(),
                 () -> Stream.empty(),
-                phase -> match(phase.getLetBindings(),
-                        () -> Stream.empty(),
-                        letBindings ->
-                                letBindings.getBindings().stream().map(
-                                        letBinding ->
-                                                new Ident(letBinding.getName(), letBinding.getSpan()))))
+                phase -> phase.getLetStatements().stream()
+                        .flatMap(letStatement ->
+                                letStatement.getBindings().stream()
+                                        .map(letBinding ->
+                                                new Ident(
+                                                        letBinding.getName(),
+                                                        letBinding.getSpan()))))
                 .collect(Collectors.toList());
         Stream<ErrorMessage> setupErrors = checkIdents(setupIdents, env);
 

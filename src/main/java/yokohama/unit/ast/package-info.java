@@ -59,10 +59,10 @@
  * 
  * FourPhaseTest ::= Phase? Phase? VerifyPhase Phase?
  * 
- * Phase ::= LetBindings? Execution?
+ * Phase ::= LetStatement* Execution*
  * VerifyPhase ::= Assertion+
  * 
- * LetBindings ::= LetBinding+
+ * LetStatement ::= LetBinding+
  * LetBinding ::= Expr
  * 
  * Execution ::= QuotedExpr*

@@ -11,7 +11,7 @@ import lombok.Value;
 public class Phase {
     private int numHashes;
     private Optional<String> description;
-    private Optional<LetBindings> letBindings;
+    private List<LetStatement> letStatements;
     private List<Execution> executions;
     private Span span;
 }

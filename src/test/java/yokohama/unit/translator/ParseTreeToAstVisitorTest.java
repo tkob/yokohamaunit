@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -32,7 +33,7 @@ import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.LetBinding;
-import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
@@ -386,20 +387,19 @@ public class ParseTreeToAstVisitorTest {
                 Optional.of(new Phase(
                         2,
                         Optional.empty(),
-                        Optional.of(
-                                new LetBindings(
-                                        Arrays.asList(
-                                                new LetBinding(
-                                                        "x",
-                                                        new QuotedExpr("1", Span.dummySpan()),
-                                                        Span.dummySpan())),
-                                        Span.dummySpan())),
+                        Arrays.asList(new LetStatement(
+                                Arrays.asList(
+                                        new LetBinding(
+                                                "x",
+                                                new QuotedExpr("1", Span.dummySpan()),
+                                                Span.dummySpan())),
+                                Span.dummySpan())),
                         Arrays.asList(),
                         Span.dummySpan())),
                 Optional.of(new Phase(
                         2,
                         Optional.empty(),
-                        Optional.empty(),
+                        Collections.emptyList(),
                         Arrays.asList(
                                 new Execution(
                                         Arrays.asList(
@@ -426,7 +426,7 @@ public class ParseTreeToAstVisitorTest {
                 Optional.of(new Phase(
                         2,
                         Optional.of("do that"),
-                        Optional.empty(),
+                        Collections.emptyList(),
                         Arrays.asList(
                                 new Execution(
                                         Arrays.asList(
@@ -453,14 +453,13 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 0,
                 Optional.empty(),
-                Optional.of(
-                        new LetBindings(
-                                Arrays.asList(
-                                        new LetBinding(
-                                                "x",
-                                                new QuotedExpr("1", Span.dummySpan()),
-                                                Span.dummySpan())),
-                                Span.dummySpan())),
+                Arrays.asList(new LetStatement(
+                        Arrays.asList(
+                                new LetBinding(
+                                        "x",
+                                        new QuotedExpr("1", Span.dummySpan()),
+                                        Span.dummySpan())),
+                        Span.dummySpan())),
                 Arrays.asList(),
                 Span.dummySpan());
         assertThat(actual, is(expected));
@@ -474,7 +473,7 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 2,
                 Optional.of("x = 1"),
-                Optional.empty(),
+                Collections.emptyList(),
                 Arrays.asList(
                         new Execution(Arrays.asList(new QuotedExpr("this", Span.dummySpan())), Span.dummySpan()),
                         new Execution(Arrays.asList(new QuotedExpr("that", Span.dummySpan())), Span.dummySpan())),
@@ -490,14 +489,13 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 0,
                 Optional.empty(),
-                Optional.of(
-                        new LetBindings(
-                                Arrays.asList(
-                                        new LetBinding(
-                                                "x",
-                                                new QuotedExpr("1", Span.dummySpan()),
-                                                Span.dummySpan())),
-                                Span.dummySpan())),
+                Arrays.asList(new LetStatement(
+                        Arrays.asList(
+                                new LetBinding(
+                                        "x",
+                                        new QuotedExpr("1", Span.dummySpan()),
+                                        Span.dummySpan())),
+                        Span.dummySpan())),
                 Arrays.asList(
                         new Execution(
                                 Arrays.asList(
@@ -516,7 +514,7 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 0,
                 Optional.of("x = 1"),
-                Optional.empty(),
+                Collections.emptyList(),
                 Arrays.asList(
                         new Execution(
                                 Arrays.asList(
@@ -566,7 +564,7 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 2,
                 Optional.of("do that"),
-                Optional.empty(),
+                Collections.emptyList(),
                 Arrays.asList(
                         new Execution(
                                 Arrays.asList(
@@ -588,7 +586,7 @@ public class ParseTreeToAstVisitorTest {
         Phase expected = new Phase(
                 0,
                 Optional.empty(),
-                Optional.empty(),
+                Collections.emptyList(),
                 Arrays.asList(
                         new Execution(
                                 Arrays.asList(
@@ -601,11 +599,11 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitLetBindings() throws IOException {
-        YokohamaUnitParser.LetBindingsContext ctx = parser("Let x be `1` and y = `2`.").letBindings();
+        YokohamaUnitParser.LetStatementContext ctx = parser("Let x be `1` and y = `2`.").letStatement();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        LetBindings actual = instance.visitLetBindings(ctx);
-        LetBindings expected =
-                new LetBindings(
+        LetStatement actual = instance.visitLetStatement(ctx);
+        LetStatement expected =
+                new LetStatement(
                         Arrays.asList(
                                 new LetBinding(
                                         "x",

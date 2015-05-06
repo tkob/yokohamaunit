@@ -189,8 +189,8 @@ class ClassExprCheckVisitor {
 
     private Stream<ErrorMessage> visitPhase(Phase phase) {
         return Stream.concat(
-                Optionals.toStream(phase.getLetBindings())
-                        .map(LetBindings::getBindings).flatMap(List::stream)
+                phase.getLetStatements().stream()
+                        .map(LetStatement::getBindings).flatMap(List::stream)
                         .flatMap(this::visitLetBinding),
                 phase.getExecutions().stream()
                         .map(Execution::getExpressions).flatMap(List::stream)

@@ -36,7 +36,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
-import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
@@ -986,19 +986,24 @@ public class AstToJUnitAst {
         Stream<Statement> bindings;
         if (fourPhaseTest.getSetup().isPresent()) {
             Phase setup = fourPhaseTest.getSetup().get();
-            if (setup.getLetBindings().isPresent()) {
-                LetBindings letBindings = setup.getLetBindings().get();
-                bindings = letBindings.getBindings()
-                        .stream()
-                        .flatMap(binding -> {
-                            String varName = genSym.generate(binding.getName());
-                            return Stream.concat(
-                                    translateExpr(binding.getValue(), varName, Object.class, env),
-                                    expressionStrategy.bind(env, binding.getName(), new Var(varName)).stream());
-                        });
-            } else {
-                bindings = Stream.empty();
-            }
+            bindings = setup.getLetStatements().stream()
+                    .flatMap(letStatement ->
+                            letStatement.getBindings().stream()
+                                    .flatMap(binding -> {
+                                        String varName =
+                                                genSym.generate(binding.getName());
+                                        return Stream.concat(
+                                                translateExpr(
+                                                        binding.getValue(),
+                                                        varName,
+                                                        Object.class,
+                                                        env),
+                                                expressionStrategy.bind(
+                                                        env,
+                                                        binding.getName(),
+                                                        new Var(varName))
+                                                        .stream());
+                                    }));
         } else {
             bindings = Stream.empty();
         }

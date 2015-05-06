@@ -1,6 +1,7 @@
 package yokohama.unit.translator;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
-import yokohama.unit.ast.LetBindings;
+import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NonArrayType;
 import yokohama.unit.ast.Phase;
@@ -307,14 +308,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
-        Optional<LetBindings> letBindings =
-                ctx.letBindings() == null ? Optional.empty()
-                                          : Optional.of(visitLetBindings(ctx.letBindings()));
+        List<LetStatement> letStatements =
+                ctx.letStatement().stream()
+                        .map(letStatement -> visitLetStatement(letStatement))
+                        .collect(Collectors.toList());
+
         List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, letBindings, executions, getSpan(ctx));
+        return new Phase(numHashes, description, letStatements, executions, getSpan(ctx));
     }
 
     @Override
@@ -327,7 +330,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), executions, getSpan(ctx));
+        return new Phase(numHashes, description, Collections.emptyList(), executions, getSpan(ctx));
     }
 
     @Override
@@ -353,12 +356,12 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Optional.empty(), executions, getSpan(ctx));
+        return new Phase(numHashes, description, Collections.emptyList(), executions, getSpan(ctx));
     }
 
     @Override
-    public LetBindings visitLetBindings(YokohamaUnitParser.LetBindingsContext ctx) {
-        return new LetBindings(
+    public LetStatement visitLetStatement(YokohamaUnitParser.LetStatementContext ctx) {
+        return new LetStatement(
                 ctx.letBinding().stream()
                         .map(this::visitLetBinding)
                         .collect(Collectors.toList()), getSpan(ctx));

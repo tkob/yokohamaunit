@@ -51,12 +51,12 @@ binding: Identifier (EQ | IS) expr ;
 
 fourPhaseTest: hash? TEST TestName setup? exercise? verify teardown? ;
 
-setup: hash? SETUP PhaseDescription? (letBindings execution* | execution+) ;
+setup: hash? SETUP PhaseDescription? (letStatement+ execution* | execution+) ;
 exercise: hash? EXERCISE PhaseDescription? execution+ ;
 verify: hash? VERIFY PhaseDescription? assertion+ ;
 teardown: hash? TEARDOWN PhaseDescription? execution+ ;
 
-letBindings: LET letBinding (AND letBinding)* STOP ;
+letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
 execution: DO Expr (AND Expr)* STOP ;
 
