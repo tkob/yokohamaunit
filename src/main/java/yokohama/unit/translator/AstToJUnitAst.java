@@ -543,7 +543,7 @@ public class AstToJUnitAst {
                                         paramType.toArray(),
                                         argVar.getName(),
                                         new ArrayExpr(paramType.toArray(), varargVars),
-                                        Span.dummySpan()));
+                                        t.getSpan()));
                         return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
                     }));
         } else {
