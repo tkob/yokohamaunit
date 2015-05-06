@@ -490,7 +490,7 @@ public class AstToJUnitAst {
         String methodName = methodPattern.getName();
         List<yokohama.unit.ast.Type> argTypes = methodPattern.getParamTypes();
         boolean isVararg = methodPattern.isVararg();
-        Optional<Ident> receiver = invocationExpr.getReceiver();
+        Optional<yokohama.unit.ast.Expr> receiver = invocationExpr.getReceiver();
         List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();
 
         Type returnType = Type.of(
@@ -561,13 +561,8 @@ public class AstToJUnitAst {
             // invokevirtual
             Type receiverType = Type.fromClass(clazz);
             Var receiverVar = new Var(genSym.generate("receiver"));
-            Stream<Statement> getReceiver =
-                    expressionStrategy.eval(
-                            receiverVar.getName(),
-                            new QuotedExpr(receiver.get().getName(), Span.dummySpan()),
-                            receiverType.toClass(),
-                            envVarName)
-                            .stream();
+            Stream<Statement> getReceiver = translateExpr(
+                    receiver.get(),receiverVar.getName(), clazz, envVarName);
             invocation = Stream.concat(getReceiver, Stream.of(
                     new VarInitStatement(
                             returnType,

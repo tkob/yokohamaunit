@@ -662,7 +662,7 @@ public class ParseTreeToAstVisitorTest {
     @Test
     public void testVisitInvokeExpr() throws IOException {
         YokohamaUnitParser.InvokeExprContext ctx =
-                parser("an invocation of `java.lang.String.endsWith(String)` on s with \"end\"").invokeExpr();
+                parser("an invocation of `java.lang.String.endsWith(String)` on `s` with \"end\"").invokeExpr();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         InvocationExpr actual = instance.visitInvokeExpr(ctx);
         InvocationExpr expected =
@@ -678,7 +678,7 @@ public class ParseTreeToAstVisitorTest {
                                 ),
                                 false,
                                 Span.dummySpan()),
-                        Optional.of(new Ident("s", Span.dummySpan())),
+                        Optional.of(new QuotedExpr("s", Span.dummySpan())),
                         Arrays.asList(new StringExpr("end", Span.dummySpan())),
                         Span.dummySpan());
         assertThat(actual, is(expected));
@@ -687,7 +687,7 @@ public class ParseTreeToAstVisitorTest {
     @Test
     public void testVisitInvokeExpr2() throws IOException {
         YokohamaUnitParser.InvokeExprContext ctx =
-                parser("an invocation of `String.isEmpty()` on s").invokeExpr();
+                parser("an invocation of `String.isEmpty()` on `s`").invokeExpr();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         InvocationExpr actual = instance.visitInvokeExpr(ctx);
         InvocationExpr expected =
@@ -698,7 +698,7 @@ public class ParseTreeToAstVisitorTest {
                                 Arrays.asList(),
                                 false,
                                 Span.dummySpan()),
-                        Optional.of(new Ident("s", Span.dummySpan())),
+                        Optional.of(new QuotedExpr("s", Span.dummySpan())),
                         Arrays.asList(),
                         Span.dummySpan());
         assertThat(actual, is(expected));

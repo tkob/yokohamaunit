@@ -11,7 +11,7 @@ import yokohama.unit.position.Span;
 public class InvocationExpr implements Expr {
     private final ClassType classType;
     private final MethodPattern methodPattern;
-    private final Optional<Ident> receiver;
+    private final Optional<Expr> receiver;
     private final List<Expr> args;
     private final Span span;
 

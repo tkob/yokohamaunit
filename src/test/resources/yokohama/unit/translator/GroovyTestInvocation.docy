@@ -10,27 +10,27 @@
 # Test: invokevirtual with no argument
 
 Assert `len` is `5` where s is `"Hello"` and len is an invocation of
- `String.length()` on s.
+ `String.length()` on `s`.
 
 Assert `intValue` is `5` where n is `5` and intValue is an invocation of
-`Integer.intValue()` on n.
+`Integer.intValue()` on `n`.
 
 Assert `intValue` is `5` where n is `5` and intValue is an invocation of
-`Number.intValue()` on n.
+`Number.intValue()` on `n`.
 
 Assert `size` is `0` where list is `new ArrayList()` and size is an
-invocation of `ArrayList.size()` on list.
+invocation of `ArrayList.size()` on `list`.
 
 Assert `size` is `0` where list is `new ArrayList()` and size is an
-invocation of `List.size()` on list.
+invocation of `List.size()` on `list`.
 
 # Test: List.remove is overloaded on arguments
 
 Assert `previous` is `30` where list is `[10, 20, 30, 2]` and previous is an
-invocation of `List.remove(int)` on list with 2.
+invocation of `List.remove(int)` on `list` with 2.
 
 Assert `hit` is `true` where list is `[10, 20, 30, 2]` and hit is an invocation
-of `List.remove(Object)` on list with 2.
+of `List.remove(Object)` on `list` with 2.
 
 # Test: invokestatic with no argument
 

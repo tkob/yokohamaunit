@@ -89,7 +89,7 @@ primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
 invokeExpr: AN_INVOCATION_OF classType DOT methodPattern
-            ( ON Identifier )?
+            ( ON Expr )?
             ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 
 argumentExpr: Expr
