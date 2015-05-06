@@ -404,58 +404,45 @@ public class AstToJUnitAst {
             Class<?> expectedType,
             String envVarName) {
         Var exprVar = new Var(genSym.generate("expr"));
-        Pair<Type, Stream<Statement>> returnTypeAndStatements = expr.accept(
+        Stream<Statement> statements = expr.accept(
                 quotedExpr -> {
-                    Type returnType = Type.OBJECT;
-                    Stream<Statement> statements = expressionStrategy.eval(
-                            exprVar.getName(), quotedExpr, Type.fromClass(expectedType).box().toClass(), envVarName).stream();
-                    return new Pair<>(returnType, statements);
+                    return expressionStrategy.eval(
+                            exprVar.getName(),
+                            quotedExpr,
+                            Type.fromClass(expectedType).box().toClass(),
+                            envVarName).stream();
                 },
                 stubExpr -> {
-                    Type returnType = Type.of(
-                            new yokohama.unit.ast.Type(stubExpr.getClassToStub(), 0, Span.dummySpan()),
-                            classResolver);
-                    Stream<Statement> statements = mockStrategy.stub(
-                            exprVar.getName(), stubExpr, this, envVarName, classResolver).stream();
-                    return new Pair<>(returnType, statements);
+                    return mockStrategy.stub(
+                            exprVar.getName(),
+                            stubExpr,
+                            this,
+                            envVarName,
+                            classResolver).stream();
                 },
                 invocationExpr -> {
                     return translateInvocationExpr(
                             invocationExpr, exprVar.getName(), envVarName);
                 },
                 integerExpr -> {
-                    Type returnType = integerExpr.match(
-                            intValue -> Type.INT,
-                            longValue -> Type.LONG);
-                    Stream<Statement> statements =
-                            translateIntegerExpr(integerExpr, exprVar.getName(), envVarName);
-                    return new Pair<>(returnType, statements);
+                    return translateIntegerExpr(
+                            integerExpr, exprVar.getName(), envVarName);
                 },
                 floatingPointExpr -> {
-                    Type returnType = floatingPointExpr.match(
-                            floatValue -> Type.FLOAT,
-                            doubleValue -> Type.DOUBLE);
-                    Stream<Statement> statements =
-                            translateFloatingPointExpr(floatingPointExpr, exprVar.getName(), envVarName);
-                    return new Pair<>(returnType, statements);
+                    return translateFloatingPointExpr(
+                            floatingPointExpr, exprVar.getName(), envVarName);
                 },
                 booleanExpr -> {
-                    Type returnType = Type.BOOLEAN;
-                    Stream<Statement> statements =
-                            translateBooleanExpr(booleanExpr, exprVar.getName(), envVarName);
-                    return new Pair<>(returnType, statements);
+                    return translateBooleanExpr(
+                            booleanExpr, exprVar.getName(), envVarName);
                 },
                 charExpr -> {
-                    Type returnType = Type.CHAR;
-                    Stream<Statement> statements =
-                            translateCharExpr(charExpr, exprVar.getName(), envVarName);
-                    return new Pair<>(returnType, statements);
+                    return translateCharExpr(
+                            charExpr, exprVar.getName(), envVarName);
                 },
                 stringExpr -> {
-                    Type returnType = Type.STRING;
-                    Stream<Statement> statements =
-                            translateStringExpr(stringExpr, exprVar.getName(), envVarName);
-                    return new Pair<>(returnType, statements);
+                    return translateStringExpr(
+                            stringExpr, exprVar.getName(), envVarName);
                 });
 
         // box or unbox if needed
@@ -463,13 +450,13 @@ public class AstToJUnitAst {
                 boxOrUnbox(
                         Type.fromClass(expectedType),
                         varName,
-                        returnTypeAndStatements.getFirst(),
+                        typeOfExpr(expr),
                         exprVar);
 
-        return Stream.concat(returnTypeAndStatements.getSecond(), boxing);
+        return Stream.concat(statements, boxing);
     }
 
-    Pair<Type, Stream<Statement>> translateInvocationExpr(
+    Stream<Statement> translateInvocationExpr(
             InvocationExpr invocationExpr,
             String varName,
             String envVarName) {
@@ -482,9 +469,7 @@ public class AstToJUnitAst {
         Optional<yokohama.unit.ast.Expr> receiver = invocationExpr.getReceiver();
         List<yokohama.unit.ast.Expr> args = invocationExpr.getArgs();
 
-        Type returnType = Type.of(
-                methodPattern.getReturnType(classType, classResolver),
-                classResolver);
+        Type returnType = typeOfExpr(invocationExpr);
 
         List<Pair<Var, Stream<Statement>>> setupArgs;
         if (isVararg) {
@@ -588,7 +573,7 @@ public class AstToJUnitAst {
                             Span.dummySpan()));
         }
 
-        return new Pair<>(returnType, Stream.concat(setupStatements,invocation));
+        return Stream.concat(setupStatements,invocation);
     }
 
     Stream<Statement> translateIntegerExpr(
@@ -779,6 +764,30 @@ public class AstToJUnitAst {
                                     new VarExpr(fromVar.getName()),
                                     Span.dummySpan()));
                 });
+    }
+
+    private Type typeOfExpr(yokohama.unit.ast.Expr expr) {
+        return expr.accept(
+                quotedExpr -> Type.OBJECT,
+                stubExpr -> Type.of(
+                        stubExpr.getClassToStub().toType(), classResolver),
+                invocationExpr -> {
+                    MethodPattern mp = invocationExpr.getMethodPattern();
+                    return Type.of(
+                                mp.getReturnType(
+                                        invocationExpr.getClassType(),
+                                        classResolver),
+                                classResolver);
+                },
+                integerExpr -> integerExpr.match(
+                        intValue -> Type.INT,
+                        longValue -> Type.LONG),
+                floatingPointExpr -> floatingPointExpr.match(
+                        floatValue -> Type.FLOAT,
+                        doubleValue -> Type.DOUBLE),
+                booleanExpr -> Type.BOOLEAN,
+                charExpr -> Type.CHAR,
+                stringExpr -> Type.STRING);
     }
 
     Type translateType(yokohama.unit.ast.Type type) {
