@@ -144,7 +144,7 @@ public class Type {
             else if (clazz.equals(   Double.TYPE)) { return DOUBLE;  }
             else { throw new RuntimeException("should not reach here"); }
         } else {
-            return new ClassType(clazz, Span.dummySpan()).toType();
+            return ClassType.fromClass(clazz).toType();
         }
     }
 }

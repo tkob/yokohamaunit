@@ -51,6 +51,10 @@ public class ClassType implements NonArrayType {
 
     }
 
+    public static ClassType fromClass(Class<?> clazz) {
+        return new ClassType(clazz, Span.dummySpan());
+    }
+
     @Override
     public <T> T accept(NonArrayTypeVisitor<T> visitor) {
         return visitor.visitClassType(this);
