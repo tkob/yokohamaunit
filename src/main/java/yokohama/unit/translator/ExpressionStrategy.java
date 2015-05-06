@@ -33,8 +33,8 @@ public interface ExpressionStrategy {
      * Bind a variable in the expression language to a value
      * 
      * @param envVarName a variable name (in Java) bound to the environment
-     * @param name       a variable name in the expression language to be bound
-     *                    to rhs
+     * @param ident      an identifier in the expression language to be bound
+     *                    to ths
      * @param rhs        a variable (in Java) bound to the value to which the
      *                    name is to be bound
      * @return statements that bind name to rhs in the environment of the
