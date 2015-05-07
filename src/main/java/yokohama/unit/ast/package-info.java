@@ -70,6 +70,8 @@
  * Table ::= Ident* Row*
  * 
  * Row ::= Expr*
+ * 
+ * Cell ::= ExprCell | PredCell
  * </pre>
  * 
  */
