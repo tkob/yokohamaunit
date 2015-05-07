@@ -24,6 +24,7 @@ import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
+import yokohama.unit.ast.ExprCell;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
@@ -293,8 +294,8 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(
                         new Row(
                                 Arrays.asList(
-                                        new QuotedExpr("1", Span.dummySpan()),
-                                        new QuotedExpr("2", Span.dummySpan())),
+                                        new ExprCell(new QuotedExpr("1", Span.dummySpan()), Span.dummySpan()),
+                                        new ExprCell(new QuotedExpr("2", Span.dummySpan()), Span.dummySpan())),
                                 Span.dummySpan())),
                 Span.dummySpan());
         assertThat(actual, is(expected));
@@ -317,13 +318,13 @@ public class ParseTreeToAstVisitorTest {
         List<Row> expected = Arrays.asList(
                 new Row(
                         Arrays.asList(
-                                new QuotedExpr("a", Span.dummySpan()),
-                                new QuotedExpr("b", Span.dummySpan())),
+                                new ExprCell(new QuotedExpr("a", Span.dummySpan()), Span.dummySpan()),
+                                new ExprCell(new QuotedExpr("b", Span.dummySpan()), Span.dummySpan())),
                         Span.dummySpan()),
                 new Row(
                         Arrays.asList(
-                                new QuotedExpr("c", Span.dummySpan()),
-                                new QuotedExpr("d", Span.dummySpan())),
+                                new ExprCell(new QuotedExpr("c", Span.dummySpan()), Span.dummySpan()),
+                                new ExprCell(new QuotedExpr("d", Span.dummySpan()), Span.dummySpan())),
                         Span.dummySpan()));
         assertThat(actual, is(expected));
     }
@@ -336,8 +337,8 @@ public class ParseTreeToAstVisitorTest {
         Row expected =
                 new Row(
                         Arrays.asList(
-                                new QuotedExpr("a", Span.dummySpan()),
-                                new QuotedExpr("b", Span.dummySpan())),
+                                new ExprCell(new QuotedExpr("a", Span.dummySpan()), Span.dummySpan()),
+                                new ExprCell(new QuotedExpr("b", Span.dummySpan()), Span.dummySpan())),
                         Span.dummySpan());
         assertThat(actual, is(expected));
     }

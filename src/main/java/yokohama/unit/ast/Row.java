@@ -8,6 +8,6 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class Row {
-    private List<Expr> exprs;
+    private List<Cell> cells;
     private Span span;
 }

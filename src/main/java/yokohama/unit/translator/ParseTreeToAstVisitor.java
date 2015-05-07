@@ -15,12 +15,14 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
+import yokohama.unit.ast.ExprCell;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
@@ -59,7 +61,6 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
-import yokohama.unit.util.Optionals;
 import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
@@ -277,12 +278,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Row visitRow(YokohamaUnitParser.RowContext ctx) {
-        List<Expr> exprs =
+        List<Cell> cells =
                 ctx.Expr().stream()
-                          .map(cell ->
-                                  new QuotedExpr(cell.getText().trim(), nodeSpan(cell)))
+                          .map(expr ->
+                                  new ExprCell(
+                                          new QuotedExpr(expr.getText().trim(), nodeSpan(expr)),
+                                          nodeSpan(expr)))
                           .collect(Collectors.toList());
-        return new Row(exprs, getSpan(ctx));
+        return new Row(cells, getSpan(ctx));
     }
 
     @Override
