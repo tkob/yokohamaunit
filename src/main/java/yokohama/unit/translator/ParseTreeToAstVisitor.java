@@ -279,12 +279,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Row visitRow(YokohamaUnitParser.RowContext ctx) {
         List<Cell> cells =
-                ctx.Expr().stream()
-                          .map(expr ->
-                                  new ExprCell(
-                                          new QuotedExpr(expr.getText().trim(), nodeSpan(expr)),
-                                          nodeSpan(expr)))
-                          .collect(Collectors.toList());
+                ctx.argumentExpr().stream()
+                        .map(expr ->
+                                new ExprCell(
+                                        visitArgumentExpr(expr), getSpan(expr)))
+                        .collect(Collectors.toList());
         return new Row(cells, getSpan(ctx));
     }
 

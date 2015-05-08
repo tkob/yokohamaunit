@@ -30,6 +30,7 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.Ident;
+import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Kind;
@@ -285,7 +286,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitTableDef() throws IOException {
-        YokohamaUnitParser.TableDefContext ctx = parser("[table name]\n|a|b\n|1|2\n").tableDef();
+        YokohamaUnitParser.TableDefContext ctx = parser("[table name]\n|a|b|\n|`1`|2|\n").tableDef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Table actual = instance.visitTableDef(ctx);
         Table expected = new Table(
@@ -295,7 +296,7 @@ public class ParseTreeToAstVisitorTest {
                         new Row(
                                 Arrays.asList(
                                         new ExprCell(new QuotedExpr("1", Span.dummySpan()), Span.dummySpan()),
-                                        new ExprCell(new QuotedExpr("2", Span.dummySpan()), Span.dummySpan())),
+                                        new ExprCell(new IntegerExpr(true, "2", Span.dummySpan()), Span.dummySpan())),
                                 Span.dummySpan())),
                 Span.dummySpan());
         assertThat(actual, is(expected));
@@ -312,7 +313,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitRows() throws IOException {
-        YokohamaUnitParser.RowsContext ctx = parser("|a|b|\n|c|d|\n", YokohamaUnitLexer.IN_TABLE_ONSET).rows();
+        YokohamaUnitParser.RowsContext ctx = parser("|`a`|`b`|\n|`c`|`d`|\n").rows();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         List<Row> actual = instance.visitRows(ctx);
         List<Row> expected = Arrays.asList(
@@ -331,7 +332,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitRow() throws IOException {
-        YokohamaUnitParser.RowContext ctx = parser("|a|b\n", YokohamaUnitLexer.IN_TABLE_ONSET).row();
+        YokohamaUnitParser.RowContext ctx = parser("|`a`|`b`|\n").row();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Row actual = instance.visitRow(ctx);
         Row expected =

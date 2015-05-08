@@ -158,8 +158,8 @@ public class VariableCheckVisitorTest {
                         .appendln("Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
-                        .appendln("|a|b|a|c|a")
-                        .appendln("|0|1|2|3|4")
+                        .appendln("|a|b|a|c|a|")
+                        .appendln("|0|1|2|3|4|")
                         .toString(),
                 Arrays.asList("a", "a")),
         new Fixture(
@@ -278,8 +278,8 @@ public class VariableCheckVisitorTest {
                         .appendln("Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
-                        .appendln("|a|b|a|c|a")
-                        .appendln("|0|1|2|3|4")
+                        .appendln("|a|b|a|c|a|")
+                        .appendln("|0|1|2|3|4|")
                         .toString(),
                 Arrays.asList("a", "a", "a")),
         new Fixture(
