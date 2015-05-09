@@ -1,6 +1,6 @@
 lexer grammar YokohamaUnitLexer;
 
-STAR_LBRACKET: '*[' -> skip, mode(ABBREVIATION);
+STAR_LBRACKET: '*[' Spaces? -> skip, mode(ABBREVIATION);
 HASH1: '#' ;
 HASH2: '##' ;
 HASH3: '###' ;
@@ -60,12 +60,12 @@ OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
 WS : Spaces -> skip ;
 
 mode ABBREVIATION;
-ShortName: ~[\]\r\n]* ;
-RBRACKET_COLON: ']:' Spaces? -> skip, mode(LONG_NAME) ;
+ShortName: ~[\]\r\n]+ ;
+RBRACKET_COLON: ']:' [ \t]* -> skip, mode(LONG_NAME) ;
 
 mode LONG_NAME;
-LongName: ~[\r\n]* ;
-EXIT_LONG_NAME: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+LongName: ~[\r\n]+ ;
+NEW_LINE_LONG_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TEST_NAME;
 TestName: ~[\r\n]+ ;
@@ -128,11 +128,11 @@ WS_CLASS: Spaces -> skip ;
 CLOSE_BACK_TICK3: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_FILE_NAME;
-SingleQuoteName: (~['\r\n]|'\'\'')* ;
+SingleQuoteName: (~['\r\n]|'\'\'')+ ;
 CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_BOOK_NAME;
-SingleQuoteName3: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
+SingleQuoteName3: (~['\r\n]|'\'\'')+ -> type(SingleQuoteName) ;
 CLOSE_SINGLE_QUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 fragment
