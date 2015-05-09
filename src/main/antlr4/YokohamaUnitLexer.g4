@@ -37,13 +37,13 @@ EQ: '=' ;
 LET: 'Let' ;
 BE: 'be' ;
 DO: 'Do' ;
-A_STUB_OF: 'a' [ \t\r\n]+ 'stub' [ \t\r\n]+ 'of' -> mode(EXPECT_CLASS) ;
+A_STUB_OF: 'a' Spaces 'stub' Spaces 'of' -> mode(EXPECT_CLASS) ;
 SUCH: 'such' ;
-METHOD: 'method' [ \r\r\n]* '`' -> mode(METHOD_PATTERN) ;
+METHOD: 'method' Spaces? '`' -> mode(METHOD_PATTERN) ;
 RETURNS: 'returns' ;
-AN_INSTANCE_OF: 'an' [ \t\r\n]+ 'instance' [ \t\r\n]+ 'of' -> mode(EXPECT_CLASS) ;
-AN_INSTANCE: 'an' [ \t\r\n]+ 'instance' -> mode(AFTER_AN_INSTANCE) ;
-AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n]+ 'of' [ \t\r\n]* '`' -> mode(METHOD_PATTERN) ;
+AN_INSTANCE_OF: 'an' Spaces 'instance' Spaces 'of' -> mode(EXPECT_CLASS) ;
+AN_INSTANCE: 'an' Spaces 'instance' -> mode(AFTER_AN_INSTANCE) ;
+AN_INVOCATION_OF: 'an' Spaces 'invocation' Spaces 'of' Spaces? '`' -> mode(METHOD_PATTERN) ;
 ON: 'on' ;
 WITH: 'with' ;
 NULL: 'null' ;
@@ -58,8 +58,7 @@ EMPTY_STRING: '""' ;
 OPEN_BACK_TICK: '`' -> skip, mode(IN_BACK_TICK) ;
 OPEN_DOUBLE_QUOTE: '"' -> skip, mode(IN_DOUBLE_QUOTE) ;
 OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
-NEW_LINE : ('\r'? '\n')+ -> skip ;
-WS : [ \t]+ -> skip ;
+WS : Spaces -> skip ;
 
 mode TEST_NAME;
 TestName: ~[\r\n]+ ;
@@ -106,36 +105,36 @@ RPAREN: ')' ;
 LBRACKET: '[' ;
 RBRACKET: ']' ;
 Identifier3 : IdentStart IdentPart* -> type(Identifier);
-SPACETABNEWLINE2: [ \t\r\n]+ -> skip ;
+WS_METHOD_PATTERN: Spaces -> skip ;
 CLOSE_BACK_TICK2: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode EXPECT_CLASS;
 OPEN_BACK_TICK4: '`' -> skip, mode(CLASS) ;
-SPACETABNEWLINE3: [ \t\r\n]+ -> skip ;
+WS_EXPECT_CLASS: Spaces -> skip ;
 
 mode CLASS;
 DOT2: '.' -> type(DOT) ;
 Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
-SPACETABNEWLINE4: [ \t\r\n]+ -> skip ;
+WS_CLASS: Spaces -> skip ;
 CLOSE_BACK_TICK3: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
 Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
 OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
-SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
+WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
 mode AFTER_TABLE;
 LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
-SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
+WS_AFTER_TABLE: Spaces -> skip ;
 
 mode AFTER_CSV;
 OPEN_SINGLE_QUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
-SPACETABNEWLINE7: [ \t\r\n]+ -> skip ;
+WS_AFTER_CSV: Spaces -> skip ;
 
 mode AFTER_EXCEL;
 OPEN_SINGLE_QUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
-SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
+WS_AFTER_EXCEL: Spaces -> skip ;
 
 mode IN_TABLE_NAME;
 SingleQuoteName: ~[\]\r\n]* ;
@@ -151,11 +150,14 @@ CLOSE_SINGLE_QUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 mode ABBREVIATION;
 ShortName: ~[\]\r\n]* ;
-RBRACKET_COLON: ']:' [ \t\r\n]* -> skip, mode(LONG_NAME) ;
+RBRACKET_COLON: ']:' Spaces? -> skip, mode(LONG_NAME) ;
 
 mode LONG_NAME;
 LongName: ~[\r\n]* ;
 EXIT_LONG_NAME: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+
+fragment
+Spaces: [ \t\r\n]+ ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]
