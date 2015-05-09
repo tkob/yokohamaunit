@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Abbreviation;
+import yokohama.unit.ast.AnchorExpr;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
@@ -511,8 +512,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Object visitAnchorExpr(YokohamaUnitParser.AnchorExprContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public AnchorExpr visitAnchorExpr(YokohamaUnitParser.AnchorExprContext ctx) {
+        return new AnchorExpr(ctx.Anchor().getText(), getSpan(ctx));
     }
 
     @Override
