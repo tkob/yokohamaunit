@@ -86,7 +86,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitDefinition2() throws IOException {
-        YokohamaUnitParser.DefinitionContext ctx = parser("[table name]\n|a|b\n----\n|1|2\n\n").definition();
+        YokohamaUnitParser.DefinitionContext ctx = parser("[table name]\n|a|b|\n|----|\n|1|2|\n\n").definition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Definition result = instance.visitDefinition(ctx);
         assertThat(result, is(instanceOf(Table.class)));
@@ -286,7 +286,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitHeader() throws IOException {
-        YokohamaUnitParser.HeaderContext ctx = parser("|a|b\n").header();
+        YokohamaUnitParser.HeaderContext ctx = parser("|a|b|\n").header();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         List<Ident> actual = instance.visitHeader(ctx);
         List<Ident> expected = Arrays.asList(new Ident("a", Span.dummySpan()), new Ident("b", Span.dummySpan()));
