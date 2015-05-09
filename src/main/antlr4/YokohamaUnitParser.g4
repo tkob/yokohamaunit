@@ -30,7 +30,7 @@ throwsPredicate: THROWS matcher ;
 
 matcher: equalTo | instanceOf | instanceSuchThat | nullValue ;
 equalTo: argumentExpr ;
-instanceOf: AN_INSTANCE_OF classType BACK_TICK;
+instanceOf: AN_INSTANCE_OF_BACK_TICK classType BACK_TICK;
 instanceSuchThat: AN_INSTANCE Identifier OF BACK_TICK classType BACK_TICK SUCH THAT proposition (AND proposition)*;
 nullValue: NULL | NOTHING ;
 
@@ -41,9 +41,9 @@ condition: forAll
 forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
 tableRef: UTABLE LBRACKET TableName RBRACKET
-        | CSV FileName SINGLE_QUOTE
-        | TSV FileName SINGLE_QUOTE
-        | EXCEL BookName SINGLE_QUOTE
+        | CSV_SINGLE_QUOTE FileName SINGLE_QUOTE
+        | TSV_SINGLE_QUOTE FileName SINGLE_QUOTE
+        | EXCEL_SINGLE_QUOTE BookName SINGLE_QUOTE
         ;
 
 bindings: WHERE binding (AND binding)* ;
@@ -78,8 +78,8 @@ expr: BACK_TICK Expr BACK_TICK
     | stringExpr
     ;
 
-stubExpr: A_STUB_OF classType BACK_TICK ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
-stubBehavior: METHOD methodPattern BACK_TICK RETURNS expr ;
+stubExpr: A_STUB_OF_BACK_TICK classType BACK_TICK ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
+stubBehavior: METHOD_BACK_TICK methodPattern BACK_TICK RETURNS expr ;
 
 methodPattern: Identifier LPAREN (type COMMA)* (type THREEDOTS?)? RPAREN ;
 
@@ -88,7 +88,7 @@ nonArrayType: primitiveType | classType ;
 primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
-invokeExpr: AN_INVOCATION_OF classType DOT methodPattern BACK_TICK
+invokeExpr: AN_INVOCATION_OF_BACK_TICK classType DOT methodPattern BACK_TICK
             ( ON BACK_TICK Expr BACK_TICK )?
             ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 

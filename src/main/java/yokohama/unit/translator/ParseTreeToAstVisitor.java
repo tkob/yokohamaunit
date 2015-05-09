@@ -228,13 +228,13 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         if (ctx.UTABLE() != null) {
             String name = ctx.TableName().getText();
             return new Pair<>(TableType.INLINE, name);
-        } else if (ctx.CSV() != null) {
+        } else if (ctx.CSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
             return new Pair<>(TableType.CSV, name);
-        } else if (ctx.TSV() != null) {
+        } else if (ctx.TSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
             return new Pair<>(TableType.TSV, name);
-        } else if (ctx.EXCEL() != null) {
+        } else if (ctx.EXCEL_SINGLE_QUOTE() != null) {
             String name = ctx.BookName().getText().replace("''", "'");
             return new Pair<>(TableType.EXCEL, name);
         } else {
