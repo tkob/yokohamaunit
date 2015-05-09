@@ -25,6 +25,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import yokohama.unit.ast.AnchorExpr;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
@@ -105,7 +106,8 @@ public class AstToJUnitAst {
 
     public CompilationUnit translate(Group group) {
         final List<Table> tables = tableExtractVisitor.extractTables(group);
-        final List<CodeBlock> codeBlocks = codeBlockExtractVisitor.visit(group);
+        Map<String, CodeBlock> codeBlockMap =
+                codeBlockExtractVisitor.extractMap(group);
         return new AstToJUnitAstVisitor(
                 name,
                 packageName,
@@ -114,7 +116,7 @@ public class AstToJUnitAst {
                 genSym,
                 classResolver,
                 tables,
-                codeBlocks)
+                codeBlockMap)
                 .translateGroup(group);
     }
 }
@@ -128,7 +130,7 @@ class AstToJUnitAstVisitor {
     final GenSym genSym;
     final ClassResolver classResolver;
     final List<Table> tables;
-    final List<CodeBlock> codeBlocks;
+    final Map<String, CodeBlock> codeBlockMap;
 
     CompilationUnit translateGroup(Group group) {
         List<Definition> definitions = group.getDefinitions();
@@ -512,7 +514,8 @@ class AstToJUnitAstVisitor {
                             stringExpr, exprVar.getName(), envVarName);
                 },
                 anchorExpr -> {
-                    throw new UnsupportedOperationException();
+                    return translateAnchorExpr(
+                            anchorExpr, exprVar.getName(), envVarName);
                 });
 
         // box or unbox if needed
@@ -720,6 +723,19 @@ class AstToJUnitAstVisitor {
                         varName,
                         new StrLitExpr(strValue),
                         stringExpr.getSpan()));
+    }
+
+    Stream<Statement> translateAnchorExpr(
+            AnchorExpr anchorExpr, String varName, String envVarName) {
+        String anchor = anchorExpr.getAnchor();
+        CodeBlock codeBlock = codeBlockMap.get(anchor);
+        String code = codeBlock.getCode(System.lineSeparator(), true);
+        return Stream.<Statement>of(
+                new VarInitStatement(
+                        Type.STRING,
+                        varName,
+                        new StrLitExpr(code),
+                        anchorExpr.getSpan()));
     }
 
     public Stream<Statement> boxOrUnbox(

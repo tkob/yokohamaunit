@@ -17,7 +17,6 @@ import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.position.Span;
-import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
@@ -72,7 +71,7 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyList());
+                        Collections.emptyMap());
         List<Method> actual = instance.translateTest(test);
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
@@ -95,7 +94,7 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyList());
+                        Collections.emptyMap());
         List<Method> actual = instance.translateAssertion(assertion, 0, testName);
         List<Method> expected = Arrays.asList(new Method(
                 Arrays.asList(Annotation.TEST),
@@ -132,7 +131,7 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyList());
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());
@@ -195,7 +194,7 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyList());
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());
@@ -268,7 +267,7 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyList());
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());
