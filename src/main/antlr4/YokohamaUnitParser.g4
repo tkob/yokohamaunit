@@ -4,14 +4,14 @@ options { tokenVocab=YokohamaUnitLexer; }
 
 group: abbreviation* definition* ;
 
-abbreviation: STAR_LBRACKET ShortName RBRACKET_COLON LongName ;
+abbreviation: STAR_LBRACKET ShortName RBRACKET_COLON Line ;
 
 definition: test
           | fourPhaseTest
           | tableDef
           ;
 
-test: TEST TestName assertion+ ;
+test: TEST Line assertion+ ;
 
 assertion: ASSERT THAT? propositions condition? STOP ;
 
@@ -47,12 +47,12 @@ tableRef: UTABLE LBRACKET TableName RBRACKET
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) expr ;
 
-fourPhaseTest: TEST TestName setup? exercise? verify teardown? ;
+fourPhaseTest: TEST Line setup? exercise? verify teardown? ;
 
-setup: SETUP PhaseDescription? (letStatement+ execution* | execution+) ;
-exercise: EXERCISE PhaseDescription? execution+ ;
-verify: VERIFY PhaseDescription? assertion+ ;
-teardown: TEARDOWN PhaseDescription? execution+ ;
+setup: SETUP Line? (letStatement+ execution* | execution+) ;
+exercise: EXERCISE Line? execution+ ;
+verify: VERIFY Line? assertion+ ;
+teardown: TEARDOWN Line? execution+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;

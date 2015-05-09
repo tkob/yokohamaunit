@@ -99,7 +99,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Abbreviation visitAbbreviation(YokohamaUnitParser.AbbreviationContext ctx) {
-        return new Abbreviation(ctx.ShortName().getText(), ctx.LongName().getText(), getSpan(ctx));
+        return new Abbreviation(ctx.ShortName().getText(), ctx.Line().getText(), getSpan(ctx));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Test visitTest(YokohamaUnitParser.TestContext ctx) {
-        String name = ctx.TestName().getText();
+        String name = ctx.Line().getText();
         List<Assertion> assertions =
                 ctx.assertion().stream()
                                .map(this::visitAssertion)
@@ -286,7 +286,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public FourPhaseTest visitFourPhaseTest(YokohamaUnitParser.FourPhaseTestContext ctx) {
-        String name = ctx.TestName().getText();
+        String name = ctx.Line().getText();
         Optional<Phase> setup =
                 ctx.setup() == null ? Optional.empty()
                                     : Optional.of(visitSetup(ctx.setup()));
@@ -303,8 +303,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Phase visitSetup(YokohamaUnitParser.SetupContext ctx) {
         Optional<String> description =
-                ctx.PhaseDescription() == null ? Optional.empty()
-                                               : Optional.of(ctx.PhaseDescription().getText());
+                ctx.Line() == null ? Optional.empty()
+                                               : Optional.of(ctx.Line().getText());
         List<LetStatement> letStatements =
                 ctx.letStatement().stream()
                         .map(letStatement -> visitLetStatement(letStatement))
@@ -320,8 +320,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Phase visitExercise(YokohamaUnitParser.ExerciseContext ctx) {
         Optional<String> description =
-                ctx.PhaseDescription() == null ? Optional.empty()
-                                               : Optional.of(ctx.PhaseDescription().getText());
+                ctx.Line() == null ? Optional.empty()
+                                               : Optional.of(ctx.Line().getText());
         List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)
@@ -332,8 +332,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public VerifyPhase visitVerify(YokohamaUnitParser.VerifyContext ctx) {
         Optional<String> description =
-                ctx.PhaseDescription() == null ? Optional.empty()
-                                               : Optional.of(ctx.PhaseDescription().getText());
+                ctx.Line() == null ? Optional.empty()
+                                               : Optional.of(ctx.Line().getText());
         List<Assertion> assertions = ctx.assertion()
                 .stream()
                 .map(this::visitAssertion)
@@ -344,8 +344,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Phase visitTeardown(YokohamaUnitParser.TeardownContext ctx) {
         Optional<String> description =
-                ctx.PhaseDescription() == null ? Optional.empty()
-                                               : Optional.of(ctx.PhaseDescription().getText());
+                ctx.Line() == null ? Optional.empty()
+                                               : Optional.of(ctx.Line().getText());
         List<Execution> executions = ctx.execution()
                 .stream()
                 .map(this::visitExecution)

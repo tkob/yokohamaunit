@@ -1,16 +1,16 @@
 lexer grammar YokohamaUnitLexer;
 
 STAR_LBRACKET: '*[' Spaces? -> mode(ABBREVIATION);
-TEST: Hashes Spaces? 'Test:' [ \t]* -> mode(TEST_NAME);
+TEST: Hashes Spaces? 'Test:' [ \t]* -> mode(UNTIL_EOL);
+SETUP:    Hashes Spaces? 'Setup:'    Spaces? -> mode(UNTIL_EOL);
+EXERCISE: Hashes Spaces? 'Exercise:' Spaces? -> mode(UNTIL_EOL);
+VERIFY:   Hashes Spaces? 'Verify:'   Spaces? -> mode(UNTIL_EOL);
+TEARDOWN: Hashes Spaces? 'Teardown:' Spaces? -> mode(UNTIL_EOL);
+SETUP_NO_DESC:    Hashes Spaces? 'Setup'    -> type(SETUP) ;
+EXERCISE_NO_DESC: Hashes Spaces? 'Exercise' -> type(EXERCISE) ;
+VERIFY_NO_DESC:   Hashes Spaces? 'Verify'   -> type(VERIFY) ;
+TEARDOWN_NO_DESC: Hashes Spaces? 'Teardown' -> type(TEARDOWN) ;
 LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
-SETUP:    Hashes Spaces? 'Setup'    ;
-EXERCISE: Hashes Spaces? 'Exercise' ;
-VERIFY:   Hashes Spaces? 'Verify'   ;
-TEARDOWN: Hashes Spaces? 'Teardown' ;
-SETUP_DESC:    Hashes Spaces? 'Setup:'    Spaces? -> type(SETUP),    mode(PHASE_DESCRIPTION);
-EXERCISE_DESC: Hashes Spaces? 'Exercise:' Spaces? -> type(EXERCISE), mode(PHASE_DESCRIPTION);
-VERIFY_DESC:   Hashes Spaces? 'Verify:'   Spaces? -> type(VERIFY),   mode(PHASE_DESCRIPTION);
-TEARDOWN_DESC: Hashes Spaces? 'Teardown:' Spaces? -> type(TEARDOWN), mode(PHASE_DESCRIPTION);
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
@@ -59,23 +59,15 @@ WS : Spaces -> skip ;
 
 mode ABBREVIATION;
 ShortName: ~[\]\r\n]+ ;
-RBRACKET_COLON: ']:' [ \t]* -> mode(LONG_NAME) ;
+RBRACKET_COLON: ']:' [ \t]* -> mode(UNTIL_EOL) ;
 
-mode LONG_NAME;
-LongName: ~[\r\n]+ ;
-NEW_LINE_LONG_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
-
-mode TEST_NAME;
-TestName: ~[\r\n]+ ;
-NEW_LINE_TEST_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+mode UNTIL_EOL;
+Line: ~[\r\n]+ ;
+NEW_LINE: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TABLE_NAME;
 TableName: ~[\]\r\n]+ ;
 RBRACKET_TABLE_NAME: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
-
-mode PHASE_DESCRIPTION;
-PhaseDescription: ~[\r\n]+ ;
-NEW_LINE_PHASE_DESCRIPTION: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
