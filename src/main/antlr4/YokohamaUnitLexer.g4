@@ -1,6 +1,6 @@
 lexer grammar YokohamaUnitLexer;
 
-STAR_LBRACKET: '*[' Spaces? -> skip, mode(ABBREVIATION);
+STAR_LBRACKET: '*[' Spaces? -> mode(ABBREVIATION);
 HASH1: '#' ;
 HASH2: '##' ;
 HASH3: '###' ;
@@ -8,7 +8,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' [ \t]* -> mode(TEST_NAME);
-TABLE_CAPTION: '[' -> skip, mode(TABLE_NAME);
+TABLE_CAPTION: '[' -> type(LBRACKET), mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -54,14 +54,14 @@ Integer: IntegerLiteral ;
 FloatingPoint: FloatingPointLiteral ;
 MINUS: '-' ;
 EMPTY_STRING: '""' ;
-OPEN_BACK_TICK: '`' -> skip, mode(IN_BACK_TICK) ;
-OPEN_DOUBLE_QUOTE: '"' -> skip, mode(IN_DOUBLE_QUOTE) ;
-OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
+BACK_TICK: '`' -> mode(IN_BACK_TICK) ;
+DOUBLE_QUOTE: '"' -> mode(IN_DOUBLE_QUOTE) ;
+SINGLE_QUOTE: '\'' -> mode(IN_SINGLE_QUOTE) ;
 WS : Spaces -> skip ;
 
 mode ABBREVIATION;
 ShortName: ~[\]\r\n]+ ;
-RBRACKET_COLON: ']:' [ \t]* -> skip, mode(LONG_NAME) ;
+RBRACKET_COLON: ']:' [ \t]* -> mode(LONG_NAME) ;
 
 mode LONG_NAME;
 LongName: ~[\r\n]+ ;
@@ -73,7 +73,7 @@ NEW_LINE_TEST_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TABLE_NAME;
 TableName: ~[\]\r\n]+ ;
-RBRACKET_TABLE_NAME: ']' -> skip, mode(DEFAULT_MODE) ;
+RBRACKET_TABLE_NAME: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
 
 mode PHASE_LEADING;
 COLON: ':' [ \t]* -> skip, mode(PHASE_DESCRIPTION) ;
@@ -86,20 +86,20 @@ NEW_LINE_PHASE_DESCRIPTION: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
 Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
-OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
+BACK_TICK_AFTER_AN_INSTANCE: '`' -> type(BACK_TICK), mode(CLASS) ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
 mode IN_DOUBLE_QUOTE;
 Str: (~["\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
-CLOSE_DOUBLE_QUOTE: '"' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_DOUBLE_QUOTE: '"' -> type(DOUBLE_QUOTE), mode(DEFAULT_MODE) ;
 
 mode IN_SINGLE_QUOTE;
 Char: (~['\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
-CLOSE_SINGLE_QUOTE: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 mode IN_BACK_TICK;
 Expr: ~[`]+ ;
-CLOSE_BACK_TICK: '`' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_BACK_TICK: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 mode METHOD_PATTERN;
 BOOLEAN: 'boolean' ;
@@ -119,21 +119,21 @@ LBRACKET: '[' ;
 RBRACKET: ']' ;
 Identifier3 : IdentStart IdentPart* -> type(Identifier);
 WS_METHOD_PATTERN: Spaces -> skip ;
-CLOSE_BACK_TICK2: '`' -> skip, mode(DEFAULT_MODE) ;
+BACK_TICK_METHOD_PATTERN: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 mode CLASS;
 DOT2: '.' -> type(DOT) ;
 Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
 WS_CLASS: Spaces -> skip ;
-CLOSE_BACK_TICK3: '`' -> skip, mode(DEFAULT_MODE) ;
+BACK_TICK_CLASS: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 mode IN_FILE_NAME;
 SingleQuoteName: (~['\r\n]|'\'\'')+ ;
-CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE_IN_FILE_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 mode IN_BOOK_NAME;
 SingleQuoteName3: (~['\r\n]|'\'\'')+ -> type(SingleQuoteName) ;
-CLOSE_SINGLE_QUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE_IN_BOOK_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 fragment
 Spaces: [ \t\r\n]+ ;
