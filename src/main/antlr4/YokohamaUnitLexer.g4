@@ -56,6 +56,9 @@ EMPTY_STRING: '""' ;
 BACK_TICK: '`' -> mode(IN_BACK_TICK) ;
 DOUBLE_QUOTE: '"' -> mode(IN_DOUBLE_QUOTE) ;
 SINGLE_QUOTE: '\'' -> mode(IN_SINGLE_QUOTE) ;
+BACK_TICKS:   '```'   -> mode(IN_FENCE_3) ;
+BACK_TICKS4:  '````'  -> mode(IN_FENCE_4), type(BACK_TICKS) ;
+BACK_TICKS5:  '`````' -> mode(IN_FENCE_5), type(BACK_TICKS) ;
 WS : Spaces -> skip ;
 
 mode ABBREVIATION;
@@ -87,6 +90,18 @@ CLOSE_SINGLE_QUOTE: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 mode IN_BACK_TICK;
 Expr: ~[`]+ ;
 CLOSE_BACK_TICK: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
+
+mode IN_FENCE_3;
+CLOSE_BACK_TICKS_3: '```' [ \t]* '\r'? '\n' -> type(BACK_TICKS) ;
+CodeLine: ~[\r\n]* '\r'? '\n' ;
+
+mode IN_FENCE_4;
+CLOSE_BACK_TICKS_4: '```' [ \t]* '\r'? '\n' -> type(BACK_TICKS) ;
+CodeLine4: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
+
+mode IN_FENCE_5;
+CLOSE_BACK_TICKS_5: '```' [ \t]* '\r'? '\n' -> type(BACK_TICKS) ;
+CodeLine5: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
 
 mode METHOD_PATTERN;
 BOOLEAN: 'boolean' ;

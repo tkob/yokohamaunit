@@ -143,6 +143,10 @@ public class YokohamaUnitLexerTest {
         // String
         new Fixture("\"\\\"\"", Arrays.asList("\"", "\\\"", "\"")),
         new Fixture("\"abc\"", Arrays.asList("\"", "abc", "\"")),
+        // Fenced Code Blocks
+        new Fixture("```perl\ncode\n``` \n", Arrays.asList("```", "perl\n", "code\n", "``` \n")),
+        new Fixture("````perl\ncode\n````\n", Arrays.asList("````", "perl\n", "code\n", "````\n")),
+        new Fixture("`````perl\ncode\n`````\n", Arrays.asList("`````", "perl\n", "code\n", "`````\n")),
     };
 
     @Theory
