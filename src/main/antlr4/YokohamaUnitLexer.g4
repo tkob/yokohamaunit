@@ -1,15 +1,16 @@
 lexer grammar YokohamaUnitLexer;
 
-STAR_LBRACKET: '*[' Spaces? -> mode(ABBREVIATION);
-TEST: Hashes Spaces? 'Test:' [ \t]* -> mode(UNTIL_EOL);
-SETUP:    Hashes Spaces? 'Setup:'    Spaces? -> mode(UNTIL_EOL);
-EXERCISE: Hashes Spaces? 'Exercise:' Spaces? -> mode(UNTIL_EOL);
-VERIFY:   Hashes Spaces? 'Verify:'   Spaces? -> mode(UNTIL_EOL);
-TEARDOWN: Hashes Spaces? 'Teardown:' Spaces? -> mode(UNTIL_EOL);
-SETUP_NO_DESC:    Hashes Spaces? 'Setup'    -> type(SETUP) ;
-EXERCISE_NO_DESC: Hashes Spaces? 'Exercise' -> type(EXERCISE) ;
-VERIFY_NO_DESC:   Hashes Spaces? 'Verify'   -> type(VERIFY) ;
-TEARDOWN_NO_DESC: Hashes Spaces? 'Teardown' -> type(TEARDOWN) ;
+STAR_LBRACKET: '*[' [ \t]* -> mode(ABBREVIATION);
+HASHES:   Hashes [ \t]* -> mode(UNTIL_EOL) ;
+TEST:     Hashes [ \t]* 'Test:'     [ \t]* -> mode(UNTIL_EOL);
+SETUP:    Hashes [ \t]* 'Setup:'    [ \t]* -> mode(UNTIL_EOL);
+EXERCISE: Hashes [ \t]* 'Exercise:' [ \t]* -> mode(UNTIL_EOL);
+VERIFY:   Hashes [ \t]* 'Verify:'   [ \t]* -> mode(UNTIL_EOL);
+TEARDOWN: Hashes [ \t]* 'Teardown:' [ \t]* -> mode(UNTIL_EOL);
+SETUP_NO_DESC:    Hashes [ \t]* 'Setup'    -> type(SETUP) ;
+EXERCISE_NO_DESC: Hashes [ \t]* 'Exercise' -> type(EXERCISE) ;
+VERIFY_NO_DESC:   Hashes [ \t]* 'Verify'   -> type(VERIFY) ;
+TEARDOWN_NO_DESC: Hashes [ \t]* 'Teardown' -> type(TEARDOWN) ;
 LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
