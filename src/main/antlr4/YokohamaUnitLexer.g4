@@ -26,7 +26,6 @@ THROWS: 'throws' ;
 FOR: 'for' ;
 ALL: 'all' ;
 COMMA: ',' ;
-RULES: 'rules' ;
 IN: 'in' ;
 UTABLE: 'Table' ;
 CSV: 'CSV' Spaces? '\'' -> mode(IN_FILE_NAME) ;
