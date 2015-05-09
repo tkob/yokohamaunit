@@ -224,7 +224,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Pair<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
         if (ctx.UTABLE() != null) {
-            String name = ctx.TableName().getText();
+            String name = ctx.Anchor().getText();
             return new Pair<>(TableType.INLINE, name);
         } else if (ctx.CSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
@@ -257,7 +257,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Table visitTableDef(YokohamaUnitParser.TableDefContext ctx) {
-        String name = ctx.TableName().getText();
+        String name = ctx.Anchor().getText();
         List<Ident> header = visitHeader(ctx.header());
         List<Row> rows = visitRows(ctx.rows());
         return new Table(name, header, rows, getSpan(ctx));

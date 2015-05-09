@@ -11,7 +11,7 @@ SETUP_NO_DESC:    Hashes [ \t]* 'Setup'    -> type(SETUP) ;
 EXERCISE_NO_DESC: Hashes [ \t]* 'Exercise' -> type(EXERCISE) ;
 VERIFY_NO_DESC:   Hashes [ \t]* 'Verify'   -> type(VERIFY) ;
 TEARDOWN_NO_DESC: Hashes [ \t]* 'Teardown' -> type(TEARDOWN) ;
-LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
+LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(ANCHOR);
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
@@ -69,9 +69,9 @@ mode UNTIL_EOL;
 Line: ~[ \t\r\n]+ ([ \t]+ ~[ \t\r\n]+)* ; //exclude trailing spaces
 NEW_LINE: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
-mode TABLE_NAME;
-TableName: ~[\]\r\n]+ ;
-RBRACKET_TABLE_NAME: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
+mode ANCHOR;
+Anchor: ~[\]\r\n]+ ;
+RBRACKET_ANCHOR: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
