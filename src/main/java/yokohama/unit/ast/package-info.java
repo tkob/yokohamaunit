@@ -35,6 +35,7 @@
  *        | BooleanExpr
  *        | CharExpr
  *        | StringExpr
+ *        | AnchorExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

@@ -511,6 +511,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitAnchorExpr(YokohamaUnitParser.AnchorExprContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public Heading visitHeading(YokohamaUnitParser.HeadingContext ctx) {
         return new Heading(ctx.Line().getText(), getSpan(ctx));
     }

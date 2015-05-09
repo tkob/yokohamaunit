@@ -9,4 +9,5 @@ public interface ExprVisitor<T> {
     T visitBooleanExpr(BooleanExpr booleanExpr);
     T visitCharExpr(CharExpr charExpr);
     T visitStringExpr(StringExpr stringExpr);
+    T visitAnchorExpr(AnchorExpr anchorExpr);
 }

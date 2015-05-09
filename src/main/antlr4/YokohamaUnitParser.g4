@@ -76,6 +76,7 @@ expr: quotedExpr
     | booleanExpr
     | charExpr
     | stringExpr
+    | anchorExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
@@ -100,6 +101,7 @@ argumentExpr: quotedExpr
             | booleanExpr
             | charExpr
             | stringExpr
+            | anchorExpr
             ;
 
 integerExpr: MINUS? Integer ;
@@ -111,6 +113,8 @@ booleanExpr: TRUE | FALSE ;
 charExpr: SINGLE_QUOTE Char SINGLE_QUOTE ;
 
 stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
+
+anchorExpr: LBRACKET Anchor RBRACKET ;
 
 codeBlock: heading BACK_TICKS lang CodeLine* BACK_TICKS ;
 lang: CodeLine ;

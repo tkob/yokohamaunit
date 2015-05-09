@@ -480,6 +480,9 @@ public class AstToJUnitAst {
                 stringExpr -> {
                     return translateStringExpr(
                             stringExpr, exprVar.getName(), envVarName);
+                },
+                anchorExpr -> {
+                    throw new UnsupportedOperationException();
                 });
 
         // box or unbox if needed
@@ -821,7 +824,8 @@ public class AstToJUnitAst {
                         doubleValue -> Type.DOUBLE),
                 booleanExpr -> Type.BOOLEAN,
                 charExpr -> Type.CHAR,
-                stringExpr -> Type.STRING);
+                stringExpr -> Type.STRING,
+                anchorExpr -> Type.STRING);
     }
 
     List<List<Statement>> translateTableRef(

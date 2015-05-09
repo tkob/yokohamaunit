@@ -142,7 +142,8 @@ class ClassExprCheckVisitor {
                 floatingPointExpr -> Stream.<ErrorMessage>empty(),
                 booleanExpr -> Stream.<ErrorMessage>empty(),
                 charExpr -> Stream.<ErrorMessage>empty(),
-                stringExpr -> Stream.<ErrorMessage>empty());
+                stringExpr -> Stream.<ErrorMessage>empty(),
+                anchorExpr -> Stream.<ErrorMessage>empty());
     }
 
     private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {
