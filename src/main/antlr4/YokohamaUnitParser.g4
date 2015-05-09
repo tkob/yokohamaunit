@@ -41,9 +41,9 @@ condition: forAll
 forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
 tableRef: UTABLE LBRACKET TableName RBRACKET
-        | CSV SingleQuoteName SINGLE_QUOTE
-        | TSV SingleQuoteName SINGLE_QUOTE
-        | EXCEL SingleQuoteName SINGLE_QUOTE
+        | CSV FileName SINGLE_QUOTE
+        | TSV FileName SINGLE_QUOTE
+        | EXCEL BookName SINGLE_QUOTE
         ;
 
 bindings: WHERE binding (AND binding)* ;

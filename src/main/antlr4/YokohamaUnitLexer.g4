@@ -128,11 +128,11 @@ WS_CLASS: Spaces -> skip ;
 BACK_TICK_CLASS: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 mode IN_FILE_NAME;
-SingleQuoteName: (~['\r\n]|'\'\'')+ ;
+FileName: (~['\r\n]|'\'\'')+ ;
 CLOSE_SINGLE_QUOTE_IN_FILE_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 mode IN_BOOK_NAME;
-SingleQuoteName3: (~['\r\n]|'\'\'')+ -> type(SingleQuoteName) ;
+BookName: (~['\r\n]|'\'\'')+ ;
 CLOSE_SINGLE_QUOTE_IN_BOOK_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 fragment
