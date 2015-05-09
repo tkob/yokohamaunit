@@ -4,7 +4,7 @@ options { tokenVocab=YokohamaUnitLexer; }
 
 group: abbreviation* definition* ;
 
-abbreviation: ShortName LongName ;
+abbreviation: STAR_LBRACKET ShortName RBRACKET_COLON LongName ;
 
 definition: test
           | fourPhaseTest
@@ -21,7 +21,7 @@ propositions: proposition (AND THAT? proposition)* ;
 
 proposition: subject predicate ;
 
-subject: Expr | invokeExpr ;
+subject: BACK_TICK Expr BACK_TICK | invokeExpr ;
 
 predicate: isPredicate | isNotPredicate | throwsPredicate ;
 isPredicate: IS matcher ;
@@ -30,8 +30,8 @@ throwsPredicate: THROWS matcher ;
 
 matcher: equalTo | instanceOf | instanceSuchThat | nullValue ;
 equalTo: argumentExpr ;
-instanceOf: AN_INSTANCE_OF classType ;
-instanceSuchThat: AN_INSTANCE Identifier OF classType SUCH THAT proposition (AND proposition)*;
+instanceOf: AN_INSTANCE_OF_BACK_TICK classType BACK_TICK;
+instanceSuchThat: AN_INSTANCE Identifier OF BACK_TICK classType BACK_TICK SUCH THAT proposition (AND proposition)*;
 nullValue: NULL | NOTHING ;
 
 condition: forAll
@@ -40,10 +40,10 @@ condition: forAll
 
 forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
-tableRef: UTABLE SingleQuoteName
-        | CSV SingleQuoteName
-        | TSV SingleQuoteName
-        | EXCEL SingleQuoteName
+tableRef: UTABLE LBRACKET TableName RBRACKET
+        | CSV_SINGLE_QUOTE FileName SINGLE_QUOTE
+        | TSV_SINGLE_QUOTE FileName SINGLE_QUOTE
+        | EXCEL_SINGLE_QUOTE BookName SINGLE_QUOTE
         ;
 
 bindings: WHERE binding (AND binding)* ;
@@ -58,17 +58,17 @@ teardown: hash? TEARDOWN PhaseDescription? execution+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
-execution: DO Expr (AND Expr)* STOP ;
+execution: DO BACK_TICK Expr BACK_TICK (AND BACK_TICK Expr BACK_TICK)* STOP ;
 
-tableDef: TableName header HBAR? rows
-        | header HBAR? rows TableName ;
+tableDef: LBRACKET TableName RBRACKET header HBAR? rows
+        | header HBAR? rows LBRACKET TableName RBRACKET ;
 
 header: (BAR Identifier)+ BAR_EOL ;
 
 rows: row+ ;
 row: (BAR argumentExpr)+ BAR_EOL  ;
 
-expr: Expr
+expr: BACK_TICK Expr BACK_TICK
     | stubExpr
     | invokeExpr
     | integerExpr
@@ -78,8 +78,8 @@ expr: Expr
     | stringExpr
     ;
 
-stubExpr: A_STUB_OF classType ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
-stubBehavior: METHOD methodPattern RETURNS expr ;
+stubExpr: A_STUB_OF_BACK_TICK classType BACK_TICK ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
+stubBehavior: METHOD_BACK_TICK methodPattern BACK_TICK RETURNS expr ;
 
 methodPattern: Identifier LPAREN (type COMMA)* (type THREEDOTS?)? RPAREN ;
 
@@ -88,11 +88,11 @@ nonArrayType: primitiveType | classType ;
 primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
-invokeExpr: AN_INVOCATION_OF classType DOT methodPattern
-            ( ON Expr )?
+invokeExpr: AN_INVOCATION_OF_BACK_TICK classType DOT methodPattern BACK_TICK
+            ( ON BACK_TICK Expr BACK_TICK )?
             ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 
-argumentExpr: Expr
+argumentExpr: BACK_TICK Expr BACK_TICK
             | integerExpr
             | floatingPointExpr
             | booleanExpr
@@ -106,6 +106,6 @@ floatingPointExpr: MINUS? FloatingPoint ;
 
 booleanExpr: TRUE | FALSE ;
 
-charExpr: Char ;
+charExpr: SINGLE_QUOTE Char SINGLE_QUOTE ;
 
-stringExpr: Str | EMPTY_STRING ;
+stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
