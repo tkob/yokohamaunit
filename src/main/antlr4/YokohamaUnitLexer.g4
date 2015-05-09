@@ -29,9 +29,9 @@ COMMA: ',' ;
 RULES: 'rules' ;
 IN: 'in' ;
 UTABLE: 'Table' ;
-CSV: 'CSV' -> mode(AFTER_CSV) ;
-TSV: 'TSV' -> mode(AFTER_CSV) ;
-EXCEL: 'Excel' -> mode(AFTER_EXCEL) ;
+CSV: 'CSV' Spaces? '\'' -> mode(IN_FILE_NAME) ;
+TSV: 'TSV'  Spaces? '\''-> mode(IN_FILE_NAME) ;
+EXCEL: 'Excel' Spaces? '\'' -> mode(IN_BOOK_NAME) ;
 WHERE: 'where' ;
 EQ: '=' ;
 LET: 'Let' ;
@@ -119,14 +119,6 @@ OF: 'of' ;
 Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
 OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
-
-mode AFTER_CSV;
-OPEN_SINGLE_QUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
-WS_AFTER_CSV: Spaces -> skip ;
-
-mode AFTER_EXCEL;
-OPEN_SINGLE_QUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
-WS_AFTER_EXCEL: Spaces -> skip ;
 
 mode IN_FILE_NAME;
 SingleQuoteName: (~['\r\n]|'\'\'')* ;
