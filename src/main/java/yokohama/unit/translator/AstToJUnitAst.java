@@ -219,10 +219,11 @@ public class AstToJUnitAst {
         Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(
                 isPredicate -> {
                     return Stream.concat(
-                            expressionStrategy.eval(
-                                    actual,
+                            translateExpr(
                                     proposition.getSubject(),
-                                    Object.class, envVarName).stream(),
+                                    actual,
+                                    Object.class,
+                                    envVarName),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
@@ -242,11 +243,11 @@ public class AstToJUnitAst {
                             nullValue -> null);
                     String unexpected = genSym.generate("unexpected");
                     return Stream.concat(
-                            expressionStrategy.eval(
-                                    actual,
+                            translateExpr(
                                     proposition.getSubject(),
+                                    actual,
                                     Object.class,
-                                    envVarName).stream(),
+                                    envVarName),
                             Stream.concat(
                                     translateMatcher(
                                             isNotPredicate.getComplement(),
@@ -270,11 +271,12 @@ public class AstToJUnitAst {
                     return Stream.concat(
                             bindThrown(
                                     actual,
-                                    expressionStrategy.eval(
-                                            __,
+                                    translateExpr(
                                             proposition.getSubject(),
+                                            __,
                                             Object.class,
-                                            envVarName),
+                                            envVarName)
+                                            .collect(Collectors.toList()),
                                     envVarName),
                             translateMatcher(
                                     throwsPredicate.getThrowee(),

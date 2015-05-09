@@ -142,14 +142,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Proposition visitProposition(YokohamaUnitParser.PropositionContext ctx) {
-        QuotedExpr subject = visitSubject(ctx.subject());
+        Expr subject = visitSubject(ctx.subject());
         Predicate predicate = visitPredicate(ctx.predicate());
         return new Proposition(subject, predicate, getSpan(ctx));
     }
 
     @Override
-    public QuotedExpr visitSubject(YokohamaUnitParser.SubjectContext ctx) {
-        return new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()));
+    public Expr visitSubject(YokohamaUnitParser.SubjectContext ctx) {
+        return (Expr)visitChildren(ctx);
     }
 
     @Override
@@ -383,16 +383,20 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Execution visitExecution(YokohamaUnitParser.ExecutionContext ctx) {
         return new Execution(
-                ctx.Expr().stream()
-                        .map(expr -> new QuotedExpr(expr.getText(), nodeSpan(expr)))
+                ctx.quotedExpr().stream()
+                        .map(quotedExpr -> visitQuotedExpr(quotedExpr))
                         .collect(Collectors.toList()),
                 getSpan(ctx));
     }
 
     @Override
     public Expr visitExpr(YokohamaUnitParser.ExprContext ctx) {
-        return ctx.Expr() != null ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
-                                  : (Expr)visitChildren(ctx);
+        return (Expr)visitChildren(ctx);
+    }
+
+    @Override
+    public QuotedExpr visitQuotedExpr(YokohamaUnitParser.QuotedExprContext ctx) {
+        return new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()));
     }
 
     @Override
@@ -470,9 +474,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public InvocationExpr visitInvokeExpr(YokohamaUnitParser.InvokeExprContext ctx) {
         ClassType classType = visitClassType(ctx.classType());
         MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
-        Optional<Expr> receiver = Optional.ofNullable(ctx.Expr())
-                        .map(expr ->
-                                new QuotedExpr(expr.getText(), nodeSpan(expr)));
+        Optional<Expr> receiver = Optional.ofNullable(ctx.quotedExpr())
+                        .map(quotedExpr -> visitQuotedExpr(quotedExpr));
         List<Expr> args = ctx.argumentExpr().stream()
                 .map(this::visitArgumentExpr)
                 .collect(Collectors.toList());
@@ -481,9 +484,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Expr visitArgumentExpr(YokohamaUnitParser.ArgumentExprContext ctx) {
-        return ctx.Expr() != null
-                ? new QuotedExpr(ctx.Expr().getText(), nodeSpan(ctx.Expr()))
-                :(Expr)visitChildren(ctx);
+        return (Expr)visitChildren(ctx);
     }
 
     @Override

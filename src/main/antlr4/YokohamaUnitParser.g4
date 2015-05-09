@@ -21,7 +21,7 @@ propositions: proposition (AND THAT? proposition)* ;
 
 proposition: subject predicate ;
 
-subject: BACK_TICK Expr BACK_TICK | invokeExpr ;
+subject: quotedExpr | invokeExpr ;
 
 predicate: isPredicate | isNotPredicate | throwsPredicate ;
 isPredicate: IS matcher ;
@@ -58,7 +58,7 @@ teardown: hash? TEARDOWN PhaseDescription? execution+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
-execution: DO BACK_TICK Expr BACK_TICK (AND BACK_TICK Expr BACK_TICK)* STOP ;
+execution: DO quotedExpr (AND quotedExpr)* STOP ;
 
 tableDef: LBRACKET TableName RBRACKET header HBAR? rows
         | header HBAR? rows LBRACKET TableName RBRACKET ;
@@ -68,7 +68,7 @@ header: (BAR Identifier)+ BAR_EOL ;
 rows: row+ ;
 row: (BAR argumentExpr)+ BAR_EOL  ;
 
-expr: BACK_TICK Expr BACK_TICK
+expr: quotedExpr
     | stubExpr
     | invokeExpr
     | integerExpr
@@ -77,6 +77,8 @@ expr: BACK_TICK Expr BACK_TICK
     | charExpr
     | stringExpr
     ;
+
+quotedExpr: BACK_TICK Expr BACK_TICK ;
 
 stubExpr: A_STUB_OF_BACK_TICK classType BACK_TICK ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
 stubBehavior: METHOD_BACK_TICK methodPattern BACK_TICK RETURNS expr ;
@@ -89,10 +91,10 @@ primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
 invokeExpr: AN_INVOCATION_OF_BACK_TICK classType DOT methodPattern BACK_TICK
-            ( ON BACK_TICK Expr BACK_TICK )?
+            ( ON quotedExpr)?
             ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 
-argumentExpr: BACK_TICK Expr BACK_TICK
+argumentExpr: quotedExpr
             | integerExpr
             | floatingPointExpr
             | booleanExpr

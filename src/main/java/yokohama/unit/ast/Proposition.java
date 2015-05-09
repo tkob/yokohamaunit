@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class Proposition {
-    private QuotedExpr subject;
+    private Expr subject;
     private Predicate predicate;
     private Span span;
 }
