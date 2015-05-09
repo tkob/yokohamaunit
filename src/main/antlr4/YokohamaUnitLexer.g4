@@ -7,7 +7,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' -> mode(TEST_LEADING);
-TABLECAPTION: '[' -> skip, mode(TABLE_NAME);
+TABLE_CAPTION: '[' -> skip, mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -15,7 +15,7 @@ TEARDOWN: 'Teardown' -> mode(PHASE_LEADING);
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 BAR: '|' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
-STARLBRACKET: '*[' -> skip, mode(ABBREVIATION);
+STAR_LBRACKET: '*[' -> skip, mode(ABBREVIATION);
 ASSERT: 'Assert' ;
 THAT: 'that' ;
 STOP: '.' ;
@@ -55,9 +55,9 @@ Integer: IntegerLiteral ;
 FloatingPoint: FloatingPointLiteral ;
 MINUS: '-' ;
 EMPTY_STRING: '""' ;
-OPENBACKTICK: '`' -> skip, mode(IN_BACKTICK) ;
-OPENDOUBLEQUOTE: '"' -> skip, mode(IN_DOUBLEQUOTE) ;
-OPENSINGLEQUOTE: '\'' -> skip, mode(IN_SINGLEQUOTE) ;
+OPEN_BACK_TICK: '`' -> skip, mode(IN_BACK_TICK) ;
+OPEN_DOUBLE_QUOTE: '"' -> skip, mode(IN_DOUBLE_QUOTE) ;
+OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
 NEW_LINE : ('\r'? '\n')+ -> skip ;
 WS : [ \t]+ -> skip ;
 
@@ -66,34 +66,34 @@ WS3: [ \t]+ -> skip, mode(TEST_NAME);
 
 mode TEST_NAME;
 TestName: ~[\r\n]+ ;
-NEW_LINE_TESTNAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+NEW_LINE_TEST_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TABLE_NAME;
 TableName: ~[\]\r\n]+ ;
-EXIT_TABLENAME: ']' [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+NEW_LINE_TABLE_NAME: ']' [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode PHASE_LEADING;
 COLON: ':' [ \t]* -> skip, mode(PHASE_DESCRIPTION) ;
-WS5: [ \t]* '\r'? '\n' -> skip, mode(DEFAULT_MODE) ;
+NEW_LINE_PHASE_LEADING: [ \t]* '\r'? '\n' -> skip, mode(DEFAULT_MODE) ;
 
 mode PHASE_DESCRIPTION;
 PhaseDescription: ~[\r\n]+ ;
-NEW_LINE_PHASE: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+NEW_LINE_PHASE_DESCRIPTION: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
-mode IN_DOUBLEQUOTE;
+mode IN_DOUBLE_QUOTE;
 Str: (~["\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
-CLOSEDOUBLEQUOTE: '"' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_DOUBLE_QUOTE: '"' -> skip, mode(DEFAULT_MODE) ;
 
-mode IN_SINGLEQUOTE;
+mode IN_SINGLE_QUOTE;
 Char: (~['\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
-CLOSESINGLEQUOTE: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE: '\'' -> skip, mode(DEFAULT_MODE) ;
 
-mode IN_BACKTICK;
-Expr: ~[`]+ /*-> type(Expr)*/ ;
-CLOSEBACKTICK: '`' -> skip, mode(DEFAULT_MODE) ;
+mode IN_BACK_TICK;
+Expr: ~[`]+ ;
+CLOSE_BACK_TICK: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_METHOD;
-OPENBACKTICK3: '`' -> skip, mode(METHOD_PATTERN) ;
+OPEN_BACK_TICK3: '`' -> skip, mode(METHOD_PATTERN) ;
 SPACETABNEWLINE: [ \t\r\n]+ -> skip ;
 
 mode METHOD_PATTERN;
@@ -114,22 +114,22 @@ LBRACKET: '[' ;
 RBRACKET: ']' ;
 Identifier3 : IdentStart IdentPart* -> type(Identifier);
 SPACETABNEWLINE2: [ \t\r\n]+ -> skip ;
-CLOSEBACKTICK2: '`' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_BACK_TICK2: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode EXPECT_CLASS;
-OPENBACKTICK4: '`' -> skip, mode(CLASS) ;
+OPEN_BACK_TICK4: '`' -> skip, mode(CLASS) ;
 SPACETABNEWLINE3: [ \t\r\n]+ -> skip ;
 
 mode CLASS;
 DOT2: '.' -> type(DOT) ;
 Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
 SPACETABNEWLINE4: [ \t\r\n]+ -> skip ;
-CLOSEBACKTICK3: '`' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_BACK_TICK3: '`' -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
 Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
-OPENBACKTICK5: '`' -> skip, mode(CLASS) ;
+OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
 SPACETABNEWLINE5: [ \t\r\n]+ -> skip ;
 
 mode AFTER_TABLE;
@@ -137,11 +137,11 @@ LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
 SPACETABNEWLINE6: [ \t\r\n]+ -> skip ;
 
 mode AFTER_CSV;
-OPENSINGLEQUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
+OPEN_SINGLE_QUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
 SPACETABNEWLINE7: [ \t\r\n]+ -> skip ;
 
 mode AFTER_EXCEL;
-OPENSINGLEQUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
+OPEN_SINGLE_QUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
 SPACETABNEWLINE8: [ \t\r\n]+ -> skip ;
 
 mode IN_TABLE_NAME;
@@ -150,15 +150,15 @@ RBRACKET2: ']' -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_FILE_NAME;
 SingleQuoteName2: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
-CLOSESINGLEQUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_BOOK_NAME;
 SingleQuoteName3: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
-CLOSESINGLEQUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
+CLOSE_SINGLE_QUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 mode ABBREVIATION;
 ShortName: ~[\]\r\n]* ;
-RBRACKETCOLON: ']:' [ \t\r\n]* -> skip, mode(LONG_NAME) ;
+RBRACKET_COLON: ']:' [ \t\r\n]* -> skip, mode(LONG_NAME) ;
 
 mode LONG_NAME;
 LongName: ~[\r\n]* ;
