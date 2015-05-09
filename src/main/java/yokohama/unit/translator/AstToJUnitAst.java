@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -28,6 +29,8 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
+import yokohama.unit.ast.CodeBlock;
+import yokohama.unit.ast.CodeBlockExtractVisitor;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -69,7 +72,6 @@ import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
-import yokohama.unit.ast_junit.NonArrayType;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
@@ -89,26 +91,54 @@ import yokohama.unit.util.Optionals;
 import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AstToJUnitAst {
-    private final String name;
-    private final String packageName;
-    ExpressionStrategy expressionStrategy;
-    MockStrategy mockStrategy;
-    GenSym genSym;
-    ClassResolver classResolver;
-    TableExtractVisitor tableExtractVisitor;
+    final String name;
+    final String packageName;
+    final ExpressionStrategy expressionStrategy;
+    final MockStrategy mockStrategy;
+    final GenSym genSym;
+    final ClassResolver classResolver;
+    final TableExtractVisitor tableExtractVisitor;
+    final CodeBlockExtractVisitor codeBlockExtractVisitor =
+            new CodeBlockExtractVisitor();
 
     public CompilationUnit translate(Group group) {
-        List<Definition> definitions = group.getDefinitions();
         final List<Table> tables = tableExtractVisitor.extractTables(group);
+        final List<CodeBlock> codeBlocks = codeBlockExtractVisitor.visit(group);
+        return new AstToJUnitAstVisitor(
+                name,
+                packageName,
+                expressionStrategy,
+                mockStrategy,
+                genSym,
+                classResolver,
+                tables,
+                codeBlocks)
+                .translateGroup(group);
+    }
+}
+
+@AllArgsConstructor
+class AstToJUnitAstVisitor {
+    final String name;
+    final String packageName;
+    final ExpressionStrategy expressionStrategy;
+    final MockStrategy mockStrategy;
+    final GenSym genSym;
+    final ClassResolver classResolver;
+    final List<Table> tables;
+    final List<CodeBlock> codeBlocks;
+
+    CompilationUnit translateGroup(Group group) {
+        List<Definition> definitions = group.getDefinitions();
         List<Method> methods =
                 definitions.stream()
                         .flatMap(definition -> definition.accept(
-                                test -> translateTest(test, tables).stream(),
+                                test -> translateTest(test).stream(),
                                 fourPhaseTest ->
                                         translateFourPhaseTest(
-                                                fourPhaseTest, tables).stream(),
+                                                fourPhaseTest).stream(),
                                 table -> Stream.empty(),
                                 codeBlock -> Stream.empty(),
                                 heading -> Stream.empty()))
@@ -124,7 +154,7 @@ public class AstToJUnitAst {
         return new CompilationUnit(packageName, classes);
     }
 
-    List<Method> translateTest(Test test, final List<Table> tables) {
+    List<Method> translateTest(Test test) {
         final String name = test.getName();
         List<Assertion> assertions = test.getAssertions();
         List<Method> methods = 
@@ -132,14 +162,14 @@ public class AstToJUnitAst {
                         .mapToObj(Integer::new)
                         .flatMap(i ->
                                 translateAssertion(
-                                        assertions.get(i), i + 1, name, tables)
+                                        assertions.get(i), i + 1, name)
                                         .stream())
                         .collect(Collectors.toList());
         return methods;
     }
 
     List<Method> translateAssertion(
-            Assertion assertion, int index, String testName, List<Table> tables) {
+            Assertion assertion, int index, String testName) {
         String methodName = SUtils.toIdent(testName) + "_" + index;
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(
@@ -163,7 +193,7 @@ public class AstToJUnitAst {
                 tableRef -> {
                     String env = genSym.generate("env");
                     List<List<Statement>> table =
-                            translateTableRef(tableRef, tables, env);
+                            translateTableRef(tableRef, env);
                     return IntStream.range(0, table.size())
                             .mapToObj(Integer::new)
                             .map(i -> {
@@ -830,7 +860,6 @@ public class AstToJUnitAst {
 
     List<List<Statement>> translateTableRef(
             TableRef tableRef,
-            List<Table> tables,
             String envVarName) {
         String name = tableRef.getName();
         List<Ident> idents = tableRef.getIdents();
@@ -973,7 +1002,7 @@ public class AstToJUnitAst {
         }
     }
 
-    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest, List<Table> tables) {
+    List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
         String env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());

@@ -46,7 +46,7 @@ public class MockitoMockStrategy implements MockStrategy {
     public List<Statement> stub(
             String varName,
             StubExpr stubExpr,
-            AstToJUnitAst astToJUnitAst,
+            AstToJUnitAstVisitor astToJUnitAstVisitor,
             String envVarName,
             ClassResolver classResolver) {
         List<StubBehavior> behavior = stubExpr.getBehavior();
@@ -60,7 +60,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         varName,
                         stubExpr.getClassToStub(),
                         b,
-                        astToJUnitAst,
+                        astToJUnitAstVisitor,
                         envVarName,
                         classResolver));
         return Stream.concat(createMock, defineBehavior).collect(Collectors.toList());
@@ -91,7 +91,7 @@ public class MockitoMockStrategy implements MockStrategy {
             String varName,
             yokohama.unit.ast.ClassType classToStub,
             StubBehavior behavior,
-            AstToJUnitAst astToJUnitAst,
+            AstToJUnitAstVisitor astToJUnitAstVisitor,
             String envVarName,
             ClassResolver classResolver) {
         /*
@@ -114,7 +114,7 @@ public class MockitoMockStrategy implements MockStrategy {
                 classResolver);
 
         String returnedVarName = genSym.generate("returned");
-        Stream<Statement> returned = astToJUnitAst.translateExpr(
+        Stream<Statement> returned = astToJUnitAstVisitor.translateExpr(
                 behavior.getToBeReturned(),
                 returnedVarName,
                 returnType.box().toClass(),

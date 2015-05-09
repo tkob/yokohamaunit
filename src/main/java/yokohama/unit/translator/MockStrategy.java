@@ -21,7 +21,7 @@ public interface MockStrategy {
      * 
      * @param varName            a variable name to be bound to the stub
      * @param stubExpr           a stub expression
-     * @param astToJUnitAst
+     * @param astToJUnitAstVisitor 
      * @param envVarName         a variable name bound to the environment
      * @param classResolver
      * @return statements that bind the variable name to the stub
@@ -29,7 +29,7 @@ public interface MockStrategy {
     List<Statement> stub(
             String varName,
             StubExpr stubExpr,
-            AstToJUnitAst astToJUnitAst,
+            AstToJUnitAstVisitor astToJUnitAstVisitor,
             String envVarName,
             ClassResolver classResolver);
 }
