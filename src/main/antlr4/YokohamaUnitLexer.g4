@@ -6,7 +6,7 @@ HASH3: '###' ;
 HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
-TEST: 'Test:' -> mode(TEST_LEADING);
+TEST: 'Test:' [ \t]* -> mode(TEST_NAME);
 TABLE_CAPTION: '[' -> skip, mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
@@ -60,9 +60,6 @@ OPEN_DOUBLE_QUOTE: '"' -> skip, mode(IN_DOUBLE_QUOTE) ;
 OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
 NEW_LINE : ('\r'? '\n')+ -> skip ;
 WS : [ \t]+ -> skip ;
-
-mode TEST_LEADING;
-WS3: [ \t]+ -> skip, mode(TEST_NAME);
 
 mode TEST_NAME;
 TestName: ~[\r\n]+ ;
