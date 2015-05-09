@@ -1,3 +1,3 @@
-Test: Multiple assertions
+# Test: Multiple assertions
 Assert that `1 + 1` is `2`.
 Assert that `1 + 1` is not `3`.

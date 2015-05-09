@@ -70,7 +70,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitGroup() throws IOException {
-        YokohamaUnitParser.GroupContext ctx = parser("Test: test name\nAssert `a` is `b`.").group();
+        YokohamaUnitParser.GroupContext ctx = parser("# Test: test name\nAssert `a` is `b`.").group();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Group result = instance.visitGroup(ctx);
         assertThat(result.getDefinitions().size(), is(1));
@@ -78,7 +78,7 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitDefinition() throws IOException {
-        YokohamaUnitParser.DefinitionContext ctx = parser("Test: test name\n Assert `a` is `b`.").definition();
+        YokohamaUnitParser.DefinitionContext ctx = parser("# Test: test name\n Assert `a` is `b`.").definition();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Definition result = instance.visitDefinition(ctx);
         assertThat(result, is(instanceOf(yokohama.unit.ast.Test.class)));
@@ -94,28 +94,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitTest() throws IOException {
-        YokohamaUnitParser.TestContext ctx = parser("Test: test name\nAssert `1` is `1`.").test();
+        YokohamaUnitParser.TestContext ctx = parser("# Test: test name\nAssert `1` is `1`.").test();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         yokohama.unit.ast.Test result = instance.visitTest(ctx);
         assertEquals("test name", result.getName());
-    }
-
-    @Test
-    public void testVisitHash() throws IOException {
-        YokohamaUnitParser.HashContext ctx = parser("#").hash();
-        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Integer actual = instance.visitHash(ctx);
-        Integer expected = 1;
-        assertThat(actual, is(expected));
-    }
-
-    @Test
-    public void testVisitHash2() throws IOException {
-        YokohamaUnitParser.HashContext ctx = parser("######").hash();
-        ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Integer actual = instance.visitHash(ctx);
-        Integer expected = 6;
-        assertThat(actual, is(expected));
     }
 
     @Test
@@ -346,16 +328,14 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitFourPhaseTest() throws IOException {
-        YokohamaUnitParser.FourPhaseTestContext ctx = parser("Test: Four phase test\nVerify\nAssert `x` is `1`.").fourPhaseTest();
+        YokohamaUnitParser.FourPhaseTestContext ctx = parser("# Test: Four phase test\n## Verify\nAssert `x` is `1`.").fourPhaseTest();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
         FourPhaseTest expected = new FourPhaseTest(
-                0,
                 "Four phase test",
                 Optional.empty(),
                 Optional.empty(),
                 new VerifyPhase(
-                        0,
                         Optional.empty(),
                         Arrays.asList(
                                 new Assertion(
@@ -384,10 +364,8 @@ public class ParseTreeToAstVisitorTest {
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         FourPhaseTest actual = instance.visitFourPhaseTest(ctx);
         FourPhaseTest expected = new FourPhaseTest(
-                1,
                 "Four phase test",
                 Optional.of(new Phase(
-                        2,
                         Optional.empty(),
                         Arrays.asList(new LetStatement(
                                 Arrays.asList(
@@ -399,7 +377,6 @@ public class ParseTreeToAstVisitorTest {
                         Arrays.asList(),
                         Span.dummySpan())),
                 Optional.of(new Phase(
-                        2,
                         Optional.empty(),
                         Collections.emptyList(),
                         Arrays.asList(
@@ -409,7 +386,6 @@ public class ParseTreeToAstVisitorTest {
                                         Span.dummySpan())),
                         Span.dummySpan())),
                 new VerifyPhase(
-                        2,
                         Optional.of("verification"),
                         Arrays.asList(
                                 new Assertion(
@@ -426,7 +402,6 @@ public class ParseTreeToAstVisitorTest {
                                 Span.dummySpan())),
                         Span.dummySpan()),
                 Optional.of(new Phase(
-                        2,
                         Optional.of("do that"),
                         Collections.emptyList(),
                         Arrays.asList(
@@ -449,11 +424,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitSetup() throws IOException {
-        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x be `1`.").setup();
+        YokohamaUnitParser.SetupContext ctx = parser("# Setup\nLet x be `1`.").setup();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitSetup(ctx);
         Phase expected = new Phase(
-                0,
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
@@ -473,7 +447,6 @@ public class ParseTreeToAstVisitorTest {
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitSetup(ctx);
         Phase expected = new Phase(
-                2,
                 Optional.of("x = 1"),
                 Collections.emptyList(),
                 Arrays.asList(
@@ -485,11 +458,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitSetup3() throws IOException {
-        YokohamaUnitParser.SetupContext ctx = parser("Setup\nLet x = `1`.\nDo `that`.").setup();
+        YokohamaUnitParser.SetupContext ctx = parser("# Setup\nLet x = `1`.\nDo `that`.").setup();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitSetup(ctx);
         Phase expected = new Phase(
-                0,
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
@@ -510,11 +482,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitExercise() throws IOException {
-        YokohamaUnitParser.ExerciseContext ctx = parser("Exercise: x = 1\nDo `this`. Do `that`.").exercise();
+        YokohamaUnitParser.ExerciseContext ctx = parser("# Exercise: x = 1\nDo `this`. Do `that`.").exercise();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitExercise(ctx);
         Phase expected = new Phase(
-                0,
                 Optional.of("x = 1"),
                 Collections.emptyList(),
                 Arrays.asList(
@@ -534,12 +505,11 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitVerify() throws IOException {
-        YokohamaUnitParser.VerifyContext ctx = parser("Verify\nAssert that `x` is `1`.").verify();
+        YokohamaUnitParser.VerifyContext ctx = parser("# Verify\nAssert that `x` is `1`.").verify();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase expResult = null;
         VerifyPhase actual = instance.visitVerify(ctx);
         VerifyPhase expected = new VerifyPhase(
-                0,
                 Optional.empty(),
                 Arrays.asList(
                         new Assertion(
@@ -564,7 +534,6 @@ public class ParseTreeToAstVisitorTest {
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitTeardown(ctx);
         Phase expected = new Phase(
-                2,
                 Optional.of("do that"),
                 Collections.emptyList(),
                 Arrays.asList(
@@ -582,11 +551,10 @@ public class ParseTreeToAstVisitorTest {
 
     @Test
     public void testVisitTeardown2() throws IOException {
-        YokohamaUnitParser.TeardownContext ctx = parser("Teardown\nDo `this`.").teardown();
+        YokohamaUnitParser.TeardownContext ctx = parser("# Teardown\nDo `this`.").teardown();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Phase actual = instance.visitTeardown(ctx);
         Phase expected = new Phase(
-                0,
                 Optional.empty(),
                 Collections.emptyList(),
                 Arrays.asList(

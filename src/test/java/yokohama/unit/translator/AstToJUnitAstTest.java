@@ -60,7 +60,7 @@ public class AstToJUnitAstTest {
 
     @Test
     public void testTranslateTest() {
-        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), 0, yokohama.unit.position.Span.dummySpan());
+        yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), yokohama.unit.position.Span.dummySpan());
         List<Table> tables = Arrays.asList();
         GenSym genSym = new GenSym();
         AstToJUnitAst instance = new AstToJUnitAst("", "", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());

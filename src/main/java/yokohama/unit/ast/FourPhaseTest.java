@@ -8,7 +8,6 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class FourPhaseTest implements Definition {
-    private int numHashes;
     private String name;
     private Optional<Phase> setup;
     private Optional<Phase> exercise;

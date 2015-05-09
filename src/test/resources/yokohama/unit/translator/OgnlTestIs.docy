@@ -1,2 +1,2 @@
-Test: Simple Arithmetic
+# Test: Simple Arithmetic
 Assert that `1 + 1` is `2`.

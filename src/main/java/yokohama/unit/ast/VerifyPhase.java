@@ -9,7 +9,6 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class VerifyPhase {
-    private int numHashes;
     private Optional<String> description;
     private List<Assertion> assertions; 
     private Span span;

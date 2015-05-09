@@ -1,3 +1,3 @@
-Test: Null test
+# Test: Null test
 Assert that `null` is null.
 Assert that `"null"` is not null.

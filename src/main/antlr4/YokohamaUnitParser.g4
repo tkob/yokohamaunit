@@ -11,9 +11,7 @@ definition: test
           | tableDef
           ;
 
-test: hash? TEST TestName assertion+ ;
-
-hash: HASH1 | HASH2 | HASH3 | HASH4 | HASH5 | HASH6 ;
+test: TEST TestName assertion+ ;
 
 assertion: ASSERT THAT? propositions condition? STOP ;
 
@@ -49,12 +47,12 @@ tableRef: UTABLE LBRACKET TableName RBRACKET
 bindings: WHERE binding (AND binding)* ;
 binding: Identifier (EQ | IS) expr ;
 
-fourPhaseTest: hash? TEST TestName setup? exercise? verify teardown? ;
+fourPhaseTest: TEST TestName setup? exercise? verify teardown? ;
 
-setup: hash? SETUP PhaseDescription? (letStatement+ execution* | execution+) ;
-exercise: hash? EXERCISE PhaseDescription? execution+ ;
-verify: hash? VERIFY PhaseDescription? assertion+ ;
-teardown: hash? TEARDOWN PhaseDescription? execution+ ;
+setup: SETUP PhaseDescription? (letStatement+ execution* | execution+) ;
+exercise: EXERCISE PhaseDescription? execution+ ;
+verify: VERIFY PhaseDescription? assertion+ ;
+teardown: TEARDOWN PhaseDescription? execution+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;

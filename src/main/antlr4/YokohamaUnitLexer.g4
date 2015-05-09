@@ -1,18 +1,12 @@
 lexer grammar YokohamaUnitLexer;
 
 STAR_LBRACKET: '*[' Spaces? -> mode(ABBREVIATION);
-HASH1: '#' ;
-HASH2: '##' ;
-HASH3: '###' ;
-HASH4: '####' ;
-HASH5: '#####' ;
-HASH6: '######' ;
-TEST: 'Test:' [ \t]* -> mode(TEST_NAME);
+TEST: Hashes Spaces? 'Test:' [ \t]* -> mode(TEST_NAME);
 LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
-SETUP:    'Setup' -> mode(PHASE_LEADING);
-EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
-VERIFY:   'Verify'  -> mode(PHASE_LEADING);
-TEARDOWN: 'Teardown' -> mode(PHASE_LEADING);
+SETUP:    Hashes Spaces? 'Setup' -> mode(PHASE_LEADING);
+EXERCISE: Hashes Spaces? 'Exercise' -> mode(PHASE_LEADING);
+VERIFY:   Hashes Spaces? 'Verify'  -> mode(PHASE_LEADING);
+TEARDOWN: Hashes Spaces? 'Teardown' -> mode(PHASE_LEADING);
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
@@ -134,6 +128,9 @@ CLOSE_SINGLE_QUOTE_IN_FILE_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) 
 mode IN_BOOK_NAME;
 BookName: (~['\r\n]|'\'\'')+ ;
 CLOSE_SINGLE_QUOTE_IN_BOOK_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
+
+fragment
+Hashes: '#' | '##' | '###' | '####' | '#####' | '######' ;
 
 fragment
 Spaces: [ \t\r\n]+ ;

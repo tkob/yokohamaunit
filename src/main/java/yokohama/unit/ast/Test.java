@@ -10,7 +10,6 @@ import lombok.Value;
 public class Test implements Definition {
     private String name;
     private List<Assertion> assertions;    
-    private int numHashes;
     private Span span;
 
     @Override

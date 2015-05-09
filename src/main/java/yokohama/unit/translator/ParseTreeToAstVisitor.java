@@ -109,18 +109,12 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Test visitTest(YokohamaUnitParser.TestContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         String name = ctx.TestName().getText();
         List<Assertion> assertions =
                 ctx.assertion().stream()
                                .map(this::visitAssertion)
                                .collect(Collectors.toList());
-        return new Test(name, assertions, numHashes, getSpan(ctx));
-    }
-
-    @Override
-    public Integer visitHash(YokohamaUnitParser.HashContext ctx) {
-        return ctx.getText().length();
+        return new Test(name, assertions, getSpan(ctx));
     }
 
     @Override
@@ -292,7 +286,6 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public FourPhaseTest visitFourPhaseTest(YokohamaUnitParser.FourPhaseTestContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         String name = ctx.TestName().getText();
         Optional<Phase> setup =
                 ctx.setup() == null ? Optional.empty()
@@ -304,12 +297,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<Phase> teardown =
                 ctx.teardown() == null ? Optional.empty()
                                        : Optional.of(visitTeardown(ctx.teardown()));
-        return new FourPhaseTest(numHashes, name, setup, exercise, verify, teardown, getSpan(ctx));
+        return new FourPhaseTest(name, setup, exercise, verify, teardown, getSpan(ctx));
     }
 
     @Override
     public Phase visitSetup(YokohamaUnitParser.SetupContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
@@ -322,12 +314,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, letStatements, executions, getSpan(ctx));
+        return new Phase(description, letStatements, executions, getSpan(ctx));
     }
 
     @Override
     public Phase visitExercise(YokohamaUnitParser.ExerciseContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
@@ -335,12 +326,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
     }
 
     @Override
     public VerifyPhase visitVerify(YokohamaUnitParser.VerifyContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
@@ -348,12 +338,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitAssertion)
                 .collect(Collectors.toList());
-        return new VerifyPhase(numHashes, description, assertions, getSpan(ctx));
+        return new VerifyPhase(description, assertions, getSpan(ctx));
     }
 
     @Override
     public Phase visitTeardown(YokohamaUnitParser.TeardownContext ctx) {
-        int numHashes = ctx.hash() == null ? 0 : visitHash(ctx.hash());
         Optional<String> description =
                 ctx.PhaseDescription() == null ? Optional.empty()
                                                : Optional.of(ctx.PhaseDescription().getText());
@@ -361,7 +350,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 .stream()
                 .map(this::visitExecution)
                 .collect(Collectors.toList());
-        return new Phase(numHashes, description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
     }
 
     @Override

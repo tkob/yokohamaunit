@@ -22,7 +22,7 @@ public class TableExtractVisitorTest {
         List<Abbreviation> abbreviations = Arrays.asList();
         List<Definition> definitions = Arrays.asList(
                 new Table("table 1", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan()),
-                new yokohama.unit.ast.Test("test name", Arrays.asList(), 0, yokohama.unit.position.Span.dummySpan()),
+                new yokohama.unit.ast.Test("test name", Arrays.asList(), yokohama.unit.position.Span.dummySpan()),
                 new Table("table 2", Arrays.asList(new Ident("a", yokohama.unit.position.Span.dummySpan())), Arrays.asList(new Row(Arrays.asList(), yokohama.unit.position.Span.dummySpan())), yokohama.unit.position.Span.dummySpan())
         );
         Group group = new Group(abbreviations, definitions, yokohama.unit.position.Span.dummySpan());

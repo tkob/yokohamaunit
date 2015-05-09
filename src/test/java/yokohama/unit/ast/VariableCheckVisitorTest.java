@@ -90,62 +90,62 @@ public class VariableCheckVisitorTest {
     public static Fixture[] PARAMs = {
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where c = `3` and d = `4`.")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where b = `3` and c = `4`.")
                         .toString(),
                 Arrays.asList("b")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where c = `3` and d = `4` and c = `5`.")
                         .toString(),
                 Arrays.asList("c")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all c and d in Table [table].")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all b and c in Table [table].")
                         .toString(),
                 Arrays.asList("b")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all c, d, c, e and c in Table [table].")
                         .toString(),
                 Arrays.asList("c", "c")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Verify: verify")
+                        .appendln("# Test: test")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
                         .appendln("|a|b|c|")
@@ -154,8 +154,8 @@ public class VariableCheckVisitorTest {
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Verify: verify")
+                        .appendln("# Test: test")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
                         .appendln("|a|b|a|c|a|")
@@ -164,10 +164,10 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance c of `Exception`")
                         .appendln("such that `c.m()` throws an instance c of `Exception`")
                         .appendln("such that `c.m()` throws nothing.")
@@ -175,10 +175,10 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("c")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws an instance b of `Exception`")
                         .appendln("such that `b.m()` throws nothing.")
@@ -186,84 +186,84 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("a", "b")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance c of `Exception`")
                         .appendln("such that `c.m()` throws nothing.")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and b = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance b of `Exception`")
                         .appendln("such that `b.m()` throws nothing.")
                         .toString(),
                 Arrays.asList("b")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where c = `3` and d = `4`.")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where a = `3` and b = `4`.")
                         .toString(),
                 Arrays.asList("a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where c = `3` and d = `4` and c = `5`.")
                         .toString(),
                 Arrays.asList("a", "c")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all c and d in Table [table].")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all a and b in Table [table].")
                         .toString(),
                 Arrays.asList("a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` for all c, d, c, e and c in Table [table].")
                         .toString(),
                 Arrays.asList("a", "c", "c")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
                         .appendln("|a|b|c|")
@@ -272,10 +272,10 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1`.")
                         .appendln("[table]")
                         .appendln("|a|b|a|c|a|")
@@ -284,10 +284,10 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("a", "a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws an instance b of `Exception`")
                         .appendln("such that `b.m()` throws nothing.")
@@ -295,58 +295,58 @@ public class VariableCheckVisitorTest {
                 Arrays.asList("a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws nothing.")
                         .toString(),
                 Arrays.asList("a", "a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Setup: setup")
+                        .appendln("# Test: test")
+                        .appendln("## Setup: setup")
                         .appendln("Let a = `1` and a = `2`.")
-                        .appendln("Verify: verify")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` throws an instance b of `Exception`")
                         .appendln("such that `b.m()` throws nothing.")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
-                        .appendln("Verify: verify")
+                        .appendln("# Test: test")
+                        .appendln("## Verify: verify")
                         .appendln("Assert `1` is `1` where a = `1` and b = `2`.")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` is `1` where a = `1` and b = `2`.")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` is `1` where a = `1` and a = `2`.")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` is `1` for all a and b in Table [table].")
                         .toString(),
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` is `1` for all a, b and a in Table [table].")
                         .toString(),
                 Arrays.asList("a")),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws an instance b of `Exception`")
                         .appendln("such that `b.m()` throws nothing.")
@@ -354,7 +354,7 @@ public class VariableCheckVisitorTest {
                 Arrays.asList()),
         new Fixture(
                 new SBuilder(4)
-                        .appendln("Test: test")
+                        .appendln("# Test: test")
                         .appendln("Assert `1` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws an instance a of `Exception`")
                         .appendln("such that `a.m()` throws nothing.")

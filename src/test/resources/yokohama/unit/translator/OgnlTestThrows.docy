@@ -1,14 +1,14 @@
-Test: Division by zero
+# Test: Division by zero
 Assert that `1 / 0` throws an instance of `java.lang.ArithmeticException`.
 
-Test: NPO
+# Test: NPO
 Assert that `null.toString()` throws an instance of `java.lang.NullPointerException`.
 
-Test: UnsupportedEncodingException
+# Test: UnsupportedEncodingException
 Assert that `"".getBytes("")` throws an instance of `java.io.UnsupportedEncodingException`.
 
-Test: OgnlException
+# Test: OgnlException
 Assert that `null.field` throws an instance of `ognl.OgnlException`.
 
-Test: No exception
+# Test: No exception
 Assert that `1 + 1` throws nothing.
