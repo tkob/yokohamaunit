@@ -37,11 +37,11 @@ EQ: '=' ;
 LET: 'Let' ;
 BE: 'be' ;
 DO: 'Do' ;
-A_STUB_OF: 'a' Spaces 'stub' Spaces 'of' -> mode(EXPECT_CLASS) ;
+A_STUB_OF: 'a' Spaces 'stub' Spaces 'of' Spaces? '`' -> mode(CLASS) ;
 SUCH: 'such' ;
 METHOD: 'method' Spaces? '`' -> mode(METHOD_PATTERN) ;
 RETURNS: 'returns' ;
-AN_INSTANCE_OF: 'an' Spaces 'instance' Spaces 'of' -> mode(EXPECT_CLASS) ;
+AN_INSTANCE_OF: 'an' Spaces 'instance' Spaces 'of' Spaces? '`' -> mode(CLASS) ;
 AN_INSTANCE: 'an' Spaces 'instance' -> mode(AFTER_AN_INSTANCE) ;
 AN_INVOCATION_OF: 'an' Spaces 'invocation' Spaces 'of' Spaces? '`' -> mode(METHOD_PATTERN) ;
 ON: 'on' ;
@@ -107,10 +107,6 @@ RBRACKET: ']' ;
 Identifier3 : IdentStart IdentPart* -> type(Identifier);
 WS_METHOD_PATTERN: Spaces -> skip ;
 CLOSE_BACK_TICK2: '`' -> skip, mode(DEFAULT_MODE) ;
-
-mode EXPECT_CLASS;
-OPEN_BACK_TICK4: '`' -> skip, mode(CLASS) ;
-WS_EXPECT_CLASS: Spaces -> skip ;
 
 mode CLASS;
 DOT2: '.' -> type(DOT) ;
