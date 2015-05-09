@@ -2,7 +2,9 @@ package yokohama.unit.util;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -85,5 +87,16 @@ public class Lists {
         return Stream.concat(
                 firstf.apply(first), rest.stream().flatMap(restf))
                 .collect(Collectors.toList());
+    }
+
+    public static <T, U, V> Map<U, V> listToMap(
+            List<T> list, Function<T, Pair<U, V>> f) {
+        return list.stream().collect(
+                () -> new HashMap<>(),
+                (map, e) -> {
+                    Pair<U, V> pair = f.apply(e);
+                    map.put(pair.getFirst(), pair.getSecond());
+                },
+                (map1, map2) -> map1.putAll(map2));
     }
 }
