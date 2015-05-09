@@ -1,5 +1,6 @@
 lexer grammar YokohamaUnitLexer;
 
+STAR_LBRACKET: '*[' -> skip, mode(ABBREVIATION);
 HASH1: '#' ;
 HASH2: '##' ;
 HASH3: '###' ;
@@ -12,10 +13,9 @@ SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
 TEARDOWN: 'Teardown' -> mode(PHASE_LEADING);
-BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 BAR: '|' ;
+BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
-STAR_LBRACKET: '*[' -> skip, mode(ABBREVIATION);
 ASSERT: 'Assert' ;
 THAT: 'that' ;
 STOP: '.' ;
@@ -60,6 +60,14 @@ OPEN_DOUBLE_QUOTE: '"' -> skip, mode(IN_DOUBLE_QUOTE) ;
 OPEN_SINGLE_QUOTE: '\'' -> skip, mode(IN_SINGLE_QUOTE) ;
 WS : Spaces -> skip ;
 
+mode ABBREVIATION;
+ShortName: ~[\]\r\n]* ;
+RBRACKET_COLON: ']:' Spaces? -> skip, mode(LONG_NAME) ;
+
+mode LONG_NAME;
+LongName: ~[\r\n]* ;
+EXIT_LONG_NAME: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+
 mode TEST_NAME;
 TestName: ~[\r\n]+ ;
 NEW_LINE_TEST_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
@@ -75,6 +83,12 @@ NEW_LINE_PHASE_LEADING: [ \t]* '\r'? '\n' -> skip, mode(DEFAULT_MODE) ;
 mode PHASE_DESCRIPTION;
 PhaseDescription: ~[\r\n]+ ;
 NEW_LINE_PHASE_DESCRIPTION: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+
+mode AFTER_AN_INSTANCE;
+OF: 'of' ;
+Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
+OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
+WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
 mode IN_DOUBLE_QUOTE;
 Str: (~["\\\r\n] | UnicodeEscape | EscapeSequence)+ ;
@@ -114,12 +128,6 @@ Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
 WS_CLASS: Spaces -> skip ;
 CLOSE_BACK_TICK3: '`' -> skip, mode(DEFAULT_MODE) ;
 
-mode AFTER_AN_INSTANCE;
-OF: 'of' ;
-Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
-OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
-WS_AFTER_AN_INSTANCE: Spaces -> skip ;
-
 mode IN_FILE_NAME;
 SingleQuoteName: (~['\r\n]|'\'\'')* ;
 CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
@@ -127,14 +135,6 @@ CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
 mode IN_BOOK_NAME;
 SingleQuoteName3: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
 CLOSE_SINGLE_QUOTE3: '\'' -> skip, mode(DEFAULT_MODE) ;
-
-mode ABBREVIATION;
-ShortName: ~[\]\r\n]* ;
-RBRACKET_COLON: ']:' Spaces? -> skip, mode(LONG_NAME) ;
-
-mode LONG_NAME;
-LongName: ~[\r\n]* ;
-EXIT_LONG_NAME: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 fragment
 Spaces: [ \t\r\n]+ ;
