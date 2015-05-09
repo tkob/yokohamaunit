@@ -69,7 +69,9 @@
  * 
  * Table ::= Ident* Row*
  * 
- * Row ::= Expr*
+ * Row ::= Cell+
+ * 
+ * Cell ::= ExprCell | PredCell
  * </pre>
  * 
  */

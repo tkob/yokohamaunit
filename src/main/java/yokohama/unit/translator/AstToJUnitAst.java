@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
+import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
@@ -872,12 +873,21 @@ public class AstToJUnitAst {
                 .filter(i -> idents.contains(header.get(i)))
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
-                    String varName = genSym.generate(header.get(i).getName());
-                    return Stream.concat(
-                            translateExpr(
-                                    row.getExprs().get(i), varName, Object.class, envVarName),
-                            expressionStrategy.bind(
-                                    envVarName, header.get(i), new Var(varName)).stream());
+                    Cell cell = row.getCells().get(i);
+                    return cell.accept(
+                            exprCell -> {
+                                String varName = genSym.generate(header.get(i).getName());
+                                return Stream.concat(
+                                        translateExpr(
+                                                exprCell.getExpr(), varName, Object.class, envVarName),
+                                        expressionStrategy.bind(
+                                                envVarName, header.get(i), new Var(varName)).stream());
+                            },
+                            predCell -> {
+                                throw new TranslationException(
+                                        "Expected expression but found predicate",
+                                        predCell.getSpan());
+                            });
                 })
                 .collect(Collectors.toList());
     }

@@ -12,7 +12,9 @@ SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
 TEARDOWN: 'Teardown' -> mode(PHASE_LEADING);
-BAR: '|' -> mode(IN_TABLE_HEADER) ;
+BAR_EOL: '|' [ \t]* '\r'? '\n' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+BAR: '|' -> mode(IN_THE_MIDDLE_OF_LINE) ;
+HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 STARLBRACKET: '*[' -> skip, mode(ABBREVIATION);
 ASSERT: 'Assert' -> mode(IN_THE_MIDDLE_OF_LINE) ;
 THAT: 'that' -> mode(IN_THE_MIDDLE_OF_LINE) ;
@@ -60,6 +62,9 @@ NEW_LINE : ('\r'? '\n')+ -> skip ;
 WS : [ \t]+ -> skip ;
 
 mode IN_THE_MIDDLE_OF_LINE;
+BAR_EOL2: '|' [ \t]* '\r'? '\n' -> type(BAR_EOL), mode(DEFAULT_MODE) ;
+BAR2: '|' -> type(BAR) ;
+HBAR2: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' -> type(HBAR) ;
 ASSERT2: 'Assert' -> type(ASSERT) ;
 THAT2: 'that' -> type(THAT) ;
 STOP2: '.' -> type(STOP) ;
@@ -135,25 +140,6 @@ CLOSESINGLEQUOTE: '\'' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
 mode IN_BACKTICK;
 Expr: ~[`]+ /*-> type(Expr)*/ ;
 CLOSEBACKTICK: '`' -> skip, mode(IN_THE_MIDDLE_OF_LINE) ;
-
-mode IN_TABLE_HEADER;
-IDENTHEADER: IdentStart IdentPart* -> type(Identifier) ;
-BARH: '|' -> type(BAR) ;
-NEWLINE: '\r'? '\n' -> mode(IN_TABLE_ONSET) ;
-SPACETAB: [ \t]+ -> skip ;
-
-mode IN_TABLE_CELL;
-ExprCell: ~[|\r\n]+ -> type(Expr) ;
-BARCELL: '|' -> type(BAR) ;
-NEWLINECELL: '\r'? '\n' -> type(NEWLINE), mode(IN_TABLE_ONSET) ;
-SPACETABCELL: [ \t]+ -> skip ;
-
-mode IN_TABLE_ONSET;
-HBAR: [|\-=\:\.\+ \t]+ '\r'? '\n' ;
-BARONSET: '|' -> type(BAR), mode(IN_TABLE_CELL) ;
-TABLECAPTION2: '[' -> skip, mode(TABLE_NAME);
-SPACETAB2: [ \t]+ -> skip ;
-NEWLINEONSET: '\r'?'\n' -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_METHOD;
 OPENBACKTICK3: '`' -> skip, mode(METHOD_PATTERN) ;

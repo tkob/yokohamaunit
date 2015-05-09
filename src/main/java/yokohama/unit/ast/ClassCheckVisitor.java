@@ -210,6 +210,12 @@ class ClassExprCheckVisitor {
     }
 
     private Stream<ErrorMessage> visitRow(Row row) {
-        return row.getExprs().stream().flatMap(this::visitExpr);
+        return row.getCells().stream().flatMap(this::visitCell);
+    }
+
+    private Stream<ErrorMessage> visitCell(Cell cell) {
+        return cell.accept(
+                exprCell -> visitExpr(exprCell.getExpr()),
+                predCell -> visitPredicate(predCell.getPredicate()));
     }
 }

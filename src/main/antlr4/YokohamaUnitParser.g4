@@ -63,10 +63,10 @@ execution: DO Expr (AND Expr)* STOP ;
 tableDef: TableName header HBAR? rows
         | header HBAR? rows TableName ;
 
-header: BAR (Identifier BAR)* Identifier? NEWLINE;
+header: (BAR Identifier)+ BAR_EOL ;
 
 rows: row+ ;
-row: BAR (Expr BAR)* Expr? NEWLINE  ;
+row: (BAR argumentExpr)+ BAR_EOL  ;
 
 expr: Expr
     | stubExpr
