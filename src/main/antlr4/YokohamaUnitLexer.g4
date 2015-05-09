@@ -39,11 +39,11 @@ BE: 'be' ;
 DO: 'Do' ;
 A_STUB_OF: 'a' [ \t\r\n]+ 'stub' [ \t\r\n]+ 'of' -> mode(EXPECT_CLASS) ;
 SUCH: 'such' ;
-METHOD: 'method' -> mode(AFTER_METHOD) ;
+METHOD: 'method' [ \r\r\n]* '`' -> mode(METHOD_PATTERN) ;
 RETURNS: 'returns' ;
 AN_INSTANCE_OF: 'an' [ \t\r\n]+ 'instance' [ \t\r\n]+ 'of' -> mode(EXPECT_CLASS) ;
 AN_INSTANCE: 'an' [ \t\r\n]+ 'instance' -> mode(AFTER_AN_INSTANCE) ;
-AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n]+ 'of' -> mode(AFTER_METHOD) ;
+AN_INVOCATION_OF: 'an' [ \t\r\n]+ 'invocation' [ \t\r\n]+ 'of' [ \t\r\n]* '`' -> mode(METHOD_PATTERN) ;
 ON: 'on' ;
 WITH: 'with' ;
 NULL: 'null' ;
@@ -88,10 +88,6 @@ CLOSE_SINGLE_QUOTE: '\'' -> skip, mode(DEFAULT_MODE) ;
 mode IN_BACK_TICK;
 Expr: ~[`]+ ;
 CLOSE_BACK_TICK: '`' -> skip, mode(DEFAULT_MODE) ;
-
-mode AFTER_METHOD;
-OPEN_BACK_TICK3: '`' -> skip, mode(METHOD_PATTERN) ;
-SPACETABNEWLINE: [ \t\r\n]+ -> skip ;
 
 mode METHOD_PATTERN;
 BOOLEAN: 'boolean' ;

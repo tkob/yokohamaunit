@@ -33,7 +33,7 @@ public class YokohamaUnitLexerTest {
 
     @DataPoints
     public static Fixture[] PARAMs = {
-        new Fixture("Test: Simple Test\n", Arrays.asList("Test:", "Simple Test")),
+        new Fixture("Test: Simple Test\n", Arrays.asList("Test: ", "Simple Test")),
         new Fixture("[Test Fixture]\n", Arrays.asList("Test Fixture")),
         new Fixture("Setup \t\nLet", Arrays.asList("Setup", "Let")),
         new Fixture("Setup: make a mock\nLet", Arrays.asList("Setup", "make a mock", "Let")),
@@ -63,7 +63,7 @@ public class YokohamaUnitLexerTest {
         new Fixture("|-=:.+ |\n", Arrays.asList("|-=:.+ |\n")),
         new Fixture("| ---- | \n\n==", Arrays.asList("| ---- | \n", "=", "=")),
         new Fixture("|==|\n", Arrays.asList("|==|\n")),
-        new Fixture("an invocation of `java.util.Option.of()`", Arrays.asList("an invocation of", "java", ".", "util", ".", "Option", ".", "of", "(", ")")),
+        new Fixture("an invocation of `java.util.Option.of()`", Arrays.asList("an invocation of `", "java", ".", "util", ".", "Option", ".", "of", "(", ")")),
         new Fixture("0", Arrays.asList("0")),
         new Fixture("2147483647", Arrays.asList("2147483647")),
         new Fixture("2147483648", Arrays.asList("2147483648")),
