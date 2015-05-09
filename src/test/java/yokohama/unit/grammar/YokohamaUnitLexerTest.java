@@ -34,6 +34,7 @@ public class YokohamaUnitLexerTest {
     @DataPoints
     public static Fixture[] PARAMs = {
         new Fixture("# Test: Simple Test\n", Arrays.asList("# Test: ", "Simple Test")),
+        new Fixture("# Test:  Simple Test \n", Arrays.asList("# Test:  ", "Simple Test")),
         new Fixture("[Test Fixture]\n", Arrays.asList("[", "Test Fixture", "]")),
         new Fixture("## Setup \t\nLet", Arrays.asList("## Setup", "Let")),
         new Fixture("## Setup: make a mock\nLet", Arrays.asList("## Setup: ", "make a mock", "Let")),

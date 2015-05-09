@@ -62,7 +62,7 @@ ShortName: ~[\]\r\n]+ ;
 RBRACKET_COLON: ']:' [ \t]* -> mode(UNTIL_EOL) ;
 
 mode UNTIL_EOL;
-Line: ~[\r\n]+ ;
+Line: ~[ \t\r\n]+ ([ \t]+ ~[ \t\r\n]+)* ; //exclude trailing spaces
 NEW_LINE: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TABLE_NAME;
