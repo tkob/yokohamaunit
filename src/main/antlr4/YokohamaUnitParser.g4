@@ -40,7 +40,7 @@ condition: forAll
 
 forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
-tableRef: UTABLE SingleQuoteName
+tableRef: UTABLE TableName
         | CSV SingleQuoteName
         | TSV SingleQuoteName
         | EXCEL SingleQuoteName

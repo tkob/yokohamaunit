@@ -28,7 +28,7 @@ ALL: 'all' ;
 COMMA: ',' ;
 RULES: 'rules' ;
 IN: 'in' ;
-UTABLE: 'Table' -> mode(AFTER_TABLE) ;
+UTABLE: 'Table' ;
 CSV: 'CSV' -> mode(AFTER_CSV) ;
 TSV: 'TSV' -> mode(AFTER_CSV) ;
 EXCEL: 'Excel' -> mode(AFTER_EXCEL) ;
@@ -66,7 +66,7 @@ NEW_LINE_TEST_NAME: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode TABLE_NAME;
 TableName: ~[\]\r\n]+ ;
-NEW_LINE_TABLE_NAME: ']' [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
+RBRACKET_TABLE_NAME: ']' -> skip, mode(DEFAULT_MODE) ;
 
 mode PHASE_LEADING;
 COLON: ':' [ \t]* -> skip, mode(PHASE_DESCRIPTION) ;
@@ -124,10 +124,6 @@ Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
 OPEN_BACK_TICK5: '`' -> skip, mode(CLASS) ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
-mode AFTER_TABLE;
-LBRACKET2: '[' -> skip, mode(IN_TABLE_NAME) ;
-WS_AFTER_TABLE: Spaces -> skip ;
-
 mode AFTER_CSV;
 OPEN_SINGLE_QUOTE3: '\'' -> skip, mode(IN_FILE_NAME) ;
 WS_AFTER_CSV: Spaces -> skip ;
@@ -136,12 +132,8 @@ mode AFTER_EXCEL;
 OPEN_SINGLE_QUOTE4: '\'' -> skip, mode(IN_BOOK_NAME) ;
 WS_AFTER_EXCEL: Spaces -> skip ;
 
-mode IN_TABLE_NAME;
-SingleQuoteName: ~[\]\r\n]* ;
-RBRACKET2: ']' -> skip, mode(DEFAULT_MODE) ;
-
 mode IN_FILE_NAME;
-SingleQuoteName2: (~['\r\n]|'\'\'')* -> type(SingleQuoteName) ;
+SingleQuoteName: (~['\r\n]|'\'\'')* ;
 CLOSE_SINGLE_QUOTE2: '\'' -> skip, mode(DEFAULT_MODE) ;
 
 mode IN_BOOK_NAME;
