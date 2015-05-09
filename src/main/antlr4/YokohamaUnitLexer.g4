@@ -8,7 +8,7 @@ HASH4: '####' ;
 HASH5: '#####' ;
 HASH6: '######' ;
 TEST: 'Test:' [ \t]* -> mode(TEST_NAME);
-TABLE_CAPTION: '[' -> type(LBRACKET), mode(TABLE_NAME);
+LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
 SETUP:    'Setup' -> mode(PHASE_LEADING);
 EXERCISE: 'Exercise' -> mode(PHASE_LEADING);
 VERIFY:   'Verify'  -> mode(PHASE_LEADING);
@@ -85,7 +85,7 @@ NEW_LINE_PHASE_DESCRIPTION: ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
-Identifier5 : IdentStart IdentPart* -> type(Identifier) ;
+Identifier_AFTER_AN_INSTANCE : IdentStart IdentPart* -> type(Identifier) ;
 BACK_TICK_AFTER_AN_INSTANCE: '`' -> type(BACK_TICK), mode(CLASS) ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
@@ -110,20 +110,20 @@ LONG: 'long' ;
 CHAR: 'char' ;
 FLOAT: 'float' ;
 DOUBLE: 'double' ;
-COMMA3: ',' -> type(COMMA);
+COMMA_METHOD_PATTERN: ',' -> type(COMMA);
 THREEDOTS: '...' ;
 DOT: '.' ;
 LPAREN: '(' ;
 RPAREN: ')' ;
 LBRACKET: '[' ;
 RBRACKET: ']' ;
-Identifier3 : IdentStart IdentPart* -> type(Identifier);
+Identifier_METHOD_PATTERN : IdentStart IdentPart* -> type(Identifier);
 WS_METHOD_PATTERN: Spaces -> skip ;
 BACK_TICK_METHOD_PATTERN: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 mode CLASS;
-DOT2: '.' -> type(DOT) ;
-Identifier4 : IdentStart IdentPart* -> type(Identifier) ;
+DOT_CLASS: '.' -> type(DOT) ;
+Identifier_CLASS : IdentStart IdentPart* -> type(Identifier) ;
 WS_CLASS: Spaces -> skip ;
 BACK_TICK_CLASS: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
