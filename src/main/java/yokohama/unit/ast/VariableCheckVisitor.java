@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import yokohama.unit.util.FList;
 import yokohama.unit.util.Optionals;
-import static yokohama.unit.util.Optionals.match;
 import yokohama.unit.util.Pair;
 
 public class VariableCheckVisitor {
@@ -30,7 +29,9 @@ public class VariableCheckVisitor {
         return definition.accept(
                 test -> checkTest(test, env),
                 fourPhaseTest -> checkFourPhaseTest(fourPhaseTest, env),
-                table -> checkTable(table, env));
+                table -> checkTable(table, env),
+                codeBlock -> Stream.<ErrorMessage>empty(),
+                heading -> Stream.<ErrorMessage>empty());
     }
 
     private Stream<ErrorMessage> checkTest(Test test, FList<String> env) {

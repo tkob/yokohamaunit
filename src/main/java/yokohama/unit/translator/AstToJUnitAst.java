@@ -109,7 +109,9 @@ public class AstToJUnitAst {
                                 fourPhaseTest ->
                                         translateFourPhaseTest(
                                                 fourPhaseTest, tables).stream(),
-                                table -> Stream.empty()))
+                                table -> Stream.empty(),
+                                codeBlock -> Stream.empty(),
+                                heading -> Stream.empty()))
                         .collect(Collectors.toList());
         ClassDecl testClass =
                 new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);

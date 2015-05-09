@@ -9,6 +9,8 @@ abbreviation: STAR_LBRACKET ShortName RBRACKET_COLON Line ;
 definition: test
           | fourPhaseTest
           | tableDef
+          | codeBlock
+          | heading
           ;
 
 test: TEST Line assertion+ ;
@@ -109,3 +111,8 @@ booleanExpr: TRUE | FALSE ;
 charExpr: SINGLE_QUOTE Char SINGLE_QUOTE ;
 
 stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
+
+codeBlock: heading BACK_TICKS lang CodeLine* BACK_TICKS ;
+lang: CodeLine ;
+
+heading: HASHES Line ;

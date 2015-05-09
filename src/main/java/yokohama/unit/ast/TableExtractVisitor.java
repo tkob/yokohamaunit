@@ -13,7 +13,9 @@ public class TableExtractVisitor {
                         definition.accept(
                                 test -> Stream.empty(),
                                 fourPhaseTest -> Stream.empty(),
-                                table -> Stream.of(table)))
+                                table -> Stream.of(table),
+                                codeBlock -> Stream.empty(),
+                                heading -> Stream.empty()))
                 .collect(Collectors.toList());
     }
 }

@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
@@ -18,6 +19,7 @@ import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ClassType;
+import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -27,6 +29,7 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Heading;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
@@ -61,6 +64,7 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
+import yokohama.unit.util.Lists;
 import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
@@ -504,5 +508,26 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public StringExpr visitStringExpr(YokohamaUnitParser.StringExprContext ctx) {
         String literal = ctx.EMPTY_STRING() != null ? "" : ctx.Str().getText();
         return new StringExpr(literal, getSpan(ctx));
+    }
+
+    @Override
+    public Heading visitHeading(YokohamaUnitParser.HeadingContext ctx) {
+        return new Heading(ctx.Line().getText(), getSpan(ctx));
+    }
+
+    @Override
+    public CodeBlock visitCodeBlock(YokohamaUnitParser.CodeBlockContext ctx) {
+        return new CodeBlock(
+                visitHeading(ctx.heading()),
+                visitLang(ctx.lang()),
+                Lists.map(
+                        ctx.CodeLine(),
+                        codeLine -> StringUtils.chomp(codeLine.getText())),
+                getSpan(ctx));
+    }
+
+    @Override
+    public String visitLang(YokohamaUnitParser.LangContext ctx) {
+        return StringUtils.chomp(ctx.CodeLine().getText());
     }
 }
