@@ -22,3 +22,23 @@ a```
 ````
 b
 ```
+
+# Test: Four back ticks
+
+Assert `"\u0060\u0060\u0060\n".denormalize()` is [Four].
+
+### Four
+
+````
+```
+````
+
+# Test: Five back ticks
+
+Assert `"\u0060\u0060\u0060\u0060\n".denormalize()` is [Five].
+
+### Five
+
+`````
+````
+`````

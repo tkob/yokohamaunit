@@ -96,11 +96,11 @@ CLOSE_BACK_TICKS_3: '```' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DE
 CodeLine: ~[\r\n]* '\r'? '\n' ;
 
 mode IN_FENCE_4;
-CLOSE_BACK_TICKS_4: '```' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
+CLOSE_BACK_TICKS_4: '````' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
 CodeLine4: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
 
 mode IN_FENCE_5;
-CLOSE_BACK_TICKS_5: '```' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
+CLOSE_BACK_TICKS_5: '`````' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
 CodeLine5: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
 
 mode METHOD_PATTERN;

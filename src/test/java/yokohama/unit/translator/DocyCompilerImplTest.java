@@ -263,7 +263,9 @@ public class DocyCompilerImplTest {
                 new GroovyExpressionStrategyFactory(),
                 Arrays.asList(
                         "Interpret_anchor_expression_1",
-                        "Back_ticks_inside_code_block_1")),
+                        "Back_ticks_inside_code_block_1",
+                        "Four_back_ticks_1",
+                        "Five_back_ticks_1")),
     };
 
     @DataPoints
