@@ -116,7 +116,7 @@ stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
 
 anchorExpr: LBRACKET Anchor RBRACKET ;
 
-codeBlock: heading BACK_TICKS lang CodeLine* BACK_TICKS ;
-lang: CodeLine ;
+codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
+attributes: CodeLine ;
 
 heading: HASHES Line ;

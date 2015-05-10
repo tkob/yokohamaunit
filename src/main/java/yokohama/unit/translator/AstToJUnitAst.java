@@ -729,7 +729,7 @@ class AstToJUnitAstVisitor {
             AnchorExpr anchorExpr, String varName, String envVarName) {
         String anchor = anchorExpr.getAnchor();
         CodeBlock codeBlock = codeBlockMap.get(anchor);
-        String code = codeBlock.getCode(System.lineSeparator(), true);
+        String code = codeBlock.getCode();
         return Stream.<Statement>of(
                 new VarInitStatement(
                         Type.STRING,

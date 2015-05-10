@@ -265,7 +265,10 @@ public class DocyCompilerImplTest {
                         "Interpret_anchor_expression_1",
                         "Back_ticks_inside_code_block_1",
                         "Four_back_ticks_1",
-                        "Five_back_ticks_1")),
+                        "Five_back_ticks_1",
+                        "Code_block_with_lf_1",
+                        "Code_block_with_crlf_1",
+                        "Code_block_with_chop_1")),
     };
 
     @DataPoints

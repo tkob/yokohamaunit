@@ -10,12 +10,17 @@ import yokohama.unit.util.Lists;
 @EqualsAndHashCode(exclude={"span"})
 public class CodeBlock implements Definition {
     Heading heading;
-    String lang;
+    List<String> attributes;
     List<String> lines;    
     Span span;
 
-    public String getCode(
-            String lineSeparator, boolean appendLineSeparatorAtTheEnd) {
+    public String getCode() {
+        String lineSeparator =
+                  attributes.contains("lf")   ? "\n"
+                : attributes.contains("crlf") ? "\r\n"
+                : System.lineSeparator();
+        boolean chop =
+                attributes.contains("chop") || attributes.contains("chomp");
         StringBuilder sb = new StringBuilder();
         Lists.forEachOrderedInitAndLast(lines,
                 line -> {
@@ -24,7 +29,7 @@ public class CodeBlock implements Definition {
                 },
                 line -> {
                     sb.append(line);
-                    if (appendLineSeparatorAtTheEnd) {
+                    if (!chop) {
                         sb.append(lineSeparator);
                     }
                 });

@@ -42,3 +42,33 @@ Assert `"\u0060\u0060\u0060\u0060\n".denormalize()` is [Five].
 `````
 ````
 `````
+
+# Test: Code block with lf
+
+Assert `s.length()` is 2 where s is [lf].
+
+### lf
+
+```text lf
+a
+```
+
+# Test: Code block with crlf
+
+Assert `s.length()` is 3 where s is [crlf].
+
+### crlf
+
+```text crlf
+a
+```
+
+# Test: Code block with chop
+
+Assert `s.length()` is 1 where s is [chop].
+
+### chop
+
+```text crlf chop
+a
+```

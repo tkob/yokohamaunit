@@ -1,6 +1,7 @@
 package yokohama.unit.translator;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -525,7 +526,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public CodeBlock visitCodeBlock(YokohamaUnitParser.CodeBlockContext ctx) {
         return new CodeBlock(
                 visitHeading(ctx.heading()),
-                visitLang(ctx.lang()),
+                visitAttributes(ctx.attributes()),
                 Lists.map(
                         ctx.CodeLine(),
                         codeLine -> StringUtils.chomp(codeLine.getText())),
@@ -533,7 +534,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public String visitLang(YokohamaUnitParser.LangContext ctx) {
-        return StringUtils.chomp(ctx.CodeLine().getText());
+    public List<String> visitAttributes(YokohamaUnitParser.AttributesContext ctx) {
+        return Arrays.asList(StringUtils.split(ctx.CodeLine().getText()));
     }
 }
