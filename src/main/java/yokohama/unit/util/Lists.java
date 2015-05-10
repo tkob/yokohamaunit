@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,6 +64,7 @@ public class Lists {
         return Stream.concat(init.stream().flatMap(initf), lastf.apply(last))
                 .collect(Collectors.toList());
     }
+
     public static <T, U> List<U> mapFirstAndRest(
             List<T> list, Function<T, U> firstf, Function<T, U> restf) {
         if (list.isEmpty()) return Collections.emptyList();
@@ -87,6 +89,28 @@ public class Lists {
         return Stream.concat(
                 firstf.apply(first), rest.stream().flatMap(restf))
                 .collect(Collectors.toList());
+    }
+
+    public static <T> void forEachOrderedInitAndLast(
+            List<T> list, Consumer<T> initf, Consumer<T> lastf) {
+        if (list.isEmpty()) return;
+
+        List<T> init = list.subList(0, list.size() - 1);
+        T last = last(list);
+
+        init.stream().forEachOrdered(initf);
+        lastf.accept(last);
+    }
+
+    public static <T> void forEachOrderedFirstAndRest(
+            List<T> list, Consumer<T> firstf, Consumer<T> restf) {
+        if (list.isEmpty()) return;
+
+        T first = list.get(0);
+        List<T> rest = list.subList(1, list.size());
+
+        firstf.accept(first);
+        rest.stream().forEachOrdered(restf);
     }
 
     public static <T, U, V> Map<U, V> listToMap(
