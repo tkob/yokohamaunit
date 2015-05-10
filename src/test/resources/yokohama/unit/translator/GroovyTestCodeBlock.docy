@@ -1,0 +1,74 @@
+# Test: Interpret anchor expression
+
+Assert `"cheer\n".multiply(3).denormalize()` is [Three cheers].
+
+### Three cheers
+
+```
+cheer
+cheer
+cheer
+```   
+
+# Test: Back ticks inside code block
+
+Assert `"a\u0060\u0060\u0060\n\u0060\u0060\u0060\u0060\nb\n".denormalize()` is
+[Code block with back ticks].
+
+### Code block with back ticks
+
+```
+a```
+````
+b
+```
+
+# Test: Four back ticks
+
+Assert `"\u0060\u0060\u0060\n".denormalize()` is [Four].
+
+### Four
+
+````
+```
+````
+
+# Test: Five back ticks
+
+Assert `"\u0060\u0060\u0060\u0060\n".denormalize()` is [Five].
+
+### Five
+
+`````
+````
+`````
+
+# Test: Code block with lf
+
+Assert `s.length()` is 2 where s is [lf].
+
+### lf
+
+```text lf
+a
+```
+
+# Test: Code block with crlf
+
+Assert `s.length()` is 3 where s is [crlf].
+
+### crlf
+
+```text crlf
+a
+```
+
+# Test: Code block with chop
+
+Assert `s.length()` is 1 where s is [chop].
+
+### chop
+
+```text crlf chop
+a
+```

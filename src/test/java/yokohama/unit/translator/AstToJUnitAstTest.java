@@ -1,6 +1,7 @@
 package yokohama.unit.translator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +17,6 @@ import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.position.Span;
-import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
@@ -61,10 +61,18 @@ public class AstToJUnitAstTest {
     @Test
     public void testTranslateTest() {
         yokohama.unit.ast.Test test = new yokohama.unit.ast.Test("test", Arrays.asList(), yokohama.unit.position.Span.dummySpan());
-        List<Table> tables = Arrays.asList();
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst("", "", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
-        List<Method> actual = instance.translateTest(test, tables);
+        AstToJUnitAstVisitor instance =
+                new AstToJUnitAstVisitor(
+                        "",
+                        "",
+                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        genSym,
+                        new ClassResolver(),
+                        Collections.emptyList(),
+                        Collections.emptyMap());
+        List<Method> actual = instance.translateTest(test);
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
     }
@@ -76,10 +84,18 @@ public class AstToJUnitAstTest {
     public void testTranslateAssertion() {
         Assertion assertion = new Assertion(Arrays.asList(), Fixture.none(), yokohama.unit.position.Span.dummySpan());
         String testName = "test";
-        List<Table> tables = Arrays.asList();
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst("", "", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
-        List<Method> actual = instance.translateAssertion(assertion, 0, testName, tables);
+        AstToJUnitAstVisitor instance =
+                new AstToJUnitAstVisitor(
+                        "",
+                        "",
+                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        genSym,
+                        new ClassResolver(),
+                        Collections.emptyList(),
+                        Collections.emptyMap());
+        List<Method> actual = instance.translateAssertion(assertion, 0, testName);
         List<Method> expected = Arrays.asList(new Method(
                 Arrays.asList(Annotation.TEST),
                 "test_0",
@@ -106,7 +122,16 @@ public class AstToJUnitAstTest {
                         yokohama.unit.position.Span.dummySpan()),
                 yokohama.unit.position.Span.dummySpan());
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
+        AstToJUnitAstVisitor instance =
+                new AstToJUnitAstVisitor(
+                        "C",
+                        "p",
+                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        genSym,
+                        new ClassResolver(),
+                        Collections.emptyList(),
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());
@@ -160,7 +185,16 @@ public class AstToJUnitAstTest {
                 yokohama.unit.position.Span.dummySpan());
 
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
+        AstToJUnitAstVisitor instance =
+                new AstToJUnitAstVisitor(
+                        "C",
+                        "p",
+                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        genSym,
+                        new ClassResolver(),
+                        Collections.emptyList(),
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());
@@ -224,7 +258,16 @@ public class AstToJUnitAstTest {
                         yokohama.unit.position.Span.dummySpan()),
                 yokohama.unit.position.Span.dummySpan());
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst("C", "p", new OgnlExpressionStrategy("Name", "com.example", genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
+        AstToJUnitAstVisitor instance =
+                new AstToJUnitAstVisitor(
+                        "C",
+                        "p",
+                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        genSym,
+                        new ClassResolver(),
+                        Collections.emptyList(),
+                        Collections.emptyMap());
         List<Statement> actual =
                 instance.translateProposition(proposition, "env")
                         .collect(Collectors.toList());

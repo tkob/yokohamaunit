@@ -1,16 +1,17 @@
 lexer grammar YokohamaUnitLexer;
 
-STAR_LBRACKET: '*[' Spaces? -> mode(ABBREVIATION);
-TEST: Hashes Spaces? 'Test:' [ \t]* -> mode(UNTIL_EOL);
-SETUP:    Hashes Spaces? 'Setup:'    Spaces? -> mode(UNTIL_EOL);
-EXERCISE: Hashes Spaces? 'Exercise:' Spaces? -> mode(UNTIL_EOL);
-VERIFY:   Hashes Spaces? 'Verify:'   Spaces? -> mode(UNTIL_EOL);
-TEARDOWN: Hashes Spaces? 'Teardown:' Spaces? -> mode(UNTIL_EOL);
-SETUP_NO_DESC:    Hashes Spaces? 'Setup'    -> type(SETUP) ;
-EXERCISE_NO_DESC: Hashes Spaces? 'Exercise' -> type(EXERCISE) ;
-VERIFY_NO_DESC:   Hashes Spaces? 'Verify'   -> type(VERIFY) ;
-TEARDOWN_NO_DESC: Hashes Spaces? 'Teardown' -> type(TEARDOWN) ;
-LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(TABLE_NAME);
+STAR_LBRACKET: '*[' [ \t]* -> mode(ABBREVIATION);
+HASHES:   Hashes [ \t]* -> mode(UNTIL_EOL) ;
+TEST:     Hashes [ \t]* 'Test:'     [ \t]* -> mode(UNTIL_EOL);
+SETUP:    Hashes [ \t]* 'Setup:'    [ \t]* -> mode(UNTIL_EOL);
+EXERCISE: Hashes [ \t]* 'Exercise:' [ \t]* -> mode(UNTIL_EOL);
+VERIFY:   Hashes [ \t]* 'Verify:'   [ \t]* -> mode(UNTIL_EOL);
+TEARDOWN: Hashes [ \t]* 'Teardown:' [ \t]* -> mode(UNTIL_EOL);
+SETUP_NO_DESC:    Hashes [ \t]* 'Setup'    -> type(SETUP) ;
+EXERCISE_NO_DESC: Hashes [ \t]* 'Exercise' -> type(EXERCISE) ;
+VERIFY_NO_DESC:   Hashes [ \t]* 'Verify'   -> type(VERIFY) ;
+TEARDOWN_NO_DESC: Hashes [ \t]* 'Teardown' -> type(TEARDOWN) ;
+LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(ANCHOR);
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
@@ -55,6 +56,9 @@ EMPTY_STRING: '""' ;
 BACK_TICK: '`' -> mode(IN_BACK_TICK) ;
 DOUBLE_QUOTE: '"' -> mode(IN_DOUBLE_QUOTE) ;
 SINGLE_QUOTE: '\'' -> mode(IN_SINGLE_QUOTE) ;
+BACK_TICKS:   '```'   -> mode(IN_FENCE_3) ;
+BACK_TICKS4:  '````'  -> mode(IN_FENCE_4), type(BACK_TICKS) ;
+BACK_TICKS5:  '`````' -> mode(IN_FENCE_5), type(BACK_TICKS) ;
 WS : Spaces -> skip ;
 
 mode ABBREVIATION;
@@ -65,9 +69,9 @@ mode UNTIL_EOL;
 Line: ~[ \t\r\n]+ ([ \t]+ ~[ \t\r\n]+)* ; //exclude trailing spaces
 NEW_LINE: [ \t]* ('\r'? '\n')+ -> skip, mode(DEFAULT_MODE) ;
 
-mode TABLE_NAME;
-TableName: ~[\]\r\n]+ ;
-RBRACKET_TABLE_NAME: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
+mode ANCHOR;
+Anchor: ~[\]\r\n]+ ;
+RBRACKET_ANCHOR: ']' -> type(RBRACKET), mode(DEFAULT_MODE) ;
 
 mode AFTER_AN_INSTANCE;
 OF: 'of' ;
@@ -86,6 +90,18 @@ CLOSE_SINGLE_QUOTE: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 mode IN_BACK_TICK;
 Expr: ~[`]+ ;
 CLOSE_BACK_TICK: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
+
+mode IN_FENCE_3;
+CLOSE_BACK_TICKS_3: '```' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
+CodeLine: ~[\r\n]* '\r'? '\n' ;
+
+mode IN_FENCE_4;
+CLOSE_BACK_TICKS_4: '````' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
+CodeLine4: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
+
+mode IN_FENCE_5;
+CLOSE_BACK_TICKS_5: '`````' [ \t]* ('\r'? '\n' | EOF) -> type(BACK_TICKS), mode(DEFAULT_MODE) ;
+CodeLine5: ~[\r\n]* '\r'? '\n' -> type(CodeLine) ;
 
 mode METHOD_PATTERN;
 BOOLEAN: 'boolean' ;

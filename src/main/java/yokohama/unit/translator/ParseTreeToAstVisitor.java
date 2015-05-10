@@ -1,6 +1,7 @@
 package yokohama.unit.translator;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Abbreviation;
+import yokohama.unit.ast.AnchorExpr;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
@@ -18,6 +21,7 @@ import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ClassType;
+import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -27,6 +31,7 @@ import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.FloatingPointExpr;
 import yokohama.unit.ast.FourPhaseTest;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.Heading;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
@@ -61,6 +66,7 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
+import yokohama.unit.util.Lists;
 import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
@@ -220,7 +226,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Pair<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
         if (ctx.UTABLE() != null) {
-            String name = ctx.TableName().getText();
+            String name = ctx.Anchor().getText();
             return new Pair<>(TableType.INLINE, name);
         } else if (ctx.CSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
@@ -253,7 +259,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Table visitTableDef(YokohamaUnitParser.TableDefContext ctx) {
-        String name = ctx.TableName().getText();
+        String name = ctx.Anchor().getText();
         List<Ident> header = visitHeader(ctx.header());
         List<Row> rows = visitRows(ctx.rows());
         return new Table(name, header, rows, getSpan(ctx));
@@ -504,5 +510,31 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public StringExpr visitStringExpr(YokohamaUnitParser.StringExprContext ctx) {
         String literal = ctx.EMPTY_STRING() != null ? "" : ctx.Str().getText();
         return new StringExpr(literal, getSpan(ctx));
+    }
+
+    @Override
+    public AnchorExpr visitAnchorExpr(YokohamaUnitParser.AnchorExprContext ctx) {
+        return new AnchorExpr(ctx.Anchor().getText(), getSpan(ctx));
+    }
+
+    @Override
+    public Heading visitHeading(YokohamaUnitParser.HeadingContext ctx) {
+        return new Heading(ctx.Line().getText(), getSpan(ctx));
+    }
+
+    @Override
+    public CodeBlock visitCodeBlock(YokohamaUnitParser.CodeBlockContext ctx) {
+        return new CodeBlock(
+                visitHeading(ctx.heading()),
+                visitAttributes(ctx.attributes()),
+                Lists.map(
+                        ctx.CodeLine(),
+                        codeLine -> StringUtils.chomp(codeLine.getText())),
+                getSpan(ctx));
+    }
+
+    @Override
+    public List<String> visitAttributes(YokohamaUnitParser.AttributesContext ctx) {
+        return Arrays.asList(StringUtils.split(ctx.CodeLine().getText()));
     }
 }

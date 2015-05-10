@@ -33,6 +33,7 @@ public class YokohamaUnitLexerTest {
 
     @DataPoints
     public static Fixture[] PARAMs = {
+        new Fixture("# Unknown Title \n", Arrays.asList("# ", "Unknown Title")),
         new Fixture("# Test: Simple Test\n", Arrays.asList("# Test: ", "Simple Test")),
         new Fixture("# Test:  Simple Test \n", Arrays.asList("# Test:  ", "Simple Test")),
         new Fixture("[Test Fixture]\n", Arrays.asList("[", "Test Fixture", "]")),
@@ -142,6 +143,10 @@ public class YokohamaUnitLexerTest {
         // String
         new Fixture("\"\\\"\"", Arrays.asList("\"", "\\\"", "\"")),
         new Fixture("\"abc\"", Arrays.asList("\"", "abc", "\"")),
+        // Fenced Code Blocks
+        new Fixture("```perl\ncode\n``` \n", Arrays.asList("```", "perl\n", "code\n", "``` \n")),
+        new Fixture("````perl\ncode\n````\n", Arrays.asList("````", "perl\n", "code\n", "````\n")),
+        new Fixture("`````perl\ncode\n`````\n", Arrays.asList("`````", "perl\n", "code\n", "`````\n")),
     };
 
     @Theory

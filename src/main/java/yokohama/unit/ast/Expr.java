@@ -13,7 +13,8 @@ public interface Expr {
             Function<FloatingPointExpr, T> visitFloatingPointExpr_,
             Function<BooleanExpr, T> visitBooleanExpr_,
             Function<CharExpr, T> visitCharExpr_,
-            Function<StringExpr, T> visitStringExpr_
+            Function<StringExpr, T> visitStringExpr_,
+            Function<AnchorExpr, T> visitAnchorExpr_
     ) {
         return accept(new ExprVisitor<T>() {
             @Override
@@ -47,6 +48,10 @@ public interface Expr {
             @Override
             public T visitStringExpr(StringExpr stringExpr) {
                 return visitStringExpr_.apply(stringExpr);
+            }
+            @Override
+            public T visitAnchorExpr(AnchorExpr anchorExpr) {
+                return visitAnchorExpr_.apply(anchorExpr);
             }
         });
     }

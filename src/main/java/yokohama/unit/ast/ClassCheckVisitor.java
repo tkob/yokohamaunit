@@ -67,7 +67,9 @@ class ClassExprCheckVisitor {
         return definition.accept(
                 this::visitTest,
                 this::visitFourPhaseTest,
-                this::visitTable);
+                this::visitTable,
+                this::visitCodeBlock,
+                this::visitHeading);
     }
 
     private Stream<ErrorMessage> visitTest(Test test) {
@@ -140,7 +142,8 @@ class ClassExprCheckVisitor {
                 floatingPointExpr -> Stream.<ErrorMessage>empty(),
                 booleanExpr -> Stream.<ErrorMessage>empty(),
                 charExpr -> Stream.<ErrorMessage>empty(),
-                stringExpr -> Stream.<ErrorMessage>empty());
+                stringExpr -> Stream.<ErrorMessage>empty(),
+                anchorExpr -> Stream.<ErrorMessage>empty());
     }
 
     private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {
@@ -217,5 +220,13 @@ class ClassExprCheckVisitor {
         return cell.accept(
                 exprCell -> visitExpr(exprCell.getExpr()),
                 predCell -> visitPredicate(predCell.getPredicate()));
+    }
+
+    private Stream<ErrorMessage> visitCodeBlock(CodeBlock codeBlock) {
+        return Stream.empty();
+    }
+
+    private Stream<ErrorMessage> visitHeading(Heading heading) {
+        return Stream.empty();
     }
 }

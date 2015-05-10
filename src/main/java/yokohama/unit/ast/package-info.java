@@ -4,7 +4,7 @@
  * <pre>
  * Group ::= Abbreviation* Definition*
  * 
- * Definition ::= Test | FourPhaseTest | Table
+ * Definition ::= Test | FourPhaseTest | Table | Heading | CodeBlock
  * 
  * Test ::= Assertion*
  * 
@@ -35,6 +35,7 @@
  *        | BooleanExpr
  *        | CharExpr
  *        | StringExpr
+ *        | AnchorExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 
@@ -72,6 +73,8 @@
  * Row ::= Cell+
  * 
  * Cell ::= ExprCell | PredCell
+ * 
+ * Code Block ::= Heading
  * </pre>
  * 
  */

@@ -258,6 +258,17 @@ public class DocyCompilerImplTest {
                         "Invoking_methods_with_vararg_2",
                         "Invoking_methods_with_vararg_3",
                         "Invoking_methods_with_vararg_4")),
+        new Fixture(
+                "GroovyTestCodeBlock.docy",
+                new GroovyExpressionStrategyFactory(),
+                Arrays.asList(
+                        "Interpret_anchor_expression_1",
+                        "Back_ticks_inside_code_block_1",
+                        "Four_back_ticks_1",
+                        "Five_back_ticks_1",
+                        "Code_block_with_lf_1",
+                        "Code_block_with_crlf_1",
+                        "Code_block_with_chop_1")),
     };
 
     @DataPoints

@@ -9,6 +9,8 @@ abbreviation: STAR_LBRACKET ShortName RBRACKET_COLON Line ;
 definition: test
           | fourPhaseTest
           | tableDef
+          | codeBlock
+          | heading
           ;
 
 test: TEST Line assertion+ ;
@@ -38,7 +40,7 @@ condition: forAll
 
 forAll: FOR ALL vars IN tableRef ;
 vars: Identifier ((COMMA Identifier)* AND Identifier)? ;
-tableRef: UTABLE LBRACKET TableName RBRACKET
+tableRef: UTABLE LBRACKET Anchor RBRACKET
         | CSV_SINGLE_QUOTE FileName SINGLE_QUOTE
         | TSV_SINGLE_QUOTE FileName SINGLE_QUOTE
         | EXCEL_SINGLE_QUOTE BookName SINGLE_QUOTE
@@ -58,8 +60,8 @@ letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;
 
-tableDef: LBRACKET TableName RBRACKET header HBAR? rows
-        | header HBAR? rows LBRACKET TableName RBRACKET ;
+tableDef: LBRACKET Anchor RBRACKET header HBAR? rows
+        | header HBAR? rows LBRACKET Anchor RBRACKET ;
 
 header: (BAR Identifier)+ BAR_EOL ;
 
@@ -74,6 +76,7 @@ expr: quotedExpr
     | booleanExpr
     | charExpr
     | stringExpr
+    | anchorExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
@@ -98,6 +101,7 @@ argumentExpr: quotedExpr
             | booleanExpr
             | charExpr
             | stringExpr
+            | anchorExpr
             ;
 
 integerExpr: MINUS? Integer ;
@@ -109,3 +113,10 @@ booleanExpr: TRUE | FALSE ;
 charExpr: SINGLE_QUOTE Char SINGLE_QUOTE ;
 
 stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
+
+anchorExpr: LBRACKET Anchor RBRACKET ;
+
+codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
+attributes: CodeLine ;
+
+heading: HASHES Line ;
