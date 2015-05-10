@@ -1,0 +1,20 @@
+*[Collections]: java.util.Collections
+*[ErrorCollector]: yokohama.unit.translator.ErrorCollector
+*[ErrorMessage]: yokohama.unit.position.ErrorMessage
+*[Span]: yokohama.unit.position.Span
+
+# Test: ErrorCollector
+
+Assert that `ec.getErrors()` is `Collections.emptyList()`
+where ec is `ErrorCollector.of(null)`.
+
+Assert that `ec.append(check1).getErrors()` is
+    `[new ErrorMessage("test", Span.dummySpan())]`
+where ec is `ErrorCollector.of(null)`
+and check1 is `{ ast -> [new ErrorMessage("test", Span.dummySpan())] }`.
+
+Assert that `ec.append(check1).append(check2).getErrors()` is
+`[new ErrorMessage("test1", Span.dummySpan()), new ErrorMessage("test2", Span.dummySpan())]`
+where ec is `ErrorCollector.of(null)`
+and check1 is `{ ast -> [new ErrorMessage("test1", Span.dummySpan())] }`
+and check2 is `{ ast -> [new ErrorMessage("test2", Span.dummySpan())] }`.

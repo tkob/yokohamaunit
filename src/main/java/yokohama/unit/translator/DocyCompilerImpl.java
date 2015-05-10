@@ -12,7 +12,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
@@ -26,6 +31,25 @@ import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.Either;
 import yokohama.unit.util.GenSym;
+
+@RequiredArgsConstructor
+class ErrorCollector {
+    final Group group;
+    final Stream<ErrorMessage> errors;
+
+    public ErrorCollector append(Function<Group, List<ErrorMessage>> f) {
+        return new ErrorCollector(
+                group, Stream.concat(errors, f.apply(group).stream()));
+    }
+
+    public List<ErrorMessage> getErrors() {
+        return errors.collect(Collectors.toList());
+    }
+
+    public static ErrorCollector of(Group group) {
+        return new ErrorCollector(group, Stream.empty());
+    }
+}
 
 @AllArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
@@ -73,15 +97,18 @@ public class DocyCompilerImpl implements DocyCompiler {
                 .visitGroup(ctx);
 
         // Check AST
-        List<ErrorMessage> variableCheckErrors = variableCheckVisitor.check(ast);
+        List<ErrorMessage> errors =
+                ErrorCollector.of(ast)
+                        .append(variableCheckVisitor::check)
+                        .getErrors();
 
         Either<List<ErrorMessage>, ClassResolver> classResolverOrErrors =
                 new ClassCheckVisitor(classLoader).check(ast);
         List<ErrorMessage> classCheckErrors =
                 classResolverOrErrors.leftOptional().orElse(Collections.emptyList());
 
-        if (!variableCheckErrors.isEmpty() || !classCheckErrors.isEmpty()) {
-            return ListUtils.union(variableCheckErrors, classCheckErrors);
+        if (!errors.isEmpty() || !classCheckErrors.isEmpty()) {
+            return ListUtils.union(errors, classCheckErrors);
         }
 
         ClassResolver classResolver = classResolverOrErrors.rightOptional().get();
