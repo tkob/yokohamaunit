@@ -293,7 +293,6 @@ public class DocyCompilerImplTest {
                 DocyCompiler instance = new DocyCompilerImpl(
                         new DocyParserImpl(),
                         new ParseTreeToAstVisitorFactory(),
-                        new VariableCheckVisitor(),
                         new AstToJUnitAstFactory(),
                         fixture.expressionStrategyFactory,
                         new MockitoMockStrategyFactory(),

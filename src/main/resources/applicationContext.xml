@@ -5,7 +5,6 @@
   <bean id="docyCompiler" class="yokohama.unit.translator.DocyCompilerImpl">
     <constructor-arg><bean class="yokohama.unit.translator.DocyParserImpl"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.ParseTreeToAstVisitorFactory"/></constructor-arg>
-    <constructor-arg><bean class="yokohama.unit.ast.VariableCheckVisitor"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.AstToJUnitAstFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.GroovyExpressionStrategyFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.MockitoMockStrategyFactory"/></constructor-arg>

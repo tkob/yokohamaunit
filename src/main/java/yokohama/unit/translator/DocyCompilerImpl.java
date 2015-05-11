@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
@@ -51,15 +50,15 @@ class ErrorCollector {
     }
 }
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DocyCompilerImpl implements DocyCompiler {
-    DocyParser docyParser;
-    ParseTreeToAstVisitorFactory parseTreeToAstVisitorFactory;
-    VariableCheckVisitor variableCheckVisitor;
-    AstToJUnitAstFactory astToJUnitAstFactory;
-    ExpressionStrategyFactory expressionStrategyFactory;
-    MockStrategyFactory mockStrategyFactory;
-    JUnitAstCompiler jUnitAstCompiler;
+    final DocyParser docyParser;
+    final ParseTreeToAstVisitorFactory parseTreeToAstVisitorFactory;
+    final AstToJUnitAstFactory astToJUnitAstFactory;
+    final ExpressionStrategyFactory expressionStrategyFactory;
+    final MockStrategyFactory mockStrategyFactory;
+    final JUnitAstCompiler jUnitAstCompiler;
+    final VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
 
     @SneakyThrows(MalformedURLException.class)
     private URL toURL(String cp) {
