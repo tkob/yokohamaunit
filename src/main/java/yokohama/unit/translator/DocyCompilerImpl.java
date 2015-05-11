@@ -15,11 +15,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
+import yokohama.unit.ast.AnchorCheckVisitor;
 import yokohama.unit.ast.ClassCheckVisitor;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
@@ -58,7 +58,9 @@ public class DocyCompilerImpl implements DocyCompiler {
     final ExpressionStrategyFactory expressionStrategyFactory;
     final MockStrategyFactory mockStrategyFactory;
     final JUnitAstCompiler jUnitAstCompiler;
+    
     final VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
+    final AnchorCheckVisitor anchorCheckVisitor = new AnchorCheckVisitor();
 
     @SneakyThrows(MalformedURLException.class)
     private URL toURL(String cp) {
@@ -99,6 +101,7 @@ public class DocyCompilerImpl implements DocyCompiler {
         List<ErrorMessage> errors =
                 ErrorCollector.of(ast)
                         .append(variableCheckVisitor::check)
+                        .append(anchorCheckVisitor::check)
                         .getErrors();
 
         Either<List<ErrorMessage>, ClassResolver> classResolverOrErrors =
