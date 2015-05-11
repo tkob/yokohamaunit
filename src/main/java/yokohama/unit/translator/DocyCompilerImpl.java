@@ -9,7 +9,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
+import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.AnchorCheckVisitor;
 import yokohama.unit.ast.ClassCheckVisitor;
 import yokohama.unit.ast.Group;
@@ -30,6 +29,7 @@ import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.Either;
 import yokohama.unit.util.GenSym;
+import yokohama.unit.util.Pair;
 
 @RequiredArgsConstructor
 class ErrorCollector {
@@ -98,22 +98,21 @@ public class DocyCompilerImpl implements DocyCompiler {
                 .visitGroup(ctx);
 
         // Check AST
+        // Create ClassResolver and get errors if any
+        Pair<ClassResolver, List<ErrorMessage>> classResolverAndErrors =
+                createClassResolver(ast.getAbbreviations(), classLoader);
+        ClassResolver classResolver = classResolverAndErrors.getFirst();
+        List<ErrorMessage> classResolverErrors = classResolverAndErrors.getSecond();
+        ClassCheckVisitor classCheckVisitor = new ClassCheckVisitor(classResolver);
+        
+        // other AST checks
         List<ErrorMessage> errors =
                 ErrorCollector.of(ast)
+                        .append(__ -> classResolverErrors)
+                        .append(classCheckVisitor::check)
                         .append(variableCheckVisitor::check)
                         .append(anchorCheckVisitor::check)
                         .getErrors();
-
-        Either<List<ErrorMessage>, ClassResolver> classResolverOrErrors =
-                new ClassCheckVisitor(classLoader).check(ast);
-        List<ErrorMessage> classCheckErrors =
-                classResolverOrErrors.leftOptional().orElse(Collections.emptyList());
-
-        if (!errors.isEmpty() || !classCheckErrors.isEmpty()) {
-            return ListUtils.union(errors, classCheckErrors);
-        }
-
-        ClassResolver classResolver = classResolverOrErrors.rightOptional().get();
 
         // AST to JUnit AST
         CompilationUnit junit;
@@ -153,5 +152,28 @@ public class DocyCompilerImpl implements DocyCompiler {
                 classPath,
                 dest,
                 javacArgs);
+    }
+
+    private Pair<ClassResolver, List<ErrorMessage>> createClassResolver(
+            List<Abbreviation> abbreviations, ClassLoader classLoader) {
+        List<Either<ErrorMessage, Pair<String, String>>> bindingsOrErrors =
+                abbreviations.stream().map(abbreviation -> {
+                    String longName = abbreviation.getLongName();
+                    Span span = abbreviation.getSpan();
+                    try {
+                        Class.forName(longName, false, classLoader);
+                    } catch (ClassNotFoundException e) {
+                        return Either.<ErrorMessage, Pair<String, String>>left(
+                                new ErrorMessage("cannot find class: " + longName, span));
+                    }
+                    return Either.<ErrorMessage, Pair<String, String>>right(abbreviation.toPair());
+                }).collect(Collectors.toList());
+        Stream<Pair<String, String>> bindings =
+                bindingsOrErrors.stream().flatMap(Either::rightStream);
+        List<ErrorMessage> errors =
+                bindingsOrErrors.stream()
+                        .flatMap(Either::leftStream)
+                        .collect(Collectors.toList());
+        return new Pair<>(new ClassResolver(bindings, classLoader), errors);
     }
 }

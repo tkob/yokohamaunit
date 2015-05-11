@@ -2,6 +2,8 @@
 *[Optional]: java.util.Optional
 *[ClassCheckVisitor]: yokohama.unit.ast.ClassCheckVisitor
 *[ErrorMessage]: yokohama.unit.position.ErrorMessage
+*[ClassResolver]: yokohama.unit.util.ClassResolver
+*[Pair]: yokohama.unit.util.Pair
 
 # Test: ClassCheckVisitor.check
 
@@ -22,8 +24,10 @@ Let factory = `new yokohama.unit.translator.ParseTreeToAstVisitorFactory()`.
 
 Let ast = `factory.create(Optional.of(docyPath)).visitGroup(ctx)`.
 
-Let visitor = `new ClassCheckVisitor(ClassLoader.getSystemClassLoader())`. 
+Let classResolver = `new ClassResolver([new Pair("List", "java.util.List")])`.
+
+Let visitor = `new ClassCheckVisitor(classResolver)`.
 
 ## Verify
 
-Assert that `visitor.check(ast).leftOptional().get().size()` is `14`.
+Assert that `visitor.check(ast).size()` is `12`.

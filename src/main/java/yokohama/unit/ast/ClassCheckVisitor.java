@@ -5,62 +5,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import yokohama.unit.position.ErrorMessage;
-import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
-import yokohama.unit.util.Either;
 import yokohama.unit.util.Optionals;
-import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
 public class ClassCheckVisitor {
-    private final ClassLoader classLoader;
-
-    public Either<List<ErrorMessage>, ClassResolver> check(Group group) {
-        Pair<ClassResolver, Stream<ErrorMessage>> classResolverAndErrors=
-                visitAbbreviations(group.getAbbreviations());
-        ClassResolver classResolver = classResolverAndErrors.getFirst();
-        Stream<ErrorMessage> abbreviationErrors = classResolverAndErrors.getSecond();
-
-        Stream<ErrorMessage> definitionErrors =
-                new ClassExprCheckVisitor(group, classResolver).check();
-
-        List<ErrorMessage> errors =
-                Stream.concat(abbreviationErrors, definitionErrors)
-                        .collect(Collectors.toList());
-        return errors.size() > 0
-                ? Either.left(errors)
-                : Either.right(classResolver);
-    }
-
-    private Pair<ClassResolver, Stream<ErrorMessage>> visitAbbreviations(
-            List<Abbreviation> abbreviations) {
-        List<Either<ErrorMessage, Pair<String, String>>> bindingsOrErrors =
-                abbreviations.stream().map(abbreviation -> {
-                    String longName = abbreviation.getLongName();
-                    Span span = abbreviation.getSpan();
-                    try {
-                        Class.forName(longName, false, classLoader);
-                    } catch (ClassNotFoundException e) {
-                        return Either.<ErrorMessage, Pair<String, String>>left(
-                                new ErrorMessage("cannot find class: " + longName, span));
-                    }
-                    return Either.<ErrorMessage, Pair<String, String>>right(abbreviation.toPair());
-                }).collect(Collectors.toList());
-        Stream<Pair<String, String>> bindings =
-                bindingsOrErrors.stream().flatMap(Either::rightStream);
-        Stream<ErrorMessage> errors =
-                bindingsOrErrors.stream().flatMap(Either::leftStream);
-        return new Pair<>(new ClassResolver(bindings, classLoader), errors);
-    }
-}
-
-@AllArgsConstructor
-class ClassExprCheckVisitor {
-    private final Group group;
     private final ClassResolver classResolver;
 
-    public Stream<ErrorMessage> check() {
-        return group.getDefinitions().stream().flatMap(this::visitDefinition);
+    public List<ErrorMessage> check(Group group) {
+        return group.getDefinitions().stream()
+                .flatMap(this::visitDefinition)
+                .collect(Collectors.toList());
     }
 
     private Stream<ErrorMessage> visitDefinition(Definition definition) {
