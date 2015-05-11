@@ -116,6 +116,7 @@ task checkDocumentConsistency << {
                     !name.endsWith("Visitor.java") &&
                     !name.endsWith("Strategy.java") &&
                     !name.endsWith("Exception.java") &&
+                    !name.endsWith("Template.java") &&
                     !name.endsWith(".original~") &&
                     !name.equals("package-info.java")
                 } as FilenameFilter)
