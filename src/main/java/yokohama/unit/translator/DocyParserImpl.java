@@ -43,9 +43,11 @@ public class DocyParserImpl implements DocyParser {
         };
         CharStream stream = new ANTLRInputStream(ins);
         Lexer lex = new YokohamaUnitLexer(stream);
+        lex.removeErrorListeners();
         lex.addErrorListener(errorListener);
         CommonTokenStream tokens = new CommonTokenStream(lex);
         YokohamaUnitParser parser = new YokohamaUnitParser(tokens);
+        parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
         GroupContext ctx = parser.group();
