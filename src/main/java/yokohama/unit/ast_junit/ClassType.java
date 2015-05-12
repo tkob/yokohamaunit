@@ -33,10 +33,6 @@ public class ClassType implements NonArrayType {
         return clazz.isInterface();
     }
 
-    public Type toType() {
-        return new Type(this, 0);
-    }
-    
     public static ClassType of(
             yokohama.unit.ast.ClassType classType,
             ClassResolver classResolver) {

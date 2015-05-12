@@ -2,7 +2,6 @@ package yokohama.unit.ast_junit;
 
 import lombok.Value;
 import yokohama.unit.ast.Kind;
-import yokohama.unit.position.Span;
 
 @Value
 public class PrimitiveType implements NonArrayType {
@@ -25,10 +24,6 @@ public class PrimitiveType implements NonArrayType {
             case DOUBLE:  return new ClassType(Double.class);
         }
         throw new RuntimeException("should not reach here");
-    }
-
-    public Type toType() {
-        return new Type(this, 0);
     }
 
     public static PrimitiveType of(yokohama.unit.ast.PrimitiveType primitiveType) {
