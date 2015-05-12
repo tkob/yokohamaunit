@@ -113,6 +113,7 @@ public class DocyCompilerImpl implements DocyCompiler {
                         .append(variableCheckVisitor::check)
                         .append(anchorCheckVisitor::check)
                         .getErrors();
+        if (!errors.isEmpty()) return errors;
 
         // AST to JUnit AST
         CompilationUnit junit;
