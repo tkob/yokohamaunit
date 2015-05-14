@@ -119,6 +119,7 @@ LPAREN: '(' ;
 RPAREN: ')' ;
 LBRACKET: '[' ;
 RBRACKET: ']' ;
+HASH: '#' ;
 Identifier_METHOD_PATTERN : IdentStart IdentPart* -> type(Identifier);
 WS_METHOD_PATTERN: Spaces -> skip ;
 BACK_TICK_METHOD_PATTERN: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;

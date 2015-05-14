@@ -57,3 +57,8 @@ Assert `path` is `new File("a/b/c").toPath()` where path is an invocation of
 
 Assert `stream.sum()` is `6` where stream is an invocation of
  `IntStream.of(int...)` with 1, 2, 3.
+
+# Test: Hash can be used to separate class name and method name
+
+Assert `len` is `5` where len is an invocation of `String#length()` on
+`"Hello"`.

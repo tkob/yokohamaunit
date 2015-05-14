@@ -90,7 +90,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestLiterals.docy", new GroovyExpressionStrategyFactory(), 54),
         new Fixture(
-                "GroovyTestInvocation.docy", new GroovyExpressionStrategyFactory(), 14),
+                "GroovyTestInvocation.docy", new GroovyExpressionStrategyFactory(), 15),
         new Fixture(
                 "GroovyTestCodeBlock.docy", new GroovyExpressionStrategyFactory(), 7),
     };

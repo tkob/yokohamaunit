@@ -91,7 +91,7 @@ nonArrayType: primitiveType | classType ;
 primitiveType: BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE ;
 classType: Identifier (DOT Identifier)* ;
 
-invokeExpr: AN_INVOCATION_OF_BACK_TICK classType DOT methodPattern BACK_TICK
+invokeExpr: AN_INVOCATION_OF_BACK_TICK classType (DOT | HASH) methodPattern BACK_TICK
             ( ON quotedExpr)?
             ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 
