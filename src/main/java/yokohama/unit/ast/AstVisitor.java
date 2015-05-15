@@ -5,30 +5,30 @@ public abstract class AstVisitor<T> {
     public abstract T visitAbbreviation(Abbreviation abbreviation);
     public T visitDefinition(Definition definition) {
         return definition.accept(
-            test -> visitTest(test),
-            fourPhaseTest -> visitFourPhaseTest(fourPhaseTest),
-            table -> visitTable(table),
-            codeBlock -> visitCodeBlock(codeBlock),
-            heading -> visitHeading(heading));
+                this::visitTest,
+                this::visitFourPhaseTest,
+                this::visitTable,
+                this::visitCodeBlock,
+                this::visitHeading);
     }
     public abstract T visitTest(Test test);
     public abstract T visitAssertion(Assertion assertion);
     public abstract T visitProposition(Proposition proposition);
     public T visitPredicate(Predicate predicate) {
         return predicate.accept(
-                isPredicate -> visitIsPredicate(isPredicate),
-                isNotPredicate -> visitIsNotPredicate(isNotPredicate),
-                throwsPredicate -> visitThrowsPredicate(throwsPredicate));
+                this::visitIsPredicate,
+                this::visitIsNotPredicate,
+                this::visitThrowsPredicate);
     };
     public abstract T visitIsPredicate(IsPredicate isPredicate);
     public abstract T visitIsNotPredicate(IsNotPredicate isNotPredicate);
     public abstract T visitThrowsPredicate(ThrowsPredicate throwsPredicate);
     public T visitMatcher(Matcher matcher) {
         return matcher.accept(
-                equalTo -> visitEqualToMatcher(equalTo),
-                instanceOf -> visitInstanceOfMatcher(instanceOf),
-                instanceSuchThat -> visitInstanceSuchThatMatcher(instanceSuchThat),
-                nullValue -> visitNullValueMatcher(nullValue));
+                this::visitEqualToMatcher,
+                this::visitInstanceOfMatcher,
+                this::visitInstanceSuchThatMatcher,
+                this::visitNullValueMatcher);
     }
     public abstract T visitEqualToMatcher(EqualToMatcher equalTo);
     public abstract T visitInstanceOfMatcher(InstanceOfMatcher instanceOf);
@@ -37,15 +37,15 @@ public abstract class AstVisitor<T> {
 
     public T visitExpr(Expr expr) {
         return expr.accept(
-                quotedExpr -> visitQuotedExpr(quotedExpr),
-                stubExpr -> visitStubExpr(stubExpr),
-                invocationExpr -> visitInvocationExpr(invocationExpr),
-                integerExpr -> visitIntegerExpr(integerExpr),
-                floatingPointExpr -> visitFloatingPointExpr(floatingPointExpr),
-                booleanExpr -> visitBooleanExpr(booleanExpr),
-                charExpr -> visitCharExpr(charExpr),
-                stringExpr -> visitStringExpr(stringExpr),
-                anchorExpr -> visitAnchorExpr(anchorExpr));
+                this::visitQuotedExpr,
+                this::visitStubExpr,
+                this::visitInvocationExpr,
+                this::visitIntegerExpr,
+                this::visitFloatingPointExpr,
+                this::visitBooleanExpr,
+                this::visitCharExpr,
+                this::visitStringExpr,
+                this::visitAnchorExpr);
     }
     public abstract T visitQuotedExpr(QuotedExpr quotedExpr);
     public abstract T visitStubExpr(StubExpr stubExpr);
@@ -61,16 +61,16 @@ public abstract class AstVisitor<T> {
     public abstract T visitType(Type type);
     public T visitNonArrayType(NonArrayType nonArrayType) {
         return nonArrayType.accept(
-                primitiveType -> visitPrimitiveType(primitiveType),
-                classType -> visitClassType(classType));
+                this::visitPrimitiveType,
+                this::visitClassType);
     }
     public abstract T visitPrimitiveType(PrimitiveType primitiveType);
     public abstract T visitClassType(ClassType classType);
     public T visitFixture(Fixture fixture) {
         return fixture.accept(
-                () -> visitNone(),
-                tableRef -> visitTableRef(tableRef),
-                bindings -> visitBindings(bindings));
+                this::visitNone,
+                this::visitTableRef,
+                this::visitBindings);
     }
     public abstract T visitNone();
     public abstract T visitTableRef(TableRef tableRef);
@@ -92,8 +92,8 @@ public abstract class AstVisitor<T> {
     public abstract T visitRow(Row row);
     public T visitCell(Cell cell) {
         return cell.accept(
-                exprCell -> visitExprCell(exprCell),
-                predCell -> visitPredCell(predCell));
+                this::visitExprCell,
+                this::visitPredCell);
     }
     public abstract T visitExprCell(ExprCell exprCell);
     public abstract T visitPredCell(PredCell predCell);
