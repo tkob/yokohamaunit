@@ -43,6 +43,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
+import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
@@ -1049,12 +1050,12 @@ class AstToJUnitAstVisitor {
 
         Optional<Stream<Statement>> setupActions =
                 fourPhaseTest.getSetup()
-                        .map(Phase::getExecutions)
-                        .map(execition -> translateExecutions(execition, env));
+                        .map(Phase::getStatements)
+                        .map(statements -> translateStatements(statements, env));
         Optional<Stream<Statement>> exerciseActions =
                 fourPhaseTest.getExercise()
-                        .map(Phase::getExecutions)
-                        .map(execution -> translateExecutions(execution, env));
+                        .map(Phase::getStatements)
+                        .map(statements -> translateStatements(statements, env));
         Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
@@ -1082,7 +1083,7 @@ class AstToJUnitAstVisitor {
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter =
-                    translateExecutions(teardown.getExecutions(), env)
+                    translateStatements(teardown.getStatements(), env)
                             .collect(Collectors.toList());
         } else {
             actionsAfter = Arrays.asList();
@@ -1105,18 +1106,24 @@ class AstToJUnitAstVisitor {
                                 : statements)));
     }
 
-    Stream<Statement> translateExecutions(
-            List<Execution> executions, String envVarName) {
+    Stream<Statement> translateStatements(
+            List<yokohama.unit.ast.Statement> statements, String envVarName) {
+        return statements.stream()
+                .flatMap(statement -> statement.accept(
+                        execution -> translateExecution(execution, envVarName),
+                        invoke -> translateInvoke(invoke, envVarName)));
+    }
+
+    Stream<Statement> translateExecution(
+            Execution execution, String envVarName) {
         String __ = genSym.generate("__");
-        return executions.stream()
-                .flatMap(execution ->
-                        execution.getExpressions()
-                                .stream()
-                                .flatMap(expression ->
-                                        expressionStrategy.eval(
-                                                __,
-                                                expression,
-                                                Object.class,
-                                                envVarName).stream()));
+        return execution.getExpressions().stream()
+                .flatMap(expression ->
+                        expressionStrategy.eval(
+                                __, expression, Object.class, envVarName).stream());
+    }
+
+    Stream<Statement> translateInvoke(Invoke invoke, String envVarName) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

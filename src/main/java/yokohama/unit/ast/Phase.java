@@ -11,6 +11,6 @@ import lombok.Value;
 public class Phase {
     private Optional<String> description;
     private List<LetStatement> letStatements;
-    private List<Execution> executions;
+    private List<Statement> statements;
     private Span span;
 }

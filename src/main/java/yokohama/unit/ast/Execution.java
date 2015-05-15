@@ -7,7 +7,12 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode(exclude={"span"})
-public class Execution {
+public class Execution implements Statement {
     private List<QuotedExpr> expressions;
     private Span span;
+
+    @Override
+    public <T> T accept(StatementVisitor<T> visitor) {
+        return visitor.visitExecution(this);
+    }
 }

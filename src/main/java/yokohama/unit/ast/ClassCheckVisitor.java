@@ -150,9 +150,25 @@ public class ClassCheckVisitor {
                 phase.getLetStatements().stream()
                         .map(LetStatement::getBindings).flatMap(List::stream)
                         .flatMap(this::visitLetBinding),
-                phase.getExecutions().stream()
-                        .map(Execution::getExpressions).flatMap(List::stream)
-                        .flatMap(this::visitExpr));
+                phase.getStatements().stream().flatMap(this::visitStatement));
+    }
+
+    private Stream<ErrorMessage> visitStatement(Statement statement) {
+        return statement.accept(
+                this::visitExecution,
+                this::visitInvoke);
+    }
+
+    private Stream<ErrorMessage> visitExecution(Execution execution) {
+        return execution.getExpressions().stream().flatMap(this::visitExpr);
+    }
+
+    private Stream<ErrorMessage> visitInvoke(Invoke invoke) {
+        return Stream.concat(
+                visitClassType(invoke.getClassType()),
+                Stream.concat(
+                        visitMethodPattern(invoke.getMethodPattern()),
+                        invoke.getArgs().stream().flatMap(this::visitExpr)));
     }
 
     private Stream<ErrorMessage> visitLetBinding(LetBinding letBinding) {

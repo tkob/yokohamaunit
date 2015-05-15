@@ -59,8 +59,11 @@ teardown: TEARDOWN Line? statement+ ;
 letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: Identifier (EQ | BE) expr ;
 
-statement: execution ;
+statement: execution | invoke ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;
+invoke: INVOKE_TICK classType (DOT | HASH) methodPattern BACK_TICK
+            ( ON quotedExpr)?
+            ( WITH argumentExpr (COMMA argumentExpr)* )? ;
 
 tableDef: LBRACKET Anchor RBRACKET header HBAR? rows
         | header HBAR? rows LBRACKET Anchor RBRACKET ;

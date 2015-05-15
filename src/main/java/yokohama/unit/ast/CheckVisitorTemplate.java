@@ -192,7 +192,7 @@ public class CheckVisitorTemplate extends AstVisitor<Stream<ErrorMessage>> {
     public Stream<ErrorMessage> visitPhase(Phase phase) {
         return Stream.concat(
                 phase.getLetStatements().stream().flatMap(this::visitLetStatement),
-                phase.getExecutions().stream().flatMap(this::visitExecution));
+                phase.getStatements().stream().flatMap(this::visitStatement));
     }
 
     @Override
@@ -217,6 +217,17 @@ public class CheckVisitorTemplate extends AstVisitor<Stream<ErrorMessage>> {
         return execution.getExpressions().stream().flatMap(this::visitExpr);
     }
 
+    @Override
+    public Stream<ErrorMessage> visitInvoke(Invoke invoke) {
+        return Stream.concat(
+                Stream.concat(
+                        visitClassType(invoke.getClassType()),
+                        visitMethodPattern(invoke.getMethodPattern())),
+                Stream.concat(
+                        Optionals.toStream(invoke.getReceiver()).flatMap(this::visitExpr),
+                        invoke.getArgs().stream().flatMap(this::visitExpr)));
+    }
+    
     @Override
     public Stream<ErrorMessage> visitTable(Table table) {
         return Stream.concat(
@@ -253,5 +264,4 @@ public class CheckVisitorTemplate extends AstVisitor<Stream<ErrorMessage>> {
     public Stream<ErrorMessage> visitIdent(Ident ident) {
         return Stream.empty();
     }
-    
 }

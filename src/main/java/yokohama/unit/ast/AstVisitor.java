@@ -81,7 +81,13 @@ public abstract class AstVisitor<T> {
     public abstract T visitVerifyPhase(VerifyPhase verifyPhase);
     public abstract T visitLetStatement(LetStatement letStatement);
     public abstract T visitLetBinding(LetBinding letBinding);
+    public T visitStatement(Statement statement) {
+        return statement.accept(
+                this::visitExecution,
+                this::visitInvoke);
+    }
     public abstract T visitExecution(Execution execution);
+    public abstract T visitInvoke(Invoke invoke);
     public abstract T visitTable(Table table);
     public abstract T visitRow(Row row);
     public T visitCell(Cell cell) {

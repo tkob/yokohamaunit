@@ -53,6 +53,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.Statement;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
@@ -316,11 +317,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                         .map(letStatement -> visitLetStatement(letStatement))
                         .collect(Collectors.toList());
 
-        List<Execution> executions = ctx.statement()
+        List<Statement> statements = ctx.statement()
                 .stream()
                 .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, letStatements, executions, getSpan(ctx));
+        return new Phase(description, letStatements, statements, getSpan(ctx));
     }
 
     @Override
@@ -328,11 +329,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.statement()
+        List<Statement> statements = ctx.statement()
                 .stream()
                 .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), statements, getSpan(ctx));
     }
 
     @Override
@@ -352,11 +353,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.statement()
+        List<Statement> statements = ctx.statement()
                 .stream()
                 .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), statements, getSpan(ctx));
     }
 
     @Override
@@ -387,6 +388,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                         .map(quotedExpr -> visitQuotedExpr(quotedExpr))
                         .collect(Collectors.toList()),
                 getSpan(ctx));
+    }
+
+    @Override
+    public Object visitInvoke(YokohamaUnitParser.InvokeContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
