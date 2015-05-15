@@ -316,9 +316,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                         .map(letStatement -> visitLetStatement(letStatement))
                         .collect(Collectors.toList());
 
-        List<Execution> executions = ctx.execution()
+        List<Execution> executions = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
         return new Phase(description, letStatements, executions, getSpan(ctx));
     }
@@ -328,9 +328,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.execution()
+        List<Execution> executions = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
         return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
     }
@@ -352,9 +352,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.execution()
+        List<Execution> executions = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
         return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
     }
@@ -373,6 +373,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitExpr(ctx.expr()),
                 getSpan(ctx));
+    }
+
+    @Override
+    public Execution visitStatement(YokohamaUnitParser.StatementContext ctx) {
+        return (Execution)visitChildren(ctx);
     }
 
     @Override
