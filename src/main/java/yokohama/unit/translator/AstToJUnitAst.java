@@ -43,6 +43,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
+import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
@@ -70,6 +71,8 @@ import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.IntLitExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
+import yokohama.unit.ast_junit.InvokeStaticVoidStatement;
+import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
@@ -544,106 +547,24 @@ class AstToJUnitAstVisitor {
 
         Type returnType = typeOfExpr(invocationExpr);
 
-        List<Pair<Var, Stream<Statement>>> setupArgs;
-        if (isVararg) {
-            int splitAt = argTypes.size() - 1;
-            List<Pair<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
-                    Pair.zip(
-                            argTypes,
-                            Lists.split(args, splitAt).map((nonVarargs, varargs) ->
-                                    ListUtils.union(
-                                            Lists.map(nonVarargs, Arrays::asList),
-                                            Arrays.asList(varargs))));
-            setupArgs = Lists.mapInitAndLast(
-                    typesAndArgs,
-                    typeAndArg -> typeAndArg.map((t, arg) -> {
-                        Var argVar = new Var(genSym.generate("arg"));
-                        Type paramType = Type.of(t, classResolver);
-                        Stream<Statement> expr = translateExpr(
-                                arg.get(0), argVar.getName(), paramType.toClass(), envVarName);
-                        return new Pair<>(argVar, expr);
-                    }),
-                    typeAndArg -> typeAndArg.map((t, varargs) -> {
-                        Type paramType = Type.of(t, classResolver);
-                        List<Pair<Var, Stream<Statement>>> exprs = varargs.stream().map(
-                                vararg -> {
-                                    Var varargVar = new Var(genSym.generate("vararg"));
-                                    Stream<Statement> expr = translateExpr(
-                                            vararg,
-                                            varargVar.getName(),
-                                            paramType.toClass(),
-                                            envVarName);
-                                    return new Pair<>(varargVar, expr);
-                                }).collect(Collectors.toList());
-                        List<Var> varargVars = Pair.unzip(exprs).getFirst();
-                        Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
-                        Var argVar = new Var(genSym.generate("arg"));
-                        Stream<Statement> arrayStatement = Stream.of(
-                                new VarInitStatement(
-                                        paramType.toArray(),
-                                        argVar.getName(),
-                                        new ArrayExpr(paramType.toArray(), varargVars),
-                                        t.getSpan()));
-                        return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
-                    }));
-        } else {
-            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
-                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
-                            argTypes, args);
-            setupArgs = pairs.stream().map(pair -> pair.map((t, arg) -> {
-                        // evaluate actual args and coerce to parameter types
-                        Var argVar = new Var(genSym.generate("arg"));
-                        Type paramType = Type.of(t, classResolver);
-                        Stream<Statement> expr = translateExpr(
-                                arg, argVar.getName(), paramType.toClass(), envVarName);
-                        return new Pair<>(argVar, expr);
-                    })).collect(Collectors.toList());
-        }
-        List<Var> argVars = Pair.unzip(setupArgs).getFirst();
-        Stream<Statement> setupStatements =
-                setupArgs.stream().flatMap(Pair::getSecond);
+        Pair<List<Var>, Stream<Statement>> argVarsAndStatements =
+                setupArgs(argTypes, isVararg, args, envVarName);
+        List<Var> argVars = argVarsAndStatements.getFirst();
+        Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
 
-        Stream<Statement> invocation;
-        if (receiver.isPresent()) {
-            // invokevirtual
-            Var receiverVar = new Var(genSym.generate("receiver"));
-            Stream<Statement> getReceiver = translateExpr(
-                    receiver.get(),receiverVar.getName(), clazz, envVarName);
-            invocation = Stream.concat(getReceiver, Stream.of(
-                    new VarInitStatement(
-                            returnType,
-                            varName,
-                            new InvokeExpr(
-                                    ClassType.of(classType, classResolver),
-                                    receiverVar,
-                                    methodName,
-                                    Lists.mapInitAndLast(
-                                            Type.listOf(argTypes, classResolver),
-                                            type -> type,
-                                            type -> isVararg ? type.toArray(): type),
-                                    argVars,
-                                    returnType),
-                            invocationExpr.getSpan())));
-        } else {
-            // invokestatic
-            invocation = Stream.of(
-                    new VarInitStatement(
-                            returnType,
-                            varName,
-                            new InvokeStaticExpr(
-                                    ClassType.of(classType, classResolver),
-                                    Collections.emptyList(),
-                                    methodName,
-                                    Lists.mapInitAndLast(
-                                            Type.listOf(argTypes, classResolver),
-                                            type -> type,
-                                            type -> isVararg ? type.toArray(): type),
-                                    argVars,
-                                    returnType),
-                            invocationExpr.getSpan()));
-        }
+        Stream<Statement> invocation = generateInvoke(
+                varName,
+                classType,
+                methodName,
+                argTypes,
+                isVararg,
+                argVars,
+                receiver,
+                returnType,
+                envVarName,
+                invocationExpr.getSpan());
 
-        return Stream.concat(setupStatements,invocation);
+        return Stream.concat(setupStatements, invocation);
     }
 
     Stream<Statement> translateIntegerExpr(
@@ -856,11 +777,11 @@ class AstToJUnitAstVisitor {
                         stubExpr.getClassToStub().toType(), classResolver),
                 invocationExpr -> {
                     MethodPattern mp = invocationExpr.getMethodPattern();
-                    return Type.of(
-                                mp.getReturnType(
-                                        invocationExpr.getClassType(),
-                                        classResolver),
-                                classResolver);
+                    return mp.getReturnType(
+                            invocationExpr.getClassType(),
+                            classResolver)
+                            .map(type -> Type.of(type, classResolver))
+                            .get();
                 },
                 integerExpr -> integerExpr.match(
                         intValue -> Type.INT,
@@ -1049,12 +970,12 @@ class AstToJUnitAstVisitor {
 
         Optional<Stream<Statement>> setupActions =
                 fourPhaseTest.getSetup()
-                        .map(Phase::getExecutions)
-                        .map(execition -> translateExecutions(execition, env));
+                        .map(Phase::getStatements)
+                        .map(statements -> translateStatements(statements, env));
         Optional<Stream<Statement>> exerciseActions =
                 fourPhaseTest.getExercise()
-                        .map(Phase::getExecutions)
-                        .map(execution -> translateExecutions(execution, env));
+                        .map(Phase::getStatements)
+                        .map(statements -> translateStatements(statements, env));
         Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
                 .stream()
                 .flatMap(assertion ->
@@ -1082,7 +1003,7 @@ class AstToJUnitAstVisitor {
         if (fourPhaseTest.getTeardown().isPresent()) {
             Phase teardown = fourPhaseTest.getTeardown().get();
             actionsAfter =
-                    translateExecutions(teardown.getExecutions(), env)
+                    translateStatements(teardown.getStatements(), env)
                             .collect(Collectors.toList());
         } else {
             actionsAfter = Arrays.asList();
@@ -1105,18 +1026,229 @@ class AstToJUnitAstVisitor {
                                 : statements)));
     }
 
-    Stream<Statement> translateExecutions(
-            List<Execution> executions, String envVarName) {
+    Stream<Statement> translateStatements(
+            List<yokohama.unit.ast.Statement> statements, String envVarName) {
+        return statements.stream()
+                .flatMap(statement -> statement.accept(
+                        execution -> translateExecution(execution, envVarName),
+                        invoke -> translateInvoke(invoke, envVarName)));
+    }
+
+    Stream<Statement> translateExecution(
+            Execution execution, String envVarName) {
         String __ = genSym.generate("__");
-        return executions.stream()
-                .flatMap(execution ->
-                        execution.getExpressions()
-                                .stream()
-                                .flatMap(expression ->
-                                        expressionStrategy.eval(
-                                                __,
-                                                expression,
-                                                Object.class,
-                                                envVarName).stream()));
+        return execution.getExpressions().stream()
+                .flatMap(expression ->
+                        expressionStrategy.eval(
+                                __, expression, Object.class, envVarName).stream());
+    }
+
+    Stream<Statement> translateInvoke(Invoke invoke, String envVarName) {
+        yokohama.unit.ast.ClassType classType = invoke.getClassType();
+        Class<?> clazz = classType.toClass(classResolver);
+        MethodPattern methodPattern = invoke.getMethodPattern();
+        String methodName = methodPattern.getName();
+        List<yokohama.unit.ast.Type> argTypes = methodPattern.getParamTypes();
+        boolean isVararg = methodPattern.isVararg();
+        Optional<yokohama.unit.ast.Expr> receiver = invoke.getReceiver();
+        List<yokohama.unit.ast.Expr> args = invoke.getArgs();
+
+        Pair<List<Var>, Stream<Statement>> argVarsAndStatements =
+                setupArgs(argTypes, isVararg, args, envVarName);
+        List<Var> argVars = argVarsAndStatements.getFirst();
+        Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
+
+        Optional<Type> returnType = invoke.getMethodPattern()
+                .getReturnType(classType, classResolver)
+                .map(type -> Type.of(type, classResolver));
+        Stream<Statement> invocation;
+        if (returnType.isPresent()) {
+            invocation = generateInvoke(
+                    genSym.generate("__"),
+                    classType,
+                    methodName,
+                    argTypes,
+                    isVararg,
+                    argVars,
+                    receiver,
+                    returnType.get(),
+                    envVarName,
+                    invoke.getSpan());
+        } else {
+            invocation = generateInvokeVoid(
+                    classType,
+                    methodName,
+                    argTypes,
+                    isVararg,
+                    argVars,
+                    receiver,
+                    envVarName,
+                    invoke.getSpan());
+        }
+
+        return Stream.concat(setupStatements, invocation);
+    }
+
+    Pair<List<Var>, Stream<Statement>> setupArgs(
+            List<yokohama.unit.ast.Type> argTypes,
+            boolean isVararg,
+            List<yokohama.unit.ast.Expr> args,
+            String envVarName) {
+        List<Pair<Var, Stream<Statement>>> setupArgs;
+        if (isVararg) {
+            int splitAt = argTypes.size() - 1;
+            List<Pair<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
+                    Pair.zip(
+                            argTypes,
+                            Lists.split(args, splitAt).map((nonVarargs, varargs) ->
+                                    ListUtils.union(
+                                            Lists.map(nonVarargs, Arrays::asList),
+                                            Arrays.asList(varargs))));
+            setupArgs = Lists.mapInitAndLast(
+                    typesAndArgs,
+                    typeAndArg -> typeAndArg.map((t, arg) -> {
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Type paramType = Type.of(t, classResolver);
+                        Stream<Statement> expr = translateExpr(
+                                arg.get(0), argVar.getName(), paramType.toClass(), envVarName);
+                        return new Pair<>(argVar, expr);
+                    }),
+                    typeAndArg -> typeAndArg.map((t, varargs) -> {
+                        Type paramType = Type.of(t, classResolver);
+                        List<Pair<Var, Stream<Statement>>> exprs = varargs.stream().map(
+                                vararg -> {
+                                    Var varargVar = new Var(genSym.generate("vararg"));
+                                    Stream<Statement> expr = translateExpr(
+                                            vararg,
+                                            varargVar.getName(),
+                                            paramType.toClass(),
+                                            envVarName);
+                                    return new Pair<>(varargVar, expr);
+                                }).collect(Collectors.toList());
+                        List<Var> varargVars = Pair.unzip(exprs).getFirst();
+                        Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Stream<Statement> arrayStatement = Stream.of(
+                                new VarInitStatement(
+                                        paramType.toArray(),
+                                        argVar.getName(),
+                                        new ArrayExpr(paramType.toArray(), varargVars),
+                                        t.getSpan()));
+                        return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
+                    }));
+        } else {
+            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
+                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
+                            argTypes, args);
+            setupArgs = pairs.stream().map(pair -> pair.map((t, arg) -> {
+                        // evaluate actual args and coerce to parameter types
+                        Var argVar = new Var(genSym.generate("arg"));
+                        Type paramType = Type.of(t, classResolver);
+                        Stream<Statement> expr = translateExpr(
+                                arg, argVar.getName(), paramType.toClass(), envVarName);
+                        return new Pair<>(argVar, expr);
+                    })).collect(Collectors.toList());
+        }
+        List<Var> argVars = Pair.unzip(setupArgs).getFirst();
+        Stream<Statement> setupStatements =
+                setupArgs.stream().flatMap(Pair::getSecond);
+
+        return new Pair<>(argVars, setupStatements);
+    }
+
+    Stream<Statement> generateInvoke(
+            String varName,
+            yokohama.unit.ast.ClassType classType,
+            String methodName,
+            List<yokohama.unit.ast.Type> argTypes,
+            boolean isVararg,
+            List<Var> argVars,
+            Optional<yokohama.unit.ast.Expr> receiver,
+            Type returnType,
+            String envVarName,
+            Span span) {
+        Class<?> clazz = classType.toClass(classResolver);
+
+        if (receiver.isPresent()) {
+            // invokevirtual
+            Var receiverVar = new Var(genSym.generate("receiver"));
+            Stream<Statement> getReceiver = translateExpr(
+                    receiver.get(),receiverVar.getName(), clazz, envVarName);
+            return Stream.concat(getReceiver, Stream.of(
+                    new VarInitStatement(
+                            returnType,
+                            varName,
+                            new InvokeExpr(
+                                    ClassType.of(classType, classResolver),
+                                    receiverVar,
+                                    methodName,
+                                    Lists.mapInitAndLast(
+                                            Type.listOf(argTypes, classResolver),
+                                            type -> type,
+                                            type -> isVararg ? type.toArray(): type),
+                                    argVars,
+                                    returnType),
+                            span)));
+        } else {
+            // invokestatic
+            return Stream.of(
+                    new VarInitStatement(
+                            returnType,
+                            varName,
+                            new InvokeStaticExpr(
+                                    ClassType.of(classType, classResolver),
+                                    Collections.emptyList(),
+                                    methodName,
+                                    Lists.mapInitAndLast(
+                                            Type.listOf(argTypes, classResolver),
+                                            type -> type,
+                                            type -> isVararg ? type.toArray(): type),
+                                    argVars,
+                                    returnType),
+                            span));
+        }
+    }
+
+    Stream<Statement> generateInvokeVoid(
+            yokohama.unit.ast.ClassType classType,
+            String methodName,
+            List<yokohama.unit.ast.Type> argTypes,
+            boolean isVararg,
+            List<Var> argVars,
+            Optional<yokohama.unit.ast.Expr> receiver,
+            String envVarName,
+            Span span) {
+        Class<?> clazz = classType.toClass(classResolver);
+
+        if (receiver.isPresent()) {
+            // invokevirtual
+            Var receiverVar = new Var(genSym.generate("receiver"));
+            Stream<Statement> getReceiver = translateExpr(
+                    receiver.get(), receiverVar.getName(), clazz, envVarName);
+            return Stream.concat(getReceiver, Stream.of(
+                    new InvokeVoidStatement(
+                            ClassType.of(classType, classResolver),
+                            receiverVar,
+                            methodName,
+                            Lists.mapInitAndLast(
+                                    Type.listOf(argTypes, classResolver),
+                                    type -> type,
+                                    type -> isVararg ? type.toArray(): type),
+                            argVars,
+                            span)));
+        } else {
+            // invokestatic
+            return Stream.of(
+                    new InvokeStaticVoidStatement(
+                            ClassType.of(classType, classResolver),
+                            Collections.emptyList(),
+                            methodName,
+                            Lists.mapInitAndLast(
+                                    Type.listOf(argTypes, classResolver),
+                                    type -> type,
+                                    type -> isVararg ? type.toArray(): type),
+                            argVars,
+                            span));
+        }
     }
 }

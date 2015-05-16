@@ -1,0 +1,25 @@
+*[ArrayList]: java.util.ArrayList
+*[List]: java.util.List
+
+# Test: Construct an ArrayList using put method
+## Setup
+Let list = `new ArrayList()`.
+
+Do `list.add(1)`.
+
+Invoke `List.add(Object)` on `list` with 2.
+
+## Verify
+
+Assert that `list` is `[1, 2]`.
+
+# Test: Copy array
+## Setup
+Let array1 = `[1, 2, 3] as int[]` and array2 = `[4, 5, 6] as int[]`.
+
+Invoke `System.arraycopy(Object, int, Object, int, int)` with `array1`, 0,
+`array2`, 1, 2.
+
+## Verify
+
+Assert that `array2 as List` is `[4, 1, 2]`.

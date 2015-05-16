@@ -60,13 +60,16 @@
  * 
  * FourPhaseTest ::= Phase? Phase? VerifyPhase Phase?
  * 
- * Phase ::= LetStatement* Execution*
+ * Phase ::= LetStatement* Statement*
  * VerifyPhase ::= Assertion+
  * 
  * LetStatement ::= LetBinding+
  * LetBinding ::= Expr
  * 
+ * Statement ::= Execution | Invoke
+ * 
  * Execution ::= QuotedExpr*
+ * Invoke ::= MethodPattern Expr*
  * 
  * Table ::= Ident* Row*
  * 

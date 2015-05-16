@@ -6,64 +6,17 @@ import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.util.ClassResolver;
-import yokohama.unit.util.Optionals;
 
 @AllArgsConstructor
-public class ClassCheckVisitor {
+public class ClassCheckVisitor extends CheckVisitorTemplate {
     private final ClassResolver classResolver;
 
     public List<ErrorMessage> check(Group group) {
-        return group.getDefinitions().stream()
-                .flatMap(this::visitDefinition)
-                .collect(Collectors.toList());
+        return visitGroup(group).collect(Collectors.toList());
     }
 
-    private Stream<ErrorMessage> visitDefinition(Definition definition) {
-        return definition.accept(
-                this::visitTest,
-                this::visitFourPhaseTest,
-                this::visitTable,
-                this::visitCodeBlock,
-                this::visitHeading);
-    }
-
-    private Stream<ErrorMessage> visitTest(Test test) {
-        return test.getAssertions().stream()
-                .flatMap(assertion -> visitAssertion(assertion));
-    }
-
-    private Stream<ErrorMessage> visitAssertion(Assertion assertion) {
-        Stream<ErrorMessage> propositionErrors =
-                assertion.getPropositions().stream()
-                        .flatMap(this::visitProposition);
-        Stream<ErrorMessage> fixtureErrors = visitFixture(assertion.getFixture());
-        return Stream.concat(propositionErrors, fixtureErrors);
-    }
-
-    private Stream<ErrorMessage> visitProposition(Proposition proposition) {
-        return visitPredicate(proposition.getPredicate());
-    }
-
-    private Stream<ErrorMessage> visitPredicate(Predicate predicate) {
-        return predicate.accept(
-                isPredicate -> visitMatcher(isPredicate.getComplement()),
-                isNotPredicate -> visitMatcher(isNotPredicate.getComplement()),
-                throwsPredicate -> visitMatcher(throwsPredicate.getThrowee()));
-    }
-
-    private Stream<ErrorMessage> visitMatcher(Matcher matcher) {
-        return matcher.accept(
-            equalTo -> Stream.<ErrorMessage>empty(),
-            instanceOf -> visitClassType(instanceOf.getClazz()),
-            instanceSuchThat ->
-                    Stream.concat(
-                            visitClassType(instanceSuchThat.getClazz()),
-                            instanceSuchThat.getPropositions().stream()
-                                    .flatMap(this::visitProposition)),
-            nullValue -> Stream.<ErrorMessage>empty());
-    }
-
-    private Stream<ErrorMessage> visitClassType(ClassType classType) {
+    @Override
+    public Stream<ErrorMessage> visitClassType(ClassType classType) {
         String name = classType.getName();
         try {
             classResolver.lookup(name);
@@ -72,116 +25,6 @@ public class ClassCheckVisitor {
                     "cannot resolve class: " + name,
                     classType.getSpan()));
         }
-        return Stream.empty();
-    }
-
-    private Stream<ErrorMessage> visitFixture(Fixture fixture) {
-        return fixture.accept(
-                () -> Stream.<ErrorMessage>empty(),
-                tableRef -> Stream.<ErrorMessage>empty(),
-                bindings ->
-                        bindings.getBindings().stream()
-                                .flatMap(this::visitBinding));
-    }
-
-    private Stream<ErrorMessage> visitBinding(Binding binding) {
-        return visitExpr(binding.getValue());
-    }
-
-    private Stream<ErrorMessage> visitExpr(Expr expr) {
-        return expr.accept(
-                quotedExpr -> Stream.<ErrorMessage>empty(),
-                stubExpr -> visitStubExpr(stubExpr),
-                invocationExpr -> visitInvocationExpr(invocationExpr),
-                integerExpr -> Stream.<ErrorMessage>empty(),
-                floatingPointExpr -> Stream.<ErrorMessage>empty(),
-                booleanExpr -> Stream.<ErrorMessage>empty(),
-                charExpr -> Stream.<ErrorMessage>empty(),
-                stringExpr -> Stream.<ErrorMessage>empty(),
-                anchorExpr -> Stream.<ErrorMessage>empty());
-    }
-
-    private Stream<ErrorMessage> visitStubExpr(StubExpr stubExpr) {
-        return Stream.concat(
-                visitClassType(stubExpr.getClassToStub()),
-                stubExpr.getBehavior().stream().flatMap(this::visitBehavior));
-    }
-
-    private Stream<ErrorMessage> visitInvocationExpr(InvocationExpr invocationExpr) {
-        return Stream.concat(
-                visitClassType(invocationExpr.getClassType()),
-                Stream.concat(
-                        visitMethodPattern(invocationExpr.getMethodPattern()),
-                        invocationExpr.getArgs().stream().flatMap(this::visitExpr)));
-    }
-
-    private Stream<ErrorMessage> visitBehavior(StubBehavior behavior) {
-        return Stream.concat(
-                visitMethodPattern(behavior.getMethodPattern()),
-                visitExpr(behavior.getToBeReturned()));
-    }
-
-    private Stream<ErrorMessage> visitMethodPattern(MethodPattern methodPattern) {
-        return methodPattern.getParamTypes().stream().flatMap(this::visitType);
-    }
-
-    private Stream<ErrorMessage> visitType(Type type) {
-        return type.getNonArrayType().accept(
-                primitiveType -> Stream.<ErrorMessage>empty(),
-                classType -> visitClassType(classType));
-    }
-
-    private Stream<ErrorMessage> visitFourPhaseTest(FourPhaseTest fourPhaseTest) {
-        Stream<ErrorMessage> setup
-                = Optionals.toStream(fourPhaseTest.getSetup()).flatMap(this::visitPhase);
-        Stream<ErrorMessage> exercise =
-                Optionals.toStream(fourPhaseTest.getExercise()).flatMap(this::visitPhase);
-        Stream<ErrorMessage> verify =
-                visitVerifyPhase(fourPhaseTest.getVerify());
-        Stream<ErrorMessage> teardown =
-                Optionals.toStream(fourPhaseTest.getTeardown()).flatMap(this::visitPhase);
-        return Stream.concat(setup,
-                Stream.concat(exercise,
-                        Stream.concat(verify, teardown)));
-    }
-
-    private Stream<ErrorMessage> visitPhase(Phase phase) {
-        return Stream.concat(
-                phase.getLetStatements().stream()
-                        .map(LetStatement::getBindings).flatMap(List::stream)
-                        .flatMap(this::visitLetBinding),
-                phase.getExecutions().stream()
-                        .map(Execution::getExpressions).flatMap(List::stream)
-                        .flatMap(this::visitExpr));
-    }
-
-    private Stream<ErrorMessage> visitLetBinding(LetBinding letBinding) {
-        return visitExpr(letBinding.getValue());
-    }
-
-    private Stream<ErrorMessage> visitVerifyPhase(VerifyPhase verifyPhase) {
-        return verifyPhase.getAssertions().stream().flatMap(this::visitAssertion);
-    }
-
-    private Stream<ErrorMessage> visitTable(Table table) {
-        return table.getRows().stream().flatMap(this::visitRow);
-    }
-
-    private Stream<ErrorMessage> visitRow(Row row) {
-        return row.getCells().stream().flatMap(this::visitCell);
-    }
-
-    private Stream<ErrorMessage> visitCell(Cell cell) {
-        return cell.accept(
-                exprCell -> visitExpr(exprCell.getExpr()),
-                predCell -> visitPredicate(predCell.getPredicate()));
-    }
-
-    private Stream<ErrorMessage> visitCodeBlock(CodeBlock codeBlock) {
-        return Stream.empty();
-    }
-
-    private Stream<ErrorMessage> visitHeading(Heading heading) {
         return Stream.empty();
     }
 }

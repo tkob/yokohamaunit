@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -109,9 +110,10 @@ public class MockitoMockStrategy implements MockStrategy {
         boolean isVararg = methodPattern.isVararg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
 
-        Type returnType = Type.of(
-                methodPattern.getReturnType(classToStub, classResolver),
-                classResolver);
+        Type returnType =
+                methodPattern.getReturnType(classToStub, classResolver)
+                        .map(type -> Type.of(type, classResolver))
+                        .get();
 
         String returnedVarName = genSym.generate("returned");
         Stream<Statement> returned = astToJUnitAstVisitor.translateExpr(

@@ -44,6 +44,7 @@ AN_INSTANCE: 'an' Spaces 'instance' -> mode(AFTER_AN_INSTANCE) ;
 AN_INVOCATION_OF_BACK_TICK: 'an' Spaces 'invocation' Spaces 'of' Spaces? '`' -> mode(METHOD_PATTERN) ;
 ON: 'on' ;
 WITH: 'with' ;
+INVOKE_TICK: 'Invoke' Spaces? '`' -> mode (METHOD_PATTERN) ;
 NULL: 'null' ;
 NOTHING: 'nothing' ;
 TRUE: 'true' ;

@@ -37,6 +37,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
+import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -53,6 +54,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.Statement;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
@@ -316,11 +318,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                         .map(letStatement -> visitLetStatement(letStatement))
                         .collect(Collectors.toList());
 
-        List<Execution> executions = ctx.execution()
+        List<Statement> statements = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, letStatements, executions, getSpan(ctx));
+        return new Phase(description, letStatements, statements, getSpan(ctx));
     }
 
     @Override
@@ -328,11 +330,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.execution()
+        List<Statement> statements = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), statements, getSpan(ctx));
     }
 
     @Override
@@ -352,11 +354,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Optional<String> description =
                 ctx.Line() == null ? Optional.empty()
                                                : Optional.of(ctx.Line().getText());
-        List<Execution> executions = ctx.execution()
+        List<Statement> statements = ctx.statement()
                 .stream()
-                .map(this::visitExecution)
+                .map(this::visitStatement)
                 .collect(Collectors.toList());
-        return new Phase(description, Collections.emptyList(), executions, getSpan(ctx));
+        return new Phase(description, Collections.emptyList(), statements, getSpan(ctx));
     }
 
     @Override
@@ -376,12 +378,29 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Statement visitStatement(YokohamaUnitParser.StatementContext ctx) {
+        return (Statement)visitChildren(ctx);
+    }
+
+    @Override
     public Execution visitExecution(YokohamaUnitParser.ExecutionContext ctx) {
         return new Execution(
                 ctx.quotedExpr().stream()
                         .map(quotedExpr -> visitQuotedExpr(quotedExpr))
                         .collect(Collectors.toList()),
                 getSpan(ctx));
+    }
+
+    @Override
+    public Invoke visitInvoke(YokohamaUnitParser.InvokeContext ctx) {
+        ClassType classType = visitClassType(ctx.classType());
+        MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
+        Optional<Expr> receiver = Optional.ofNullable(ctx.quotedExpr())
+                        .map(quotedExpr -> visitQuotedExpr(quotedExpr));
+        List<Expr> args = ctx.argumentExpr().stream()
+                .map(this::visitArgumentExpr)
+                .collect(Collectors.toList());
+        return new Invoke(classType, methodPattern, receiver, args, getSpan(ctx));
     }
 
     @Override

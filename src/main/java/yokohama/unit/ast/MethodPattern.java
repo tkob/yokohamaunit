@@ -2,6 +2,7 @@ package yokohama.unit.ast;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -17,7 +18,8 @@ public class MethodPattern {
     private boolean vararg;
     private Span span;
 
-    public Type getReturnType(ClassType classType, ClassResolver classResolver) {
+    public Optional<Type> getReturnType(
+            ClassType classType, ClassResolver classResolver) {
         Class<?> clazz = classType.toClass(classResolver);
         List<Type> argTypesVarArgErased = vararg
                 ? Lists.mapInitAndLast(paramTypes, Function.identity(),
@@ -29,7 +31,10 @@ public class MethodPattern {
                     argTypesVarArgErased.stream()
                             .map(type -> type.toClass(classResolver))
                             .toArray(n -> new Class[n]));
-            return Type.fromClass(method.getReturnType());
+            Class<?> returnType = method.getReturnType();
+            return returnType.equals(Void.TYPE)
+                    ? Optional.empty()
+                    : Optional.of(Type.fromClass(returnType));
         } catch (NoSuchMethodException e) {
             throw new AstException(e.getMessage(), span, e);
         }
