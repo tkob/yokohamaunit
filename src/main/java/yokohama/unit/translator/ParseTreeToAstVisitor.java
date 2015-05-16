@@ -37,6 +37,7 @@ import yokohama.unit.ast.InstanceOfMatcher;
 import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
+import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.LetBinding;
@@ -377,8 +378,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Execution visitStatement(YokohamaUnitParser.StatementContext ctx) {
-        return (Execution)visitChildren(ctx);
+    public Statement visitStatement(YokohamaUnitParser.StatementContext ctx) {
+        return (Statement)visitChildren(ctx);
     }
 
     @Override
@@ -391,8 +392,15 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Object visitInvoke(YokohamaUnitParser.InvokeContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Invoke visitInvoke(YokohamaUnitParser.InvokeContext ctx) {
+        ClassType classType = visitClassType(ctx.classType());
+        MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
+        Optional<Expr> receiver = Optional.ofNullable(ctx.quotedExpr())
+                        .map(quotedExpr -> visitQuotedExpr(quotedExpr));
+        List<Expr> args = ctx.argumentExpr().stream()
+                .map(this::visitArgumentExpr)
+                .collect(Collectors.toList());
+        return new Invoke(classType, methodPattern, receiver, args, getSpan(ctx));
     }
 
     @Override
