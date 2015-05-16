@@ -1,0 +1,14 @@
+*[ArrayList]: java.util.ArrayList
+*[List]: java.util.List
+
+# Test: Construct an ArrayList using put method
+## Setup
+Let list = `new ArrayList()`.
+
+Do `list.add(1)`.
+
+Invoke `List.add(Object)` on `list` with 2.
+
+## Verify
+
+Assert that `list` is `[1, 2]`.
