@@ -857,11 +857,11 @@ class AstToJUnitAstVisitor {
                         stubExpr.getClassToStub().toType(), classResolver),
                 invocationExpr -> {
                     MethodPattern mp = invocationExpr.getMethodPattern();
-                    return Type.of(
-                                mp.getReturnType(
-                                        invocationExpr.getClassType(),
-                                        classResolver),
-                                classResolver);
+                    return mp.getReturnType(
+                            invocationExpr.getClassType(),
+                            classResolver)
+                            .map(type -> Type.of(type, classResolver))
+                            .get();
                 },
                 integerExpr -> integerExpr.match(
                         intValue -> Type.INT,
