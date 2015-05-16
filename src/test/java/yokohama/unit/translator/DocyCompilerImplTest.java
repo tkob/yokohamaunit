@@ -94,7 +94,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestCodeBlock.docy", new GroovyExpressionStrategyFactory(), 7),
         new Fixture(
-                "GroovyTestInvoke.docy", new GroovyExpressionStrategyFactory(), 1),
+                "GroovyTestInvoke.docy", new GroovyExpressionStrategyFactory(), 2),
     };
 
     @DataPoints
