@@ -63,7 +63,8 @@ statement: execution | invoke ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;
 invoke: INVOKE_TICK classType (DOT | HASH) methodPattern BACK_TICK
             ( ON quotedExpr)?
-            ( WITH argumentExpr (COMMA argumentExpr)* )? ;
+            ( WITH argumentExpr (COMMA argumentExpr)* )?
+            STOP;
 
 tableDef: LBRACKET Anchor RBRACKET header HBAR? rows
         | header HBAR? rows LBRACKET Anchor RBRACKET ;
