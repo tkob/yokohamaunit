@@ -32,6 +32,7 @@ public class MockitoMockStrategy implements MockStrategy {
     private final String name;
     private final String packageName;
     private final GenSym genSym;
+    private final ClassResolver classResolver;
 
     @SneakyThrows(ClassNotFoundException.class)
     private ClassType MOCKITO(ClassResolver classResolver) {
@@ -44,7 +45,7 @@ public class MockitoMockStrategy implements MockStrategy {
     }
 
     @Override
-    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses() {
         return Collections.emptyList();
     }
 
@@ -53,8 +54,7 @@ public class MockitoMockStrategy implements MockStrategy {
             String varName,
             StubExpr stubExpr,
             AstToJUnitAstVisitor astToJUnitAstVisitor,
-            String envVarName,
-            ClassResolver classResolver) {
+            String envVarName) {
         List<StubBehavior> behavior = stubExpr.getBehavior();
 
         /*

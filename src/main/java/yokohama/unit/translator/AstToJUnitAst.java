@@ -169,7 +169,7 @@ class AstToJUnitAstVisitor {
                 new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
         Stream<ClassDecl> auxClasses = Stream.concat(
                 expressionStrategy.auxClasses(classResolver).stream(),
-                mockStrategy.auxClasses(classResolver).stream());
+                mockStrategy.auxClasses().stream());
         List<ClassDecl> classes =
                 Stream.concat(auxClasses, Stream.of(testClass))
                         .collect(Collectors.toList());
@@ -506,8 +506,7 @@ class AstToJUnitAstVisitor {
                             exprVar.getName(),
                             stubExpr,
                             this,
-                            envVarName,
-                            classResolver).stream();
+                            envVarName).stream();
                 },
                 invocationExpr -> {
                     return translateInvocationExpr(
