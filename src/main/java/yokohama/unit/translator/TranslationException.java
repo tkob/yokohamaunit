@@ -23,6 +23,11 @@ public class TranslationException extends RuntimeException {
         this.span = span;
     }
 
+    @Override
+    public String getMessage() {
+        return span.toString() + ": " + super.getMessage();
+    }
+
     public ErrorMessage toErrorMessage() {
         return new ErrorMessage(this.getMessage(), this.span);
     }
