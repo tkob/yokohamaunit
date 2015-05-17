@@ -46,12 +46,12 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     static final ClassType EL_EXCEPTION = new ClassType(ELException.class);
 
     @Override
-    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Statement> env(String varName, ClassResolver classResolver) {
+    public List<Statement> env(String varName) {
         /*
         javax.el.ELProcessor env = new javax.el.ELProcessor();
         env.getELManager().importClass("java.util.ArrayList")

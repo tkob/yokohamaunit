@@ -52,12 +52,12 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Statement> env(String varName, ClassResolver classResolver) {
+    public List<Statement> env(String varName) {
         /*
         importCustomizer = new org.codehaus.groovy.control.customizers.ImportCustomizer()
         importCustomizer.addImport("ArrayList", "java.util.ArrayList")

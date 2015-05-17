@@ -167,7 +167,7 @@ class AstToJUnitAstVisitor {
         ClassDecl testClass =
                 new ClassDecl(true, name, Optional.empty(), Arrays.asList(), methods);
         Stream<ClassDecl> auxClasses = Stream.concat(
-                expressionStrategy.auxClasses(classResolver).stream(),
+                expressionStrategy.auxClasses().stream(),
                 mockStrategy.auxClasses().stream());
         List<ClassDecl> classes =
                 Stream.concat(auxClasses, Stream.of(testClass))
@@ -203,7 +203,7 @@ class AstToJUnitAstVisitor {
                             Optional.empty(),
                             Arrays.asList(ClassType.EXCEPTION),
                             ListUtils.union(
-                                    expressionStrategy.env(env, classResolver),
+                                    expressionStrategy.env(env),
                                     propositions.stream()
                                             .flatMap(proposition ->
                                                     translateProposition(
@@ -225,7 +225,7 @@ class AstToJUnitAstVisitor {
                                         Optional.empty(),
                                         Arrays.asList(ClassType.EXCEPTION),
                                         ListUtils.union(
-                                                expressionStrategy.env(env, classResolver),
+                                                expressionStrategy.env(env),
                                                 ListUtils.union(
                                                         table.get(i),
                                                         propositions
@@ -247,7 +247,7 @@ class AstToJUnitAstVisitor {
                             Optional.empty(),
                             Arrays.asList(ClassType.EXCEPTION),
                             ListUtils.union(
-                                    expressionStrategy.env(env, classResolver),
+                                    expressionStrategy.env(env),
                                     Stream.concat(
                                             bindings.getBindings()
                                                     .stream()
@@ -1031,7 +1031,7 @@ class AstToJUnitAstVisitor {
                 Optional.empty(),
                 Arrays.asList(ClassType.EXCEPTION),
                 ListUtils.union(
-                        expressionStrategy.env(env, classResolver),
+                        expressionStrategy.env(env),
                         actionsAfter.size() > 0
                                 ?  Arrays.asList(
                                         new TryStatement(

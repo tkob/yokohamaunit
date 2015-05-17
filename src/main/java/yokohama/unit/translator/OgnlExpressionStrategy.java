@@ -59,7 +59,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
+    public Collection<ClassDecl> auxClasses() {
         if (classResolver.isEmpty()) return Collections.emptyList();
         /*
         The following interface is implemented:
@@ -182,7 +182,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> env(String varName, ClassResolver classResolver) {
+    public List<Statement> env(String varName) {
         if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(

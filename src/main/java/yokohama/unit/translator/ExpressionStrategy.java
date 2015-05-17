@@ -9,25 +9,22 @@ import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Var;
-import yokohama.unit.util.ClassResolver;
 
 public interface ExpressionStrategy {
     /**
      * Supplies auxiliary classes.
      * 
-     * @param classResolver
      * @return a collection of auxiliary classes
      */
-    Collection<ClassDecl> auxClasses(ClassResolver classResolver);
+    Collection<ClassDecl> auxClasses();
 
     /**
      * Introduces a new environment.
      * 
      * @param varName       a variable name to be bound to the new environment
-     * @param classResolver
      * @return statements that introduce a new environment
      */
-    List<Statement> env(String varName, ClassResolver classResolver);
+    List<Statement> env(String varName);
 
     /**
      * Bind a variable in the expression language to a value
