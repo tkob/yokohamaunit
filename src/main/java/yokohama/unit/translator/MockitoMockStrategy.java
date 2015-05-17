@@ -34,14 +34,15 @@ public class MockitoMockStrategy implements MockStrategy {
     private final GenSym genSym;
     private final ClassResolver classResolver;
 
-    @SneakyThrows(ClassNotFoundException.class)
-    private ClassType MOCKITO(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("org.mockito.Mockito"));
-    }
+    static final String MOCKITO = "org.mockito.Mockito";
+    static final String ONGOING_STUBBING = "org.mockito.stubbing.OngoingStubbing";
 
     @SneakyThrows(ClassNotFoundException.class)
-    private ClassType ONGOING_STUBBING(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("org.mockito.stubbing.OngoingStubbing"));
+    ClassType classTypeOf(String name) {
+        return new ClassType(classResolver.lookup(name));
+    }
+    Type typeOf(String name) {
+        return classTypeOf(name).toType();
     }
 
     @Override
@@ -84,7 +85,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         new ClassLitExpr(clazz), classToStub.getSpan()),
                 new VarInitStatement(clazz, varName,
                         new InvokeStaticExpr(
-                                MOCKITO(classResolver),
+                                classTypeOf(MOCKITO),
                                 Arrays.asList(clazz),
                                 "mock",
                                 Arrays.asList(Type.CLASS),
@@ -151,7 +152,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                     Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray(),
                                     varArg,
                                     new InvokeStaticExpr(
-                                            MOCKITO(classResolver),
+                                            classTypeOf(MOCKITO),
                                             Arrays.asList(
                                                     Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray()),
                                             "anyVararg",
@@ -206,24 +207,24 @@ public class MockitoMockStrategy implements MockStrategy {
         String __ = genSym.generate("__");
         Stream<Statement> whenReturn = Stream.of(
                 new VarInitStatement(
-                        ONGOING_STUBBING(classResolver).toType(),
+                        typeOf(ONGOING_STUBBING),
                         stubbingVarName,
                         new InvokeStaticExpr(
-                                MOCKITO(classResolver),
+                                classTypeOf(MOCKITO),
                                 Arrays.asList(),
                                 "when",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(invokeVarName)),
-                                ONGOING_STUBBING(classResolver).toType()),
+                                typeOf(ONGOING_STUBBING)),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
-                                ONGOING_STUBBING(classResolver),
+                                classTypeOf(ONGOING_STUBBING),
                                 new Var(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
                                 Arrays.asList(new Var(returnedVarName)),
-                                ONGOING_STUBBING(classResolver).toType()),
+                                typeOf(ONGOING_STUBBING)),
                         span));
 
         return Stream.concat(returned,
@@ -245,7 +246,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.BOOLEAN, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyBoolean",
                                                         Arrays.asList(),
@@ -256,7 +257,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.BYTE, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyByte",
                                                         Arrays.asList(),
@@ -267,7 +268,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.SHORT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyShort",
                                                         Arrays.asList(),
@@ -278,7 +279,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.INT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyInt",
                                                         Arrays.asList(),
@@ -289,7 +290,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.LONG, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyLong",
                                                         Arrays.asList(),
@@ -300,7 +301,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.CHAR, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyChar",
                                                         Arrays.asList(),
@@ -311,7 +312,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.FLOAT, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyFloat",
                                                         Arrays.asList(),
@@ -322,7 +323,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 return Stream.<Statement>of(
                                         new VarInitStatement(Type.DOUBLE, argVarName,
                                                 new InvokeStaticExpr(
-                                                        MOCKITO(classResolver),
+                                                        classTypeOf(MOCKITO),
                                                         Arrays.asList(),
                                                         "anyDouble",
                                                         Arrays.asList(),
@@ -350,7 +351,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
                                 new VarInitStatement(type, argVarName,
                                         new InvokeStaticExpr(
-                                                MOCKITO(classResolver),
+                                                classTypeOf(MOCKITO),
                                                 Arrays.asList(type),
                                                 "isA",
                                                 Arrays.asList(Type.CLASS),
@@ -368,7 +369,7 @@ public class MockitoMockStrategy implements MockStrategy {
                             new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
                             new VarInitStatement(type, argVarName,
                                     new InvokeStaticExpr(
-                                            MOCKITO(classResolver),
+                                            classTypeOf(MOCKITO),
                                             Arrays.asList(type),
                                             "isA",
                                             Arrays.asList(Type.CLASS),

@@ -45,24 +45,17 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     static final ClassType MAP = new ClassType(Map.class);
 
-    @SneakyThrows(ClassNotFoundException.class)
-    private ClassType OGNL(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("ognl.Ognl"));
-    }
+    static final String OGNL = "ognl.Ognl";
+    static final String OGNL_CONTEXT = "ognl.OgnlContext";
+    static final String OGNL_EXCEPTION = "ognl.OgnlException";
+    static final String CLASS_RESOLVER = "ognl.ClassResolver";
 
     @SneakyThrows(ClassNotFoundException.class)
-    private ClassType OGNL_CONTEXT(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("ognl.OgnlContext"));
+    ClassType classTypeOf(String name) {
+        return new ClassType(classResolver.lookup(name));
     }
-
-    @SneakyThrows(ClassNotFoundException.class)
-    private ClassType OGNL_EXCEPTION(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("ognl.OgnlException"));
-    }
-
-    @SneakyThrows(ClassNotFoundException.class)
-    private ClassType CLASS_RESOLVER(ClassResolver classResolver) {
-        return new ClassType(classResolver.lookup("ognl.ClassResolver"));
+    Type typeOf(String name) {
+        return classTypeOf(name).toType();
     }
 
     @Override
@@ -183,7 +176,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 false,
                 name + "$ClassResolver",
                 Optional.empty(),
-                Arrays.asList(CLASS_RESOLVER(classResolver)),
+                Arrays.asList(classTypeOf(CLASS_RESOLVER)),
                 Arrays.asList(method));
         return Arrays.asList(classResolverClass);
     }
@@ -193,7 +186,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(
-                            OGNL_CONTEXT(classResolver).toType(),
+                            typeOf(OGNL_CONTEXT),
                             varName,
                             new NewExpr(
                                     "ognl.OgnlContext",
@@ -210,7 +203,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                             new NullExpr(),
                             Span.dummySpan()),
                     new VarInitStatement(
-                            CLASS_RESOLVER(classResolver).toType(),
+                            typeOf(CLASS_RESOLVER),
                             classResolverVar.getName(),
                             new NewExpr(
                                     packageName.equals("")
@@ -220,15 +213,15 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Arrays.asList()),
                             Span.dummySpan()),
                     new VarInitStatement(
-                            OGNL_CONTEXT(classResolver).toType(),
+                            typeOf(OGNL_CONTEXT),
                             varName,
                             new InvokeStaticExpr(
-                                    OGNL(classResolver),
+                                    classTypeOf(OGNL),
                                     Arrays.asList(),
                                     "createDefaultContext",
                                     Arrays.asList(
                                             Type.OBJECT,
-                                            CLASS_RESOLVER(classResolver).toType()),
+                                            typeOf(CLASS_RESOLVER)),
                                     Arrays.asList(
                                             rootVar,
                                             classResolverVar),
@@ -249,7 +242,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.OBJECT,
                         genSym.generate("__"),
                         new InvokeExpr(
-                                OGNL_CONTEXT(classResolver),
+                                classTypeOf(OGNL_CONTEXT),
                                 new Var(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
@@ -265,14 +258,14 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         Var nullValueVar = new Var(genSym.generate("nullValue"));
         Var condVar = new Var(genSym.generate("cond"));
         return Optional.of(new CatchClause(
-                OGNL_EXCEPTION(classResolver),
+                classTypeOf(OGNL_EXCEPTION),
                 caughtVar,
                 Arrays.asList(
                         new VarInitStatement(
                                 Type.THROWABLE,
                                 reasonVar.getName(),
                                 new InvokeExpr(
-                                        OGNL_EXCEPTION(classResolver),
+                                        classTypeOf(OGNL_EXCEPTION),
                                         caughtVar,
                                         "getReason",
                                         Arrays.asList(),
@@ -318,7 +311,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeStaticExpr(
-                                OGNL(classResolver),
+                                classTypeOf(OGNL),
                                 Arrays.asList(),
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
