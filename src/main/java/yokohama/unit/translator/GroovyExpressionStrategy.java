@@ -36,6 +36,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     private final String name;
     private final String packageName;
     private final GenSym genSym;
+    private final ClassResolver classResolver;
 
     static final Type COMPILATION_CUSTOMIZER =
             new Type(new ClassType(CompilationCustomizer.class), 0);

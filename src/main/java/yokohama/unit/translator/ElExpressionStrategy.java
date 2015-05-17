@@ -39,6 +39,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     private final String name;
     private final String packageName;
     private final GenSym genSym;
+    private final ClassResolver classResolver;
 
     static final ClassType EL_PROCESSOR = new ClassType(ELProcessor.class);
     static final ClassType EL_MANAGER = new ClassType(ELManager.class);

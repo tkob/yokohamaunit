@@ -52,7 +52,7 @@ public class AstToJUnitAstTest {
         Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.position.Span.dummySpan());
         String packageName = "com.example";
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(name, packageName, genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
+        AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(name, packageName, genSym, new ClassResolver()), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
         CompilationUnit actual = instance.translate(group);
         CompilationUnit expected = new CompilationUnit(packageName, Arrays.asList(new ClassDecl(true, name, Optional.empty(), Arrays.asList(), Arrays.asList())));
         assertThat(actual, is(expected));
@@ -66,7 +66,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym),
                         genSym,
                         new ClassResolver(),
@@ -89,7 +89,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym),
                         genSym,
                         new ClassResolver(),
@@ -126,7 +126,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym),
                         genSym,
                         new ClassResolver(),
@@ -189,7 +189,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym),
                         genSym,
                         new ClassResolver(),
@@ -262,7 +262,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym),
                         genSym,
                         new ClassResolver(),

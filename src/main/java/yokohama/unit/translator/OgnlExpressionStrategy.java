@@ -43,6 +43,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     private final String name;
     private final String packageName;
     private final GenSym genSym;
+    private final ClassResolver classResolver;
 
     static final ClassType OGNL = new ClassType(Ognl.class);
     static final ClassType OGNL_CONTEXT = new ClassType(OgnlContext.class);
