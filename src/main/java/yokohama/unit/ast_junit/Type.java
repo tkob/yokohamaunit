@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import yokohama.unit.ast.Kind;
-import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 
 @Value
@@ -19,7 +18,6 @@ public class Type {
     public static final Type THROWABLE = new Type(new ClassType(Throwable.class), 0);
     public static final Type CLASS = new Type(new ClassType(Class.class), 0);
     public static final Type STRING = new Type(new ClassType(String.class), 0);
-    public static final Type MATCHER = new Type(new ClassType(org.hamcrest.Matcher.class), 0);
     public static final Type MAP = new Type(new ClassType(java.util.Map.class), 0);
 
     public static final Type BOOLEAN = new Type(new PrimitiveType(Kind.BOOLEAN), 0);

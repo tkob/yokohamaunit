@@ -1,6 +1,5 @@
 package yokohama.unit.translator;
 
-import groovy.lang.GroovyShell;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,9 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.customizers.CompilationCustomizer;
-import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import lombok.SneakyThrows;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.ArrayExpr;
@@ -38,13 +35,30 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     private final GenSym genSym;
     private final ClassResolver classResolver;
 
-    static final Type COMPILATION_CUSTOMIZER =
-            new Type(new ClassType(CompilationCustomizer.class), 0);
-    static final ClassType IMPORT_CUSTOMIZER =
-            new ClassType(ImportCustomizer.class);
-    static final ClassType COMPILER_CONFIGURATION =
-            new ClassType(CompilerConfiguration.class);
-    static final ClassType GROOVY_SHELL = new ClassType(GroovyShell.class);
+    @SneakyThrows(ClassNotFoundException.class)
+    private Type COMPILATION_CUSTOMIZER(ClassResolver classResolver) {
+        return new Type(
+                new ClassType(classResolver.lookup(
+                        "org.codehaus.groovy.control.customizers.CompilationCustomizer")),
+                0);
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType IMPORT_CUSTOMIZER(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup(
+                "org.codehaus.groovy.control.customizers.ImportCustomizer"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType COMPILER_CONFIGURATION(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup(
+                "org.codehaus.groovy.control.CompilerConfiguration"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType GROOVY_SHELL(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup("groovy.lang.GroovyShell"));
+    }
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -65,7 +79,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         Var importCustomizerVar = new Var(genSym.generate("importCustomizer"));
         Stream<Statement> importCustomizer = Stream.of(
                 new VarInitStatement(
-                        IMPORT_CUSTOMIZER.toType(),
+                        IMPORT_CUSTOMIZER(classResolver).toType(),
                         importCustomizerVar.getName(),
                         new NewExpr(
                                 "org.codehaus.groovy.control.customizers.ImportCustomizer",
@@ -89,15 +103,15 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                     new StrLitExpr(longName),
                                     Span.dummySpan()),
                             new VarInitStatement(
-                                    IMPORT_CUSTOMIZER.toType(),
+                                    IMPORT_CUSTOMIZER(classResolver).toType(),
                                     __.getName(),
                                     new InvokeExpr(
-                                            IMPORT_CUSTOMIZER,
+                                            IMPORT_CUSTOMIZER(classResolver),
                                             importCustomizerVar,
                                             "addImport",
                                             Arrays.asList(Type.STRING, Type.STRING),
                                             Arrays.asList(shortNameVar, longNameVar),
-                                            IMPORT_CUSTOMIZER.toType()),
+                                            IMPORT_CUSTOMIZER(classResolver).toType()),
                                     Span.dummySpan()));
                 });
 
@@ -106,7 +120,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         Var __ = new Var(genSym.generate("__"));
         Stream<Statement> configuration = Stream.of(
                 new VarInitStatement(
-                        COMPILER_CONFIGURATION.toType(),
+                        COMPILER_CONFIGURATION(classResolver).toType(),
                         configurationVar.getName(),
                         new NewExpr(
                                 "org.codehaus.groovy.control.CompilerConfiguration",
@@ -114,31 +128,31 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Collections.emptyList()),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        COMPILATION_CUSTOMIZER.toArray(),
+                        COMPILATION_CUSTOMIZER(classResolver).toArray(),
                         customizersVar.getName(),
                         new ArrayExpr(
-                                COMPILATION_CUSTOMIZER.toArray(),
+                                COMPILATION_CUSTOMIZER(classResolver).toArray(),
                                 Arrays.asList(importCustomizerVar)),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        COMPILER_CONFIGURATION.toType(),
+                        COMPILER_CONFIGURATION(classResolver).toType(),
                         __.getName(),
                         new InvokeExpr(
-                                COMPILER_CONFIGURATION,
+                                COMPILER_CONFIGURATION(classResolver),
                                 configurationVar,
                                 "addCompilationCustomizers",
-                                Arrays.asList(COMPILATION_CUSTOMIZER.toArray()),
+                                Arrays.asList(COMPILATION_CUSTOMIZER(classResolver).toArray()),
                                 Arrays.asList(customizersVar),
-                                COMPILER_CONFIGURATION.toType()),
+                                COMPILER_CONFIGURATION(classResolver).toType()),
                         Span.dummySpan()));
 
         Stream<Statement> groovyShell = Stream.of(
                 new VarInitStatement(
-                        GROOVY_SHELL.toType(),
+                        GROOVY_SHELL(classResolver).toType(),
                         varName,
                         new NewExpr(
                                 "groovy.lang.GroovyShell",
-                                Arrays.asList(COMPILER_CONFIGURATION.toType()),
+                                Arrays.asList(COMPILER_CONFIGURATION(classResolver).toType()),
                                 Arrays.asList(configurationVar)),
                         Span.dummySpan()));
 
@@ -160,7 +174,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                         new StrLitExpr(ident.getName()),
                         ident.getSpan()),
                 new InvokeVoidStatement(
-                        GROOVY_SHELL,
+                        GROOVY_SHELL(classResolver),
                         new Var(envVarName),
                         "setVariable",
                         Arrays.asList(Type.STRING, Type.OBJECT),
@@ -186,7 +200,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                         new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
-                                GROOVY_SHELL,
+                                GROOVY_SHELL(classResolver),
                                 new Var(envVarName),
                                 "evaluate",
                                 Arrays.asList(Type.STRING),

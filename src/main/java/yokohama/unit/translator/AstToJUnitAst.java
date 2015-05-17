@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -135,6 +136,22 @@ class AstToJUnitAstVisitor {
     final List<Table> tables;
     final Map<String, CodeBlock> codeBlockMap;
 
+    @SneakyThrows(ClassNotFoundException.class)
+    private Type MATCHER() {
+        return new Type(
+                new ClassType(classResolver.lookup("org.hamcrest.Matcher")), 0);
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType CORE_MATCHERS() {
+        return new ClassType(classResolver.lookup("org.hamcrest.CoreMatchers"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private Annotation TEST() {
+        return new Annotation(new ClassType(classResolver.lookup("org.junit.Test")));
+    }
+
     CompilationUnit translateGroup(Group group) {
         List<Definition> definitions = group.getDefinitions();
         List<Method> methods =
@@ -181,7 +198,7 @@ class AstToJUnitAstVisitor {
                 () -> {
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
-                            Arrays.asList(Annotation.TEST),
+                            Arrays.asList(TEST()),
                             methodName,
                             Arrays.asList(),
                             Optional.empty(),
@@ -203,7 +220,7 @@ class AstToJUnitAstVisitor {
                             .mapToObj(Integer::new)
                             .map(i -> {
                                 return new Method(
-                                        Arrays.asList(Annotation.TEST),
+                                        Arrays.asList(TEST()),
                                         methodName + "_" + (i + 1),
                                         Arrays.asList(),
                                         Optional.empty(),
@@ -225,7 +242,7 @@ class AstToJUnitAstVisitor {
                 bindings -> {
                     String env = genSym.generate("env");
                     return Arrays.asList(new Method(
-                            Arrays.asList(Annotation.TEST),
+                            Arrays.asList(TEST()),
                             methodName,
                             Arrays.asList(),
                             Optional.empty(),
@@ -292,15 +309,15 @@ class AstToJUnitAstVisitor {
                                             actual,
                                             envVarName),
                                     Stream.of(new VarInitStatement(
-                                            Type.MATCHER,
+                                            MATCHER(),
                                             expected,
                                             new InvokeStaticExpr(
-                                                    ClassType.CORE_MATCHERS,
+                                                    CORE_MATCHERS(),
                                                     Arrays.asList(),
                                                     "not",
-                                                    Arrays.asList(Type.MATCHER),
+                                                    Arrays.asList(MATCHER()),
                                                     Arrays.asList(new Var(unexpected)),
-                                                    Type.MATCHER),
+                                                    MATCHER()),
                                             predicate.getSpan()))));
                 },
                 throwsPredicate -> {
@@ -398,14 +415,14 @@ class AstToJUnitAstVisitor {
                                 Object.class,
                                 envVarName),
                         Stream.of(new VarInitStatement(
-                                Type.MATCHER,
+                                MATCHER(),
                                 varName,
                                 new EqualToMatcherExpr(objVar),
                                 equalTo.getSpan())));
             },
             (InstanceOfMatcher instanceOf) -> {
                 return Stream.of(new VarInitStatement(
-                        Type.MATCHER,
+                        MATCHER(),
                         varName,
                         new InstanceOfMatcherExpr(
                                 lookupClassName(
@@ -422,7 +439,7 @@ class AstToJUnitAstVisitor {
                 String instanceOfVarName = genSym.generate("instanceOfMatcher");
                 Stream<Statement> instanceOfStatements = Stream.of(
                         new VarInitStatement(
-                                Type.MATCHER,
+                                MATCHER(),
                                 instanceOfVarName,
                                 new InstanceOfMatcherExpr(
                                         lookupClassName(
@@ -452,7 +469,7 @@ class AstToJUnitAstVisitor {
             (NullValueMatcher nullValue) -> {
                 return Stream.of(
                         new VarInitStatement(
-                                Type.MATCHER,
+                                MATCHER(),
                                 varName,
                                 new NullValueMatcherExpr(),
                                 nullValue.getSpan()));
@@ -1010,7 +1027,7 @@ class AstToJUnitAstVisitor {
         }
 
         return Arrays.asList(new Method(
-                Arrays.asList(Annotation.TEST),
+                Arrays.asList(TEST()),
                 testName,
                 Arrays.asList(),
                 Optional.empty(),

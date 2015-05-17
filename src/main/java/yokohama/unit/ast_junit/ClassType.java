@@ -7,10 +7,6 @@ import yokohama.unit.util.ClassResolver;
 public class ClassType implements NonArrayType {
     private Class<?> clazz;
 
-    public static final ClassType TEST = new ClassType(org.junit.Test.class);
-    public static final ClassType CORE_MATCHERS =
-            new ClassType(org.hamcrest.CoreMatchers.class);
-
     public static final ClassType STRING = new ClassType(String.class);
     public static final ClassType THROWABLE = new ClassType(Throwable.class);
     public static final ClassType EXCEPTION = new ClassType(Exception.class);

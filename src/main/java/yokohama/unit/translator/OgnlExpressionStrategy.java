@@ -9,9 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.OgnlException;
+import lombok.SneakyThrows;
 import yokohama.unit.ast.Ident;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.position.Span;
@@ -45,11 +43,27 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
     private final GenSym genSym;
     private final ClassResolver classResolver;
 
-    static final ClassType OGNL = new ClassType(Ognl.class);
-    static final ClassType OGNL_CONTEXT = new ClassType(OgnlContext.class);
-    static final ClassType OGNL_EXCEPTION = new ClassType(OgnlException.class);
-    static final ClassType CLASS_RESOLVER = new ClassType(ognl.ClassResolver.class);
     static final ClassType MAP = new ClassType(Map.class);
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType OGNL(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup("ognl.Ognl"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType OGNL_CONTEXT(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup("ognl.OgnlContext"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType OGNL_EXCEPTION(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup("ognl.OgnlException"));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    private ClassType CLASS_RESOLVER(ClassResolver classResolver) {
+        return new ClassType(classResolver.lookup("ognl.ClassResolver"));
+    }
 
     @Override
     public Collection<ClassDecl> auxClasses(ClassResolver classResolver) {
@@ -169,7 +183,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 false,
                 name + "$ClassResolver",
                 Optional.empty(),
-                Arrays.asList(CLASS_RESOLVER),
+                Arrays.asList(CLASS_RESOLVER(classResolver)),
                 Arrays.asList(method));
         return Arrays.asList(classResolverClass);
     }
@@ -179,7 +193,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         if (classResolver.isEmpty()) {
             return Arrays.asList(
                     new VarInitStatement(
-                            OGNL_CONTEXT.toType(),
+                            OGNL_CONTEXT(classResolver).toType(),
                             varName,
                             new NewExpr(
                                     "ognl.OgnlContext",
@@ -196,7 +210,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                             new NullExpr(),
                             Span.dummySpan()),
                     new VarInitStatement(
-                            CLASS_RESOLVER.toType(),
+                            CLASS_RESOLVER(classResolver).toType(),
                             classResolverVar.getName(),
                             new NewExpr(
                                     packageName.equals("")
@@ -206,15 +220,15 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Arrays.asList()),
                             Span.dummySpan()),
                     new VarInitStatement(
-                            OGNL_CONTEXT.toType(),
+                            OGNL_CONTEXT(classResolver).toType(),
                             varName,
                             new InvokeStaticExpr(
-                                    OGNL,
+                                    OGNL(classResolver),
                                     Arrays.asList(),
                                     "createDefaultContext",
                                     Arrays.asList(
                                             Type.OBJECT,
-                                            CLASS_RESOLVER.toType()),
+                                            CLASS_RESOLVER(classResolver).toType()),
                                     Arrays.asList(
                                             rootVar,
                                             classResolverVar),
@@ -235,7 +249,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         Type.OBJECT,
                         genSym.generate("__"),
                         new InvokeExpr(
-                                OGNL_CONTEXT,
+                                OGNL_CONTEXT(classResolver),
                                 new Var(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
@@ -251,14 +265,14 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
         Var nullValueVar = new Var(genSym.generate("nullValue"));
         Var condVar = new Var(genSym.generate("cond"));
         return Optional.of(new CatchClause(
-                OGNL_EXCEPTION,
+                OGNL_EXCEPTION(classResolver),
                 caughtVar,
                 Arrays.asList(
                         new VarInitStatement(
                                 Type.THROWABLE,
                                 reasonVar.getName(),
                                 new InvokeExpr(
-                                        OGNL_EXCEPTION,
+                                        OGNL_EXCEPTION(classResolver),
                                         caughtVar,
                                         "getReason",
                                         Arrays.asList(),
@@ -304,7 +318,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeStaticExpr(
-                                new ClassType(ognl.Ognl.class),
+                                OGNL(classResolver),
                                 Arrays.asList(),
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),

@@ -10,11 +10,14 @@ import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
 
 public class MethodTest {
+    public static final Annotation TEST =
+            new Annotation(new ClassType(org.junit.Test.class));
+
     @Test
     public void testToString_SBuilder() {
         SBuilder actual = new SBuilder(4);
         Method instance = new Method(
-                Arrays.asList(Annotation.TEST),
+                Arrays.asList(TEST),
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
@@ -34,7 +37,7 @@ public class MethodTest {
     public void testToString_SBuilder1() {
         SBuilder actual = new SBuilder(4);
         Method instance = new Method(
-                Arrays.asList(Annotation.TEST),
+                Arrays.asList(TEST),
                 "test",
                 Arrays.asList(),
                 Optional.empty(),
