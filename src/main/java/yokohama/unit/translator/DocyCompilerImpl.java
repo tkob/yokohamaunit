@@ -120,9 +120,11 @@ public class DocyCompilerImpl implements DocyCompiler {
         try {
             GenSym genSym = new GenSym();
             ExpressionStrategy expressionStrategy =
-                    expressionStrategyFactory.create(name, packageName, genSym);
+                    expressionStrategyFactory.create(
+                            name, packageName, genSym, classResolver);
             MockStrategy mockStrategy =
-                    mockStrategyFactory.create(name, packageName, genSym);
+                    mockStrategyFactory.create(
+                            name, packageName, genSym, classResolver);
             junit = astToJUnitAstFactory.create(name,
                     packageName,
                     expressionStrategy,

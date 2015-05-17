@@ -11,10 +11,9 @@ public interface MockStrategy {
     /**
      * Supplies auxiliary classes.
      * 
-     * @param classResolver
      * @return a collection of auxiliary classes
      */
-    Collection<ClassDecl> auxClasses(ClassResolver classResolver);
+    Collection<ClassDecl> auxClasses();
 
     /**
      * Create a stub.
@@ -23,13 +22,11 @@ public interface MockStrategy {
      * @param stubExpr           a stub expression
      * @param astToJUnitAstVisitor 
      * @param envVarName         a variable name bound to the environment
-     * @param classResolver
      * @return statements that bind the variable name to the stub
      */
     List<Statement> stub(
             String varName,
             StubExpr stubExpr,
             AstToJUnitAstVisitor astToJUnitAstVisitor,
-            String envVarName,
-            ClassResolver classResolver);
+            String envVarName);
 }

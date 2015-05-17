@@ -45,6 +45,8 @@ import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 
 public class AstToJUnitAstTest {
+    static final Type MATCHER = new Type(new ClassType(org.hamcrest.Matcher.class), 0);
+    static final Annotation TEST = new Annotation(new ClassType(org.junit.Test.class));
 
     @Test
     public void testTranslate() {
@@ -52,7 +54,7 @@ public class AstToJUnitAstTest {
         Group group = new Group(Arrays.asList(), Arrays.asList(), yokohama.unit.position.Span.dummySpan());
         String packageName = "com.example";
         GenSym genSym = new GenSym();
-        AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(name, packageName, genSym), new MockitoMockStrategy("Name", "com.example", genSym), genSym, new ClassResolver(), new TableExtractVisitor());
+        AstToJUnitAst instance = new AstToJUnitAst(name, packageName, new OgnlExpressionStrategy(name, packageName, genSym, new ClassResolver()), new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()), genSym, new ClassResolver(), new TableExtractVisitor());
         CompilationUnit actual = instance.translate(group);
         CompilationUnit expected = new CompilationUnit(packageName, Arrays.asList(new ClassDecl(true, name, Optional.empty(), Arrays.asList(), Arrays.asList())));
         assertThat(actual, is(expected));
@@ -66,8 +68,8 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
-                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
@@ -89,22 +91,22 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
-                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
                         Collections.emptyMap());
         List<Method> actual = instance.translateAssertion(assertion, 0, testName);
         List<Method> expected = Arrays.asList(new Method(
-                Arrays.asList(Annotation.TEST),
+                Arrays.asList(TEST),
                 "test_0",
                 Arrays.asList(),
                 Optional.empty(),
                 Arrays.asList(new ClassType(java.lang.Exception.class)),
                 Arrays.asList(
                         new VarInitStatement(
-                                OgnlExpressionStrategy.OGNL_CONTEXT.toType(),
+                                new ClassType(ognl.OgnlContext.class).toType(),
                                 "env",
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()))));
@@ -126,8 +128,8 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
-                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
@@ -167,7 +169,7 @@ public class AstToJUnitAstTest {
                         Type.OBJECT, "obj", new VarExpr("expr2"), Span.dummySpan()),
                 // is `b`
                 new VarInitStatement(
-                        Type.MATCHER, "expected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
+                        MATCHER, "expected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
                 // `a` is `b`
                 new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
@@ -189,8 +191,8 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
-                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
@@ -230,17 +232,17 @@ public class AstToJUnitAstTest {
                         Type.OBJECT, "obj", new VarExpr("expr2"), Span.dummySpan()),
                 // is not `b`
                 new VarInitStatement(
-                        Type.MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
+                        MATCHER, "unexpected", new EqualToMatcherExpr(new Var("obj")), Span.dummySpan()),
                 new VarInitStatement(
-                        Type.MATCHER,
+                        MATCHER,
                         "expected",
                         new InvokeStaticExpr(
                                 new ClassType(org.hamcrest.CoreMatchers.class),
                                 Arrays.asList(),
                                 "not",
-                                Arrays.asList(Type.MATCHER),
+                                Arrays.asList(MATCHER),
                                 Arrays.asList(new Var("unexpected")),
-                                Type.MATCHER),
+                                MATCHER),
                         Span.dummySpan()),
                 // `a` is not `b`
                 new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
@@ -262,8 +264,8 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "C",
                         "p",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym),
-                        new MockitoMockStrategy("Name", "com.example", genSym),
+                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
@@ -297,7 +299,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE,
                                                         "reason",
                                                         new InvokeExpr(
-                                                                OgnlExpressionStrategy.OGNL_EXCEPTION,
+                                                                new ClassType(ognl.OgnlException.class),
                                                                 new Var("ex2"),
                                                                 "getReason",
                                                                 Arrays.asList(),
@@ -336,7 +338,7 @@ public class AstToJUnitAstTest {
                                                         Type.THROWABLE, "actual", new VarExpr("ex"), Span.dummySpan())))
                         ),
                         Arrays.asList()),
-                new VarInitStatement(Type.MATCHER, "expected", new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
+                new VarInitStatement(MATCHER, "expected", new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
                 new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }
