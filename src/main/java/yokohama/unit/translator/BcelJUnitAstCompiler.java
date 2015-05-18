@@ -379,10 +379,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             ConstantPoolGen cp) {
         InstructionHandle ih = il.append(InstructionFactory.NOP);
         addLineNumber(mg, ih, varInitStatement.getSpan());
-        LocalVariableGen var = locals.get(varInitStatement.getName());
+        LocalVariableGen var = locals.get(varInitStatement.getVar().getName());
         Type type = typeOf(varInitStatement.getType());
         Type fromType = varInitStatement.getValue().<Type>accept(varExpr -> {
-                LocalVariableGen from = locals.get(varExpr.getName());
+                LocalVariableGen from = locals.get(varExpr.getVar().getName());
                 il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
                 return from.getType();
             },

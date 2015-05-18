@@ -107,7 +107,7 @@ public class AstToJUnitAstTest {
                 Arrays.asList(
                         new VarInitStatement(
                                 new ClassType(ognl.OgnlContext.class).toType(),
-                                "env",
+                                Sym.of("env"),
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()))));
         assertThat(actual, is(expected));
@@ -135,11 +135,11 @@ public class AstToJUnitAstTest {
                         Collections.emptyList(),
                         Collections.emptyMap());
         List<Statement> actual =
-                instance.translateProposition(proposition, "env")
+                instance.translateProposition(proposition, Sym.of("env"))
                         .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(// `a`
-                new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
+                new VarInitStatement(Type.STRING, Sym.of("expression"), new StrLitExpr("a"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("expr"), new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
@@ -149,10 +149,10 @@ public class AstToJUnitAstTest {
                                 Sym.of("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "actual", new VarExpr("expr"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("actual"), new VarExpr(Sym.of("expr")), Span.dummySpan()),
                 // `b`
-                new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "expr2", new InvokeStaticExpr(
+                new VarInitStatement(Type.STRING, Sym.of("expression2"), new StrLitExpr("b"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("expr2"), new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
@@ -163,10 +163,10 @@ public class AstToJUnitAstTest {
                         Type.OBJECT),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        Type.OBJECT, "obj", new VarExpr("expr2"), Span.dummySpan()),
+                        Type.OBJECT, Sym.of("obj"), new VarExpr(Sym.of("expr2")), Span.dummySpan()),
                 // is `b`
                 new VarInitStatement(
-                        MATCHER, "expected", new EqualToMatcherExpr(Sym.of("obj")), Span.dummySpan()),
+                        MATCHER, Sym.of("expected"), new EqualToMatcherExpr(Sym.of("obj")), Span.dummySpan()),
                 // `a` is `b`
                 new IsStatement(Sym.of("actual"), Sym.of("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
@@ -195,11 +195,11 @@ public class AstToJUnitAstTest {
                         Collections.emptyList(),
                         Collections.emptyMap());
         List<Statement> actual =
-                instance.translateProposition(proposition, "env")
+                instance.translateProposition(proposition, Sym.of("env"))
                         .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(// `a`
-                new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
+                new VarInitStatement(Type.STRING, Sym.of("expression"), new StrLitExpr("a"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("expr"), new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
@@ -209,10 +209,10 @@ public class AstToJUnitAstTest {
                                 Sym.of("env")),
                         Type.OBJECT),
                         Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "actual", new VarExpr("expr"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("actual"), new VarExpr(Sym.of("expr")), Span.dummySpan()),
                 // `b`
-                new VarInitStatement(Type.STRING, "expression2", new StrLitExpr("b"), Span.dummySpan()),
-                new VarInitStatement(Type.OBJECT, "expr2", new InvokeStaticExpr(
+                new VarInitStatement(Type.STRING, Sym.of("expression2"), new StrLitExpr("b"), Span.dummySpan()),
+                new VarInitStatement(Type.OBJECT, Sym.of("expr2"), new InvokeStaticExpr(
                         new ClassType(ognl.Ognl.class),
                         Arrays.asList(),
                         "getValue",
@@ -223,13 +223,13 @@ public class AstToJUnitAstTest {
                         Type.OBJECT),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        Type.OBJECT, "obj", new VarExpr("expr2"), Span.dummySpan()),
+                        Type.OBJECT, Sym.of("obj"), new VarExpr(Sym.of("expr2")), Span.dummySpan()),
                 // is not `b`
                 new VarInitStatement(
-                        MATCHER, "unexpected", new EqualToMatcherExpr(Sym.of("obj")), Span.dummySpan()),
+                        MATCHER, Sym.of("unexpected"), new EqualToMatcherExpr(Sym.of("obj")), Span.dummySpan()),
                 new VarInitStatement(
                         MATCHER,
-                        "expected",
+                        Sym.of("expected"),
                         new InvokeStaticExpr(
                                 new ClassType(org.hamcrest.CoreMatchers.class),
                                 Arrays.asList(),
@@ -265,11 +265,11 @@ public class AstToJUnitAstTest {
                         Collections.emptyList(),
                         Collections.emptyMap());
         List<Statement> actual =
-                instance.translateProposition(proposition, "env")
+                instance.translateProposition(proposition, Sym.of("env"))
                         .collect(Collectors.toList());
         List<Statement> expected = Arrays.asList(new TryStatement(
-                        Arrays.asList(new VarInitStatement(Type.STRING, "expression", new StrLitExpr("a"), Span.dummySpan()),
-                                new VarInitStatement(Type.OBJECT, "expr", new InvokeStaticExpr(
+                        Arrays.asList(new VarInitStatement(Type.STRING, Sym.of("expression"), new StrLitExpr("a"), Span.dummySpan()),
+                                new VarInitStatement(Type.OBJECT, Sym.of("expr"), new InvokeStaticExpr(
                                         new ClassType(ognl.Ognl.class),
                                         Arrays.asList(),
                                         "getValue",
@@ -279,14 +279,14 @@ public class AstToJUnitAstTest {
                                                 Sym.of("env")),
                                         Type.OBJECT),
                                         Span.dummySpan()),
-                                new VarInitStatement(Type.OBJECT, "tmp", new VarExpr("expr"), Span.dummySpan()),
-                                new VarInitStatement(Type.THROWABLE, "actual", new NullExpr(), Span.dummySpan())),
+                                new VarInitStatement(Type.OBJECT, Sym.of("tmp"), new VarExpr(Sym.of("expr")), Span.dummySpan()),
+                                new VarInitStatement(Type.THROWABLE, Sym.of("actual"), new NullExpr(), Span.dummySpan())),
                         Arrays.asList(new CatchClause(
                                         new ClassType(ognl.OgnlException.class),
                                         Sym.of("ex2"),
                                         Arrays.asList(new VarInitStatement(
                                                         Type.THROWABLE,
-                                                        "reason",
+                                                        Sym.of("reason"),
                                                         new InvokeExpr(
                                                                 new ClassType(ognl.OgnlException.class),
                                                                 Sym.of("ex2"),
@@ -297,12 +297,12 @@ public class AstToJUnitAstTest {
                                                         Span.dummySpan()),
                                                 new VarInitStatement(
                                                         Type.THROWABLE,
-                                                        "nullValue",
+                                                        Sym.of("nullValue"),
                                                         new NullExpr(),
                                                         Span.dummySpan()),
                                                 new VarInitStatement(
                                                         Type.BOOLEAN,
-                                                        "cond",
+                                                        Sym.of("cond"),
                                                         new EqualOpExpr(Sym.of("reason"), Sym.of("nullValue")),
                                                         Span.dummySpan()),
                                                 new IfStatement(
@@ -310,24 +310,24 @@ public class AstToJUnitAstTest {
                                                         Arrays.asList(
                                                                 new VarInitStatement(
                                                                         Type.THROWABLE,
-                                                                        "actual",
-                                                                        new VarExpr("ex2"),
+                                                                        Sym.of("actual"),
+                                                                        new VarExpr(Sym.of("ex2")),
                                                                         Span.dummySpan())),
                                                         Arrays.asList(
                                                                 new VarInitStatement(
                                                                         Type.THROWABLE,
-                                                                        "actual",
-                                                                        new VarExpr("reason"),
+                                                                        Sym.of("actual"),
+                                                                        new VarExpr(Sym.of("reason")),
                                                                         Span.dummySpan()))))),
                                 new CatchClause(
                                         new ClassType(java.lang.Throwable.class),
                                         Sym.of("ex"),
                                         Arrays.asList(
                                                 new VarInitStatement(
-                                                        Type.THROWABLE, "actual", new VarExpr("ex"), Span.dummySpan())))
+                                                        Type.THROWABLE, Sym.of("actual"), new VarExpr(Sym.of("ex")), Span.dummySpan())))
                         ),
                         Arrays.asList()),
-                new VarInitStatement(MATCHER, "expected", new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
+                new VarInitStatement(MATCHER, Sym.of("expected"), new InstanceOfMatcherExpr("java.lang.String"), Span.dummySpan()),
                 new IsStatement(Sym.of("actual"), Sym.of("expected"), Span.dummySpan()));
         assertThat(actual, is(expected));
     }

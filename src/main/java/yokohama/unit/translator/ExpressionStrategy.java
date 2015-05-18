@@ -21,15 +21,15 @@ public interface ExpressionStrategy {
     /**
      * Introduces a new environment.
      * 
-     * @param varName       a variable name to be bound to the new environment
+     * @param var       a variable to be bound to the new environment
      * @return statements that introduce a new environment
      */
-    List<Statement> env(String varName);
+    List<Statement> env(Sym var);
 
     /**
      * Bind a variable in the expression language to a value
      * 
-     * @param envVarName a variable name (in Java) bound to the environment
+     * @param envVar     a variable (in Java) bound to the environment
      * @param ident      an identifier in the expression language to be bound
      *                    to ths
      * @param rhs        a variable (in Java) bound to the value to which the
@@ -37,23 +37,23 @@ public interface ExpressionStrategy {
      * @return statements that bind name to rhs in the environment of the
      *          expression language
      */
-    List<Statement> bind(String envVarName, Ident ident, Sym rhs);
+    List<Statement> bind(Sym envVar, Ident ident, Sym rhs);
 
-    Optional<CatchClause> catchAndAssignCause(String causeVarName);
+    Optional<CatchClause> catchAndAssignCause(Sym causeVar);
 
     /**
      * Evaluates an expression.
      * 
-     * @param varName      a variable name to be bound to the result
+     * @param var          a variable to be bound to the result
      * @param quotedExpr   an expression to be evaluated
      * @param expectedType Specifies the type that the resultant evaluation
      *                      will be coerced to.
-     * @param envVarName   a variable name bound to the environment
+     * @param envVar       a variable bound to the environment
      * @return statements that evaluates the expression
      */
     List<Statement> eval(
-            String varName,
+            Sym var,
             QuotedExpr quotedExpr,
             Class<?> expectedType,
-            String envVarName);
+            Sym envVar);
 }

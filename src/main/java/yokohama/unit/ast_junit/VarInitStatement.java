@@ -5,11 +5,12 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
+import yokohama.unit.util.Sym;
 
 @Value
 public class VarInitStatement implements Statement {
     private final Type type;
-    private final String name;
+    private final Sym var;
     private final Expr value;
     private final Span span;
 
@@ -17,76 +18,76 @@ public class VarInitStatement implements Statement {
     public void toString(SBuilder sb) {
         value.<Void>accept(
                 varExpr -> {
-                    sb.appendln(name, " = ", varExpr.getName(), ";");
+                    sb.appendln(var.getName(), " = ", varExpr.getVar().getName(), ";");
                     return null;
                 },
                 instanceOfMatcherExpr -> {
-                    instanceOfMatcherExpr.getExpr(sb, name);
+                    instanceOfMatcherExpr.getExpr(sb, var.getName());
                     return null;
                 },
                 nullValueMatcherExpr -> {
-                    nullValueMatcherExpr.getExpr(sb, name);
+                    nullValueMatcherExpr.getExpr(sb, var.getName());
                     return null;
                 },
                 equalToMatcherExpr -> {
-                    equalToMatcherExpr.getExpr(sb, name);
+                    equalToMatcherExpr.getExpr(sb, var.getName());
                     return null;
                 },
                 newExpr -> {
-                    newExpr.getExpr(sb, name);
+                    newExpr.getExpr(sb, var.getName());
                     return null;
                 },
                 strLitExpr -> {
-                    sb.appendln(name, " = \"", escapeJava(strLitExpr.getText()), "\";");
+                    sb.appendln(var.getName(), " = \"", escapeJava(strLitExpr.getText()), "\";");
                     return null;
                 },
                 nullExpr -> {
-                    sb.appendln(name, " = null;");
+                    sb.appendln(var.getName(), " = null;");
                     return null;
                 },
                 invokeExpr -> {
-                    invokeExpr.getExpr(sb, type, name);
+                    invokeExpr.getExpr(sb, type, var.getName());
                     return null;
                 },
                 invokeStaticExpr -> {
-                    invokeStaticExpr.getExpr(sb, type, name);
+                    invokeStaticExpr.getExpr(sb, type, var.getName());
                     return null;
                 },
                 intLitExpr -> {
-                    sb.appendln(name, " = ", intLitExpr.getValue(), ";");
+                    sb.appendln(var.getName(), " = ", intLitExpr.getValue(), ";");
                     return null;
                 },
                 longLitExpr -> {
-                    sb.appendln(name, " = ", longLitExpr.getValue(), "L;");
+                    sb.appendln(var.getName(), " = ", longLitExpr.getValue(), "L;");
                     return null;
                 },
                 floatLitExpr -> {
-                    sb.appendln(name, " = ", floatLitExpr.getValue(), "f;");
+                    sb.appendln(var.getName(), " = ", floatLitExpr.getValue(), "f;");
                     return null;
                 },
                 doubleLitExpr -> {
-                    sb.appendln(name, " = ", doubleLitExpr.getValue(), "d;");
+                    sb.appendln(var.getName(), " = ", doubleLitExpr.getValue(), "d;");
                     return null;
                 },
                 booleanLitExpr -> {
-                    sb.appendln(name, " = ", booleanLitExpr.getValue(), ";");
+                    sb.appendln(var.getName(), " = ", booleanLitExpr.getValue(), ";");
                     return null;
                 },
                 charLitExpr -> {
                     // We use escapeEcmaScript instead of escapeJava for single quoted to be escaped
-                    sb.appendln(name, " = '", escapeEcmaScript(String.valueOf(charLitExpr.getValue())), "';");
+                    sb.appendln(var.getName(), " = '", escapeEcmaScript(String.valueOf(charLitExpr.getValue())), "';");
                     return null;
                 },
                 classLitExpr -> {
-                    sb.appendln(name, " = ", classLitExpr.getType().getText(), ".class;");
+                    sb.appendln(var.getName(), " = ", classLitExpr.getType().getText(), ".class;");
                     return null;
                 },
                 equalOpExpr -> {
-                    sb.appendln(name, " = ", equalOpExpr.getLhs().getName(), " == ", equalOpExpr.getRhs().getName(), ";");
+                    sb.appendln(var.getName(), " = ", equalOpExpr.getLhs().getName(), " == ", equalOpExpr.getRhs().getName(), ";");
                     return null;
                 },
                 arrayExpr -> {
-                    arrayExpr.getExpr(sb, type, name);
+                    arrayExpr.getExpr(sb, type, var.getName());
                     return null;
                 });
     }

@@ -61,17 +61,17 @@ public class JUnitAstCompilerTest {
                                                         Arrays.asList(ClassType.EXCEPTION),
                                                         Arrays.asList(new VarInitStatement(
                                                                         Type.STRING,
-                                                                        "content1",
+                                                                        Sym.of("content1"),
                                                                         new StrLitExpr("a"),
                                                                         Span.dummySpan()),
                                                                 new VarInitStatement(
                                                                         Type.STRING,
-                                                                        "content2",
+                                                                        Sym.of("content2"),
                                                                         new StrLitExpr("b"),
                                                                         Span.dummySpan()),
                                                                 new VarInitStatement(
                                                                         Type.STRING.toArray(),
-                                                                        "ret",
+                                                                        Sym.of("ret"),
                                                                         new ArrayExpr(
                                                                                 Type.STRING.toArray(),
                                                                                 Arrays.asList(Sym.of("content1"),

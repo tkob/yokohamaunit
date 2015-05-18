@@ -45,11 +45,11 @@ public class MethodTest {
                 Arrays.asList(new ClassType(java.lang.Exception.class)),
                 Arrays.asList(new VarInitStatement(
                                 new Type(new ClassType(ognl.OgnlContext.class), 0),
-                                "env",
+                                Sym.of("env"),
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()),
-                        new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
-                        new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, Sym.of("actual"), new IntLitExpr(1), Span.dummySpan()),
+                        new VarInitStatement(Type.OBJECT, Sym.of("expected"), new IntLitExpr(1), Span.dummySpan()),
                         new IsStatement(Sym.of("actual"), Sym.of("expected"), Span.dummySpan())));
         instance.toString(actual);
 

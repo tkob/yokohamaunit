@@ -15,9 +15,8 @@ public class GenSym {
         }
     }
 
-    public String generate(String prefix) {
+    public Sym generate(String prefix) {
         int index = map.compute(prefix, (k, v) -> v == null ? 1 : v + 1);
-        return index == 1 ? prefix : prefix + index;
+        return index == 1 ? Sym.of(prefix) : Sym.of(prefix + index);
     }
-    
 }

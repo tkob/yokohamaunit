@@ -4,7 +4,7 @@
 Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
 
 ## Verify
-Assert `instance.generate(prefix)` is `"prefix"`.
+Assert `instance.generate(prefix).name` is `"prefix"`.
     
 # Test: The second call of generate method returns prefix plus '2'
 
@@ -13,7 +13,7 @@ Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
 Do `instance.generate(prefix)`.
 
 ## Verify
-Assert `instance.generate(prefix)` is `"prefix2"`.
+Assert `instance.generate(prefix).name` is `"prefix2"`.
 
 # Test: Different prefixes are independent of each other as for numbering
 
@@ -22,4 +22,4 @@ Let prefix = `"prefix"` and instance = `new yokohama.unit.util.GenSym()`.
 Do `instance.generate("another")`.
 
 ## Verify
-Assert `instance.generate(prefix)` is `"prefix"`.
+Assert `instance.generate(prefix).name` is `"prefix"`.

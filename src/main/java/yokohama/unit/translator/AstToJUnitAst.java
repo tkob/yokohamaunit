@@ -195,7 +195,7 @@ class AstToJUnitAstVisitor {
         List<Proposition> propositions = assertion.getPropositions();
         return assertion.getFixture().accept(
                 () -> {
-                    String env = genSym.generate("env");
+                    Sym env = genSym.generate("env");
                     return Arrays.asList(new Method(
                             Arrays.asList(annotationOf(TEST)),
                             methodName,
@@ -212,7 +212,7 @@ class AstToJUnitAstVisitor {
                                             .collect(Collectors.toList()))));
                 },
                 tableRef -> {
-                    String env = genSym.generate("env");
+                    Sym env = genSym.generate("env");
                     List<List<Statement>> table =
                             translateTableRef(tableRef, env);
                     return IntStream.range(0, table.size())
@@ -239,7 +239,7 @@ class AstToJUnitAstVisitor {
                             .collect(Collectors.toList());
                 },
                 bindings -> {
-                    String env = genSym.generate("env");
+                    Sym env = genSym.generate("env");
                     return Arrays.asList(new Method(
                             Arrays.asList(annotationOf(TEST)),
                             methodName,
@@ -265,9 +265,9 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> translateProposition(
-            Proposition proposition, String envVarName) {
-        String actual = genSym.generate("actual");
-        String expected = genSym.generate("expected");
+            Proposition proposition, Sym envVar) {
+        Sym actual = genSym.generate("actual");
+        Sym expected = genSym.generate("expected");
         Predicate predicate = proposition.getPredicate();
         Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(isPredicate -> {
                     return Stream.concat(
@@ -275,12 +275,12 @@ class AstToJUnitAstVisitor {
                                     proposition.getSubject(),
                                     actual,
                                     Object.class,
-                                    envVarName),
+                                    envVar),
                             translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
                                     actual,
-                                    envVarName));
+                                    envVar));
                 },
                 isNotPredicate -> {
                     // inhibit `is not instance e of Exception such that...`
@@ -293,17 +293,17 @@ class AstToJUnitAstVisitor {
                                         instanceSuchThat.getSpan());
                             },
                             nullValue -> null);
-                    String unexpected = genSym.generate("unexpected");
+                    Sym unexpected = genSym.generate("unexpected");
                     return Stream.concat(translateExpr(
                                     proposition.getSubject(),
                                     actual,
                                     Object.class,
-                                    envVarName),
+                                    envVar),
                             Stream.concat(translateMatcher(
                                             isNotPredicate.getComplement(),
                                             unexpected,
                                             actual,
-                                            envVarName),
+                                            envVar),
                                     Stream.of(new VarInitStatement(
                                             typeOf(MATCHER),
                                             expected,
@@ -312,12 +312,12 @@ class AstToJUnitAstVisitor {
                                                     Arrays.asList(),
                                                     "not",
                                                     Arrays.asList(typeOf(MATCHER)),
-                                                    Arrays.asList(Sym.of(unexpected)),
+                                                    Arrays.asList(unexpected),
                                                     typeOf(MATCHER)),
                                             predicate.getSpan()))));
                 },
                 throwsPredicate -> {
-                    String __ = genSym.generate("tmp");
+                    Sym __ = genSym.generate("tmp");
                     return Stream.concat(
                             bindThrown(
                                     actual,
@@ -325,14 +325,14 @@ class AstToJUnitAstVisitor {
                                             proposition.getSubject(),
                                             __,
                                             Object.class,
-                                            envVarName)
+                                            envVar)
                                             .collect(Collectors.toList()),
-                                    envVarName),
+                                    envVar),
                             translateMatcher(
                                     throwsPredicate.getThrowee(),
                                     expected,
                                     actual,
-                                    envVarName));
+                                    envVar));
                 }
         );
         Matcher matcher = predicate.accept(
@@ -343,14 +343,14 @@ class AstToJUnitAstVisitor {
                 matcher instanceof InstanceSuchThatMatcher
                         ? Stream.empty()
                         : Stream.of(new IsStatement(
-                                Sym.of(actual),
-                                Sym.of(expected),
+                                actual,
+                                expected,
                                 predicate.getSpan())));
     }
 
     Stream<Statement> bindThrown(
-            String actual, List<Statement> statements, String envVarName) {
-        String e = genSym.generate("ex");
+            Sym actual, List<Statement> statements, Sym envVar) {
+        Sym e = genSym.generate("ex");
         /*
         Throwable actual;
         try {
@@ -375,7 +375,7 @@ class AstToJUnitAstVisitor {
                                         expressionStrategy.catchAndAssignCause(actual)),
                                 Stream.of(new CatchClause(
                                         ClassType.THROWABLE,
-                                        Sym.of(e),
+                                        e,
                                         Arrays.asList(new VarInitStatement(
                                                 Type.THROWABLE,
                                                 actual,
@@ -395,27 +395,25 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateMatcher(
             Matcher matcher,
-            String varName,
-            String actual,
-            String envVarName) {
+            Sym var,
+            Sym actual,
+            Sym envVar) {
         return matcher.<Stream<Statement>>accept((EqualToMatcher equalTo) -> {
-                Sym objVar = Sym.of(genSym.generate("obj"));
-                return Stream.concat(
-                        translateExpr(
-                                equalTo.getExpr(),
-                                objVar.getName(),
+                Sym objVar = genSym.generate("obj");
+                return Stream.concat(translateExpr(equalTo.getExpr(),
+                                objVar,
                                 Object.class,
-                                envVarName),
+                                envVar),
                         Stream.of(new VarInitStatement(
                                 typeOf(MATCHER),
-                                varName,
+                                var,
                                 new EqualToMatcherExpr(objVar),
                                 equalTo.getSpan())));
             },
             (InstanceOfMatcher instanceOf) -> {
                 return Stream.of(new VarInitStatement(
                         typeOf(MATCHER),
-                        varName,
+                        var,
                         new InstanceOfMatcherExpr(
                                 lookupClassName(
                                         instanceOf.getClazz().getName(),
@@ -428,28 +426,28 @@ class AstToJUnitAstVisitor {
                 List<Proposition> propositions = instanceSuchThat.getPropositions();
                 Span span = instanceSuchThat.getSpan();
 
-                String instanceOfVarName = genSym.generate("instanceOfMatcher");
+                Sym instanceOfVar = genSym.generate("instanceOfMatcher");
                 Stream<Statement> instanceOfStatements = Stream.of(new VarInitStatement(
                                 typeOf(MATCHER),
-                                instanceOfVarName,
+                                instanceOfVar,
                                 new InstanceOfMatcherExpr(
                                         lookupClassName(
                                                 clazz.getName(),
                                                 clazz.getSpan())),
                                 clazz.getSpan()),
                         new IsStatement(
-                                Sym.of(actual),
-                                Sym.of(instanceOfVarName),
+                                actual,
+                                instanceOfVar,
                                 clazz.getSpan()));
 
                 Stream<Statement> bindStatements =
-                        expressionStrategy.bind(envVarName, bindVar, Sym.of(actual)).stream();
+                        expressionStrategy.bind(envVar, bindVar, actual).stream();
 
                 Stream<Statement> suchThatStatements =
                         propositions
                                 .stream()
                                 .flatMap(proposition ->
-                                        translateProposition(proposition, envVarName));
+                                        translateProposition(proposition, envVar));
 
                 return Stream.concat(
                         instanceOfStatements,
@@ -458,79 +456,68 @@ class AstToJUnitAstVisitor {
                                 suchThatStatements));
             },
             (NullValueMatcher nullValue) -> {
-                return Stream.of(
-                        new VarInitStatement(
+                return Stream.of(new VarInitStatement(
                                 typeOf(MATCHER),
-                                varName,
+                                var,
                                 new NullValueMatcherExpr(),
                                 nullValue.getSpan()));
             });
     }
 
     Stream<Statement> translateBinding(
-            yokohama.unit.ast.Binding binding, String envVarName) {
+            yokohama.unit.ast.Binding binding, Sym envVar) {
         Ident name = binding.getName();
-        String varName = genSym.generate(name.getName());
-        return Stream.concat(translateExpr(
-                        binding.getValue(), varName, Object.class, envVarName),
-                expressionStrategy.bind(envVarName, name, Sym.of(varName)).stream());
+        Sym var = genSym.generate(name.getName());
+        return Stream.concat(translateExpr(binding.getValue(), var, Object.class, envVar),
+                expressionStrategy.bind(envVar, name, var).stream());
     }
 
     Stream<Statement> translateExpr(
             yokohama.unit.ast.Expr expr,
-            String varName,
+            Sym var,
             Class<?> expectedType,
-            String envVarName) {
-        Sym exprVar = Sym.of(genSym.generate("expr"));
-        Stream<Statement> statements = expr.accept(
-                quotedExpr -> {
+            Sym envVar) {
+        Sym exprVar = genSym.generate("expr");
+        Stream<Statement> statements = expr.accept(quotedExpr -> {
                     return expressionStrategy.eval(
-                            exprVar.getName(),
+                            exprVar,
                             quotedExpr,
                             Type.fromClass(expectedType).box().toClass(),
-                            envVarName).stream();
+                            envVar).stream();
                 },
                 stubExpr -> {
                     return mockStrategy.stub(
-                            exprVar.getName(),
+                            exprVar,
                             stubExpr,
                             this,
-                            envVarName).stream();
+                            envVar).stream();
                 },
                 invocationExpr -> {
-                    return translateInvocationExpr(
-                            invocationExpr, exprVar.getName(), envVarName);
+                    return translateInvocationExpr(invocationExpr, exprVar, envVar);
                 },
                 integerExpr -> {
-                    return translateIntegerExpr(
-                            integerExpr, exprVar.getName(), envVarName);
+                    return translateIntegerExpr(integerExpr, exprVar, envVar);
                 },
                 floatingPointExpr -> {
-                    return translateFloatingPointExpr(
-                            floatingPointExpr, exprVar.getName(), envVarName);
+                    return translateFloatingPointExpr(floatingPointExpr, exprVar, envVar);
                 },
                 booleanExpr -> {
-                    return translateBooleanExpr(
-                            booleanExpr, exprVar.getName(), envVarName);
+                    return translateBooleanExpr(booleanExpr, exprVar, envVar);
                 },
                 charExpr -> {
-                    return translateCharExpr(
-                            charExpr, exprVar.getName(), envVarName);
+                    return translateCharExpr(charExpr, exprVar, envVar);
                 },
                 stringExpr -> {
-                    return translateStringExpr(
-                            stringExpr, exprVar.getName(), envVarName);
+                    return translateStringExpr(stringExpr, exprVar, envVar);
                 },
                 anchorExpr -> {
-                    return translateAnchorExpr(
-                            anchorExpr, exprVar.getName(), envVarName);
+                    return translateAnchorExpr(anchorExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
         Stream<Statement> boxing =
-                boxOrUnbox(
-                        Type.fromClass(expectedType),
-                        varName,
+                boxOrUnbox(Type.fromClass(expectedType),
+                        var,
                         typeOfExpr(expr),
                         exprVar);
 
@@ -539,8 +526,8 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateInvocationExpr(
             InvocationExpr invocationExpr,
-            String varName,
-            String envVarName) {
+            Sym var,
+            Sym envVar) {
         yokohama.unit.ast.ClassType classType = invocationExpr.getClassType();
         Class<?> clazz = classType.toClass(classResolver);
         MethodPattern methodPattern = invocationExpr.getMethodPattern();
@@ -553,12 +540,12 @@ class AstToJUnitAstVisitor {
         Type returnType = typeOfExpr(invocationExpr);
 
         Pair<List<Sym>, Stream<Statement>> argVarsAndStatements =
-                setupArgs(argTypes, isVararg, args, envVarName);
+                setupArgs(argTypes, isVararg, args, envVar);
         List<Sym> argVars = argVarsAndStatements.getFirst();
         Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
 
         Stream<Statement> invocation = generateInvoke(
-                varName,
+                var,
                 classType,
                 methodName,
                 argTypes,
@@ -566,7 +553,7 @@ class AstToJUnitAstVisitor {
                 argVars,
                 receiver,
                 returnType,
-                envVarName,
+                envVar,
                 invocationExpr.getSpan());
 
         return Stream.concat(setupStatements, invocation);
@@ -574,22 +561,19 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateIntegerExpr(
             IntegerExpr integerExpr,
-            String varName,
-            String envVarName) {
-        return integerExpr.match(
-                intValue -> {
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
+            Sym var,
+            Sym envVar) {
+        return integerExpr.match(intValue -> {
+                    return Stream.<Statement>of(new VarInitStatement(
                                     Type.INT,
-                                    varName,
+                                    var,
                                     new IntLitExpr(intValue),
                                     integerExpr.getSpan()));
                 },
                 longValue -> {
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
+                    return Stream.<Statement>of(new VarInitStatement(
                                     Type.LONG,
-                                    varName,
+                                    var,
                                     new LongLitExpr(longValue),
                                     integerExpr.getSpan()));
                 });
@@ -597,100 +581,93 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateFloatingPointExpr(
             FloatingPointExpr floatingPointExpr,
-            String varName,
-            String envVarName) {
-        return floatingPointExpr.match(
-                floatValue -> {
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
+            Sym var,
+            Sym envVar) {
+        return floatingPointExpr.match(floatValue -> {
+                    return Stream.<Statement>of(new VarInitStatement(
                                     Type.FLOAT,
-                                    varName,
+                                    var,
                                     new FloatLitExpr(floatValue),
                                     floatingPointExpr.getSpan()));
                 },
                 doubleValue -> {
-                    return Stream.<Statement>of(
-                            new VarInitStatement(
+                    return Stream.<Statement>of(new VarInitStatement(
                                     Type.DOUBLE,
-                                    varName,
+                                    var,
                                     new DoubleLitExpr(doubleValue),
                                     floatingPointExpr.getSpan()));
                 });
     }
 
     Stream<Statement> translateBooleanExpr(
-            BooleanExpr booleanExpr, String varName, String envVarName) {
+            BooleanExpr booleanExpr, Sym var, Sym envVar) {
         boolean booleanValue = booleanExpr.getValue();
-        return Stream.<Statement>of(
-                new VarInitStatement(
+        return Stream.<Statement>of(new VarInitStatement(
                         Type.BOOLEAN,
-                        varName,
+                        var,
                         new BooleanLitExpr(booleanValue),
                         booleanExpr.getSpan()));
     }
 
     Stream<Statement> translateCharExpr(
-            CharExpr charExpr, String varName, String envVarName) {
+            CharExpr charExpr, Sym var, Sym envVar) {
         char charValue = charExpr.getValue();
-        return Stream.<Statement>of(
-                new VarInitStatement(
+        return Stream.<Statement>of(new VarInitStatement(
                         Type.CHAR,
-                        varName,
+                        var,
                         new CharLitExpr(charValue),
                         charExpr.getSpan()));
     }
 
     Stream<Statement> translateStringExpr(
-            StringExpr stringExpr, String varName, String envVarName) {
+            StringExpr stringExpr, Sym var, Sym envVar) {
         String strValue = stringExpr.getValue();
-        return Stream.<Statement>of(
-                new VarInitStatement(
+        return Stream.<Statement>of(new VarInitStatement(
                         Type.STRING,
-                        varName,
+                        var,
                         new StrLitExpr(strValue),
                         stringExpr.getSpan()));
     }
 
     Stream<Statement> translateAnchorExpr(
-            AnchorExpr anchorExpr, String varName, String envVarName) {
+            AnchorExpr anchorExpr, Sym var, Sym envVar) {
         String anchor = anchorExpr.getAnchor();
         CodeBlock codeBlock = codeBlockMap.get(anchor);
         String code = codeBlock.getCode();
-        return Stream.<Statement>of(
-                new VarInitStatement(
+        return Stream.<Statement>of(new VarInitStatement(
                         Type.STRING,
-                        varName,
+                        var,
                         new StrLitExpr(code),
                         anchorExpr.getSpan()));
     }
 
-    public Stream<Statement> boxOrUnbox(
-            Type toType, String toVarName, Type fromType, Sym fromVar) {
+    Stream<Statement> boxOrUnbox(
+            Type toType, Sym toVar, Type fromType, Sym fromVar) {
         return fromType.<Stream<Statement>>matchPrimitiveOrNot(
                 primitiveType -> {
                     return fromPrimitive(
-                            toType, toVarName, primitiveType, fromVar);
+                            toType, toVar, primitiveType, fromVar);
                 },
                 nonPrimitiveType -> {
-                    return fromNonPrimtive(toType, toVarName, fromVar);
+                    return fromNonPrimtive(toType, toVar, fromVar);
                 });
     }
     
     private Stream<Statement> fromPrimitive(
-            Type toType, String toVarName, PrimitiveType fromType, Sym fromVar) {
+            Type toType, Sym toVar, PrimitiveType fromType, Sym fromVar) {
         return toType.<Stream<Statement>>matchPrimitiveOrNot(
                 primitiveType -> {
                     return Stream.of(
                             new VarInitStatement(
                                     toType,
-                                    toVarName,
-                                    new VarExpr(fromVar.getName()),
+                                    toVar,
+                                    new VarExpr(fromVar),
                                     Span.dummySpan()));
                 },
                 nonPrimitiveType -> {
                     return Stream.of(new VarInitStatement(
                             nonPrimitiveType,
-                            toVarName,
+                            toVar,
                             new InvokeStaticExpr(
                                     fromType.box(),
                                     Arrays.asList(),
@@ -704,10 +681,10 @@ class AstToJUnitAstVisitor {
     }
 
     private Stream<Statement> fromNonPrimtive(
-            Type toType, String toVarName, Sym fromVar) {
+            Type toType, Sym toVar, Sym fromVar) {
         // precondition: fromVar is not primitive
         return toType.<Stream<Statement>>matchPrimitiveOrNot(primitiveType -> {
-                    Sym boxVar = Sym.of(genSym.generate("box"));
+                    Sym boxVar = genSym.generate("box");
                     ClassType boxType;
                     String unboxMethodName;
                     switch (primitiveType.getKind()) {
@@ -749,12 +726,12 @@ class AstToJUnitAstVisitor {
                     return Stream.of(
                             new VarInitStatement(
                                     boxType.toType(),
-                                    boxVar.getName(),
-                                    new VarExpr(fromVar.getName()),
+                                    boxVar,
+                                    new VarExpr(fromVar),
                                     Span.dummySpan()),
                             new VarInitStatement(
                                     toType,
-                                    toVarName,
+                                    toVar,
                                     new InvokeExpr(
                                             boxType,
                                             fromVar,
@@ -768,8 +745,8 @@ class AstToJUnitAstVisitor {
                     return Stream.of(
                             new VarInitStatement(
                                     nonPrimitiveType,
-                                    toVarName,
-                                    new VarExpr(fromVar.getName()),
+                                    toVar,
+                                    new VarExpr(fromVar),
                                     Span.dummySpan()));
                 });
     }
@@ -801,27 +778,24 @@ class AstToJUnitAstVisitor {
 
     List<List<Statement>> translateTableRef(
             TableRef tableRef,
-            String envVarName) {
+            Sym envVar) {
         String name = tableRef.getName();
         List<Ident> idents = tableRef.getIdents();
         try {
             switch(tableRef.getType()) {
                 case INLINE:
-                    return translateTable(
-                            tables.stream()
+                    return translateTable(tables.stream()
                                   .filter(table -> table.getName().equals(name))
                                   .findFirst()
                                   .get(),
                             idents,
-                            envVarName);
+                            envVar);
                 case CSV:
-                    return parseCSV(
-                            name, CSVFormat.DEFAULT.withHeader(), idents, envVarName);
+                    return parseCSV(name, CSVFormat.DEFAULT.withHeader(), idents, envVar);
                 case TSV:
-                    return parseCSV(
-                            name, CSVFormat.TDF.withHeader(), idents, envVarName);
+                    return parseCSV(name, CSVFormat.TDF.withHeader(), idents, envVar);
                 case EXCEL:
-                    return parseExcel(name, idents, envVarName);
+                    return parseExcel(name, idents, envVar);
             }
             throw new IllegalArgumentException(
                     "'" + Objects.toString(tableRef) + "' is not a table reference.");
@@ -834,11 +808,11 @@ class AstToJUnitAstVisitor {
     List<List<Statement>> translateTable(
             Table table,
             List<Ident> idents,
-            String envVarName) {
+            Sym envVar) {
         return table.getRows()
                 .stream()
                 .map(row ->
-                        translateRow(row, table.getHeader(), idents, envVarName))
+                        translateRow(row, table.getHeader(), idents, envVar))
                 .collect(Collectors.toList());
     }
 
@@ -846,17 +820,16 @@ class AstToJUnitAstVisitor {
             Row row,
             List<Ident> header,
             List<Ident> idents,
-            String envVarName) {
+            Sym envVar) {
         return IntStream.range(0, header.size())
                 .filter(i -> idents.contains(header.get(i)))
                 .mapToObj(Integer::new)
                 .flatMap(i -> {
                     Cell cell = row.getCells().get(i);
                     return cell.accept(exprCell -> {
-                                String varName = genSym.generate(header.get(i).getName());
-                                return Stream.concat(translateExpr(
-                                                exprCell.getExpr(), varName, Object.class, envVarName),
-                                        expressionStrategy.bind(envVarName, header.get(i), Sym.of(varName)).stream());
+                                Sym var = genSym.generate(header.get(i).getName());
+                                return Stream.concat(translateExpr(exprCell.getExpr(), var, Object.class, envVar),
+                                        expressionStrategy.bind(envVar, header.get(i), var).stream());
                             },
                             predCell -> {
                                 throw new TranslationException(
@@ -868,7 +841,7 @@ class AstToJUnitAstVisitor {
     }
 
     List<List<Statement>> parseCSV(
-            String fileName, CSVFormat format, List<Ident> idents, String envVarName)
+            String fileName, CSVFormat format, List<Ident> idents, Sym envVar)
             throws IOException {
         Map<String, Ident> nameToIdent = idents.stream()
                 .collect(() -> new TreeMap<>(),
@@ -884,16 +857,16 @@ class AstToJUnitAstVisitor {
                                     .filter(key -> idents.stream().anyMatch(ident -> ident.getName().equals(key)))
                                     .map(key -> nameToIdent.get(key))
                                     .flatMap(ident -> {
-                                        String varName = genSym.generate(ident.getName());
-                                        return Stream.concat(expressionStrategy.eval(varName,
+                                        Sym var = genSym.generate(ident.getName());
+                                        return Stream.concat(expressionStrategy.eval(var,
                                                 new yokohama.unit.ast.QuotedExpr(
                                                         record.get(ident.getName()),
                                                         new yokohama.unit.position.Span(
                                                                 Optional.of(Paths.get(fileName)),
                                                                 new Position((int)parser.getCurrentLineNumber(), -1),
                                                                 new Position(-1, -1))),
-                                                Object.class, envVarName).stream(),
-                                                expressionStrategy.bind(envVarName, ident, Sym.of(varName)).stream());
+                                                Object.class, envVar).stream(),
+                                                expressionStrategy.bind(envVar, ident, var).stream());
                                     })
                                     .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -901,7 +874,7 @@ class AstToJUnitAstVisitor {
     }
 
     List<List<Statement>> parseExcel(
-            String fileName, List<Ident> idents, String envVarName)
+            String fileName, List<Ident> idents, Sym envVar)
             throws InvalidFormatException, IOException {
         Map<String, Ident> nameToIdent = idents.stream()
                 .collect(() -> new TreeMap<>(),
@@ -923,17 +896,16 @@ class AstToJUnitAstVisitor {
                                 .mapToObj(Integer::new)
                                 .flatMap(i -> {
                                     Ident ident = nameToIdent.get(names.get(i));
-                                    String varName = genSym.generate(names.get(i));
-                                    return Stream.concat(expressionStrategy.eval(
-                                            varName,
+                                    Sym var = genSym.generate(names.get(i));
+                                    return Stream.concat(expressionStrategy.eval(var,
                                             new yokohama.unit.ast.QuotedExpr(
                                                     row.getCell(left + i).getStringCellValue(),
                                                     new yokohama.unit.position.Span(
                                                             Optional.of(Paths.get(fileName)),
                                                             new Position(row.getRowNum() + 1, left + i + 1),
                                                             new Position(-1, -1))),
-                                            Object.class, envVarName).stream(),
-                                            expressionStrategy.bind(envVarName, ident, Sym.of(varName)).stream());
+                                            Object.class, envVar).stream(),
+                                            expressionStrategy.bind(envVar, ident, var).stream());
                                 })
                                 .collect(Collectors.toList()))
                     .collect(Collectors.toList());
@@ -941,7 +913,7 @@ class AstToJUnitAstVisitor {
     }
 
     List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
-        String env = genSym.generate("env");
+        Sym env = genSym.generate("env");
 
         String testName = SUtils.toIdent(fourPhaseTest.getName());
         Stream<Statement> bindings;
@@ -951,16 +923,15 @@ class AstToJUnitAstVisitor {
                     .flatMap(letStatement ->
                             letStatement.getBindings().stream()
                                     .flatMap(binding -> {
-                                        String varName =
-                                                genSym.generate(binding.getName().getName());
-                                        return Stream.concat(translateExpr(
-                                                        binding.getValue(),
-                                                        varName,
+                                        Sym var = genSym.generate(binding.getName().getName());
+                                        return Stream.concat(translateExpr(binding.getValue(),
+                                                        var,
                                                         Object.class,
                                                         env),
-                                                expressionStrategy.bind(env,
+                                                expressionStrategy.bind(
+                                                        env,
                                                         binding.getName(),
-                                                        Sym.of(varName))
+                                                        var)
                                                         .stream());
                                     }));
         } else {
@@ -1026,23 +997,21 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> translateStatements(
-            List<yokohama.unit.ast.Statement> statements, String envVarName) {
+            List<yokohama.unit.ast.Statement> statements, Sym envVar) {
         return statements.stream()
-                .flatMap(statement -> statement.accept(
-                        execution -> translateExecution(execution, envVarName),
-                        invoke -> translateInvoke(invoke, envVarName)));
+                .flatMap(statement -> statement.accept(execution -> translateExecution(execution, envVar),
+                        invoke -> translateInvoke(invoke, envVar)));
     }
 
     Stream<Statement> translateExecution(
-            Execution execution, String envVarName) {
-        String __ = genSym.generate("__");
+            Execution execution, Sym envVar) {
+        Sym __ = genSym.generate("__");
         return execution.getExpressions().stream()
                 .flatMap(expression ->
-                        expressionStrategy.eval(
-                                __, expression, Object.class, envVarName).stream());
+                        expressionStrategy.eval(__, expression, Object.class, envVar).stream());
     }
 
-    Stream<Statement> translateInvoke(Invoke invoke, String envVarName) {
+    Stream<Statement> translateInvoke(Invoke invoke, Sym envVar) {
         yokohama.unit.ast.ClassType classType = invoke.getClassType();
         Class<?> clazz = classType.toClass(classResolver);
         MethodPattern methodPattern = invoke.getMethodPattern();
@@ -1053,7 +1022,7 @@ class AstToJUnitAstVisitor {
         List<yokohama.unit.ast.Expr> args = invoke.getArgs();
 
         Pair<List<Sym>, Stream<Statement>> argVarsAndStatements =
-                setupArgs(argTypes, isVararg, args, envVarName);
+                setupArgs(argTypes, isVararg, args, envVar);
         List<Sym> argVars = argVarsAndStatements.getFirst();
         Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
 
@@ -1062,8 +1031,7 @@ class AstToJUnitAstVisitor {
                 .map(type -> Type.of(type, classResolver));
         Stream<Statement> invocation;
         if (returnType.isPresent()) {
-            invocation = generateInvoke(
-                    genSym.generate("__"),
+            invocation = generateInvoke(genSym.generate("__"),
                     classType,
                     methodName,
                     argTypes,
@@ -1071,17 +1039,16 @@ class AstToJUnitAstVisitor {
                     argVars,
                     receiver,
                     returnType.get(),
-                    envVarName,
+                    envVar,
                     invoke.getSpan());
         } else {
-            invocation = generateInvokeVoid(
-                    classType,
+            invocation = generateInvokeVoid(classType,
                     methodName,
                     argTypes,
                     isVararg,
                     argVars,
                     receiver,
-                    envVarName,
+                    envVar,
                     invoke.getSpan());
         }
 
@@ -1092,7 +1059,7 @@ class AstToJUnitAstVisitor {
             List<yokohama.unit.ast.Type> argTypes,
             boolean isVararg,
             List<yokohama.unit.ast.Expr> args,
-            String envVarName) {
+            Sym envVar) {
         List<Pair<Sym, Stream<Statement>>> setupArgs;
         if (isVararg) {
             int splitAt = argTypes.size() - 1;
@@ -1105,30 +1072,28 @@ class AstToJUnitAstVisitor {
                                             Arrays.asList(varargs))));
             setupArgs = Lists.mapInitAndLast(typesAndArgs,
                     typeAndArg -> typeAndArg.map((t, arg) -> {
-                        Sym argVar = Sym.of(genSym.generate("arg"));
+                        Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
-                        Stream<Statement> expr = translateExpr(
-                                arg.get(0), argVar.getName(), paramType.toClass(), envVarName);
+                        Stream<Statement> expr = translateExpr(arg.get(0), argVar, paramType.toClass(), envVar);
                         return new Pair<>(argVar, expr);
                     }),
                     typeAndArg -> typeAndArg.map((t, varargs) -> {
                         Type paramType = Type.of(t, classResolver);
                         List<Pair<Sym, Stream<Statement>>> exprs = varargs.stream().map(vararg -> {
-                                    Sym varargVar = Sym.of(genSym.generate("vararg"));
-                                    Stream<Statement> expr = translateExpr(
-                                            vararg,
-                                            varargVar.getName(),
+                                    Sym varargVar = genSym.generate("vararg");
+                                    Stream<Statement> expr = translateExpr(vararg,
+                                            varargVar,
                                             paramType.toClass(),
-                                            envVarName);
+                                            envVar);
                                     return new Pair<>(varargVar, expr);
                                 }).collect(Collectors.toList());
                         List<Sym> varargVars = Pair.unzip(exprs).getFirst();
                         Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
-                        Sym argVar = Sym.of(genSym.generate("arg"));
+                        Sym argVar = genSym.generate("arg");
                         Stream<Statement> arrayStatement = Stream.of(
                                 new VarInitStatement(
                                         paramType.toArray(),
-                                        argVar.getName(),
+                                        argVar,
                                         new ArrayExpr(paramType.toArray(), varargVars),
                                         t.getSpan()));
                         return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
@@ -1139,10 +1104,9 @@ class AstToJUnitAstVisitor {
                             argTypes, args);
             setupArgs = pairs.stream().map(pair -> pair.map((t, arg) -> {
                         // evaluate actual args and coerce to parameter types
-                        Sym argVar = Sym.of(genSym.generate("arg"));
+                        Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
-                        Stream<Statement> expr = translateExpr(
-                                arg, argVar.getName(), paramType.toClass(), envVarName);
+                        Stream<Statement> expr = translateExpr(arg, argVar, paramType.toClass(), envVar);
                         return new Pair<>(argVar, expr);
                     })).collect(Collectors.toList());
         }
@@ -1154,7 +1118,7 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> generateInvoke(
-            String varName,
+            Sym var,
             yokohama.unit.ast.ClassType classType,
             String methodName,
             List<yokohama.unit.ast.Type> argTypes,
@@ -1162,19 +1126,17 @@ class AstToJUnitAstVisitor {
             List<Sym> argVars,
             Optional<yokohama.unit.ast.Expr> receiver,
             Type returnType,
-            String envVarName,
+            Sym envVar,
             Span span) {
         Class<?> clazz = classType.toClass(classResolver);
 
         if (receiver.isPresent()) {
             // invokevirtual
-            Sym receiverVar = Sym.of(genSym.generate("receiver"));
-            Stream<Statement> getReceiver = translateExpr(
-                    receiver.get(),receiverVar.getName(), clazz, envVarName);
-            return Stream.concat(getReceiver, Stream.of(
-                    new VarInitStatement(
+            Sym receiverVar = genSym.generate("receiver");
+            Stream<Statement> getReceiver = translateExpr(receiver.get(), receiverVar, clazz, envVar);
+            return Stream.concat(getReceiver, Stream.of(new VarInitStatement(
                             returnType,
-                            varName,
+                            var,
                             new InvokeExpr(
                                     ClassType.of(classType, classResolver),
                                     receiverVar,
@@ -1188,10 +1150,9 @@ class AstToJUnitAstVisitor {
                             span)));
         } else {
             // invokestatic
-            return Stream.of(
-                    new VarInitStatement(
+            return Stream.of(new VarInitStatement(
                             returnType,
-                            varName,
+                            var,
                             new InvokeStaticExpr(
                                     ClassType.of(classType, classResolver),
                                     Collections.emptyList(),
@@ -1213,15 +1174,14 @@ class AstToJUnitAstVisitor {
             boolean isVararg,
             List<Sym> argVars,
             Optional<yokohama.unit.ast.Expr> receiver,
-            String envVarName,
+            Sym envVar,
             Span span) {
         Class<?> clazz = classType.toClass(classResolver);
 
         if (receiver.isPresent()) {
             // invokevirtual
-            Sym receiverVar = Sym.of(genSym.generate("receiver"));
-            Stream<Statement> getReceiver = translateExpr(
-                    receiver.get(), receiverVar.getName(), clazz, envVarName);
+            Sym receiverVar = genSym.generate("receiver");
+            Stream<Statement> getReceiver = translateExpr(receiver.get(), receiverVar, clazz, envVar);
             return Stream.concat(getReceiver, Stream.of(
                     new InvokeVoidStatement(
                             ClassType.of(classType, classResolver),

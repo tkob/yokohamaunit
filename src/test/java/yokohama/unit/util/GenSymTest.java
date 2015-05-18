@@ -14,10 +14,10 @@ public class GenSymTest {
         GenSym instance = new GenSym();
 
         // Exercise
-        String actual = instance.generate(prefix);
+        Sym actual = instance.generate(prefix);
 
         // Verify
-        assertThat(actual, is("prefix"));
+        assertThat(actual.getName(), is("prefix"));
     }
     
     @Test
@@ -28,10 +28,10 @@ public class GenSymTest {
         instance.generate(prefix);
 
         // Exercise
-        String actual = instance.generate(prefix);
+        Sym actual = instance.generate(prefix);
 
         // Verify
-        assertThat(actual, is("prefix2"));
+        assertThat(actual.getName(), is("prefix2"));
     }
     
     @Test
@@ -42,10 +42,10 @@ public class GenSymTest {
         instance.generate("another");
 
         // Exercise
-        String actual = instance.generate(prefix);
+        Sym actual = instance.generate(prefix);
 
         // Verify
-        assertThat(actual, is("prefix"));
+        assertThat(actual.getName(), is("prefix"));
     }
     
     @Test
@@ -55,10 +55,10 @@ public class GenSymTest {
         GenSym instance = new GenSym(Arrays.asList("prefix"));
 
         // Exercise
-        String actual = instance.generate(prefix);
+        Sym actual = instance.generate(prefix);
 
         // Verify
-        assertThat(actual, is("prefix2"));
+        assertThat(actual.getName(), is("prefix2"));
     }
     
 }

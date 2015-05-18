@@ -6,6 +6,7 @@ import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.util.ClassResolver;
+import yokohama.unit.util.Sym;
 
 public interface MockStrategy {
     /**
@@ -18,15 +19,15 @@ public interface MockStrategy {
     /**
      * Create a stub.
      * 
-     * @param varName            a variable name to be bound to the stub
+     * @param var                a variable to be bound to the stub
      * @param stubExpr           a stub expression
      * @param astToJUnitAstVisitor 
-     * @param envVarName         a variable name bound to the environment
+     * @param envVar             a variable bound to the environment
      * @return statements that bind the variable name to the stub
      */
     List<Statement> stub(
-            String varName,
+            Sym var,
             StubExpr stubExpr,
             AstToJUnitAstVisitor astToJUnitAstVisitor,
-            String envVarName);
+            Sym envVar);
 }
