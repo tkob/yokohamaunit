@@ -67,10 +67,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Class classForName(Map context, String className) throws ClassNotFoundException;
             }
         */
-        Sym contextVar = new Sym(genSym.generate("context"));
-        Sym classNameVar = new Sym(genSym.generate("className"));
+        Sym contextVar = Sym.of(genSym.generate("context"));
+        Sym classNameVar = Sym.of(genSym.generate("className"));
 
-        Sym tableVar = new Sym(genSym.generate("table"));
+        Sym tableVar = Sym.of(genSym.generate("table"));
         Stream<Statement> createTable = Stream.of(new VarInitStatement(
                 MAP.toType(),
                 tableVar.getName(),
@@ -82,8 +82,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
         Stream<Statement> populateTable =
                 classResolver.flatMap((shortName, longName) -> {
-                    Sym shortNameVar = new Sym(genSym.generate(SUtils.toIdent(shortName)));
-                    Sym longNameVar = new Sym(genSym.generate(SUtils.toIdent(longName)));
+                    Sym shortNameVar = Sym.of(genSym.generate(SUtils.toIdent(shortName)));
+                    Sym longNameVar = Sym.of(genSym.generate(SUtils.toIdent(longName)));
                     Class<?> clazz;
                     try {
                         clazz = classResolver.lookup(longName);
@@ -113,10 +113,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Span.dummySpan()));
                 });
 
-        Sym returnedVar = new Sym(genSym.generate("returned"));
-        Sym nullValueVar = new Sym(genSym.generate("nullValue"));
-        Sym notFoundVar = new Sym(genSym.generate("notFound"));
-        Sym fallbackVar = new Sym(genSym.generate("fallback"));
+        Sym returnedVar = Sym.of(genSym.generate("returned"));
+        Sym nullValueVar = Sym.of(genSym.generate("nullValue"));
+        Sym notFoundVar = Sym.of(genSym.generate("notFound"));
+        Sym fallbackVar = Sym.of(genSym.generate("fallback"));
         Stream<Statement> lookupTable = Stream.of(
                 new VarInitStatement(
                         Type.CLASS,
@@ -194,8 +194,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                     Arrays.asList()),
                             Span.dummySpan()));
         } else {
-            Sym rootVar = new Sym(genSym.generate("root"));
-            Sym classResolverVar = new Sym(genSym.generate("classResolver"));
+            Sym rootVar = Sym.of(genSym.generate("root"));
+            Sym classResolverVar = Sym.of(genSym.generate("classResolver"));
             return Arrays.asList(
                     new VarInitStatement(
                             Type.OBJECT,
@@ -232,7 +232,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public List<Statement> bind(String envVarName, Ident ident, Sym rhs) {
-        Sym nameVar = new Sym(genSym.generate(ident.getName()));
+        Sym nameVar = Sym.of(genSym.generate(ident.getName()));
         return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
@@ -243,7 +243,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                         genSym.generate("__"),
                         new InvokeExpr(
                                 classTypeOf(OGNL_CONTEXT),
-                                new Sym(envVarName),
+                                Sym.of(envVarName),
                                 "put",
                                 Arrays.asList(Type.OBJECT, Type.OBJECT),
                                 Arrays.asList(nameVar, rhs),
@@ -253,10 +253,10 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Optional<CatchClause> catchAndAssignCause(String causeVarName) {
-        Sym caughtVar = new Sym(genSym.generate("ex"));
-        Sym reasonVar = new Sym(genSym.generate("reason"));
-        Sym nullValueVar = new Sym(genSym.generate("nullValue"));
-        Sym condVar = new Sym(genSym.generate("cond"));
+        Sym caughtVar = Sym.of(genSym.generate("ex"));
+        Sym reasonVar = Sym.of(genSym.generate("reason"));
+        Sym nullValueVar = Sym.of(genSym.generate("nullValue"));
+        Sym condVar = Sym.of(genSym.generate("cond"));
         return Optional.of(new CatchClause(
                 classTypeOf(OGNL_EXCEPTION),
                 caughtVar,
@@ -304,7 +304,7 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
             QuotedExpr quotedExpr,
             Class<?> expectedType,
             String envVarName) {
-        Sym exprVar = new Sym(genSym.generate("expression"));
+        Sym exprVar = Sym.of(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), span),
@@ -315,8 +315,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.MAP, Type.OBJECT),
                                 Arrays.asList(exprVar,
-                                        new Sym(envVarName),
-                                        new Sym(envVarName)),
+                                        Sym.of(envVarName),
+                                        Sym.of(envVarName)),
                                 Type.OBJECT),
                         Span.dummySpan()));
     }

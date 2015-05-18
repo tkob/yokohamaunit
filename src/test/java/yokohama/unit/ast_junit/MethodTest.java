@@ -50,7 +50,7 @@ public class MethodTest {
                                 Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
-                        new IsStatement(new Sym("actual"), new Sym("expected"), Span.dummySpan())));
+                        new IsStatement(Sym.of("actual"), Sym.of("expected"), Span.dummySpan())));
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();

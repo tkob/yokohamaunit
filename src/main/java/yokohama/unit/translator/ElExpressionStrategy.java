@@ -57,7 +57,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         env.getELManager().importClass("java.util.ArrayList")
         ...
         */
-        Sym managerVar = new Sym(genSym.generate("manager"));
+        Sym managerVar = Sym.of(genSym.generate("manager"));
         Stream<Statement> newElp = Stream.of(new VarInitStatement(
                         EL_PROCESSOR.toType(),
                         varName,
@@ -71,7 +71,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         managerVar.getName(),
                         new InvokeExpr(
                                 EL_PROCESSOR,
-                                new Sym(varName),
+                                Sym.of(varName),
                                 "getELManager",
                                 Arrays.asList(),
                                 Arrays.asList(),
@@ -79,7 +79,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         Span.dummySpan()));
         Stream<Statement> importClasses = classResolver.<String>map((s, l) -> l)
                 .flatMap(longName -> {
-                    Sym longNameVar = new Sym(genSym.generate(SUtils.toIdent(longName)));
+                    Sym longNameVar = Sym.of(genSym.generate(SUtils.toIdent(longName)));
                     return Stream.of(
                             new VarInitStatement(
                                     Type.STRING,
@@ -103,7 +103,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         /*
         env.defineBean(name, rhs);
         */
-        Sym nameVar = new Sym(genSym.generate(ident.getName()));
+        Sym nameVar = Sym.of(genSym.generate(ident.getName()));
         return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
@@ -111,7 +111,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         ident.getSpan()),
                 new InvokeVoidStatement(
                         EL_PROCESSOR,
-                        new Sym(envVarName),
+                        Sym.of(envVarName),
                         "defineBean",
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(nameVar, rhs),
@@ -120,10 +120,10 @@ public class ElExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Optional<CatchClause> catchAndAssignCause(String causeVarName) {
-        Sym caughtVar = new Sym(genSym.generate("ex"));
-        Sym reasonVar = new Sym(genSym.generate("reason"));
-        Sym nullValueVar = new Sym(genSym.generate("nullValue"));
-        Sym condVar = new Sym(genSym.generate("cond"));
+        Sym caughtVar = Sym.of(genSym.generate("ex"));
+        Sym reasonVar = Sym.of(genSym.generate("reason"));
+        Sym nullValueVar = Sym.of(genSym.generate("nullValue"));
+        Sym condVar = Sym.of(genSym.generate("cond"));
         return Optional.of(new CatchClause(
                 EL_EXCEPTION,
                 caughtVar,
@@ -171,8 +171,8 @@ public class ElExpressionStrategy implements ExpressionStrategy {
             QuotedExpr quotedExpr,
             Class<?> expectedType,
             String envVarName) {
-        Sym exprVar = new Sym(genSym.generate("expression"));
-        Sym expectedTypeVar = new Sym(genSym.generate("expectedType"));
+        Sym exprVar = Sym.of(genSym.generate("expression"));
+        Sym expectedTypeVar = Sym.of(genSym.generate("expectedType"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), span),
@@ -183,7 +183,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 EL_PROCESSOR,
-                                new Sym(envVarName),
+                                Sym.of(envVarName),
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.CLASS),
                                 Arrays.asList(exprVar, expectedTypeVar),

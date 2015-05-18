@@ -74,10 +74,10 @@ public class JUnitAstCompilerTest {
                                                                         "ret",
                                                                         new ArrayExpr(
                                                                                 Type.STRING.toArray(),
-                                                                                Arrays.asList(new Sym("content1"),
-                                                                                        new Sym("content2"))),
+                                                                                Arrays.asList(Sym.of("content1"),
+                                                                                        Sym.of("content2"))),
                                                                         Span.dummySpan()),
-                                                                new ReturnStatement(new Sym("ret")))))))),
+                                                                new ReturnStatement(Sym.of("ret")))))))),
         new String[] { "a", "b" }),
     };
 

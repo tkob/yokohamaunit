@@ -67,7 +67,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
 
         env = new groovy.lang.GroovyShell(configuration)
         */
-        Sym importCustomizerVar = new Sym(genSym.generate("importCustomizer"));
+        Sym importCustomizerVar = Sym.of(genSym.generate("importCustomizer"));
         Stream<Statement> importCustomizer = Stream.of(
                 new VarInitStatement(
                         typeOf(IMPORT_CUSTOMIZER),
@@ -78,9 +78,9 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Collections.emptyList()),
                         Span.dummySpan()));
         Stream<Statement> importClasses = classResolver.flatMap((shortName, longName) -> {
-                    Sym shortNameVar = new Sym(genSym.generate(SUtils.toIdent(shortName)));
-                    Sym longNameVar = new Sym(genSym.generate(SUtils.toIdent(longName)));
-                    Sym __ = new Sym(genSym.generate("__"));
+                    Sym shortNameVar = Sym.of(genSym.generate(SUtils.toIdent(shortName)));
+                    Sym longNameVar = Sym.of(genSym.generate(SUtils.toIdent(longName)));
+                    Sym __ = Sym.of(genSym.generate("__"));
                     return Stream.of(
                             new VarInitStatement(
                                     Type.STRING,
@@ -105,9 +105,9 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                     Span.dummySpan()));
                 });
 
-        Sym configurationVar = new Sym(genSym.generate("configuration"));
-        Sym customizersVar = new Sym(genSym.generate("customizers"));
-        Sym __ = new Sym(genSym.generate("__"));
+        Sym configurationVar = Sym.of(genSym.generate("configuration"));
+        Sym customizersVar = Sym.of(genSym.generate("customizers"));
+        Sym __ = Sym.of(genSym.generate("__"));
         Stream<Statement> configuration = Stream.of(
                 new VarInitStatement(
                         typeOf(COMPILER_CONFIGURATION),
@@ -157,7 +157,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         /*
         env.setVariable(name, rhs);
         */
-        Sym nameVar = new Sym(genSym.generate(ident.getName()));
+        Sym nameVar = Sym.of(genSym.generate(ident.getName()));
         return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
@@ -165,7 +165,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                         ident.getSpan()),
                 new InvokeVoidStatement(
                         classTypeOf(GROOVY_SHELL),
-                        new Sym(envVarName),
+                        Sym.of(envVarName),
                         "setVariable",
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(nameVar, rhs),
@@ -183,14 +183,14 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
             QuotedExpr quotedExpr,
             Class<?> expectedType,
             String envVarName) {
-        Sym exprVar = new Sym(genSym.generate("expression"));
+        Sym exprVar = Sym.of(genSym.generate("expression"));
         Span span = quotedExpr.getSpan();
         return Arrays.asList(new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 classTypeOf(GROOVY_SHELL),
-                                new Sym(envVarName),
+                                Sym.of(envVarName),
                                 "evaluate",
                                 Arrays.asList(Type.STRING),
                                 Arrays.asList(exprVar),

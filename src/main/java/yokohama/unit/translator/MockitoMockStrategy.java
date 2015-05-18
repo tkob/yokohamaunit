@@ -78,7 +78,7 @@ public class MockitoMockStrategy implements MockStrategy {
             yokohama.unit.ast.ClassType classToStub,
             ClassResolver classResolver) {
         // Call Mockito.mock method with the class and bind the variable to the result.
-        Sym classToStubVar = new Sym(genSym.generate("classToStub"));
+        Sym classToStubVar = Sym.of(genSym.generate("classToStub"));
         Type clazz = Type.of(classToStub.toType(), classResolver);
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
@@ -143,7 +143,7 @@ public class MockitoMockStrategy implements MockStrategy {
                     Stream.of(
                             Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray()));
             argVars = Stream.concat(pairs.stream().map(Pair::getFirst),
-                    Stream.of(new Sym(varArg)));
+                    Stream.of(Sym.of(varArg)));
             argMatchers = Stream.concat(
                     pairs.stream().flatMap(Pair::getSecond),
                     Stream.<Statement>of(
@@ -174,7 +174,7 @@ public class MockitoMockStrategy implements MockStrategy {
         Stream<Statement> invoke = Stream.concat(Stream.of(new VarInitStatement(returnType, invokeTmpVarName, 
                                 new InvokeExpr(
                                         ClassType.of(classToStub, classResolver),
-                                        new Sym(varName),
+                                        Sym.of(varName),
                                         methodName,
                                         argTypes.collect(Collectors.toList()),
                                         argVars.collect(Collectors.toList()),
@@ -190,7 +190,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                                             Arrays.asList(),
                                                             "valueOf",
                                                             Arrays.asList(primitiveType.toType()),
-                                                            Arrays.asList(new Sym(invokeTmpVarName)),
+                                                            Arrays.asList(Sym.of(invokeTmpVarName)),
                                                             boxed.toType()),
                                                     span));
                                 },
@@ -208,16 +208,16 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(),
                                 "when",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Sym(invokeVarName)),
+                                Arrays.asList(Sym.of(invokeVarName)),
                                 typeOf(ONGOING_STUBBING)),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
                                 classTypeOf(ONGOING_STUBBING),
-                                new Sym(stubbingVarName),
+                                Sym.of(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Sym(returnedVarName)),
+                                Arrays.asList(Sym.of(returnedVarName)),
                                 typeOf(ONGOING_STUBBING)),
                         span));
 
@@ -347,7 +347,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                                 Arrays.asList(type),
                                                 "isA",
                                                 Arrays.asList(Type.CLASS),
-                                                Arrays.asList(new Sym(clazzVarName)),
+                                                Arrays.asList(Sym.of(clazzVarName)),
                                                 Type.OBJECT),
                                         Span.dummySpan()));
                     }
@@ -364,10 +364,10 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Arrays.asList(type),
                                             "isA",
                                             Arrays.asList(Type.CLASS),
-                                            Arrays.asList(new Sym(clazzVarName)),
+                                            Arrays.asList(Sym.of(clazzVarName)),
                                             Type.OBJECT),
                                     Span.dummySpan()));
                 });
-        return new Pair<>(new Sym(argVarName), statements);
+        return new Pair<>(Sym.of(argVarName), statements);
     }
 }
