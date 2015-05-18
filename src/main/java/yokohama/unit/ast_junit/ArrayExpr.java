@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.List;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +9,7 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class ArrayExpr implements Expr {
     Type type;
-    List<Var> contents;
+    List<Sym> contents;
 
     void getExpr(SBuilder sb, Type type, String name) {
         NonArrayType componentType = type.getNonArrayType();

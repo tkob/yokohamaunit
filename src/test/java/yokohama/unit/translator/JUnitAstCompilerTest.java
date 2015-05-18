@@ -26,7 +26,7 @@ import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.ReturnStatement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
-import yokohama.unit.ast_junit.Var;
+import yokohama.unit.util.Sym;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
@@ -46,23 +46,20 @@ public class JUnitAstCompilerTest {
                 "ArrayCreation",
                 new CompilationUnit(
                         "yokohama.unit.translator",
-                        Arrays.asList(
-                                new ClassDecl(
+                        Arrays.asList(new ClassDecl(
                                         true,
                                         "ArrayCreation",
                                         Optional.empty(),
                                         Arrays.asList(
                                                 new ClassType(
                                                         java.util.concurrent.Callable.class)),
-                                        Arrays.asList(
-                                                new Method(
+                                        Arrays.asList(new Method(
                                                         Collections.emptyList(),
                                                         "call",
                                                         Collections.emptyList(),
                                                         Optional.of(Type.OBJECT),
                                                         Arrays.asList(ClassType.EXCEPTION),
-                                                        Arrays.asList(
-                                                                new VarInitStatement(
+                                                        Arrays.asList(new VarInitStatement(
                                                                         Type.STRING,
                                                                         "content1",
                                                                         new StrLitExpr("a"),
@@ -77,11 +74,10 @@ public class JUnitAstCompilerTest {
                                                                         "ret",
                                                                         new ArrayExpr(
                                                                                 Type.STRING.toArray(),
-                                                                                Arrays.asList(
-                                                                                        new Var("content1"),
-                                                                                        new Var("content2"))),
+                                                                                Arrays.asList(new Sym("content1"),
+                                                                                        new Sym("content2"))),
                                                                         Span.dummySpan()),
-                                                                new ReturnStatement(new Var("ret")))))))),
+                                                                new ReturnStatement(new Sym("ret")))))))),
         new String[] { "a", "b" }),
     };
 

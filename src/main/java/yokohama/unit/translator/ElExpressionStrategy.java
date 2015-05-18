@@ -26,7 +26,7 @@ import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
-import yokohama.unit.ast_junit.Var;
+import yokohama.unit.util.Sym;
 import yokohama.unit.ast_junit.VarExpr;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Span;
@@ -57,9 +57,8 @@ public class ElExpressionStrategy implements ExpressionStrategy {
         env.getELManager().importClass("java.util.ArrayList")
         ...
         */
-        Var managerVar = new Var(genSym.generate("manager"));
-        Stream<Statement> newElp = Stream.of(
-                new VarInitStatement(
+        Sym managerVar = new Sym(genSym.generate("manager"));
+        Stream<Statement> newElp = Stream.of(new VarInitStatement(
                         EL_PROCESSOR.toType(),
                         varName,
                         new NewExpr(
@@ -72,7 +71,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         managerVar.getName(),
                         new InvokeExpr(
                                 EL_PROCESSOR,
-                                new Var(varName),
+                                new Sym(varName),
                                 "getELManager",
                                 Arrays.asList(),
                                 Arrays.asList(),
@@ -80,7 +79,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                         Span.dummySpan()));
         Stream<Statement> importClasses = classResolver.<String>map((s, l) -> l)
                 .flatMap(longName -> {
-                    Var longNameVar = new Var(genSym.generate(SUtils.toIdent(longName)));
+                    Sym longNameVar = new Sym(genSym.generate(SUtils.toIdent(longName)));
                     return Stream.of(
                             new VarInitStatement(
                                     Type.STRING,
@@ -100,20 +99,19 @@ public class ElExpressionStrategy implements ExpressionStrategy {
     }
 
     @Override
-    public List<Statement> bind(String envVarName, Ident ident, Var rhs) {
+    public List<Statement> bind(String envVarName, Ident ident, Sym rhs) {
         /*
         env.defineBean(name, rhs);
         */
-        Var nameVar = new Var(genSym.generate(ident.getName()));
-        return Arrays.asList(
-                new VarInitStatement(
+        Sym nameVar = new Sym(genSym.generate(ident.getName()));
+        return Arrays.asList(new VarInitStatement(
                         Type.STRING,
                         nameVar.getName(),
                         new StrLitExpr(ident.getName()),
                         ident.getSpan()),
                 new InvokeVoidStatement(
                         EL_PROCESSOR,
-                        new Var(envVarName),
+                        new Sym(envVarName),
                         "defineBean",
                         Arrays.asList(Type.STRING, Type.OBJECT),
                         Arrays.asList(nameVar, rhs),
@@ -122,10 +120,10 @@ public class ElExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public Optional<CatchClause> catchAndAssignCause(String causeVarName) {
-        Var caughtVar = new Var(genSym.generate("ex"));
-        Var reasonVar = new Var(genSym.generate("reason"));
-        Var nullValueVar = new Var(genSym.generate("nullValue"));
-        Var condVar = new Var(genSym.generate("cond"));
+        Sym caughtVar = new Sym(genSym.generate("ex"));
+        Sym reasonVar = new Sym(genSym.generate("reason"));
+        Sym nullValueVar = new Sym(genSym.generate("nullValue"));
+        Sym condVar = new Sym(genSym.generate("cond"));
         return Optional.of(new CatchClause(
                 EL_EXCEPTION,
                 caughtVar,
@@ -173,11 +171,10 @@ public class ElExpressionStrategy implements ExpressionStrategy {
             QuotedExpr quotedExpr,
             Class<?> expectedType,
             String envVarName) {
-        Var exprVar = new Var(genSym.generate("expression"));
-        Var expectedTypeVar = new Var(genSym.generate("expectedType"));
+        Sym exprVar = new Sym(genSym.generate("expression"));
+        Sym expectedTypeVar = new Sym(genSym.generate("expectedType"));
         Span span = quotedExpr.getSpan();
-        return Arrays.asList(
-                new VarInitStatement(Type.STRING, exprVar.getName(),
+        return Arrays.asList(new VarInitStatement(Type.STRING, exprVar.getName(),
                         new StrLitExpr(quotedExpr.getText()), span),
                 new VarInitStatement(
                         Type.CLASS, expectedTypeVar.getName(),
@@ -186,7 +183,7 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                 new VarInitStatement(Type.fromClass(expectedType), varName,
                         new InvokeExpr(
                                 EL_PROCESSOR,
-                                new Var(envVarName),
+                                new Sym(envVarName),
                                 "getValue",
                                 Arrays.asList(Type.STRING, Type.CLASS),
                                 Arrays.asList(exprVar, expectedTypeVar),

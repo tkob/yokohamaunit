@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
@@ -9,20 +10,19 @@ import yokohama.unit.util.SBuilder;
 @Value
 public class InvokeVoidStatement implements Statement {
     ClassType classType;
-    Var object;
+    Sym object;
     String methodName;
     List<Type> argTypes;
-    List<Var> args;
+    List<Sym> args;
     Span span;
 
     @Override
     public void toString(SBuilder sb) {
-        sb.appendln(
-                object.getName(),
+        sb.appendln(object.getName(),
                 ".",
                 methodName,
                 "(",
-                args.stream().map(Var::getName).collect(Collectors.joining(", ")),
+                args.stream().map(Sym::getName).collect(Collectors.joining(", ")),
                 ");");
     }
 

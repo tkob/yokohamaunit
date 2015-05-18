@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.Arrays;
 import java.util.Optional;
 import org.apache.commons.lang3.text.StrBuilder;
@@ -42,15 +43,14 @@ public class MethodTest {
                 Arrays.asList(),
                 Optional.empty(),
                 Arrays.asList(new ClassType(java.lang.Exception.class)),
-                Arrays.asList(
-                        new VarInitStatement(
+                Arrays.asList(new VarInitStatement(
                                 new Type(new ClassType(ognl.OgnlContext.class), 0),
                                 "env",
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "actual", new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, "expected", new IntLitExpr(1), Span.dummySpan()),
-                        new IsStatement(new Var("actual"), new Var("expected"), Span.dummySpan())));
+                        new IsStatement(new Sym("actual"), new Sym("expected"), Span.dummySpan())));
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();

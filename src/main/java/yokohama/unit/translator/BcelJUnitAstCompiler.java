@@ -47,7 +47,7 @@ import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.ReturnStatement;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.Var;
+import yokohama.unit.util.Sym;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.ErrorMessage;
@@ -381,8 +381,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         addLineNumber(mg, ih, varInitStatement.getSpan());
         LocalVariableGen var = locals.get(varInitStatement.getName());
         Type type = typeOf(varInitStatement.getType());
-        Type fromType = varInitStatement.getValue().<Type>accept(
-            varExpr -> {
+        Type fromType = varInitStatement.getValue().<Type>accept(varExpr -> {
                 LocalVariableGen from = locals.get(varExpr.getName());
                 il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
                 return from.getType();
@@ -407,7 +406,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return new ObjectType("org.hamcrest.Matcher");
             },
             equalToMatcherExpr -> {
-                Var operand = equalToMatcherExpr.getOperand();
+                Sym operand = equalToMatcherExpr.getOperand();
                 LocalVariableGen lv = locals.get(operand.getName());
                 il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
                 il.append(factory.createInvoke(
@@ -422,7 +421,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);
                 // push arguments
-                for (Var arg : newExpr.getArgs()) {
+                for (Sym arg : newExpr.getArgs()) {
                     LocalVariableGen lv = locals.get(arg.getName());
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
                 }
@@ -452,7 +451,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 LocalVariableGen object = locals.get(invokeExpr.getObject().getName());
                 il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
                 // push arguments
-                for (Var arg : invokeExpr.getArgs()) {
+                for (Sym arg : invokeExpr.getArgs()) {
                     LocalVariableGen lv = locals.get(arg.getName());
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
                 }
@@ -473,7 +472,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             },
             invokeStaticExpr -> {
                 Type returnType = typeOf(invokeStaticExpr.getReturnType());
-                for (Var arg : invokeStaticExpr.getArgs()) {
+                for (Sym arg : invokeStaticExpr.getArgs()) {
                     LocalVariableGen lv = locals.get(arg.getName());
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
                 }
@@ -564,14 +563,14 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             InstructionFactory factory,
             ConstantPoolGen cp) {
         Type componentType = typeOf(arrayExpr.getType().getNonArrayType().toType());
-        List<Var> contents = arrayExpr.getContents();
+        List<Sym> contents = arrayExpr.getContents();
         il.append(new PUSH(cp, contents.size()));
         il.append(factory.createNewArray(
                 componentType,
                 (short)arrayExpr.getType().getDims()));
         for (int i = 0; i < contents.size(); i++) {
             il.append(InstructionConstants.DUP);
-            Var content = contents.get(i);
+            Sym content = contents.get(i);
             LocalVariableGen lv = locals.get(content.getName());
             il.append(new PUSH(cp, i));
             il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
@@ -630,7 +629,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
         addLineNumber(mg, ih, invokeVoidStatement.getSpan());
         // push arguments
-        for (Var arg : invokeVoidStatement.getArgs()) {
+        for (Sym arg : invokeVoidStatement.getArgs()) {
             LocalVariableGen lv = locals.get(arg.getName());
             il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
         }
@@ -657,7 +656,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             ConstantPoolGen cp) {
         InstructionHandle ih = il.append(InstructionFactory.NOP);
         addLineNumber(mg, ih, invokeStaticVoidStatement.getSpan());
-        for (Var arg : invokeStaticVoidStatement.getArgs()) {
+        for (Sym arg : invokeStaticVoidStatement.getArgs()) {
             LocalVariableGen lv = locals.get(arg.getName());
             il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
         }

@@ -8,7 +8,7 @@ import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.Statement;
-import yokohama.unit.ast_junit.Var;
+import yokohama.unit.util.Sym;
 
 public interface ExpressionStrategy {
     /**
@@ -37,7 +37,7 @@ public interface ExpressionStrategy {
      * @return statements that bind name to rhs in the environment of the
      *          expression language
      */
-    List<Statement> bind(String envVarName, Ident ident, Var rhs);
+    List<Statement> bind(String envVarName, Ident ident, Sym rhs);
 
     Optional<CatchClause> catchAndAssignCause(String causeVarName);
 

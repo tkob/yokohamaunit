@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
@@ -11,7 +12,7 @@ public class InvokeStaticExpr implements Expr {
     List<Type> typeArgs;
     String methodName;
     List<Type> argTypes;
-    List<Var> args;
+    List<Sym> args;
     Type returnType; // erasued return type
 
     public void getExpr(SBuilder sb, Type varType, String varName) {
@@ -20,7 +21,7 @@ public class InvokeStaticExpr implements Expr {
                 typeArgs.size() > 0
                         ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",
-                methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+                methodName, "(", args.stream().map(Sym::getName).collect(Collectors.joining(", ")), ");");
     }
 
     @Override

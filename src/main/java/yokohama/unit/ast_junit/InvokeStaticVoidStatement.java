@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Value;
@@ -12,17 +13,16 @@ public class InvokeStaticVoidStatement implements Statement {
     List<Type> typeArgs;
     String methodName;
     List<Type> argTypes;
-    List<Var> args;
+    List<Sym> args;
     Span span;
 
     @Override
     public void toString(SBuilder sb) {
-        sb.appendln(
-                clazz.getText(), ".", 
+        sb.appendln(clazz.getText(), ".", 
                 typeArgs.size() > 0
                         ? "<" + typeArgs.stream().map(Type::getText).collect(Collectors.joining(", "))  + ">"
                         : "",
-                methodName, "(", args.stream().map(Var::getName).collect(Collectors.joining(", ")), ");");
+                methodName, "(", args.stream().map(Sym::getName).collect(Collectors.joining(", ")), ");");
     }
 
     @Override

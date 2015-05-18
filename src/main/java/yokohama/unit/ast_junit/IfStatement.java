@@ -1,12 +1,13 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import java.util.List;
 import lombok.Value;
 import yokohama.unit.util.SBuilder;
 
 @Value
 public class IfStatement implements Statement {
-    private final Var cond;
+    private final Sym cond;
     private final List<Statement> then;
     private final List<Statement> otherwise;
 

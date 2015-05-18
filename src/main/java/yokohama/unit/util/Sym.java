@@ -1,8 +1,8 @@
-package yokohama.unit.ast_junit;
+package yokohama.unit.util;
 
 import lombok.Value;
 
 @Value
-public class Var {
+public class Sym {
     private String name;
 }

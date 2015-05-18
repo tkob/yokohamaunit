@@ -1,5 +1,6 @@
 package yokohama.unit.ast_junit;
 
+import yokohama.unit.util.Sym;
 import lombok.Value;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.SBuilder;
@@ -7,8 +8,8 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class IsStatement implements Statement {
-    private Var subject;
-    private Var complement;
+    private Sym subject;
+    private Sym complement;
     private Span span;
 
     @Override

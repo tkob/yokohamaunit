@@ -20,7 +20,7 @@ import yokohama.unit.ast_junit.InvokeStaticExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
-import yokohama.unit.ast_junit.Var;
+import yokohama.unit.util.Sym;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
@@ -78,7 +78,7 @@ public class MockitoMockStrategy implements MockStrategy {
             yokohama.unit.ast.ClassType classToStub,
             ClassResolver classResolver) {
         // Call Mockito.mock method with the class and bind the variable to the result.
-        Var classToStubVar = new Var(genSym.generate("classToStub"));
+        Sym classToStubVar = new Sym(genSym.generate("classToStub"));
         Type clazz = Type.of(classToStub.toType(), classResolver);
         return Stream.of(
                 new VarInitStatement(Type.CLASS, classToStubVar.getName(),
@@ -129,11 +129,11 @@ public class MockitoMockStrategy implements MockStrategy {
                 envVarName);
 
         Stream<Type> argTypes;
-        Stream<Var> argVars;
+        Stream<Sym> argVars;
         Stream<Statement> argMatchers;
         if (isVararg) {
             String varArg = genSym.generate("varArg");
-            List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
+            List<Pair<Sym, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
             argTypes = Stream.concat(
@@ -142,9 +142,8 @@ public class MockitoMockStrategy implements MockStrategy {
                             .map(type -> Type.of(type, classResolver)),
                     Stream.of(
                             Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray()));
-            argVars = Stream.concat(
-                    pairs.stream().map(Pair::getFirst),
-                    Stream.of(new Var(varArg)));
+            argVars = Stream.concat(pairs.stream().map(Pair::getFirst),
+                    Stream.of(new Sym(varArg)));
             argMatchers = Stream.concat(
                     pairs.stream().flatMap(Pair::getSecond),
                     Stream.<Statement>of(
@@ -161,7 +160,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Type.OBJECT),
                                     span)));
         } else {
-            List<Pair<Var, Stream<Statement>>> pairs = argumentTypes.stream()
+            List<Pair<Sym, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
             argTypes = methodPattern.getParamTypes().stream().map(type -> Type.of(type, classResolver));
@@ -172,12 +171,10 @@ public class MockitoMockStrategy implements MockStrategy {
         // invoke the method
         String invokeVarName = genSym.generate("invoke");
         String invokeTmpVarName = returnType.isPrimitive() ? genSym.generate("invoke") : invokeVarName;
-        Stream<Statement> invoke = Stream.concat(
-                Stream.of(
-                        new VarInitStatement(returnType, invokeTmpVarName, 
+        Stream<Statement> invoke = Stream.concat(Stream.of(new VarInitStatement(returnType, invokeTmpVarName, 
                                 new InvokeExpr(
                                         ClassType.of(classToStub, classResolver),
-                                        new Var(varName),
+                                        new Sym(varName),
                                         methodName,
                                         argTypes.collect(Collectors.toList()),
                                         argVars.collect(Collectors.toList()),
@@ -185,17 +182,15 @@ public class MockitoMockStrategy implements MockStrategy {
                                 span)),
                 // box primitive type if needed
                 returnType.getDims() == 0
-                        ? returnType.getNonArrayType().accept(
-                                primitiveType -> {
+                        ? returnType.getNonArrayType().accept(primitiveType -> {
                                     ClassType boxed = primitiveType.box();
-                                    return Stream.of(
-                                            new VarInitStatement(boxed.toType(), invokeVarName,
+                                    return Stream.of(new VarInitStatement(boxed.toType(), invokeVarName,
                                                     new InvokeStaticExpr(
                                                             boxed,
                                                             Arrays.asList(),
                                                             "valueOf",
                                                             Arrays.asList(primitiveType.toType()),
-                                                            Arrays.asList(new Var(invokeTmpVarName)),
+                                                            Arrays.asList(new Sym(invokeTmpVarName)),
                                                             boxed.toType()),
                                                     span));
                                 },
@@ -205,8 +200,7 @@ public class MockitoMockStrategy implements MockStrategy {
         // when ... thenReturn
         String stubbingVarName = genSym.generate("stubbing");
         String __ = genSym.generate("__");
-        Stream<Statement> whenReturn = Stream.of(
-                new VarInitStatement(
+        Stream<Statement> whenReturn = Stream.of(new VarInitStatement(
                         typeOf(ONGOING_STUBBING),
                         stubbingVarName,
                         new InvokeStaticExpr(
@@ -214,16 +208,16 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(),
                                 "when",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Var(invokeVarName)),
+                                Arrays.asList(new Sym(invokeVarName)),
                                 typeOf(ONGOING_STUBBING)),
                         span),
                 new VarInitStatement(Type.OBJECT, __, 
                         new InvokeExpr(
                                 classTypeOf(ONGOING_STUBBING),
-                                new Var(stubbingVarName),
+                                new Sym(stubbingVarName),
                                 "thenReturn",
                                 Arrays.asList(Type.OBJECT),
-                                Arrays.asList(new Var(returnedVarName)),
+                                Arrays.asList(new Sym(returnedVarName)),
                                 typeOf(ONGOING_STUBBING)),
                         span));
 
@@ -232,14 +226,13 @@ public class MockitoMockStrategy implements MockStrategy {
                         Stream.concat(invoke, whenReturn)));
     }
 
-    private Pair<Var, Stream<Statement>> mapArgumentType(
+    private Pair<Sym, Stream<Statement>> mapArgumentType(
             yokohama.unit.ast.Type argumentType,
             ClassResolver classResolver) {
         Span span = argumentType.getSpan();
         String argVarName = genSym.generate("arg");
         int dims = argumentType.getDims();
-        Stream<Statement> statements = argumentType.getNonArrayType().accept(
-                primitiveType -> {
+        Stream<Statement> statements = argumentType.getNonArrayType().accept(primitiveType -> {
                     if (dims == 0) {
                         switch (primitiveType.getKind()) {
                             case BOOLEAN:
@@ -347,15 +340,14 @@ public class MockitoMockStrategy implements MockStrategy {
                             case DOUBLE:  type = new Type(new PrimitiveType(Kind.DOUBLE),  dims); break;
                             default: throw new RuntimeException("should not reach here");
                         }
-                        return Stream.<Statement>of(
-                                new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
+                        return Stream.<Statement>of(new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
                                 new VarInitStatement(type, argVarName,
                                         new InvokeStaticExpr(
                                                 classTypeOf(MOCKITO),
                                                 Arrays.asList(type),
                                                 "isA",
                                                 Arrays.asList(Type.CLASS),
-                                                Arrays.asList(new Var(clazzVarName)),
+                                                Arrays.asList(new Sym(clazzVarName)),
                                                 Type.OBJECT),
                                         Span.dummySpan()));
                     }
@@ -365,18 +357,17 @@ public class MockitoMockStrategy implements MockStrategy {
                     Type type = new Type(
                             ClassType.of(classType, classResolver),
                             dims);
-                    return Stream.<Statement>of(
-                            new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
+                    return Stream.<Statement>of(new VarInitStatement(Type.CLASS, clazzVarName, new ClassLitExpr(type), span),
                             new VarInitStatement(type, argVarName,
                                     new InvokeStaticExpr(
                                             classTypeOf(MOCKITO),
                                             Arrays.asList(type),
                                             "isA",
                                             Arrays.asList(Type.CLASS),
-                                            Arrays.asList(new Var(clazzVarName)),
+                                            Arrays.asList(new Sym(clazzVarName)),
                                             Type.OBJECT),
                                     Span.dummySpan()));
                 });
-        return new Pair<>(new Var(argVarName), statements);
+        return new Pair<>(new Sym(argVarName), statements);
     }
 }
