@@ -178,89 +178,67 @@ class AstToJUnitAstVisitor {
     List<Method> translateTest(Test test) {
         final String name = test.getName();
         List<Assertion> assertions = test.getAssertions();
-        List<Method> methods = 
-                IntStream.range(0, assertions.size())
-                        .mapToObj(Integer::new)
-                        .flatMap(i ->
-                                translateAssertion(
-                                        assertions.get(i), i + 1, name)
-                                        .stream())
-                        .collect(Collectors.toList());
-        return methods;
-    }
-
-    List<Method> translateAssertion(
-            Assertion assertion, int index, String testName) {
-        String methodName = SUtils.toIdent(testName) + "_" + index;
-        List<Proposition> propositions = assertion.getPropositions();
-        return assertion.getFixture().accept(
-                () -> {
+        return IntStream.range(0, assertions.size())
+                .mapToObj(Integer::new)
+                .flatMap(assertionNo -> {
                     Sym env = genSym.generate("env");
-                    return Arrays.asList(new Method(
-                            Arrays.asList(annotationOf(TEST)),
-                            methodName,
-                            Arrays.asList(),
-                            Optional.empty(),
-                            Arrays.asList(ClassType.EXCEPTION),
-                            ListUtils.union(
-                                    expressionStrategy.env(env),
-                                    propositions.stream()
-                                            .flatMap(proposition ->
-                                                    translateProposition(
-                                                            proposition,
-                                                            env))
-                                            .collect(Collectors.toList()))));
-                },
-                tableRef -> {
-                    Sym env = genSym.generate("env");
-                    List<List<Statement>> table =
-                            translateTableRef(tableRef, env);
-                    return IntStream.range(0, table.size())
+                    List<List<Statement>> bodies =
+                            translateAssertion(
+                                    assertions.get(assertionNo), env);
+                    return IntStream.range(0, bodies.size())
                             .mapToObj(Integer::new)
-                            .map(i -> {
+                            .map(bodyNo -> {
+                                String methodName = SUtils.toIdent(name)
+                                        + "_" + assertionNo + "_" + bodyNo;
                                 return new Method(
                                         Arrays.asList(annotationOf(TEST)),
-                                        methodName + "_" + (i + 1),
+                                        methodName,
                                         Arrays.asList(),
                                         Optional.empty(),
                                         Arrays.asList(ClassType.EXCEPTION),
                                         ListUtils.union(
                                                 expressionStrategy.env(env),
-                                                ListUtils.union(
-                                                        table.get(i),
-                                                        propositions
-                                                                .stream()
-                                                                .flatMap(proposition ->
-                                                                        translateProposition(
-                                                                                proposition,
-                                                                                env))
-                                                                .collect(Collectors.toList()))));
-                            })
+                                                bodies.get(bodyNo)));
+                            });
+                })
+                .collect(Collectors.toList());
+    }
+
+    List<List<Statement>> translateAssertion(Assertion assertion, Sym env) {
+        List<Proposition> propositions = assertion.getPropositions();
+        return assertion.getFixture().accept(
+                () -> {
+                    List<Statement> body = propositions.stream()
+                            .flatMap(proposition ->
+                                    translateProposition(proposition, env))
                             .collect(Collectors.toList());
+                    return Arrays.asList(body);
+                },
+                tableRef -> {
+                    List<List<Statement>> table =
+                            translateTableRef(tableRef, env);
+                    return IntStream.range(0, table.size())
+                            .mapToObj(Integer::new)
+                            .map(i -> {
+                                return ListUtils.union(
+                                        table.get(i),
+                                        propositions.stream()
+                                                .flatMap(proposition ->
+                                                        translateProposition(proposition, env))
+                                                .collect(Collectors.toList()));
+                            }).collect(Collectors.toList());
                 },
                 bindings -> {
-                    Sym env = genSym.generate("env");
-                    return Arrays.asList(new Method(
-                            Arrays.asList(annotationOf(TEST)),
-                            methodName,
-                            Arrays.asList(),
-                            Optional.empty(),
-                            Arrays.asList(ClassType.EXCEPTION),
-                            ListUtils.union(
-                                    expressionStrategy.env(env),
-                                    Stream.concat(
-                                            bindings.getBindings()
-                                                    .stream()
-                                                    .flatMap(binding ->
-                                                            translateBinding(
-                                                                    binding,
-                                                                    env)),
-                                            propositions.stream()
-                                                    .flatMap(proposition ->
-                                                            translateProposition(
-                                                                    proposition,
-                                                                    env)))
-                                            .collect(Collectors.toList()))));
+                    List<Statement> body = Stream.concat(
+                            bindings.getBindings()
+                                    .stream()
+                                    .flatMap(binding ->
+                                            translateBinding(binding, env)),
+                            propositions.stream()
+                                    .flatMap(proposition ->
+                                            translateProposition(proposition, env)))
+                            .collect(Collectors.toList());
+                    return Arrays.asList(body);
                 });
     }
 

@@ -97,19 +97,8 @@ public class AstToJUnitAstTest {
                         new ClassResolver(),
                         Collections.emptyList(),
                         Collections.emptyMap());
-        List<Method> actual = instance.translateAssertion(assertion, 0, testName);
-        List<Method> expected = Arrays.asList(new Method(
-                Arrays.asList(TEST),
-                "test_0",
-                Arrays.asList(),
-                Optional.empty(),
-                Arrays.asList(new ClassType(java.lang.Exception.class)),
-                Arrays.asList(
-                        new VarInitStatement(
-                                new ClassType(ognl.OgnlContext.class).toType(),
-                                Sym.of("env"),
-                                new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
-                                Span.dummySpan()))));
+        List<List<Statement>> actual = instance.translateAssertion(assertion, Sym.of("env"));
+        List<List<Statement>> expected = Arrays.asList(Arrays.asList());
         assertThat(actual, is(expected));
     }
 
