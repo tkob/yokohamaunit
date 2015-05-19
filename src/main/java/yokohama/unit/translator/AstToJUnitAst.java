@@ -924,13 +924,11 @@ class AstToJUnitAstVisitor {
                 fourPhaseTest.getExercise()
                         .map(Phase::getStatements)
                         .map(statements -> translateStatements(statements, env));
-        Stream<Statement> testStatements = fourPhaseTest.getVerify().getAssertions()
-                .stream()
-                .flatMap(assertion ->
-                        assertion.getPropositions()
-                                .stream()
-                                .flatMap(proposition ->
-                                        translateProposition(proposition, env)));
+        Stream<Statement> testStatements =
+                fourPhaseTest.getVerify().getAssertions().stream()
+                        .flatMap(assertion ->
+                                translateAssertion(assertion, env)
+                                        .stream().flatMap(s -> s.stream()));
 
         List<Statement> statements =
                 Stream.concat(

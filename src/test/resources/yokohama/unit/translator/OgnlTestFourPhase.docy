@@ -7,3 +7,20 @@ Do `i.incrementAndGet()`.
 
 ## Verify
 Assert `i.get()` is `1`.
+
+Assert `j` is `1` where j = `i.get()`.
+
+# Test: String.startsWith
+## Setup
+Let sut = "hello world".
+
+## Verify
+Assert `sut.startsWith(prefix)` is `expected` for all prefix and expected in
+Table [Test data for startsWith].
+
+[Test data for startsWith]
+| prefix  | expected |
+| ------- | -------- |
+| ""      | true     |
+| "hello" | true     |
+| "world" | false    |

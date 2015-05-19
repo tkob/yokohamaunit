@@ -64,7 +64,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "OgnlTestExcel.docy", new OgnlExpressionStrategyFactory(), 3),
         new Fixture(
-                "OgnlTestFourPhase.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestFourPhase.docy", new OgnlExpressionStrategyFactory(), 2),
         new Fixture(
                 "OgnlTestFourPhaseWithTeardown.docy", new OgnlExpressionStrategyFactory(), 1),
         new Fixture(
