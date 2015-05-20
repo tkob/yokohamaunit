@@ -202,14 +202,7 @@ public class CheckVisitorTemplate extends AstVisitor<Stream<ErrorMessage>> {
 
     @Override
     public Stream<ErrorMessage> visitLetStatement(LetStatement letStatement) {
-        return letStatement.getBindings().stream().flatMap(this::visitLetBinding);
-    }
-
-    @Override
-    public Stream<ErrorMessage> visitLetBinding(LetBinding letBinding) {
-        return Stream.concat(
-                visitIdent(letBinding.getName()),
-                visitExpr(letBinding.getValue()));
+        return letStatement.getBindings().stream().flatMap(this::visitBinding);
     }
 
     @Override

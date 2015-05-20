@@ -80,7 +80,6 @@ public abstract class AstVisitor<T> {
     public abstract T visitPhase(Phase phase);
     public abstract T visitVerifyPhase(VerifyPhase verifyPhase);
     public abstract T visitLetStatement(LetStatement letStatement);
-    public abstract T visitLetBinding(LetBinding letBinding);
     public T visitStatement(Statement statement) {
         return statement.accept(
                 this::visitExecution,

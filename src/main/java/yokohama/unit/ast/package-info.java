@@ -63,8 +63,7 @@
  * Phase ::= LetStatement* Statement*
  * VerifyPhase ::= Assertion+
  * 
- * LetStatement ::= LetBinding+
- * LetBinding ::= Expr
+ * LetStatement ::= Binding+
  * 
  * Statement ::= Execution | Invoke
  * 

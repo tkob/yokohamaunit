@@ -40,7 +40,6 @@ import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
-import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NonArrayType;
@@ -370,8 +369,8 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public LetBinding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
-        return new LetBinding(
+    public Binding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
+        return new Binding(
                 new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitExpr(ctx.expr()),
                 getSpan(ctx));

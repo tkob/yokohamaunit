@@ -112,7 +112,7 @@ public class VariableCheckVisitor {
                 phase -> phase.getLetStatements().stream()
                         .flatMap(letStatement ->
                                 letStatement.getBindings().stream()
-                                        .map(LetBinding::getName)))
+                                        .map(Binding::getName)))
                 .collect(Collectors.toList());
         Stream<ErrorMessage> setupErrors = checkIdents(setupIdents, env);
 
