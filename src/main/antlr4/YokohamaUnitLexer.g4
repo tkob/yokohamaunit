@@ -34,6 +34,8 @@ WHERE: 'where' ;
 EQ: '=' ;
 LET: 'Let' ;
 BE: 'be' ;
+ANY_OF: 'any' Spaces? 'of' ;
+OR: 'or' ;
 DO: 'Do' ;
 A_STUB_OF_BACK_TICK: 'a' Spaces 'stub' Spaces 'of' Spaces? '`' -> mode(CLASS) ;
 SUCH: 'such' ;
