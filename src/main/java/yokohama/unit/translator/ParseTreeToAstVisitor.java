@@ -253,9 +253,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Binding visitBinding(YokohamaUnitParser.BindingContext ctx) {
+        return (Binding)visitChildren(ctx);
+    }
+
+    @Override
+    public Binding visitSingleBinding(YokohamaUnitParser.SingleBindingContext ctx) {
         Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
         Expr expr = visitExpr(ctx.expr());
         return new Binding(ident, expr, getSpan(ctx));
+    }
+
+    @Override
+    public Object visitChoiceBinding(YokohamaUnitParser.ChoiceBindingContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -370,10 +380,20 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Binding visitLetBinding(YokohamaUnitParser.LetBindingContext ctx) {
+        return (Binding)visitChildren(ctx);
+    }
+
+    @Override
+    public Binding visitLetSingleBinding(YokohamaUnitParser.LetSingleBindingContext ctx) {
         return new Binding(
                 new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitExpr(ctx.expr()),
                 getSpan(ctx));
+    }
+
+    @Override
+    public Object visitLetChoiceBinding(YokohamaUnitParser.LetChoiceBindingContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
