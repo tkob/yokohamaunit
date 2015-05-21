@@ -20,6 +20,7 @@ import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
+import yokohama.unit.ast.ChoiceBinding;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.Definition;
@@ -53,6 +54,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.Statement;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
@@ -257,15 +259,17 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Binding visitSingleBinding(YokohamaUnitParser.SingleBindingContext ctx) {
+    public SingleBinding visitSingleBinding(YokohamaUnitParser.SingleBindingContext ctx) {
         Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
         Expr expr = visitExpr(ctx.expr());
-        return new Binding(ident, expr, getSpan(ctx));
+        return new SingleBinding(ident, expr, getSpan(ctx));
     }
 
     @Override
-    public Object visitChoiceBinding(YokohamaUnitParser.ChoiceBindingContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ChoiceBinding visitChoiceBinding(YokohamaUnitParser.ChoiceBindingContext ctx) {
+        Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
+        List<Expr> exprs = ctx.expr().stream().map(this::visitExpr).collect(Collectors.toList());
+        return new ChoiceBinding(ident, exprs, getSpan(ctx));
     }
 
     @Override
@@ -384,16 +388,18 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Binding visitLetSingleBinding(YokohamaUnitParser.LetSingleBindingContext ctx) {
-        return new Binding(
+    public SingleBinding visitLetSingleBinding(YokohamaUnitParser.LetSingleBindingContext ctx) {
+        return new SingleBinding(
                 new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier())),
                 visitExpr(ctx.expr()),
                 getSpan(ctx));
     }
 
     @Override
-    public Object visitLetChoiceBinding(YokohamaUnitParser.LetChoiceBindingContext ctx) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ChoiceBinding visitLetChoiceBinding(YokohamaUnitParser.LetChoiceBindingContext ctx) {
+        Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
+        List<Expr> exprs = ctx.expr().stream().map(this::visitExpr).collect(Collectors.toList());
+        return new ChoiceBinding(ident, exprs, getSpan(ctx));
     }
 
     @Override

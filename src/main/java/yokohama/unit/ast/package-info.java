@@ -56,7 +56,9 @@
  * TableType :: INLINE | CSV | TSV | EXCEL
  * 
  * Bindings ::= Binding*
- * Binding ::= Ident Expr
+ * Binding ::= SingleBinding | ChoiceBinding
+ * SingleBinding ::= Ident Expr
+ * ChoiceBinding ::= Ident Expr+
  * 
  * FourPhaseTest ::= Phase? Phase? VerifyPhase Phase?
  * 

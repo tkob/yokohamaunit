@@ -31,6 +31,7 @@ import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
+import yokohama.unit.ast.ChoiceBinding;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.CodeBlockExtractVisitor;
 import yokohama.unit.ast.Definition;
@@ -52,6 +53,7 @@ import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
@@ -444,10 +446,26 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateBinding(
             yokohama.unit.ast.Binding binding, Sym envVar) {
-        Ident name = binding.getName();
+        return binding.accept(
+                singleBinding -> translateSingleBinding(singleBinding, envVar),
+                choiceBinding -> translateChoiceBinding(choiceBinding, envVar));
+    }
+
+    Stream<Statement> translateSingleBinding(
+            SingleBinding singleBinding, Sym envVar) {
+        Ident name = singleBinding.getName();
         Sym var = genSym.generate(name.getName());
-        return Stream.concat(translateExpr(binding.getValue(), var, Object.class, envVar),
+        return Stream.concat(
+                translateExpr(singleBinding.getValue(), var, Object.class, envVar),
                 expressionStrategy.bind(envVar, name, var).stream());
+    }
+
+    Stream<Statement> translateChoiceBinding(
+            ChoiceBinding choiceBinding, Sym envVar) {
+        Ident name = choiceBinding.getName();
+        List<yokohama.unit.ast.Expr> choices = choiceBinding.getChoices();
+        Sym var = genSym.generate(name.getName());
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     Stream<Statement> translateExpr(
@@ -900,18 +918,7 @@ class AstToJUnitAstVisitor {
             bindings = setup.getLetStatements().stream()
                     .flatMap(letStatement ->
                             letStatement.getBindings().stream()
-                                    .flatMap(binding -> {
-                                        Sym var = genSym.generate(binding.getName().getName());
-                                        return Stream.concat(translateExpr(binding.getValue(),
-                                                        var,
-                                                        Object.class,
-                                                        env),
-                                                expressionStrategy.bind(
-                                                        env,
-                                                        binding.getName(),
-                                                        var)
-                                                        .stream());
-                                    }));
+                                    .flatMap(binding -> translateBinding(binding, env)));
         } else {
             bindings = Stream.empty();
         }

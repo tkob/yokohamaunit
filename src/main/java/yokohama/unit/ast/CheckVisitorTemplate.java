@@ -171,10 +171,17 @@ public class CheckVisitorTemplate extends AstVisitor<Stream<ErrorMessage>> {
     }
 
     @Override
-    public Stream<ErrorMessage> visitBinding(Binding binding) {
+    public Stream<ErrorMessage> visitSingleBinding(SingleBinding singleBinding) {
         return Stream.concat(
-                visitIdent(binding.getName()),
-                visitExpr(binding.getValue()));
+                visitIdent(singleBinding.getName()),
+                visitExpr(singleBinding.getValue()));
+    }
+
+    @Override
+    public Stream<ErrorMessage> visitChoiceBinding(ChoiceBinding choiceBinding) {
+        return Stream.concat(
+                visitIdent(choiceBinding.getName()),
+                choiceBinding.getChoices().stream().flatMap(this::visitExpr));
     }
 
     @Override

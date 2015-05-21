@@ -40,6 +40,7 @@ import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
@@ -136,7 +137,7 @@ public class ParseTreeToAstVisitorTest {
                                 Span.dummySpan())),
                 new Bindings(
                         Arrays.asList(
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -166,7 +167,7 @@ public class ParseTreeToAstVisitorTest {
         YokohamaUnitParser.BindingContext ctx = parser("x = `1`").binding();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Binding actual = instance.visitBinding(ctx);
-        Binding expected = new Binding(
+        Binding expected = new SingleBinding(
                 new Ident("x", Span.dummySpan()),
                 new QuotedExpr("1", Span.dummySpan()), Span.dummySpan());
         assertThat(actual, is(expected));
@@ -368,7 +369,7 @@ public class ParseTreeToAstVisitorTest {
                         Optional.empty(),
                         Arrays.asList(new LetStatement(
                                 Arrays.asList(
-                                        new Binding(
+                                        new SingleBinding(
                                                 new Ident("x", Span.dummySpan()),
                                                 new QuotedExpr("1", Span.dummySpan()),
                                                 Span.dummySpan())),
@@ -430,7 +431,7 @@ public class ParseTreeToAstVisitorTest {
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -464,7 +465,7 @@ public class ParseTreeToAstVisitorTest {
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -574,11 +575,11 @@ public class ParseTreeToAstVisitorTest {
         LetStatement expected =
                 new LetStatement(
                         Arrays.asList(
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan()),
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("y", Span.dummySpan()),
                                         new QuotedExpr("2", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -592,7 +593,7 @@ public class ParseTreeToAstVisitorTest {
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Binding actual = instance.visitLetBinding(ctx);
         Binding expected =
-                new Binding(
+                new SingleBinding(
                         new Ident("x", Span.dummySpan()),
                         new QuotedExpr("1", Span.dummySpan()),
                         Span.dummySpan());
