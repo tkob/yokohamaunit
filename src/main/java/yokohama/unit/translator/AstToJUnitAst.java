@@ -945,9 +945,11 @@ class AstToJUnitAstVisitor {
                         candidates
                                 .map(ChoiceBinding::toPair)
                                 .collect(Collectors.toList()));
-        
-        return choices.stream().map(choice -> {
-            String testName = SUtils.toIdent(fourPhaseTest.getName());
+
+        IntStream indexes = IntStream.range(0, choices.size());
+        return indexes.mapToObj(index -> {
+            Map<Ident, yokohama.unit.ast.Expr> choice = choices.get(index);
+            String testName = SUtils.toIdent(fourPhaseTest.getName()) + "_" + index;
             Stream<Statement> bindings;
             if (fourPhaseTest.getSetup().isPresent()) {
                 Phase setup = fourPhaseTest.getSetup().get();
