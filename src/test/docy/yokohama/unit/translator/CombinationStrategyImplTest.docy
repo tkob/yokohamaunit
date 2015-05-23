@@ -1,0 +1,25 @@
+*[Collections]: java.util.Collections
+*[CombinationStrategyImpl]: yokohama.unit.translator.CombinationStrategyImpl
+*[Pair]: yokohama.unit.util.Pair
+
+# Test: generate (no variable)
+
+Assert that `sut.generate([])` is `[Collections.emptyMap()]`
+where sut = `new CombinationStrategyImpl()`.
+
+# Test: generate (one variable)
+
+Assert `sut.generate([new Pair("a", [1, 2, 3])]) as Set` is
+`[ [a:1], [a:2], [a:3] ] as Set`
+where sut = `new CombinationStrategyImpl()`.
+
+# Test: generate (two variables)
+
+Assert `sut.generate(vars) as Set` is `coms as Set`
+where sut = `new CombinationStrategyImpl()`
+and vars = `[new Pair("a", [1, 2, 3]), new Pair("b", [4, 5, 6])]`
+and coms = `[
+    [a:1, b:4], [a:1, b:5], [a:1, b:6],
+    [a:2, b:4], [a:2, b:5], [a:2, b:6],
+    [a:3, b:4], [a:3, b:5], [a:3, b:6]
+]`.
