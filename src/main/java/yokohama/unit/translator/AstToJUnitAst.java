@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
@@ -32,6 +31,7 @@ import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ChoiceBinding;
+import yokohama.unit.ast.ChoiceCollectVisitor;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.CodeBlockExtractVisitor;
 import yokohama.unit.ast.Definition;
@@ -129,7 +129,7 @@ public class AstToJUnitAst {
     }
 }
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 class AstToJUnitAstVisitor {
     final String name;
     final String packageName;
@@ -140,6 +140,9 @@ class AstToJUnitAstVisitor {
     final ClassResolver classResolver;
     final List<Table> tables;
     final Map<String, CodeBlock> codeBlockMap;
+
+    final ChoiceCollectVisitor choiceCollectVisitor =
+            new ChoiceCollectVisitor();
 
     static final String MATCHER = "org.hamcrest.Matcher";
     static final String CORE_MATCHERS = "org.hamcrest.CoreMatchers";
@@ -234,16 +237,24 @@ class AstToJUnitAstVisitor {
                             }).collect(Collectors.toList());
                 },
                 bindings -> {
-                    List<Statement> body = Stream.concat(
-                            bindings.getBindings()
-                                    .stream()
-                                    .flatMap(binding ->
-                                            translateBinding(binding, env)),
-                            propositions.stream()
-                                    .flatMap(proposition ->
-                                            translateProposition(proposition, env)))
+                    Stream<ChoiceBinding> candidates =
+                            choiceCollectVisitor.visitBindings(bindings);
+                    List<Map<Ident, yokohama.unit.ast.Expr>> choices =
+                            combinationStrategy.generate(
+                                    candidates
+                                            .map(ChoiceBinding::toPair)
+                                            .collect(Collectors.toList()));
+                    return choices.stream().map(choice -> 
+                            Stream.concat(
+                                    bindings.getBindings()
+                                            .stream()
+                                            .flatMap(binding ->
+                                                    translateBinding(binding, choice, env)),
+                                    propositions.stream()
+                                            .flatMap(proposition ->
+                                                    translateProposition(proposition, env)))
+                                    .collect(Collectors.toList()))
                             .collect(Collectors.toList());
-                    return Arrays.asList(body);
                 });
     }
 
@@ -448,10 +459,12 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> translateBinding(
-            yokohama.unit.ast.Binding binding, Sym envVar) {
+            yokohama.unit.ast.Binding binding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar) {
         return binding.accept(
                 singleBinding -> translateSingleBinding(singleBinding, envVar),
-                choiceBinding -> translateChoiceBinding(choiceBinding, envVar));
+                choiceBinding -> translateChoiceBinding(choiceBinding, choice, envVar));
     }
 
     Stream<Statement> translateSingleBinding(
@@ -464,11 +477,16 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> translateChoiceBinding(
-            ChoiceBinding choiceBinding, Sym envVar) {
+            ChoiceBinding choiceBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar) {
         Ident name = choiceBinding.getName();
         List<yokohama.unit.ast.Expr> choices = choiceBinding.getChoices();
+        yokohama.unit.ast.Expr expr = choice.get(name);
         Sym var = genSym.generate(name.getName());
-        throw new UnsupportedOperationException("not implemented yet");
+        return Stream.concat(
+                translateExpr(expr, var, Object.class, envVar),
+                expressionStrategy.bind(envVar, name, var).stream());
     }
 
     Stream<Statement> translateExpr(
@@ -914,72 +932,89 @@ class AstToJUnitAstVisitor {
     List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
         Sym env = genSym.generate("env");
 
-        String testName = SUtils.toIdent(fourPhaseTest.getName());
-        Stream<Statement> bindings;
-        if (fourPhaseTest.getSetup().isPresent()) {
-            Phase setup = fourPhaseTest.getSetup().get();
-            bindings = setup.getLetStatements().stream()
-                    .flatMap(letStatement ->
-                            letStatement.getBindings().stream()
-                                    .flatMap(binding -> translateBinding(binding, env)));
-        } else {
-            bindings = Stream.empty();
-        }
+        Stream<ChoiceBinding> candidates =
+                Optionals.toStream(
+                        fourPhaseTest
+                                .getSetup()
+                                .map(Phase::getLetStatements)
+                                .map(List::stream))
+                        .flatMap(x -> x)
+                        .flatMap(choiceCollectVisitor::visitLetStatement); 
+        List<Map<Ident, yokohama.unit.ast.Expr>> choices =
+                combinationStrategy.generate(
+                        candidates
+                                .map(ChoiceBinding::toPair)
+                                .collect(Collectors.toList()));
+        
+        return choices.stream().map(choice -> {
+            String testName = SUtils.toIdent(fourPhaseTest.getName());
+            Stream<Statement> bindings;
+            if (fourPhaseTest.getSetup().isPresent()) {
+                Phase setup = fourPhaseTest.getSetup().get();
+                bindings = setup.getLetStatements().stream()
+                        .flatMap(letStatement ->
+                                letStatement.getBindings().stream()
+                                        .flatMap(binding ->
+                                                translateBinding(binding, choice, env)));
+            } else {
+                bindings = Stream.empty();
+            }
 
-        Optional<Stream<Statement>> setupActions =
-                fourPhaseTest.getSetup()
-                        .map(Phase::getStatements)
-                        .map(statements -> translateStatements(statements, env));
-        Optional<Stream<Statement>> exerciseActions =
-                fourPhaseTest.getExercise()
-                        .map(Phase::getStatements)
-                        .map(statements -> translateStatements(statements, env));
-        Stream<Statement> testStatements =
-                fourPhaseTest.getVerify().getAssertions().stream()
-                        .flatMap(assertion ->
-                                translateAssertion(assertion, env)
-                                        .stream().flatMap(s -> s.stream()));
+            Optional<Stream<Statement>> setupActions =
+                    fourPhaseTest.getSetup()
+                            .map(Phase::getStatements)
+                            .map(statements -> translateStatements(statements, env));
+            Optional<Stream<Statement>> exerciseActions =
+                    fourPhaseTest.getExercise()
+                            .map(Phase::getStatements)
+                            .map(statements -> translateStatements(statements, env));
+            Stream<Statement> testStatements =
+                    fourPhaseTest.getVerify().getAssertions().stream()
+                            .flatMap(assertion ->
+                                    translateAssertion(assertion, env)
+                                            .stream().flatMap(s -> s.stream()));
 
-        List<Statement> statements =
-                Stream.concat(
-                        bindings,
-                        Stream.concat(
-                                Stream.concat(
-                                        setupActions.isPresent()
-                                                ? setupActions.get()
-                                                : Stream.empty(),
-                                        exerciseActions.isPresent()
-                                                ? exerciseActions.get()
-                                                : Stream.empty()),
-                                testStatements)
-                ).collect(Collectors.toList());
+            List<Statement> statements =
+                    Stream.concat(
+                            bindings,
+                            Stream.concat(
+                                    Stream.concat(
+                                            setupActions.isPresent()
+                                                    ? setupActions.get()
+                                                    : Stream.empty(),
+                                            exerciseActions.isPresent()
+                                                    ? exerciseActions.get()
+                                                    : Stream.empty()),
+                                    testStatements)
+                    ).collect(Collectors.toList());
 
 
-        List<Statement> actionsAfter;
-        if (fourPhaseTest.getTeardown().isPresent()) {
-            Phase teardown = fourPhaseTest.getTeardown().get();
-            actionsAfter =
-                    translateStatements(teardown.getStatements(), env)
-                            .collect(Collectors.toList());
-        } else {
-            actionsAfter = Arrays.asList();
-        }
+            List<Statement> actionsAfter;
+            if (fourPhaseTest.getTeardown().isPresent()) {
+                Phase teardown = fourPhaseTest.getTeardown().get();
+                actionsAfter =
+                        translateStatements(teardown.getStatements(), env)
+                                .collect(Collectors.toList());
+            } else {
+                actionsAfter = Arrays.asList();
+            }
 
-        return Arrays.asList(new Method(
-                Arrays.asList(annotationOf(TEST)),
-                testName,
-                Arrays.asList(),
-                Optional.empty(),
-                Arrays.asList(ClassType.EXCEPTION),
-                ListUtils.union(
-                        expressionStrategy.env(env),
-                        actionsAfter.size() > 0
-                                ?  Arrays.asList(
-                                        new TryStatement(
-                                                statements,
-                                                Arrays.asList(),
-                                                actionsAfter))
-                                : statements)));
+            return new Method(
+                    Arrays.asList(annotationOf(TEST)),
+                    testName,
+                    Arrays.asList(),
+                    Optional.empty(),
+                    Arrays.asList(ClassType.EXCEPTION),
+                    ListUtils.union(
+                            expressionStrategy.env(env),
+                            actionsAfter.size() > 0
+                                    ?  Arrays.asList(
+                                            new TryStatement(
+                                                    statements,
+                                                    Arrays.asList(),
+                                                    actionsAfter))
+                                    : statements));
+        }).collect(Collectors.toList());
     }
 
     Stream<Statement> translateStatements(
