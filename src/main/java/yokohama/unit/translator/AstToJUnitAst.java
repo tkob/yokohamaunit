@@ -104,6 +104,7 @@ public class AstToJUnitAst {
     final String packageName;
     final ExpressionStrategy expressionStrategy;
     final MockStrategy mockStrategy;
+    final CombinationStrategy combinationStrategy;
     final GenSym genSym;
     final ClassResolver classResolver;
     final TableExtractVisitor tableExtractVisitor;
@@ -119,6 +120,7 @@ public class AstToJUnitAst {
                 packageName,
                 expressionStrategy,
                 mockStrategy,
+                combinationStrategy,
                 genSym,
                 classResolver,
                 tables,
@@ -133,6 +135,7 @@ class AstToJUnitAstVisitor {
     final String packageName;
     final ExpressionStrategy expressionStrategy;
     final MockStrategy mockStrategy;
+    final CombinationStrategy combinationStrategy;
     final GenSym genSym;
     final ClassResolver classResolver;
     final List<Table> tables;

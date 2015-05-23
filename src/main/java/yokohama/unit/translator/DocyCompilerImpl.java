@@ -57,6 +57,7 @@ public class DocyCompilerImpl implements DocyCompiler {
     final AstToJUnitAstFactory astToJUnitAstFactory;
     final ExpressionStrategyFactory expressionStrategyFactory;
     final MockStrategyFactory mockStrategyFactory;
+    final CombinationStrategy combinationStrategy;
     final JUnitAstCompiler jUnitAstCompiler;
     
     final VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
@@ -129,6 +130,7 @@ public class DocyCompilerImpl implements DocyCompiler {
                     packageName,
                     expressionStrategy,
                     mockStrategy,
+                    combinationStrategy,
                     genSym,
                     classResolver)
                     .translate(ast);

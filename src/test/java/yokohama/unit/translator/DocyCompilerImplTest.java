@@ -122,6 +122,7 @@ public class DocyCompilerImplTest {
                         new AstToJUnitAstFactory(),
                         fixture.expressionStrategyFactory,
                         new MockitoMockStrategyFactory(),
+                        new CombinationStrategyImpl(),
                         jUnitAstCompiler);
                 List<ErrorMessage> actual = instance.compile(
                         docyPath,
