@@ -10,6 +10,7 @@ public class AstToJUnitAstFactory {
             String packageName,
             ExpressionStrategy expressionStrategy,
             MockStrategy mockStrategy,
+            CombinationStrategy combinationStrategy,
             GenSym genSym,
             ClassResolver classResolver) {
         return new AstToJUnitAst(
@@ -17,6 +18,7 @@ public class AstToJUnitAstFactory {
                 packageName,
                 expressionStrategy,
                 mockStrategy,
+                combinationStrategy,
                 genSym,
                 classResolver,
                 new TableExtractVisitor());

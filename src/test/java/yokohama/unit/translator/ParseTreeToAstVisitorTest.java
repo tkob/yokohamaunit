@@ -34,13 +34,13 @@ import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Kind;
-import yokohama.unit.ast.LetBinding;
 import yokohama.unit.ast.LetStatement;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.Row;
+import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.Table;
@@ -137,7 +137,7 @@ public class ParseTreeToAstVisitorTest {
                                 Span.dummySpan())),
                 new Bindings(
                         Arrays.asList(
-                                new Binding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -167,7 +167,7 @@ public class ParseTreeToAstVisitorTest {
         YokohamaUnitParser.BindingContext ctx = parser("x = `1`").binding();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
         Binding actual = instance.visitBinding(ctx);
-        Binding expected = new Binding(
+        Binding expected = new SingleBinding(
                 new Ident("x", Span.dummySpan()),
                 new QuotedExpr("1", Span.dummySpan()), Span.dummySpan());
         assertThat(actual, is(expected));
@@ -369,7 +369,7 @@ public class ParseTreeToAstVisitorTest {
                         Optional.empty(),
                         Arrays.asList(new LetStatement(
                                 Arrays.asList(
-                                        new LetBinding(
+                                        new SingleBinding(
                                                 new Ident("x", Span.dummySpan()),
                                                 new QuotedExpr("1", Span.dummySpan()),
                                                 Span.dummySpan())),
@@ -431,7 +431,7 @@ public class ParseTreeToAstVisitorTest {
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
-                                new LetBinding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -465,7 +465,7 @@ public class ParseTreeToAstVisitorTest {
                 Optional.empty(),
                 Arrays.asList(new LetStatement(
                         Arrays.asList(
-                                new LetBinding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -575,11 +575,11 @@ public class ParseTreeToAstVisitorTest {
         LetStatement expected =
                 new LetStatement(
                         Arrays.asList(
-                                new LetBinding(
+                                new SingleBinding(
                                         new Ident("x", Span.dummySpan()),
                                         new QuotedExpr("1", Span.dummySpan()),
                                         Span.dummySpan()),
-                                new LetBinding(
+                                new SingleBinding(
                                         new Ident("y", Span.dummySpan()),
                                         new QuotedExpr("2", Span.dummySpan()),
                                         Span.dummySpan())),
@@ -591,9 +591,9 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitLetBinding() throws IOException {
         YokohamaUnitParser.LetBindingContext ctx = parser("x = `1`").letBinding();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        LetBinding actual = instance.visitLetBinding(ctx);
-        LetBinding expected =
-                new LetBinding(
+        Binding actual = instance.visitLetBinding(ctx);
+        Binding expected =
+                new SingleBinding(
                         new Ident("x", Span.dummySpan()),
                         new QuotedExpr("1", Span.dummySpan()),
                         Span.dummySpan());

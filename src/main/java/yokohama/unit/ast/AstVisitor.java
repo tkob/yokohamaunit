@@ -75,12 +75,17 @@ public abstract class AstVisitor<T> {
     public abstract T visitNone();
     public abstract T visitTableRef(TableRef tableRef);
     public abstract T visitBindings(Bindings bindings);
-    public abstract T visitBinding(Binding binding);
+    public T visitBinding(Binding binding) {
+        return binding.accept(
+                this::visitSingleBinding,
+                this::visitChoiceBinding);
+    }
+    public abstract T visitSingleBinding(SingleBinding singleBinding);
+    public abstract T visitChoiceBinding(ChoiceBinding choiceBinding);
     public abstract T visitFourPhaseTest(FourPhaseTest fourPhaseTest);
     public abstract T visitPhase(Phase phase);
     public abstract T visitVerifyPhase(VerifyPhase verifyPhase);
     public abstract T visitLetStatement(LetStatement letStatement);
-    public abstract T visitLetBinding(LetBinding letBinding);
     public T visitStatement(Statement statement) {
         return statement.accept(
                 this::visitExecution,

@@ -1,0 +1,44 @@
+*[ChoiceBinding]: yokohama.unit.ast.ChoiceBinding
+*[ChoiceCollectVisitor]: yokohama.unit.ast.ChoiceCollectVisitor
+*[Collectors]: java.util.stream.Collectors
+*[Ident]: yokohama.unit.ast.Ident
+*[IntegerExpr]: yokohama.unit.ast.IntegerExpr
+*[Span]: yokohama.unit.position.Span
+*[TranslatorUtils]: yokohama.unit.translator.TranslatorUtils
+
+# Test: Test ChoiceCollectVisitor
+## Setup
+Let source = [Source] and ast = `TranslatorUtils.parseDocy(source)`.
+
+Let visitor = `new ChoiceCollectVisitor()`.
+
+## Verify
+
+Assert `visitor.visitGroup(ast).collect(Collectors.toList())` is
+`[
+  new ChoiceBinding(
+    new Ident("x", Span.dummySpan()),
+    [ new IntegerExpr(true, "1", Span.dummySpan()),
+      new IntegerExpr(true, "2", Span.dummySpan()),
+      new IntegerExpr(true, "3", Span.dummySpan())],
+    Span.dummySpan()),
+  new ChoiceBinding(
+    new Ident("y", Span.dummySpan()),
+    [ new IntegerExpr(true, "4", Span.dummySpan()),
+      new IntegerExpr(true, "5", Span.dummySpan()),
+      new IntegerExpr(true, "6", Span.dummySpan())],
+    Span.dummySpan())
+]`.
+
+### Source
+```
+# Test: test
+Assert `x < 4` is true where x = any of 1, 2 or 3.
+
+# Test: test 2
+## Setup
+Let y = any of 4, 5 or 6.
+
+## Verify
+Assert `y < 4` is true.
+```

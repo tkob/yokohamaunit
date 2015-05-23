@@ -8,7 +8,7 @@ import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.util.ClassResolver;
 
 @AllArgsConstructor
-public class ClassCheckVisitor extends CheckVisitorTemplate {
+public class ClassCheckVisitor extends StreamVisitorTemplate<ErrorMessage> {
     private final ClassResolver classResolver;
 
     public List<ErrorMessage> check(Group group) {

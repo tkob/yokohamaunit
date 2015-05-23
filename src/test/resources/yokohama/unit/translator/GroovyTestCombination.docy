@@ -1,0 +1,20 @@
+# Test: Combination in where-clause
+
+Assert that `a * x * y` is 0
+where a is 0
+  and x is any of 1, 2 or 3
+  and y is any of 4, 5, 6.
+
+# Test: Combination in setup
+
+## Setup
+
+Let a = 0.
+
+Let x be any of 1, 2 and y be any of 3 or 4.
+
+Let z = any of 5 or 6.
+
+## Verify
+
+Assert that `a * x * y * z` is 0.

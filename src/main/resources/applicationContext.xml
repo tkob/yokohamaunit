@@ -8,6 +8,7 @@
     <constructor-arg><bean class="yokohama.unit.translator.AstToJUnitAstFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.GroovyExpressionStrategyFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.MockitoMockStrategyFactory"/></constructor-arg>
+    <constructor-arg><bean class="yokohama.unit.translator.CombinationStrategyImpl"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.BcelJUnitAstCompiler"/></constructor-arg>
   </bean>
 </beans>

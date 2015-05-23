@@ -47,7 +47,9 @@ tableRef: UTABLE LBRACKET Anchor RBRACKET
         ;
 
 bindings: WHERE binding (AND binding)* ;
-binding: Identifier (EQ | IS) expr ;
+binding: singleBinding | choiceBinding ;
+singleBinding: Identifier (EQ | IS) expr ;
+choiceBinding: Identifier (EQ | IS) ANY_OF expr (COMMA expr)* (OR expr)? ;
 
 fourPhaseTest: TEST Line setup? exercise? verify teardown? ;
 
@@ -57,7 +59,9 @@ verify: VERIFY Line? assertion+ ;
 teardown: TEARDOWN Line? statement+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
-letBinding: Identifier (EQ | BE) expr ;
+letBinding: letSingleBinding | letChoiceBinding ;
+letSingleBinding: Identifier (EQ | BE) expr ;
+letChoiceBinding: Identifier (EQ | BE) ANY_OF expr (COMMA expr)* (OR expr)? ;
 
 statement: execution | invoke ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;

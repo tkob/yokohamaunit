@@ -21,7 +21,7 @@ public class AnchorCheckVisitor {
 }
 
 @AllArgsConstructor
-class AuxAnchorCheckVisitor extends CheckVisitorTemplate {
+class AuxAnchorCheckVisitor extends StreamVisitorTemplate<ErrorMessage> {
     Map<String, Table> tableMap;
     Map<String, CodeBlock> codeBlockMap;
 

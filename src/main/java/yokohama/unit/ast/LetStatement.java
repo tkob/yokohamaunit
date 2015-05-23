@@ -8,6 +8,6 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(exclude={"span"})
 public class LetStatement {
-    private List<LetBinding> bindings;
+    private List<Binding> bindings;
     private Span span;
 }
