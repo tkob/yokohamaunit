@@ -62,6 +62,7 @@ SINGLE_QUOTE: '\'' -> mode(IN_SINGLE_QUOTE) ;
 BACK_TICKS:   '```'   -> mode(IN_FENCE_3) ;
 BACK_TICKS4:  '````'  -> mode(IN_FENCE_4), type(BACK_TICKS) ;
 BACK_TICKS5:  '`````' -> mode(IN_FENCE_5), type(BACK_TICKS) ;
+COMMENT : '{>>' .*? '<<}' -> skip ;
 WS : Spaces -> skip ;
 
 mode ABBREVIATION;

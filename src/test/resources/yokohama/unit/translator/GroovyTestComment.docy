@@ -1,0 +1,5 @@
+# Test: comment
+
+{>> Capital 'A' <<} Assert {>> insert space between 'Assert' and 'that<<} that
+{>> By the way, 'that' can be ommitted <<} `1` {>> subject <<} is {>> copula<<}
+`1` {>> complement <<}. {>> and fullu stop<<}
