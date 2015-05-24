@@ -1,14 +1,9 @@
-*[AnyOfCheckVisitor]: yokohama.unit.ast.AnyOfCheckVisitor
-*[TranslatorUtils]: yokohama.unit.translator.TranslatorUtils
-
-# Test: AnyOfCheckVisitor.check
+# Test: Use of 'any of' in verify phase is reported as error.
 
 ## Setup
-Let source = [Fixture 1].
+Let ast = [Fixture 1] as `yokohama.unit.ast.Group`.
 
-Let ast = `yokohama.unit.translator.DataConverters.asAst(source)`.
-
-Let sut = `new AnyOfCheckVisitor()`.
+Let sut = `new yokohama.unit.ast.AnyOfCheckVisitor()`.
 
 ## Verify
 
