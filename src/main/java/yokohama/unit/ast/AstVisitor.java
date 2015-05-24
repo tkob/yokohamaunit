@@ -45,7 +45,8 @@ public abstract class AstVisitor<T> {
                 this::visitBooleanExpr,
                 this::visitCharExpr,
                 this::visitStringExpr,
-                this::visitAnchorExpr);
+                this::visitAnchorExpr,
+                this::visitAsExpr);
     }
     public abstract T visitQuotedExpr(QuotedExpr quotedExpr);
     public abstract T visitStubExpr(StubExpr stubExpr);
@@ -56,6 +57,7 @@ public abstract class AstVisitor<T> {
     public abstract T visitCharExpr(CharExpr charExpr);
     public abstract T visitStringExpr(StringExpr stringExpr);
     public abstract T visitAnchorExpr(AnchorExpr anchorExpr);
+    public abstract T visitAsExpr(AsExpr asExpr);
     public abstract T visitStubBehavior(StubBehavior behavior);
     public abstract T visitMethodPattern(MethodPattern methodPattern);
     public abstract T visitType(Type type);

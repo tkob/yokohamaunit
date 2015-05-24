@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Modifier;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import yokohama.unit.ast.AnchorExpr;
+import yokohama.unit.ast.AsExpr;
 import yokohama.unit.ast.Assertion;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.Cell;
@@ -143,6 +145,7 @@ class AstToJUnitAstVisitor {
 
     final ChoiceCollectVisitor choiceCollectVisitor =
             new ChoiceCollectVisitor();
+    final DataConverterFinder dataConverterFinder = new DataConverterFinder();
 
     static final String MATCHER = "org.hamcrest.Matcher";
     static final String CORE_MATCHERS = "org.hamcrest.CoreMatchers";
@@ -529,6 +532,9 @@ class AstToJUnitAstVisitor {
                 },
                 anchorExpr -> {
                     return translateAnchorExpr(anchorExpr, exprVar, envVar);
+                },
+                asExpr -> {
+                    return translateAsExpr(asExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
@@ -656,6 +662,43 @@ class AstToJUnitAstVisitor {
                         var,
                         new StrLitExpr(code),
                         anchorExpr.getSpan()));
+    }
+
+    private Stream<Statement> translateAsExpr(AsExpr asExpr, Sym exprVar, Sym envVar) {
+        Sym sourceVar = genSym.generate("source");
+        Stream<Statement> source = translateExpr(asExpr.getSourceExpr(), sourceVar, String.class, envVar);
+
+        yokohama.unit.ast.ClassType classType = asExpr.getClassType();
+        Class<?> returnType = classType.toClass(classResolver);
+        Stream<Statement> convert = Optionals.match(
+                dataConverterFinder.find(returnType),
+                () -> {
+                    throw new TranslationException(
+                            "converter method for " + classType.getName() + " not found",
+                            asExpr.getSpan());
+                },
+                method -> {
+                    Class<?> clazz = method.getDeclaringClass();
+                    int modifier = method.getModifiers();
+                    if (Modifier.isStatic(modifier)) {
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.fromClass(returnType),
+                                        exprVar,
+                                        new InvokeStaticExpr(
+                                                ClassType.fromClass(clazz),
+                                                Collections.emptyList(),
+                                                method.getName(),
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(sourceVar),
+                                                Type.fromClass(returnType)),
+                                        asExpr.getSpan()));
+                    } else {
+                        throw new UnsupportedOperationException("non static method");
+                    }
+                });
+
+        return Stream.concat(source, convert);
     }
 
     Stream<Statement> boxOrUnbox(
@@ -790,7 +833,8 @@ class AstToJUnitAstVisitor {
                 booleanExpr -> Type.BOOLEAN,
                 charExpr -> Type.CHAR,
                 stringExpr -> Type.STRING,
-                anchorExpr -> Type.STRING);
+                anchorExpr -> Type.STRING,
+                asExpr -> Type.of(asExpr.getClassType().toType(), classResolver));
     }
 
     List<List<Statement>> translateTableRef(

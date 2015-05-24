@@ -87,6 +87,7 @@ expr: quotedExpr
     | charExpr
     | stringExpr
     | anchorExpr
+    | asExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
@@ -125,6 +126,9 @@ charExpr: SINGLE_QUOTE Char SINGLE_QUOTE ;
 stringExpr: DOUBLE_QUOTE Str DOUBLE_QUOTE | EMPTY_STRING ;
 
 anchorExpr: LBRACKET Anchor RBRACKET ;
+
+asExpr: sourceExpr AS_BACK_TICK classType BACK_TICK ;
+sourceExpr: stringExpr | anchorExpr ;
 
 codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
 attributes: CodeLine ;

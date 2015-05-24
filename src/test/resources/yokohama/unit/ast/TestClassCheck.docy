@@ -26,6 +26,8 @@ Let s be a stub of `com.example.NotFound5` such that method
 and s be a stub of `NotFound1` such that method `m(NotFound2)` returns `0`
 and s be a stub of `List` such that method `m(List)` returns `0`.
 
+Let t be "string" as `com.example.NotFound9`.
+
 ## Verify
 
 Assert that `1` is an instance of `com.example.NotFound7`.

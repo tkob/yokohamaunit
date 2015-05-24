@@ -128,6 +128,13 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     }
 
     @Override
+    public Stream<T> visitAsExpr(AsExpr asExpr) {
+        return Stream.concat(
+                visitExpr(asExpr.getSourceExpr()),
+                visitClassType(asExpr.getClassType()));
+    }
+
+    @Override
     public Stream<T> visitStubBehavior(StubBehavior behavior) {
         return Stream.concat(
                 visitMethodPattern(behavior.getMethodPattern()),

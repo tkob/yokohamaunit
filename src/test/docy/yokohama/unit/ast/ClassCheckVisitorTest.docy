@@ -30,4 +30,4 @@ Let visitor = `new ClassCheckVisitor(classResolver)`.
 
 ## Verify
 
-Assert that `visitor.check(ast).size()` is `12`.
+Assert that `visitor.check(ast).size()` is `13`.
