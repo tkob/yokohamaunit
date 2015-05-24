@@ -19,6 +19,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import yokohama.unit.ast.Abbreviation;
 import yokohama.unit.ast.AnchorCheckVisitor;
+import yokohama.unit.ast.AnyOfCheckVisitor;
 import yokohama.unit.ast.ClassCheckVisitor;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.VariableCheckVisitor;
@@ -105,6 +106,7 @@ public class DocyCompilerImpl implements DocyCompiler {
         ClassResolver classResolver = classResolverAndErrors.getFirst();
         List<ErrorMessage> classResolverErrors = classResolverAndErrors.getSecond();
         ClassCheckVisitor classCheckVisitor = new ClassCheckVisitor(classResolver);
+        AnyOfCheckVisitor anyOfCheckVisitor = new AnyOfCheckVisitor();
         
         // other AST checks
         List<ErrorMessage> errors =
@@ -113,6 +115,7 @@ public class DocyCompilerImpl implements DocyCompiler {
                         .append(classCheckVisitor::check)
                         .append(variableCheckVisitor::check)
                         .append(anchorCheckVisitor::check)
+                        .append(anyOfCheckVisitor::check)
                         .getErrors();
         if (!errors.isEmpty()) return errors;
 

@@ -1,0 +1,25 @@
+*[AnyOfCheckVisitor]: yokohama.unit.ast.AnyOfCheckVisitor
+*[TranslatorUtils]: yokohama.unit.translator.TranslatorUtils
+
+# Test: AnyOfCheckVisitor.check
+
+## Setup
+Let source = [Fixture 1].
+
+Let ast = `TranslatorUtils.parseDocy(source)`.
+
+Let sut = `new AnyOfCheckVisitor()`.
+
+## Verify
+
+Assert that `sut.check(ast).size()` is 1.
+
+## Fixture 1
+
+```
+# Test: test
+## Setup
+Let x be any of 1, 2 or 3.
+## Verify
+Assert that `x` is `y` where y = any of 4, 5, 6.
+```
