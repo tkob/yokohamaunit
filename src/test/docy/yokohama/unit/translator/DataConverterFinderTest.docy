@@ -1,0 +1,9 @@
+# Test: Find DataConverter
+
+## Setup
+
+Let finder = `new yokohama.unit.translator.DataConverterFinder()`.
+
+## Verify: Will find yokohama.unit.translator.DataConverters#asAst
+
+Assert `finder.find(yokohama.unit.ast.Group.class).get().getName()` is "asAst".
