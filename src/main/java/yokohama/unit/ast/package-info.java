@@ -36,6 +36,7 @@
  *        | CharExpr
  *        | StringExpr
  *        | AnchorExpr
+ *        | AsExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 
@@ -48,6 +49,8 @@
  * PrimitiveType ::= Kind
  * 
  * InvocationExpr ::= MethodPattern Expr*
+ * 
+ * AsExpr ::= Expr ClassType
  * 
  * Fixture ::= | TableRef | Bindings
  * 

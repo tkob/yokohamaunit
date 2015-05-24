@@ -4,11 +4,10 @@
 *[Ident]: yokohama.unit.ast.Ident
 *[IntegerExpr]: yokohama.unit.ast.IntegerExpr
 *[Span]: yokohama.unit.position.Span
-*[TranslatorUtils]: yokohama.unit.translator.TranslatorUtils
 
 # Test: Test ChoiceCollectVisitor
 ## Setup
-Let source = [Source] and ast = `TranslatorUtils.parseDocy(source)`.
+Let ast = [Source] as `yokohama.unit.ast.Group`.
 
 Let visitor = `new ChoiceCollectVisitor()`.
 
@@ -31,6 +30,7 @@ Assert `visitor.visitGroup(ast).collect(Collectors.toList())` is
 ]`.
 
 ### Source
+
 ```
 # Test: test
 Assert `x < 4` is true where x = any of 1, 2 or 3.

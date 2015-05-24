@@ -6,9 +6,10 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
 
 public class ClassResolver {
-    private final ClassLoader classLoader;
+    @Getter private final ClassLoader classLoader;
     private final Map<String, String> table;
 
     public ClassResolver(ClassLoader classLoader) {

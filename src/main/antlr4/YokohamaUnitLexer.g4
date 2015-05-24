@@ -12,6 +12,7 @@ EXERCISE_NO_DESC: Hashes [ \t]* 'Exercise' -> type(EXERCISE) ;
 VERIFY_NO_DESC:   Hashes [ \t]* 'Verify'   -> type(VERIFY) ;
 TEARDOWN_NO_DESC: Hashes [ \t]* 'Teardown' -> type(TEARDOWN) ;
 LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(ANCHOR);
+AS_BACK_TICK: 'as' Spaces? '`' -> mode(CLASS) ;
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;

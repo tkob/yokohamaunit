@@ -12,7 +12,7 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import static yokohama.unit.translator.TranslatorUtils.parseDocy;
+import yokohama.unit.translator.DataConverters;
 import yokohama.unit.util.SBuilder;
 
 @RunWith(Theories.class)
@@ -364,7 +364,7 @@ public class VariableCheckVisitorTest {
     @Theory
     public void testCheck(final Fixture fixture) {
         String source = fixture.source;
-        Group group = parseDocy(source);
+        Group group = DataConverters.asAst(source);
         VariableCheckVisitor instance = new VariableCheckVisitor();
         List<ErrorMessage> actual = instance.check(group);
         List<ErrorMessage> expected =
