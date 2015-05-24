@@ -8,7 +8,8 @@
 
 # Test: Test ChoiceCollectVisitor
 ## Setup
-Let source = [Source] and ast = `TranslatorUtils.parseDocy(source)`.
+Let source = [Source]
+and ast = `yokohama.unit.translator.DataConverters.asAst(source)`.
 
 Let visitor = `new ChoiceCollectVisitor()`.
 

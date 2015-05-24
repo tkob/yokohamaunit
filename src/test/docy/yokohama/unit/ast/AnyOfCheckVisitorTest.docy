@@ -6,7 +6,7 @@
 ## Setup
 Let source = [Fixture 1].
 
-Let ast = `TranslatorUtils.parseDocy(source)`.
+Let ast = `yokohama.unit.translator.DataConverters.asAst(source)`.
 
 Let sut = `new AnyOfCheckVisitor()`.
 
