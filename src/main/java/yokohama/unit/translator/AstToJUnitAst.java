@@ -671,7 +671,7 @@ class AstToJUnitAstVisitor {
         yokohama.unit.ast.ClassType classType = asExpr.getClassType();
         Class<?> returnType = classType.toClass(classResolver);
         Stream<Statement> convert = Optionals.match(
-                dataConverterFinder.find(returnType),
+                dataConverterFinder.find(returnType, classResolver.getClassLoader()),
                 () -> {
                     throw new TranslationException(
                             "converter method for " + classType.getName() + " not found",
