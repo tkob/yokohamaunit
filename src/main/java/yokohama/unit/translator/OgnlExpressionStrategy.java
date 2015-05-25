@@ -320,4 +320,9 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Type.OBJECT),
                         Span.dummySpan()));
     }
+
+    @Override
+    public List<Statement> dumpEnv(Sym var, Sym envVar) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
