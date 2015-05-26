@@ -323,6 +323,17 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public List<Statement> dumpEnv(Sym var, Sym envVar) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        var,
+                        new InvokeExpr(
+                                classTypeOf(OGNL_CONTEXT),
+                                envVar,
+                                "toString",
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                Type.STRING),
+                        Span.dummySpan()));
     }
 }

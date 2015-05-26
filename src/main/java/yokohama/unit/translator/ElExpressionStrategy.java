@@ -193,6 +193,12 @@ public class ElExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public List<Statement> dumpEnv(Sym var, Sym envVar) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // It seems that there is no way to dump environment in EL
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        var,
+                        new StrLitExpr(""),
+                        Span.dummySpan()));
     }
 }
