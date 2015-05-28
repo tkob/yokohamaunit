@@ -263,8 +263,11 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateProposition(
             Proposition proposition, Sym envVar) {
+        Sym message = genSym.generate("message");
         Sym actual = genSym.generate("actual");
         Sym expected = genSym.generate("expected");
+        Stream<Statement> dumpEnv =
+                expressionStrategy.dumpEnv(message, envVar).stream();
         Predicate predicate = proposition.getPredicate();
         Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(isPredicate -> {
                     return Stream.concat(
@@ -336,13 +339,16 @@ class AstToJUnitAstVisitor {
                 isPredicate -> isPredicate.getComplement(),
                 isNotPredicate -> isNotPredicate.getComplement(),
                 throwsPredicate -> throwsPredicate.getThrowee());
-        return Stream.concat(subjectAndPredicate,
-                matcher instanceof InstanceSuchThatMatcher
-                        ? Stream.empty()
-                        : Stream.of(new IsStatement(
-                                actual,
-                                expected,
-                                predicate.getSpan())));
+        return Stream.concat(dumpEnv,
+                Stream.concat(subjectAndPredicate,
+                        matcher instanceof InstanceSuchThatMatcher
+                                ? Stream.empty()
+                                : Stream.of(
+                                        new IsStatement(
+                                                message,
+                                                actual,
+                                                expected,
+                                                predicate.getSpan()))));
     }
 
     Stream<Statement> bindThrown(
@@ -423,19 +429,27 @@ class AstToJUnitAstVisitor {
                 List<Proposition> propositions = instanceSuchThat.getPropositions();
                 Span span = instanceSuchThat.getSpan();
 
+                Sym message = genSym.generate("message");
+                Stream<Statement> dumpEnv =
+                        expressionStrategy.dumpEnv(message, envVar).stream();
                 Sym instanceOfVar = genSym.generate("instanceOfMatcher");
-                Stream<Statement> instanceOfStatements = Stream.of(new VarInitStatement(
-                                typeOf(MATCHER),
-                                instanceOfVar,
-                                new InstanceOfMatcherExpr(
-                                        lookupClassName(
-                                                clazz.getName(),
-                                                clazz.getSpan())),
-                                clazz.getSpan()),
-                        new IsStatement(
-                                actual,
-                                instanceOfVar,
-                                clazz.getSpan()));
+                Stream<Statement> instanceOfStatements =
+                        Stream.concat(
+                                dumpEnv,
+                                Stream.of(
+                                        new VarInitStatement(
+                                                typeOf(MATCHER),
+                                                instanceOfVar,
+                                                new InstanceOfMatcherExpr(
+                                                        lookupClassName(
+                                                                clazz.getName(),
+                                                                clazz.getSpan())),
+                                                clazz.getSpan()),
+                                        new IsStatement(
+                                                message,
+                                                actual,
+                                                instanceOfVar,
+                                                clazz.getSpan())));
 
                 Stream<Statement> bindStatements =
                         expressionStrategy.bind(envVar, bindVar, actual).stream();

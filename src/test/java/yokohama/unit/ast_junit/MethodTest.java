@@ -48,9 +48,10 @@ public class MethodTest {
                                 Sym.of("env"),
                                 new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
                                 Span.dummySpan()),
+                        new VarInitStatement(Type.STRING, Sym.of("message"), new StrLitExpr(""), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, Sym.of("actual"), new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, Sym.of("expected"), new IntLitExpr(1), Span.dummySpan()),
-                        new IsStatement(Sym.of("actual"), Sym.of("expected"), Span.dummySpan())));
+                        new IsStatement(Sym.of("message"), Sym.of("actual"), Sym.of("expected"), Span.dummySpan())));
         instance.toString(actual);
 
         StrBuilder expected = new StrBuilder();
@@ -59,10 +60,12 @@ public class MethodTest {
         expected.appendln("    java.lang.Object actual;");
         expected.appendln("    ognl.OgnlContext env;");
         expected.appendln("    java.lang.Object expected;");
+        expected.appendln("    java.lang.String message;");
         expected.appendln("    env = new ognl.OgnlContext();");
+        expected.appendln("    message = \"\";");
         expected.appendln("    actual = 1;");
         expected.appendln("    expected = 1;");
-        expected.appendln("    org.junit.Assert.assertThat(actual, org.hamcrest.CoreMatchers.is(expected));");
+        expected.appendln("    org.junit.Assert.assertThat(message, actual, org.hamcrest.CoreMatchers.is(expected));");
         expected.appendln("}");
 
         assertThat(actual.toString(), is(expected.toString()));

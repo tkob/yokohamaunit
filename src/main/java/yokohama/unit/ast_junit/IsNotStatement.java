@@ -7,13 +7,21 @@ import yokohama.unit.util.SBuilder;
 
 @Value
 public class IsNotStatement implements Statement {
+    private Sym message;
     private Sym subject;
     private Sym complement;
     private Span span;
 
     @Override
     public void toString(SBuilder sb) {
-        sb.appendln("org.junit.Assert.assertThat(", subject.getName(), ", org.hamcrest.CoreMatchers.is(org.hamcrest.CoreMatchers.not(", complement.getName(), ")));");
+        sb.appendln(
+                "org.junit.Assert.assertThat(",
+                message.getName(),
+                ", ",
+                subject.getName(),
+                ", org.hamcrest.CoreMatchers.not(",
+                complement.getName(),
+                "));");
     }
 
     @Override
