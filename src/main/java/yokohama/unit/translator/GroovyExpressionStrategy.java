@@ -42,6 +42,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     static final String COMPILER_CONFIGURATION =
             "org.codehaus.groovy.control.CompilerConfiguration";
     static final String GROOVY_SHELL = "groovy.lang.GroovyShell";
+    static final String BINDING = "groovy.lang.Binding";
 
     @SneakyThrows(ClassNotFoundException.class)
     ClassType classTypeOf(String name) {
@@ -195,6 +196,46 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING),
                                 Arrays.asList(exprVar),
                                 Type.OBJECT),
+                        Span.dummySpan()));
+    }
+
+    @Override
+    public List<Statement> dumpEnv(Sym var, Sym envVar) {
+        Sym bindingVar = genSym.generate("binding");
+        Sym variablesVar = genSym.generate("variables");
+        return Arrays.asList(
+                new VarInitStatement(
+                        typeOf(BINDING),
+                        bindingVar,
+                        new InvokeExpr(
+                                classTypeOf(GROOVY_SHELL),
+                                envVar,
+                                "getContext",
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                typeOf(BINDING)),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        Type.MAP,
+                        variablesVar,
+                        new InvokeExpr(
+                                classTypeOf(BINDING),
+                                bindingVar,
+                                "getVariables",
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                Type.MAP),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        var,
+                        new InvokeExpr(
+                                ClassType.fromClass(java.util.Map.class),
+                                variablesVar,
+                                "toString",
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                Type.STRING),
                         Span.dummySpan()));
     }
 }

@@ -320,4 +320,20 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                                 Type.OBJECT),
                         Span.dummySpan()));
     }
+
+    @Override
+    public List<Statement> dumpEnv(Sym var, Sym envVar) {
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        var,
+                        new InvokeExpr(
+                                classTypeOf(OGNL_CONTEXT),
+                                envVar,
+                                "toString",
+                                Collections.emptyList(),
+                                Collections.emptyList(),
+                                Type.STRING),
+                        Span.dummySpan()));
+    }
 }

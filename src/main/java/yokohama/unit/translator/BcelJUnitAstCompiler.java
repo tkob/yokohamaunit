@@ -325,18 +325,20 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
+        LocalVariableGen message = locals.get(isStatement.getMessage().getName());
         LocalVariableGen subject = locals.get(isStatement.getSubject().getName());
         LocalVariableGen complement = locals.get(isStatement.getComplement().getName());
         InstructionHandle ih =
-                il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+                il.append(InstructionFactory.createLoad(message.getType(), message.getIndex()));
         addLineNumber(mg, ih, isStatement.getSpan());
+        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
         il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
         il.append(
                 factory.createInvoke(
                         "org.junit.Assert",
                         "assertThat",
                         Type.VOID,
-                        new Type[] { Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
+                        new Type[] { Type.STRING, Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
                         Constants.INVOKESTATIC));
     }
 
@@ -347,11 +349,13 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             InstructionList il,
             InstructionFactory factory,
             ConstantPoolGen cp) {
+        LocalVariableGen message = locals.get(isNotStatement.getMessage().getName());
         LocalVariableGen subject = locals.get(isNotStatement.getSubject().getName());
         LocalVariableGen complement = locals.get(isNotStatement.getComplement().getName());
         InstructionHandle ih =
-                il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
+                il.append(InstructionFactory.createLoad(message.getType(), message.getIndex()));
         addLineNumber(mg, ih, isNotStatement.getSpan());
+        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
         il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
         il.append(
                 factory.createInvoke(
@@ -365,7 +369,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         "org.junit.Assert",
                         "assertThat",
                         Type.VOID,
-                        new Type[] { Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
+                        new Type[] { Type.STRING, Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
                         Constants.INVOKESTATIC));
     }
 

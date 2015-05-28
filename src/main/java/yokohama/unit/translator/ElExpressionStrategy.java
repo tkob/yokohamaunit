@@ -190,4 +190,15 @@ public class ElExpressionStrategy implements ExpressionStrategy {
                                 Type.OBJECT),
                         Span.dummySpan()));
     }
+
+    @Override
+    public List<Statement> dumpEnv(Sym var, Sym envVar) {
+        // It seems that there is no way to dump environment in EL
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        var,
+                        new StrLitExpr(""),
+                        Span.dummySpan()));
+    }
 }

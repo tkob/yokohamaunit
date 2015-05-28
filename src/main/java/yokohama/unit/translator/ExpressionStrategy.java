@@ -56,4 +56,13 @@ public interface ExpressionStrategy {
             QuotedExpr quotedExpr,
             Class<?> expectedType,
             Sym envVar);
+
+    /**
+     * Dump environment as a string
+     * 
+     * @param var    a variable bound to the dump string
+     * @param envVar a variable bound to the environment
+     * @return statements that dump the enviroment as a string
+     */
+    List<Statement> dumpEnv(Sym var, Sym envVar);
 }
