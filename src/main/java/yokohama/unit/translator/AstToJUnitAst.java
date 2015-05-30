@@ -267,14 +267,19 @@ class AstToJUnitAstVisitor {
         Sym message = genSym.generate("message");
         Sym actual = genSym.generate("actual");
         Sym expected = genSym.generate("expected");
-        Stream<Statement> dumpEnv =
-                expressionStrategy.dumpEnv(message, envVar).stream();
+        yokohama.unit.ast.Expr subject = proposition.getSubject();
         Predicate predicate = proposition.getPredicate();
-        Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(
+        Matcher matcher = predicate.accept(
+                isPredicate -> isPredicate.getComplement(),
+                isNotPredicate -> isNotPredicate.getComplement(),
+                throwsPredicate -> throwsPredicate.getThrowee(),
+                matchesPredicate -> { throw new UnsupportedOperationException(); },
+                doeNotMatchPredicate -> { throw new UnsupportedOperationException(); });
+        return predicate.<Stream<Statement>>accept(
                 isPredicate -> {
                     return StreamCollector.<Statement>empty()
                             .append(translateExpr(
-                                    proposition.getSubject(),
+                                    subject,
                                     actual,
                                     Object.class,
                                     envVar))
@@ -283,6 +288,15 @@ class AstToJUnitAstVisitor {
                                     expected,
                                     actual,
                                     envVar))
+                            .append(expressionStrategy.dumpEnv(message, envVar))
+                            .append(matcher instanceof InstanceSuchThatMatcher
+                                    ? Stream.empty()
+                                    : Stream.of(
+                                            new IsStatement(
+                                                    message,
+                                                    actual,
+                                                    expected,
+                                                    predicate.getSpan())))
                             .getStream();
                 },
                 isNotPredicate -> {
@@ -299,7 +313,7 @@ class AstToJUnitAstVisitor {
                     Sym unexpected = genSym.generate("unexpected");
                     return StreamCollector.<Statement>empty()
                             .append(translateExpr(
-                                    proposition.getSubject(),
+                                    subject,
                                     actual,
                                     Object.class,
                                     envVar))
@@ -319,6 +333,15 @@ class AstToJUnitAstVisitor {
                                             Arrays.asList(unexpected),
                                             typeOf(MATCHER)),
                                     predicate.getSpan()))
+                            .append(expressionStrategy.dumpEnv(message, envVar))
+                            .append(matcher instanceof InstanceSuchThatMatcher
+                                    ? Stream.empty()
+                                    : Stream.of(
+                                            new IsStatement(
+                                                    message,
+                                                    actual,
+                                                    expected,
+                                                    predicate.getSpan())))
                             .getStream();
                 },
                 throwsPredicate -> {
@@ -327,7 +350,7 @@ class AstToJUnitAstVisitor {
                             .append(bindThrown(
                                     actual,
                                     translateExpr(
-                                            proposition.getSubject(),
+                                            subject,
                                             __,
                                             Object.class,
                                             envVar)
@@ -338,27 +361,20 @@ class AstToJUnitAstVisitor {
                                     expected,
                                     actual,
                                     envVar))
+                            .append(expressionStrategy.dumpEnv(message, envVar))
+                            .append(matcher instanceof InstanceSuchThatMatcher
+                                    ? Stream.empty()
+                                    : Stream.of(
+                                            new IsStatement(
+                                                    message,
+                                                    actual,
+                                                    expected,
+                                                    predicate.getSpan())))
                             .getStream();
                 },
                 matchesPredicate -> { throw new UnsupportedOperationException(); },
                 doeNotMatchPredicate -> { throw new UnsupportedOperationException(); }
         );
-        Matcher matcher = predicate.accept(
-                isPredicate -> isPredicate.getComplement(),
-                isNotPredicate -> isNotPredicate.getComplement(),
-                throwsPredicate -> throwsPredicate.getThrowee(),
-                matchesPredicate -> { throw new UnsupportedOperationException(); },
-                doeNotMatchPredicate -> { throw new UnsupportedOperationException(); });
-        return Stream.concat(dumpEnv,
-                Stream.concat(subjectAndPredicate,
-                        matcher instanceof InstanceSuchThatMatcher
-                                ? Stream.empty()
-                                : Stream.of(
-                                        new IsStatement(
-                                                message,
-                                                actual,
-                                                expected,
-                                                predicate.getSpan()))));
     }
 
     Stream<Statement> bindThrown(
