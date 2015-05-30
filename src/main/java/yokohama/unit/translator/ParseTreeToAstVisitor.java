@@ -177,6 +177,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitMatchesPredicate(YokohamaUnitParser.MatchesPredicateContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object visitDoesNotMatchPredicate(YokohamaUnitParser.DoesNotMatchPredicateContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Matcher visitMatcher(YokohamaUnitParser.MatcherContext ctx) {
         return (Matcher)visitChildren(ctx);
     }
@@ -204,6 +214,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Matcher visitNullValue(YokohamaUnitParser.NullValueContext ctx) {
         return new NullValueMatcher(getSpan(ctx));
+    }
+
+    @Override
+    public Object visitPattern(YokohamaUnitParser.PatternContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object visitRegexp(YokohamaUnitParser.RegexpContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
