@@ -1309,6 +1309,10 @@ class StreamCollector<T> {
         return new StreamCollector<>(Stream.concat(stream, stream_));
     }
 
+    StreamCollector<T> append(List<T> list) {
+        return new StreamCollector<>(Stream.concat(stream, list.stream()));
+    }
+
     StreamCollector<T> append(T element) {
         return new StreamCollector<>(Stream.concat(stream, Stream.of(element)));
     }
