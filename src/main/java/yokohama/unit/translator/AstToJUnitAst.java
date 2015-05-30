@@ -50,6 +50,8 @@ import yokohama.unit.ast.InstanceSuchThatMatcher;
 import yokohama.unit.ast.IntegerExpr;
 import yokohama.unit.ast.InvocationExpr;
 import yokohama.unit.ast.Invoke;
+import yokohama.unit.ast.IsNotPredicate;
+import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Matcher;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
@@ -63,6 +65,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
+import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
 import yokohama.unit.ast_junit.ArrayExpr;
 import yokohama.unit.ast_junit.BooleanLitExpr;
@@ -265,104 +268,106 @@ class AstToJUnitAstVisitor {
 
     Stream<Statement> translateProposition(
             Proposition proposition, Sym envVar) {
-        Sym message = genSym.generate("message");
-        Sym actual = genSym.generate("actual");
         yokohama.unit.ast.Expr subject = proposition.getSubject();
         Predicate predicate = proposition.getPredicate();
         return predicate.<Stream<Statement>>accept(
-                isPredicate -> {
-                    return StreamCollector.<Statement>empty()
-                            .append(translateExpr(
-                                    subject,
-                                    actual,
-                                    Object.class,
-                                    envVar))
-                            .append(translateMatcher(
-                                    isPredicate.getComplement(),
-                                    actual,
-                                    matcherVar -> StreamCollector.<Statement>empty()
-                                            .append(expressionStrategy.dumpEnv(message, envVar))
-                                            .append(new IsStatement(
-                                                    message,
-                                                    actual,
-                                                    matcherVar,
-                                                    predicate.getSpan()))
-                                            .getStream(),
-                                    envVar))
-                            .getStream();
-                },
-                isNotPredicate -> {
-                    // inhibit `is not instance e of Exception such that...`
-                    isNotPredicate.getComplement().accept(
-                            equalTo -> null,
-                            instanceOf -> null,
-                            instanceSuchThat -> {
-                                throw new TranslationException(
-                                        "`instance _ of _ such that` cannot follow `is not`",
-                                        instanceSuchThat.getSpan());
-                            },
-                            nullValue -> null);
-                    Sym expected = genSym.generate("expected");
-                    return StreamCollector.<Statement>empty()
-                            .append(translateExpr(
-                                    subject,
-                                    actual,
-                                    Object.class,
-                                    envVar))
-                            .append(translateMatcher(
-                                    isNotPredicate.getComplement(),
-                                    actual,
-                                    matcherVar -> StreamCollector.<Statement>empty()
-                                            .append(new VarInitStatement(
-                                                    typeOf(MATCHER),
-                                                    expected,
-                                                    new InvokeStaticExpr(
-                                                            classTypeOf(CORE_MATCHERS),
-                                                            Arrays.asList(),
-                                                            "not",
-                                                            Arrays.asList(typeOf(MATCHER)),
-                                                            Arrays.asList(matcherVar),
-                                                            typeOf(MATCHER)),
-                                                    predicate.getSpan()))
-                                            .append(expressionStrategy.dumpEnv(message, envVar))
-                                            .append(new IsStatement(
-                                                    message,
-                                                    actual,
-                                                    expected,
-                                                    predicate.getSpan()))
-                                            .getStream(),
-                                            envVar))
-                            .getStream();
-                },
-                throwsPredicate -> {
-                    Sym __ = genSym.generate("tmp");
-                    return StreamCollector.<Statement>empty()
-                            .append(bindThrown(
-                                    actual,
-                                    translateExpr(
-                                            subject,
-                                            __,
-                                            Object.class,
-                                            envVar)
-                                            .collect(Collectors.toList()),
-                                    envVar))
-                            .append(translateMatcher(
-                                    throwsPredicate.getThrowee(),
-                                    actual,
-                                    matcherVar -> StreamCollector.<Statement>empty()
-                                            .append(expressionStrategy.dumpEnv(message, envVar))
-                                            .append(new IsStatement(
-                                                    message,
-                                                    actual,
-                                                    matcherVar,
-                                                    predicate.getSpan()))
-                                            .getStream(),
-                                    envVar))
-                            .getStream();
-                },
+                isPredicate -> translateIsPredicate(subject, isPredicate, envVar),
+                isNotPredicate -> translateIsNotPredicate(subject, isNotPredicate, envVar),
+                throwsPredicate -> translateThrowsPredicate(subject, throwsPredicate, envVar),
                 matchesPredicate -> { throw new UnsupportedOperationException(); },
                 doeNotMatchPredicate -> { throw new UnsupportedOperationException(); }
         );
+    }
+
+    Stream<Statement> translateIsPredicate(
+            yokohama.unit.ast.Expr subject, IsPredicate isPredicate, Sym envVar) {
+        Sym message = genSym.generate("message");
+        Sym actual = genSym.generate("actual");
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(subject, actual, Object.class, envVar))
+                .append(translateMatcher(
+                        isPredicate.getComplement(),
+                        actual,
+                        matcherVar -> StreamCollector.<Statement>empty()
+                                .append(expressionStrategy.dumpEnv(message, envVar))
+                                .append(new IsStatement(
+                                        message,
+                                        actual,
+                                        matcherVar,
+                                        isPredicate.getSpan()))
+                                .getStream(),
+                        envVar))
+                .getStream();
+    }
+
+    Stream<Statement> translateIsNotPredicate(
+            yokohama.unit.ast.Expr subject, IsNotPredicate isNotPredicate, Sym envVar) {
+        // inhibit `is not instance e of Exception such that...`
+        isNotPredicate.getComplement().accept(
+                equalTo -> null,
+                instanceOf -> null,
+                instanceSuchThat -> {
+                    throw new TranslationException(
+                            "`instance _ of _ such that` cannot follow `is not`",
+                            instanceSuchThat.getSpan());
+                },
+                nullValue -> null);
+
+        Sym message = genSym.generate("message");
+        Sym actual = genSym.generate("actual");
+        Sym expected = genSym.generate("expected");
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(subject, actual, Object.class, envVar))
+                .append(translateMatcher(
+                        isNotPredicate.getComplement(),
+                        actual,
+                        matcherVar -> StreamCollector.<Statement>empty()
+                                .append(new VarInitStatement(
+                                        typeOf(MATCHER),
+                                        expected,
+                                        new InvokeStaticExpr(
+                                                classTypeOf(CORE_MATCHERS),
+                                                Arrays.asList(),
+                                                "not",
+                                                Arrays.asList(typeOf(MATCHER)),
+                                                Arrays.asList(matcherVar),
+                                                typeOf(MATCHER)),
+                                        isNotPredicate.getSpan()))
+                                .append(expressionStrategy.dumpEnv(message, envVar))
+                                .append(new IsStatement(
+                                        message,
+                                        actual,
+                                        expected,
+                                        isNotPredicate.getSpan()))
+                                .getStream(),
+                        envVar))
+                .getStream();
+    }
+
+    Stream<Statement> translateThrowsPredicate(
+            yokohama.unit.ast.Expr subject, ThrowsPredicate throwsPredicate, Sym envVar) {
+        Sym message = genSym.generate("message");
+        Sym actual = genSym.generate("actual");
+        Sym __ = genSym.generate("tmp");
+        return StreamCollector.<Statement>empty()
+                .append(bindThrown(
+                        actual,
+                        translateExpr(subject, __, Object.class, envVar)
+                                .collect(Collectors.toList()),
+                        envVar))
+                .append(translateMatcher(
+                        throwsPredicate.getThrowee(),
+                        actual,
+                        matcherVar -> StreamCollector.<Statement>empty()
+                                .append(expressionStrategy.dumpEnv(message, envVar))
+                                .append(new IsStatement(
+                                        message,
+                                        actual,
+                                        matcherVar,
+                                        throwsPredicate.getSpan()))
+                                .getStream(),
+                        envVar))
+                .getStream();
     }
 
     Stream<Statement> bindThrown(
