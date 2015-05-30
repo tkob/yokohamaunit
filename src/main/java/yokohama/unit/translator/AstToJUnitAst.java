@@ -333,12 +333,16 @@ class AstToJUnitAstVisitor {
                                     expected,
                                     actual,
                                     envVar));
-                }
+                },
+                matchesPredicate -> { throw new UnsupportedOperationException(); },
+                doeNotMatchPredicate -> { throw new UnsupportedOperationException(); }
         );
         Matcher matcher = predicate.accept(
                 isPredicate -> isPredicate.getComplement(),
                 isNotPredicate -> isNotPredicate.getComplement(),
-                throwsPredicate -> throwsPredicate.getThrowee());
+                throwsPredicate -> throwsPredicate.getThrowee(),
+                matchesPredicate -> { throw new UnsupportedOperationException(); },
+                doeNotMatchPredicate -> { throw new UnsupportedOperationException(); });
         return Stream.concat(dumpEnv,
                 Stream.concat(subjectAndPredicate,
                         matcher instanceof InstanceSuchThatMatcher

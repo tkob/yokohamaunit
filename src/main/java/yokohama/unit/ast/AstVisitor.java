@@ -18,11 +18,15 @@ public abstract class AstVisitor<T> {
         return predicate.accept(
                 this::visitIsPredicate,
                 this::visitIsNotPredicate,
-                this::visitThrowsPredicate);
+                this::visitThrowsPredicate,
+                this::visitMatchesPredicate,
+                this::visitDoesNotMatchPredicate);
     };
     public abstract T visitIsPredicate(IsPredicate isPredicate);
     public abstract T visitIsNotPredicate(IsNotPredicate isNotPredicate);
     public abstract T visitThrowsPredicate(ThrowsPredicate throwsPredicate);
+    public abstract T visitMatchesPredicate(MatchesPredicate matchesPredicate);
+    public abstract T visitDoesNotMatchPredicate(DoesNotMatchPredicate doesNotMatchPredicate);
     public T visitMatcher(Matcher matcher) {
         return matcher.accept(
                 this::visitEqualToMatcher,
@@ -34,7 +38,10 @@ public abstract class AstVisitor<T> {
     public abstract T visitInstanceOfMatcher(InstanceOfMatcher instanceOf);
     public abstract T visitInstanceSuchThatMatcher(InstanceSuchThatMatcher instanceSuchThat);
     public abstract T visitNullValueMatcher(NullValueMatcher nullValue);
-
+    public T visitPattern(Pattern pattern) {
+        return pattern.accept((java.util.function.Function<RegExpPattern, T>)(this::visitRegExpPattern));
+    }
+    public abstract T visitRegExpPattern(RegExpPattern regExpPattern);
     public T visitExpr(Expr expr) {
         return expr.accept(
                 this::visitQuotedExpr,
