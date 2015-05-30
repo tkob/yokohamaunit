@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
@@ -269,18 +270,20 @@ class AstToJUnitAstVisitor {
         Stream<Statement> dumpEnv =
                 expressionStrategy.dumpEnv(message, envVar).stream();
         Predicate predicate = proposition.getPredicate();
-        Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(isPredicate -> {
-                    return Stream.concat(
-                            translateExpr(
+        Stream<Statement> subjectAndPredicate = predicate.<Stream<Statement>>accept(
+                isPredicate -> {
+                    return StreamCollector.<Statement>empty()
+                            .append(translateExpr(
                                     proposition.getSubject(),
                                     actual,
                                     Object.class,
-                                    envVar),
-                            translateMatcher(
+                                    envVar))
+                            .append(translateMatcher(
                                     isPredicate.getComplement(),
                                     expected,
                                     actual,
-                                    envVar));
+                                    envVar))
+                            .getStream();
                 },
                 isNotPredicate -> {
                     // inhibit `is not instance e of Exception such that...`
@@ -294,32 +297,34 @@ class AstToJUnitAstVisitor {
                             },
                             nullValue -> null);
                     Sym unexpected = genSym.generate("unexpected");
-                    return Stream.concat(translateExpr(
+                    return StreamCollector.<Statement>empty()
+                            .append(translateExpr(
                                     proposition.getSubject(),
                                     actual,
                                     Object.class,
-                                    envVar),
-                            Stream.concat(translateMatcher(
+                                    envVar))
+                            .append(translateMatcher(
                                             isNotPredicate.getComplement(),
                                             unexpected,
                                             actual,
-                                            envVar),
-                                    Stream.of(new VarInitStatement(
-                                            typeOf(MATCHER),
-                                            expected,
-                                            new InvokeStaticExpr(
-                                                    classTypeOf(CORE_MATCHERS),
-                                                    Arrays.asList(),
-                                                    "not",
-                                                    Arrays.asList(typeOf(MATCHER)),
-                                                    Arrays.asList(unexpected),
-                                                    typeOf(MATCHER)),
-                                            predicate.getSpan()))));
+                                            envVar))
+                            .append(new VarInitStatement(
+                                    typeOf(MATCHER),
+                                    expected,
+                                    new InvokeStaticExpr(
+                                            classTypeOf(CORE_MATCHERS),
+                                            Arrays.asList(),
+                                            "not",
+                                            Arrays.asList(typeOf(MATCHER)),
+                                            Arrays.asList(unexpected),
+                                            typeOf(MATCHER)),
+                                    predicate.getSpan()))
+                            .getStream();
                 },
                 throwsPredicate -> {
                     Sym __ = genSym.generate("tmp");
-                    return Stream.concat(
-                            bindThrown(
+                    return StreamCollector.<Statement>empty()
+                            .append(bindThrown(
                                     actual,
                                     translateExpr(
                                             proposition.getSubject(),
@@ -327,12 +332,13 @@ class AstToJUnitAstVisitor {
                                             Object.class,
                                             envVar)
                                             .collect(Collectors.toList()),
-                                    envVar),
-                            translateMatcher(
+                                    envVar))
+                            .append(translateMatcher(
                                     throwsPredicate.getThrowee(),
                                     expected,
                                     actual,
-                                    envVar));
+                                    envVar))
+                            .getStream();
                 },
                 matchesPredicate -> { throw new UnsupportedOperationException(); },
                 doeNotMatchPredicate -> { throw new UnsupportedOperationException(); }
@@ -1292,5 +1298,22 @@ class AstToJUnitAstVisitor {
                             argVars,
                             span));
         }
+    }
+}
+
+@RequiredArgsConstructor
+class StreamCollector<T> {
+    @Getter final Stream<T> stream;
+
+    StreamCollector<T> append(Stream<T> stream_) {
+        return new StreamCollector<>(Stream.concat(stream, stream_));
+    }
+
+    StreamCollector<T> append(T element) {
+        return new StreamCollector<>(Stream.concat(stream, Stream.of(element)));
+    }
+
+    public static <T> StreamCollector<T> empty() {
+        return new StreamCollector<>(Stream.empty());
     }
 }
