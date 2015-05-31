@@ -99,6 +99,8 @@ public class DocyCompilerImplTest {
                 "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), 17),
         new Fixture(
                 "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), 1),
+        new Fixture(
+                "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), 4),
     };
 
     @DataPoints
