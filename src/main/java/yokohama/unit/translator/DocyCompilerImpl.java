@@ -22,6 +22,7 @@ import yokohama.unit.ast.AnchorCheckVisitor;
 import yokohama.unit.ast.AnyOfCheckVisitor;
 import yokohama.unit.ast.ClassCheckVisitor;
 import yokohama.unit.ast.Group;
+import yokohama.unit.ast.RegExpCheckVisitor;
 import yokohama.unit.ast.VariableCheckVisitor;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
@@ -107,6 +108,7 @@ public class DocyCompilerImpl implements DocyCompiler {
         List<ErrorMessage> classResolverErrors = classResolverAndErrors.getSecond();
         ClassCheckVisitor classCheckVisitor = new ClassCheckVisitor(classResolver);
         AnyOfCheckVisitor anyOfCheckVisitor = new AnyOfCheckVisitor();
+        RegExpCheckVisitor regExpCheckVisitor = new RegExpCheckVisitor();
         
         // other AST checks
         List<ErrorMessage> errors =
@@ -116,6 +118,7 @@ public class DocyCompilerImpl implements DocyCompiler {
                         .append(variableCheckVisitor::check)
                         .append(anchorCheckVisitor::check)
                         .append(anyOfCheckVisitor::check)
+                        .append(regExpCheckVisitor::check)
                         .getErrors();
         if (!errors.isEmpty()) return errors;
 
