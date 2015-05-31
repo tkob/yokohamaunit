@@ -23,7 +23,12 @@ proposition: subject predicate ;
 
 subject: quotedExpr | invokeExpr ;
 
-predicate: isPredicate | isNotPredicate | throwsPredicate ;
+predicate: isPredicate
+         | isNotPredicate
+         | throwsPredicate
+         | matchesPredicate
+         | doesNotMatchPredicate
+         ;
 isPredicate: IS matcher ;
 isNotPredicate: IS NOT matcher ;
 throwsPredicate: THROWS matcher ;
