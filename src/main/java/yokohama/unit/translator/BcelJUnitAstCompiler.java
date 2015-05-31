@@ -421,6 +421,16 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Constants.INVOKESTATIC));
                 return new ObjectType("org.hamcrest.Matcher");
             },
+            regExpMatcherExpr -> {
+                il.append(new PUSH(cp, regExpMatcherExpr.getPattern()));
+                il.append(factory.createInvoke(
+                        "com.jcabi.matchers.RegexMatchers",
+                        "containsPattern",
+                        new ObjectType("org.hamcrest.Matcher"),
+                        new Type[] { Type.STRING },
+                        Constants.INVOKESTATIC));
+                return new ObjectType("org.hamcrest.Matcher");
+            },
             newExpr -> {
                 il.append(factory.createNew(newExpr.getType()));
                 il.append(InstructionConstants.DUP);

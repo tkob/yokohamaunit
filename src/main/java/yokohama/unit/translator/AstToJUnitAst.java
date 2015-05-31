@@ -39,6 +39,7 @@ import yokohama.unit.ast.ChoiceCollectVisitor;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.CodeBlockExtractVisitor;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.DoesNotMatchPredicate;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.FloatingPointExpr;
@@ -53,11 +54,14 @@ import yokohama.unit.ast.Invoke;
 import yokohama.unit.ast.IsNotPredicate;
 import yokohama.unit.ast.IsPredicate;
 import yokohama.unit.ast.Matcher;
+import yokohama.unit.ast.MatchesPredicate;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.NullValueMatcher;
+import yokohama.unit.ast.Pattern;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.RegExpPattern;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
@@ -89,6 +93,7 @@ import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
+import yokohama.unit.ast_junit.RegExpMatcherExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.TryStatement;
@@ -274,9 +279,12 @@ class AstToJUnitAstVisitor {
                 isPredicate -> translateIsPredicate(subject, isPredicate, envVar),
                 isNotPredicate -> translateIsNotPredicate(subject, isNotPredicate, envVar),
                 throwsPredicate -> translateThrowsPredicate(subject, throwsPredicate, envVar),
-                matchesPredicate -> { throw new UnsupportedOperationException(); },
-                doeNotMatchPredicate -> { throw new UnsupportedOperationException(); }
-        );
+                matchesPredicate ->
+                        translateMatchesPredicate(
+                                subject, matchesPredicate, envVar),
+                doesNotMatchPredicate ->
+                        translateDoesNotMatchPredicate(
+                                subject, doesNotMatchPredicate, envVar));
     }
 
     Stream<Statement> translateIsPredicate(
@@ -407,6 +415,52 @@ class AstToJUnitAstVisitor {
                         Arrays.asList()));
     }
 
+    Stream<Statement> translateMatchesPredicate(
+            yokohama.unit.ast.Expr subject,
+            MatchesPredicate matchesPredicate,
+            Sym envVar) {
+        Pattern pattern = matchesPredicate.getPattern();
+        Sym message = genSym.generate("message");
+        Sym actual = genSym.generate("actual");
+        Sym expected = genSym.generate("expected");
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(subject, actual, Object.class, envVar))
+                .append(translatePattern(pattern, expected, envVar))
+                .append(expressionStrategy.dumpEnv(message, envVar))
+                .append(new IsStatement(
+                        message, actual, expected, matchesPredicate.getSpan()))
+                .getStream();
+    }
+
+    Stream<Statement> translateDoesNotMatchPredicate(
+            yokohama.unit.ast.Expr subject,
+            DoesNotMatchPredicate doesNotMatchPredicate,
+            Sym envVar) {
+        Pattern pattern = doesNotMatchPredicate.getPattern();
+        Sym message = genSym.generate("message");
+        Sym actual = genSym.generate("actual");
+        Sym unexpected = genSym.generate("unexpected");
+        Sym expected = genSym.generate("expected");
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(subject, actual, Object.class, envVar))
+                .append(translatePattern(pattern, unexpected, envVar))
+                .append(new VarInitStatement(
+                        typeOf(MATCHER),
+                        expected,
+                        new InvokeStaticExpr(
+                                classTypeOf(CORE_MATCHERS),
+                                Arrays.asList(),
+                                "not",
+                                Arrays.asList(typeOf(MATCHER)),
+                                Arrays.asList(unexpected),
+                                typeOf(MATCHER)),
+                        doesNotMatchPredicate.getSpan()))
+                .append(expressionStrategy.dumpEnv(message, envVar))
+                .append(new IsStatement(
+                        message, actual, expected, doesNotMatchPredicate.getSpan()))
+                .getStream();
+    }
+
     private String lookupClassName(String name, Span span) {
         try {
             return classResolver.lookup(name).getCanonicalName();
@@ -494,6 +548,24 @@ class AstToJUnitAstVisitor {
                         .append(cont.apply(matcherVar))
                         .getStream();
             });
+    }
+
+    Stream<Statement> translatePattern(
+            Pattern pattern, Sym var, Sym envVar) {
+        return pattern.accept((Function<RegExpPattern, Stream<Statement>>)
+                regExpPattern ->
+                        translateRegExpPattern(regExpPattern, var, envVar));
+    }
+
+    Stream<Statement> translateRegExpPattern(
+            RegExpPattern regExpPattern, Sym var, Sym envVar) {
+        regExpPattern.getRegexp();
+        return Stream.of(
+                new VarInitStatement(
+                        typeOf(MATCHER),
+                        var,
+                        new RegExpMatcherExpr(regExpPattern.getRegexp()),
+                        regExpPattern.getSpan()));
     }
 
     Stream<Statement> translateBinding(
