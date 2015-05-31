@@ -52,8 +52,11 @@ MATCHES: 'matches' ;
 DOES: 'does' ;
 MATCH: 'match' ;
 RE_TICK: 're' Spaces? '`' -> mode(REGEXP) ;
+RE_TICK2: 're' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
 REGEX_TICK: 'regex' Spaces? '`' -> mode(REGEXP) ;
+REGEX_TICK2: 'regex' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
 REGEXP_TICK: 'regexp' Spaces? '`' -> mode(REGEXP) ;
+REGEXP_TICK2: 'regexp' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
 NULL: 'null' ;
 NOTHING: 'nothing' ;
 TRUE: 'true' ;
@@ -150,8 +153,12 @@ BookName: (~['\r\n]|'\'\'')+ ;
 CLOSE_SINGLE_QUOTE_IN_BOOK_NAME: '\'' -> type(SINGLE_QUOTE), mode(DEFAULT_MODE) ;
 
 mode REGEXP;
-Regexp: (~[`]|'\\`')+ ;
+Regexp: (~[`])+ ;
 BACK_TICK_REGEXP: '`' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
+
+mode REGEXP2;
+Regexp2: (~[`] | '`' ~[`])+ -> type(Regexp) ;
+BACK_TICK_REGEXP2: '``' -> type(BACK_TICK), mode(DEFAULT_MODE) ;
 
 fragment
 Hashes: '#' | '##' | '###' | '####' | '#####' | '######' ;

@@ -100,7 +100,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), 1),
         new Fixture(
-                "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), 4),
+                "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), 7),
     };
 
     @DataPoints
