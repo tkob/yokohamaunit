@@ -1,4 +1,7 @@
 # YokohamaUnit
+
+[![Build Status](https://travis-ci.org/tkob/yokohamaunit.svg?branch=master)](https://travis-ci.org/tkob/yokohamaunit)
+
 YokohamaUnit is a unit testing framework for Java.
 
 Tests are written in a dedicated external DSL (and an embedded expression
