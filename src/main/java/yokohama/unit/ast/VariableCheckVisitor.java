@@ -51,11 +51,12 @@ public class VariableCheckVisitor {
     }
 
     private Stream<ErrorMessage> checkPredicate(Predicate predicate, FList<String> env) {
-        Matcher matcher = predicate.accept(
-                IsPredicate::getComplement, 
-                IsNotPredicate::getComplement, 
-                ThrowsPredicate::getThrowee); 
-        return checkMatcher(matcher, env);
+        return predicate.accept(
+                isPredicate -> checkMatcher(isPredicate.getComplement(), env),
+                isNotPredicate -> checkMatcher(isNotPredicate.getComplement(), env),
+                throwsPredicate -> checkMatcher(throwsPredicate.getThrowee(), env),
+                matchesPredicate -> checkPattern(matchesPredicate.getPattern(), env),
+                doesNotMatchPredicate -> checkPattern(doesNotMatchPredicate.getPattern(), env));
     }
 
     private Stream<ErrorMessage> checkMatcher(Matcher matcher, FList<String> env) {
@@ -76,6 +77,10 @@ public class VariableCheckVisitor {
                     return Stream.concat(err, errs);
                 },
                 nullValue -> Stream.empty());
+    }
+
+    private Stream<ErrorMessage> checkPattern(Pattern pattern, FList<String> env) {
+        return Stream.empty();
     }
 
     private Stream<ErrorMessage> checkFixture(Fixture fixture, FList<String> env) {

@@ -11,7 +11,9 @@ public interface Predicate {
     default <T> T accept(
             Function<IsPredicate, T> visitIsPredicate_,
             Function<IsNotPredicate, T> visitIsNotPredicate_,
-            Function<ThrowsPredicate, T> visitThrowsPredicate_
+            Function<ThrowsPredicate, T> visitThrowsPredicate_,
+            Function<MatchesPredicate, T> visitMatchesPredicate_,
+            Function<DoesNotMatchPredicate, T> visitDoesNotMatchPredicate_
     ) {
         return accept(new PredicateVisitor<T>() {
             @Override
@@ -25,6 +27,14 @@ public interface Predicate {
             @Override
             public T visitThrowsPredicate(ThrowsPredicate throwsPredicate) {
                 return visitThrowsPredicate_.apply(throwsPredicate);
+            }
+            @Override
+            public T visitMatchesPredicate(MatchesPredicate matchesPredicate) {
+                return visitMatchesPredicate_.apply(matchesPredicate);
+            }
+            @Override
+            public T visitDoesNotMatchPredicate(DoesNotMatchPredicate doesNotMatchPredicate) {
+                return visitDoesNotMatchPredicate_.apply(doesNotMatchPredicate);
             }
         });
     }

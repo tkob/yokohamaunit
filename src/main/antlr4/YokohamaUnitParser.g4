@@ -23,16 +23,26 @@ proposition: subject predicate ;
 
 subject: quotedExpr | invokeExpr ;
 
-predicate: isPredicate | isNotPredicate | throwsPredicate ;
+predicate: isPredicate
+         | isNotPredicate
+         | throwsPredicate
+         | matchesPredicate
+         | doesNotMatchPredicate
+         ;
 isPredicate: IS matcher ;
 isNotPredicate: IS NOT matcher ;
 throwsPredicate: THROWS matcher ;
+matchesPredicate: MATCHES pattern ;
+doesNotMatchPredicate: DOES NOT MATCH pattern ;
 
 matcher: equalTo | instanceOf | instanceSuchThat | nullValue ;
 equalTo: argumentExpr ;
 instanceOf: AN_INSTANCE_OF_BACK_TICK classType BACK_TICK;
 instanceSuchThat: AN_INSTANCE Identifier OF BACK_TICK classType BACK_TICK SUCH THAT proposition (AND proposition)*;
 nullValue: NULL | NOTHING ;
+
+pattern: regexp ;
+regexp: (RE_TICK | REGEX_TICK | REGEXP_TICK) Regexp BACK_TICK ;
 
 condition: forAll
          | bindings

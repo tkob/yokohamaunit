@@ -33,6 +33,10 @@ public class VarInitStatement implements Statement {
                     equalToMatcherExpr.getExpr(sb, var.getName());
                     return null;
                 },
+                regExpMatcherExpr -> {
+                    regExpMatcherExpr.getExpr(sb, var.getName());
+                    return null;
+                },
                 newExpr -> {
                     newExpr.getExpr(sb, var.getName());
                     return null;

@@ -17,6 +17,8 @@
  * IsPredicate ::= Matcher
  * IsNotPredicate ::= Matcher
  * ThrowsPredicate ::= Matcher
+ * MatchesPredicate ::= Pattern
+ * DoesNotMatchPredicate ::= Pattern
  * 
  * Matcher ::= EqualToMatcher
  *           | InstanceOfMatcher
@@ -26,6 +28,8 @@
  * EqualToMatcher ::= QuotedExpr
  * InstanceOfMatcher ::= ClassType
  * InstanceSuchThatMatcher ::= ClassType Proposition+
+ * 
+ * Pattern ::= RegExpPattern
  * 
  * Expr ::= QuotedExpr
  *        | StubExpr

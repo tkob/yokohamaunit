@@ -50,6 +50,17 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
         return visitMatcher(throwsPredicate.getThrowee());
     }
 
+
+    @Override
+    public Stream<T> visitMatchesPredicate(MatchesPredicate matchesPredicate) {
+        return visitPattern(matchesPredicate.getPattern());
+    }
+
+    @Override
+    public Stream<T> visitDoesNotMatchPredicate(DoesNotMatchPredicate doesNotMatchPredicate) {
+        return visitPattern(doesNotMatchPredicate.getPattern());
+    }
+
     @Override
     public Stream<T> visitEqualToMatcher(EqualToMatcher equalTo) {
         return visitExpr(equalTo.getExpr());
@@ -71,6 +82,11 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
 
     @Override
     public Stream<T> visitNullValueMatcher(NullValueMatcher nullValue) {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<T> visitRegExpPattern(RegExpPattern regExpPattern) {
         return Stream.empty();
     }
 

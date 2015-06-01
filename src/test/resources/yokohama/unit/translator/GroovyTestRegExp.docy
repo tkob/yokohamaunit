@@ -1,0 +1,17 @@
+# Test: Regular Expression
+
+Assert that `"hello"` matches re `^h.*o$`.
+
+Assert that `"hello"` matches regex `\Ah.*o\z`.
+
+Assert that `" hello "` matches regexp `h.*o`.
+
+Assert that `" hello "` does not match regexp `\Ah.*o\z`.
+
+# Test: Regular Expression (two back ticks)
+
+Assert that `"\u0060hello\u0060"` matches re ``^`h.*o`$``.
+
+Assert that `"\u0060hello\u0060"` matches regex ``\A`h.*o`\z``.
+
+Assert that `" \u0060hello\u0060 "` matches regexp ``\u0060h.*o\u0060``.

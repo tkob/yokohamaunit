@@ -25,6 +25,7 @@ import yokohama.unit.ast.ChoiceBinding;
 import yokohama.unit.ast.ClassType;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.Definition;
+import yokohama.unit.ast.DoesNotMatchPredicate;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
 import yokohama.unit.ast.Expr;
@@ -49,11 +50,14 @@ import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.PrimitiveType;
 import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.Matcher;
+import yokohama.unit.ast.MatchesPredicate;
 import yokohama.unit.ast.NullValueMatcher;
+import yokohama.unit.ast.Pattern;
 import yokohama.unit.position.Position;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
+import yokohama.unit.ast.RegExpPattern;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.Statement;
@@ -177,6 +181,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public MatchesPredicate visitMatchesPredicate(
+            YokohamaUnitParser.MatchesPredicateContext ctx) {
+        return new MatchesPredicate(visitPattern(ctx.pattern()), getSpan(ctx));
+    }
+
+    @Override
+    public DoesNotMatchPredicate visitDoesNotMatchPredicate(
+            YokohamaUnitParser.DoesNotMatchPredicateContext ctx) {
+        return new DoesNotMatchPredicate(
+                visitPattern(ctx.pattern()), getSpan(ctx));
+    }
+
+    @Override
     public Matcher visitMatcher(YokohamaUnitParser.MatcherContext ctx) {
         return (Matcher)visitChildren(ctx);
     }
@@ -204,6 +221,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Matcher visitNullValue(YokohamaUnitParser.NullValueContext ctx) {
         return new NullValueMatcher(getSpan(ctx));
+    }
+
+    @Override
+    public Pattern visitPattern(YokohamaUnitParser.PatternContext ctx) {
+        return (Pattern)visitChildren(ctx); 
+    }
+
+    @Override
+    public RegExpPattern visitRegexp(YokohamaUnitParser.RegexpContext ctx) {
+        return new RegExpPattern(ctx.Regexp().getText(), getSpan(ctx));
     }
 
     @Override

@@ -1,0 +1,19 @@
+# Test: Detect synax error of regular expression
+
+## Setup
+Let ast = [Fixture 1] as `yokohama.unit.ast.Group`.
+
+Let sut = `new yokohama.unit.ast.RegExpCheckVisitor()`.
+
+## Verify
+
+Assert that `sut.check(ast).size()` is 2.
+
+## Fixture 1
+
+```
+# Test: test
+Assert that `"hello"` matches re `(.)`.
+Assert that `"hello"` matches re `(.`.
+Assert that `"hello"` matches re `).`.
+```

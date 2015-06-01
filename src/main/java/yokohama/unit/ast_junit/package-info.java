@@ -12,6 +12,7 @@
  *        | InstanceOfMatcherExpr
  *        | NullValueMatcherExpr
  *        | EqualToMatcherExpr
+ *        | RegExpMatcherExpr
  *        | NewExpr
  *        | StrLitExpr
  *        | NullExpr

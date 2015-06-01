@@ -5,6 +5,7 @@ public interface ExprVisitor<T> {
     T visitInstanceOfMatcherExpr(InstanceOfMatcherExpr instanceOfMatcherExpr);
     T visitNullValueMatcherExpr(NullValueMatcherExpr nullValueMatcherExpr);
     T visitEqualToMatcherExpr(EqualToMatcherExpr equalToMatcherExpr);
+    T visitRegExpMatcherExpr(RegExpMatcherExpr regExpMatcherExpr);
     T visitNewExpr(NewExpr newExpr);
     T visitStrLitExpr(StrLitExpr strLitExpr);
     T visitNullExpr(NullExpr nullExpr);
@@ -19,5 +20,4 @@ public interface ExprVisitor<T> {
     T visitClassLitExpr(ClassLitExpr classLitExpr);
     T visitEqualOpExpr(EqualOpExpr equalOpExpr);
     T visitArrayExpr(ArrayExpr arrayExpr);
-
 }
