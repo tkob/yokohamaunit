@@ -42,7 +42,6 @@ import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.InvokeStaticVoidStatement;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
-import yokohama.unit.ast_junit.IsNotStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.ReturnStatement;
@@ -74,7 +73,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatement(Statement statement) {
             return statement.accept(
                     isStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    isNotStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     varInitStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     tryStatement ->
                             Stream.concat(
@@ -228,10 +226,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 visitIsStatement(isStatement, locals, mg, il, factory, cp);
                 return null;
             },
-            isNotStatement -> {
-                visitIsNotStatement(isNotStatement, locals, mg, il, factory, cp);
-                return null;
-            },
             varInitStatement -> {
                 visitVarInitStatement(varInitStatement, locals, mg, il, factory, cp);
                 return null;
@@ -333,37 +327,6 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         addLineNumber(mg, ih, isStatement.getSpan());
         il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
         il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
-        il.append(
-                factory.createInvoke(
-                        "org.junit.Assert",
-                        "assertThat",
-                        Type.VOID,
-                        new Type[] { Type.STRING, Type.OBJECT, new ObjectType("org.hamcrest.Matcher") },
-                        Constants.INVOKESTATIC));
-    }
-
-    private void visitIsNotStatement(
-            IsNotStatement isNotStatement,
-            Map<String, LocalVariableGen> locals,
-            MethodGen mg,
-            InstructionList il,
-            InstructionFactory factory,
-            ConstantPoolGen cp) {
-        LocalVariableGen message = locals.get(isNotStatement.getMessage().getName());
-        LocalVariableGen subject = locals.get(isNotStatement.getSubject().getName());
-        LocalVariableGen complement = locals.get(isNotStatement.getComplement().getName());
-        InstructionHandle ih =
-                il.append(InstructionFactory.createLoad(message.getType(), message.getIndex()));
-        addLineNumber(mg, ih, isNotStatement.getSpan());
-        il.append(InstructionFactory.createLoad(subject.getType(), subject.getIndex()));
-        il.append(InstructionFactory.createLoad(complement.getType(), complement.getIndex()));
-        il.append(
-                factory.createInvoke(
-                        "org.hamcrest.CoreMatchers",
-                        "not",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        new Type[] { complement.getType() },
-                        Constants.INVOKESTATIC));
         il.append(
                 factory.createInvoke(
                         "org.junit.Assert",

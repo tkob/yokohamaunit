@@ -24,7 +24,6 @@ public class VarDeclVisitor {
     public Stream<Pair<Type, String>> visitStatement(Statement statement) { 
         return statement.accept(
                 isStatement -> Stream.<Pair<Type, String>>empty(),
-                isNotStatement -> Stream.<Pair<Type, String>>empty(),
                 varInitStatement ->
                         Stream.of(new Pair<Type, String>(varInitStatement.getType(), varInitStatement.getVar().getName())),
                 tryStatement ->

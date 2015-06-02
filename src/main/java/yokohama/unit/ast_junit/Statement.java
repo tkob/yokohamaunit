@@ -10,7 +10,6 @@ public interface Statement {
 
     default <T> T accept(
             Function<IsStatement, T> visitIsStatement_,
-            Function<IsNotStatement, T> visitIsNotStatement_,
             Function<VarInitStatement, T> visitVarInitStatement_,
             Function<TryStatement, T> visitTryStatement_,
             Function<IfStatement, T> visitIfStatement_,
@@ -22,11 +21,6 @@ public interface Statement {
             @Override
             public T visitIsStatement(IsStatement isStatement) {
                 return visitIsStatement_.apply(isStatement);
-            }
-
-            @Override
-            public T visitIsNotStatement(IsNotStatement isNotStatement) {
-                return visitIsNotStatement_.apply(isNotStatement);
             }
 
             @Override
