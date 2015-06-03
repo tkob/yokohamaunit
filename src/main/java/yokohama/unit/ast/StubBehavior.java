@@ -1,13 +1,24 @@
 package yokohama.unit.ast;
 
-import yokohama.unit.position.Span;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import java.util.function.Function;
 
-@Value
-@EqualsAndHashCode(exclude={"span"})
-public class StubBehavior {
-    private MethodPattern methodPattern;
-    private Expr toBeReturned;
-    private Span span;
+public interface StubBehavior {
+    <T> T accept(StubBehaviorVisitor<T> visitor);
+
+    default <T> T accept(
+            Function<StubReturns, T> visitStubReturns_,
+            Function<StubThrows, T> visitStubThrows_
+    ) {
+        return accept(new StubBehaviorVisitor<T>() {
+            @Override
+            public T visitStubReturns(StubReturns stubReturns) {
+                return visitStubReturns_.apply(stubReturns);
+            }
+
+            @Override
+            public T visitStubThrows(StubThrows stubThrows) {
+                return visitStubThrows_.apply(stubThrows);
+            }
+        });
+    }
 }

@@ -12,6 +12,7 @@ import yokohama.unit.ast.Kind;
 import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
+import yokohama.unit.ast.StubReturns;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
@@ -101,6 +102,24 @@ public class MockitoMockStrategy implements MockStrategy {
             AstToJUnitAstVisitor astToJUnitAstVisitor,
             Sym envVar,
             ClassResolver classResolver) {
+        return behavior.accept(
+                stubReturns ->
+                        defineReturns(
+                                var,
+                                classToStub,
+                                stubReturns,
+                                astToJUnitAstVisitor,
+                                envVar, classResolver),
+                stubThrows -> { throw new UnsupportedOperationException(); });
+    }
+
+    private Stream<Statement> defineReturns(
+            Sym var,
+            yokohama.unit.ast.ClassType classToStub,
+            StubReturns stubReturns,
+            AstToJUnitAstVisitor astToJUnitAstVisitor,
+            Sym envVar,
+            ClassResolver classResolver) {
         /*
         Defining behavior consists of four parts:
         1. Define value to return when the stub method is called (`returned`)
@@ -110,8 +129,8 @@ public class MockitoMockStrategy implements MockStrategy {
         3. Tell Mockito the return value (`whenReturn`)
         */
 
-        Span span = behavior.getSpan();
-        MethodPattern methodPattern = behavior.getMethodPattern();
+        Span span = stubReturns.getSpan();
+        MethodPattern methodPattern = stubReturns.getMethodPattern();
         String methodName = methodPattern.getName();
         boolean isVararg = methodPattern.isVararg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
@@ -122,8 +141,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         .get();
 
         Sym returnedVar = genSym.generate("returned");
-        Stream<Statement> returned = astToJUnitAstVisitor.translateExpr(
-                behavior.getToBeReturned(),
+        Stream<Statement> returned = astToJUnitAstVisitor.translateExpr(stubReturns.getToBeReturned(),
                 returnedVar,
                 returnType.box().toClass(),
                 envVar);

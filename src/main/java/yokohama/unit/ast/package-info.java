@@ -44,7 +44,9 @@
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 
- * StubBehavior ::= MethodPattern Expr
+ * StubBehavior ::= StubReturns | StubThrows
+ * StubReturns ::= MethodPattern Expr
+ * StubThrows ::= MethodPattern Expr
  * 
  * MethodPattern ::= Type*
  * 

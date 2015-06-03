@@ -65,7 +65,13 @@ public abstract class AstVisitor<T> {
     public abstract T visitStringExpr(StringExpr stringExpr);
     public abstract T visitAnchorExpr(AnchorExpr anchorExpr);
     public abstract T visitAsExpr(AsExpr asExpr);
-    public abstract T visitStubBehavior(StubBehavior behavior);
+    public T visitStubBehavior(StubBehavior behavior) {
+        return behavior.accept(
+                this::visitStubReturns,
+                this::visitStubThrows);
+    }
+    public abstract T visitStubReturns(StubReturns stubReturns);
+    public abstract T visitStubThrows(StubThrows stubThrows);
     public abstract T visitMethodPattern(MethodPattern methodPattern);
     public abstract T visitType(Type type);
     public T visitNonArrayType(NonArrayType nonArrayType) {
