@@ -478,9 +478,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public StubBehavior visitStubBehavior(YokohamaUnitParser.StubBehaviorContext ctx) {
+        return (StubBehavior)visitChildren(ctx);
+    }
+
+    @Override
+    public StubBehavior visitStubReturns(YokohamaUnitParser.StubReturnsContext ctx) {
         MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
         Expr toBeReturned = visitExpr(ctx.expr());
         return new StubBehavior(methodPattern, toBeReturned, getSpan(ctx));
+    }
+
+    @Override
+    public Object visitStubThrows(YokohamaUnitParser.StubThrowsContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
