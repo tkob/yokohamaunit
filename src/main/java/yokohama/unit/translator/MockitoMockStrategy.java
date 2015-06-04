@@ -122,11 +122,9 @@ public class MockitoMockStrategy implements MockStrategy {
             Sym envVar,
             ClassResolver classResolver) {
         /*
-        Defining behavior consists of four parts:
+        Defining behavior consists of three parts:
         1. Define value to return when the stub method is called (`returned`)
         2. Invoke the method with appropriate matchers
-           2a. Prepare matchers (`argMatchers`)
-           2b. Invoke the method with the matchers (`invoke`)
         3. Tell Mockito the return value (`whenThenReturn`)
         */
 
@@ -147,6 +145,37 @@ public class MockitoMockStrategy implements MockStrategy {
                 returnType.box().toClass(),
                 envVar);
 
+        Sym invokeVar = genSym.generate("invoke");
+        Stream<Statement> invokeWithMatchers = invokeWithMatchers(
+                var,
+                invokeVar,
+                classToStub,
+                returnType,
+                methodPattern,
+                span);
+
+        // when ... thenReturn
+        Stream<Statement> whenThenReturn =
+                whenThenReturn(invokeVar, returnedVar, span);
+
+        return Stream.concat(returned,
+                Stream.concat(invokeWithMatchers, whenThenReturn));
+    }
+
+    private Stream<Statement> invokeWithMatchers(
+            Sym var,
+            Sym invokeVar,
+            yokohama.unit.ast.ClassType classToStub,
+            Type returnType,
+            MethodPattern methodPattern,
+            Span span) {
+        /*
+        a. Prepare matchers (`argMatchers`)
+        b. Invoke the method with the matchers (`invoke`)
+        */
+        String methodName = methodPattern.getName();
+        boolean isVararg = methodPattern.isVararg();
+        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
         Stream<Type> argTypes;
         Stream<Sym> argVars;
         Stream<Statement> argMatchers;
@@ -188,17 +217,19 @@ public class MockitoMockStrategy implements MockStrategy {
         }
 
         // invoke the method
-        Sym invokeVar = genSym.generate("invoke");
         Sym invokeTmpVar = returnType.isPrimitive() ? genSym.generate("invoke") : invokeVar;
-        Stream<Statement> invoke = Stream.concat(Stream.of(new VarInitStatement(returnType, invokeTmpVar, 
-                                new InvokeExpr(
-                                        ClassType.of(classToStub, classResolver),
-                                        var,
-                                        methodName,
-                                        argTypes.collect(Collectors.toList()),
-                                        argVars.collect(Collectors.toList()),
-                                        returnType),
-                                span)),
+        Stream<Statement> invoke = Stream.concat(
+                Stream.of(new VarInitStatement(
+                        returnType,
+                        invokeTmpVar, 
+                        new InvokeExpr(
+                                ClassType.of(classToStub, classResolver),
+                                var,
+                                methodName,
+                                argTypes.collect(Collectors.toList()),
+                                argVars.collect(Collectors.toList()),
+                                returnType),
+                        span)),
                 // box primitive type if needed
                 returnType.getDims() == 0
                         ? returnType.getNonArrayType().accept(primitiveType -> {
@@ -215,14 +246,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 },
                                 classType -> Stream.empty())
                         : Stream.empty());
-
-        // when ... thenReturn
-        Stream<Statement> whenThenReturn =
-                whenThenReturn(invokeVar, returnedVar, span);
-
-        return Stream.concat(returned,
-                Stream.concat(argMatchers,
-                        Stream.concat(invoke, whenThenReturn)));
+        return Stream.concat(argMatchers, invoke);
     }
 
     private Stream<Statement> whenThenReturn(
