@@ -218,14 +218,14 @@ public class MockitoMockStrategy implements MockStrategy {
 
         // when ... thenReturn
         Stream<Statement> whenThenReturn =
-                generateWhenThenReturn(invokeVar, returnedVar, span);
+                whenThenReturn(invokeVar, returnedVar, span);
 
         return Stream.concat(returned,
                 Stream.concat(argMatchers,
                         Stream.concat(invoke, whenThenReturn)));
     }
 
-    private Stream<Statement> generateWhenThenReturn(
+    private Stream<Statement> whenThenReturn(
             Sym invokeVar, Sym returnedVar, Span span) {
         Sym stubbingVar = genSym.generate("stubbing");
         Sym __ = genSym.generate("__");
