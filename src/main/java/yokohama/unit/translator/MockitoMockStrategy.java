@@ -13,6 +13,7 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.StubReturns;
+import yokohama.unit.ast.StubThrows;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
@@ -126,7 +127,7 @@ public class MockitoMockStrategy implements MockStrategy {
         2. Invoke the method with appropriate matchers
            2a. Prepare matchers (`argMatchers`)
            2b. Invoke the method with the matchers (`invoke`)
-        3. Tell Mockito the return value (`whenReturn`)
+        3. Tell Mockito the return value (`whenThenReturn`)
         */
 
         Span span = stubReturns.getSpan();
@@ -216,9 +217,20 @@ public class MockitoMockStrategy implements MockStrategy {
                         : Stream.empty());
 
         // when ... thenReturn
+        Stream<Statement> whenThenReturn =
+                generateWhenThenReturn(invokeVar, returnedVar, span);
+
+        return Stream.concat(returned,
+                Stream.concat(argMatchers,
+                        Stream.concat(invoke, whenThenReturn)));
+    }
+
+    private Stream<Statement> generateWhenThenReturn(
+            Sym invokeVar, Sym returnedVar, Span span) {
         Sym stubbingVar = genSym.generate("stubbing");
         Sym __ = genSym.generate("__");
-        Stream<Statement> whenReturn = Stream.of(new VarInitStatement(
+        Stream<Statement> whenThenReturn = Stream.of(
+                new VarInitStatement(
                         typeOf(ONGOING_STUBBING),
                         stubbingVar,
                         new InvokeStaticExpr(
@@ -238,10 +250,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 Arrays.asList(returnedVar),
                                 typeOf(ONGOING_STUBBING)),
                         span));
-
-        return Stream.concat(returned,
-                Stream.concat(argMatchers,
-                        Stream.concat(invoke, whenReturn)));
+        return whenThenReturn;
     }
 
     private Pair<Sym, Stream<Statement>> mapArgumentType(
