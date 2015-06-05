@@ -158,8 +158,11 @@ public class MockitoMockStrategy implements MockStrategy {
         Stream<Statement> whenThenReturn =
                 whenThenReturn(invokeVar, returnedVar, span);
 
-        return Stream.concat(returned,
-                Stream.concat(invokeWithMatchers, whenThenReturn));
+        return StreamCollector.<Statement>empty()
+                .append(returned)
+                .append(invokeWithMatchers)
+                .append(whenThenReturn)
+                .getStream();
     }
 
     private Stream<Statement> invokeWithMatchers(
