@@ -237,7 +237,8 @@ public class MockitoMockStrategy implements MockStrategy {
                 returnType.getDims() == 0
                         ? returnType.getNonArrayType().accept(primitiveType -> {
                                     ClassType boxed = primitiveType.box();
-                                    return Stream.of(new VarInitStatement(boxed.toType(), invokeVar,
+                                    return Stream.of(
+                                            new VarInitStatement(boxed.toType(), invokeVar,
                                                     new InvokeStaticExpr(
                                                             boxed,
                                                             Arrays.asList(),
@@ -286,7 +287,8 @@ public class MockitoMockStrategy implements MockStrategy {
         Span span = argumentType.getSpan();
         Sym argVar = genSym.generate("arg");
         int dims = argumentType.getDims();
-        Stream<Statement> statements = argumentType.getNonArrayType().accept(primitiveType -> {
+        Stream<Statement> statements = argumentType.getNonArrayType().accept(
+                primitiveType -> {
                     if (dims == 0) {
                         switch (primitiveType.getKind()) {
                             case BOOLEAN:
@@ -394,7 +396,8 @@ public class MockitoMockStrategy implements MockStrategy {
                             case DOUBLE:  type = new Type(new PrimitiveType(Kind.DOUBLE),  dims); break;
                             default: throw new RuntimeException("should not reach here");
                         }
-                        return Stream.<Statement>of(new VarInitStatement(Type.CLASS, clazzVar, new ClassLitExpr(type), span),
+                        return Stream.<Statement>of(
+                                new VarInitStatement(Type.CLASS, clazzVar, new ClassLitExpr(type), span),
                                 new VarInitStatement(type, argVar,
                                         new InvokeStaticExpr(
                                                 classTypeOf(MOCKITO),
@@ -411,7 +414,8 @@ public class MockitoMockStrategy implements MockStrategy {
                     Type type = new Type(
                             ClassType.of(classType, classResolver),
                             dims);
-                    return Stream.<Statement>of(new VarInitStatement(Type.CLASS, clazzVar, new ClassLitExpr(type), span),
+                    return Stream.<Statement>of(
+                            new VarInitStatement(Type.CLASS, clazzVar, new ClassLitExpr(type), span),
                             new VarInitStatement(type, argVar,
                                     new InvokeStaticExpr(
                                             classTypeOf(MOCKITO),
