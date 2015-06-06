@@ -176,54 +176,15 @@ public class MockitoMockStrategy implements MockStrategy {
         a. Prepare matchers (`argMatchers`)
         b. Invoke the method with the matchers (`invoke`)
         */
-        String methodName = methodPattern.getName();
-        boolean isVararg = methodPattern.isVararg();
-        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
-        List<Type> argTypes;
-        List<Sym> argVars;
-        Stream<Statement> argMatchers;
-        if (isVararg) {
-            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs = 
-                    Lists.mapInitAndLast(
-                            argumentTypes,
-                            argumentType -> 
-                                mapArgumentType(argumentType, classResolver),
-                            argumentType -> { 
-                                Sym varArg = genSym.generate("varArg");
-                                Type varType =
-                                        Type.of(argumentType, classResolver)
-                                                .toArray();
-                                Statement statement =
-                                        new VarInitStatement(
-                                                varType,
-                                                varArg,
-                                                new InvokeStaticExpr(
-                                                        classTypeOf(MOCKITO),
-                                                        Arrays.asList(varType),
-                                                        "anyVararg",
-                                                        Arrays.asList(),
-                                                        Arrays.asList(),
-                                                        Type.OBJECT),
-                                                span);
-                                return new Pair<>(
-                                        new Pair<>(varType, varArg),
-                                        Stream.of(statement));
-                            });
-            Pair<List<Type>, List<Sym>> typesAndVars =
-                    Pair.unzip(pairs.stream().map(Pair::getFirst).collect(Collectors.toList()));
-            argTypes = typesAndVars.getFirst();
-            argVars = typesAndVars.getSecond();
-            argMatchers = pairs.stream().flatMap(Pair::getSecond);
-        } else {
-            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs = argumentTypes.stream()
-                    .map(argumentType -> mapArgumentType(argumentType, classResolver))
-                    .collect(Collectors.toList());
-            Pair<List<Type>, List<Sym>> typesAndVars =
-                    Pair.unzip(pairs.stream().map(Pair::getFirst).collect(Collectors.toList()));
-            argTypes = typesAndVars.getFirst();
-            argVars = typesAndVars.getSecond();
-            argMatchers = pairs.stream().flatMap(Pair::getSecond);
-        }
+
+        // prepare matchers
+        List<Pair<Pair<Type, Sym>, Stream<Statement>>> matchers =
+                prepareMatchers(methodPattern);
+        Pair<List<Type>, List<Sym>> typesAndVars =
+                Pair.unzip(matchers.stream().map(Pair::getFirst).collect(Collectors.toList()));
+        List<Type> argTypes = typesAndVars.getFirst();
+        List<Sym> argVars = typesAndVars.getSecond();
+        Stream<Statement> argMatchers = matchers.stream().flatMap(Pair::getSecond);
 
         // invoke the method
         Sym invokeTmpVar = returnType.isPrimitive() ? genSym.generate("invoke") : invokeVar;
@@ -234,7 +195,7 @@ public class MockitoMockStrategy implements MockStrategy {
                         new InvokeExpr(
                                 ClassType.of(classToStub, classResolver),
                                 var,
-                                methodName,
+                                methodPattern.getName(),
                                 argTypes,
                                 argVars,
                                 returnType),
@@ -257,6 +218,45 @@ public class MockitoMockStrategy implements MockStrategy {
                                 classType -> Stream.empty())
                         : Stream.empty());
         return Stream.concat(argMatchers, invoke);
+    }
+
+    private List<Pair<Pair<Type, Sym>, Stream<Statement>>>
+        prepareMatchers(MethodPattern methodPattern) {
+        boolean isVararg = methodPattern.isVararg();
+        List<yokohama.unit.ast.Type> argumentTypes =
+                methodPattern.getParamTypes();
+        if (isVararg) {
+            return Lists.mapInitAndLast(
+                    argumentTypes,
+                    argumentType -> 
+                        mapArgumentType(argumentType, classResolver),
+                    argumentType -> { 
+                        Sym varArg = genSym.generate("varArg");
+                        Type varType =
+                                Type.of(argumentType, classResolver)
+                                        .toArray();
+                        Statement statement =
+                                new VarInitStatement(
+                                        varType,
+                                        varArg,
+                                        new InvokeStaticExpr(
+                                                classTypeOf(MOCKITO),
+                                                Arrays.asList(varType),
+                                                "anyVararg",
+                                                Arrays.asList(),
+                                                Arrays.asList(),
+                                                Type.OBJECT),
+                                        argumentType.getSpan());
+                        return new Pair<>(
+                                new Pair<>(varType, varArg),
+                                Stream.of(statement));
+                    });
+        } else {
+            return argumentTypes.stream()
+                    .map(argumentType ->
+                            mapArgumentType(argumentType, classResolver))
+                    .collect(Collectors.toList());
+        }
     }
 
     private Stream<Statement> whenThenReturn(
