@@ -13,7 +13,6 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.StubReturns;
-import yokohama.unit.ast.StubThrows;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
@@ -179,22 +178,26 @@ public class MockitoMockStrategy implements MockStrategy {
         String methodName = methodPattern.getName();
         boolean isVararg = methodPattern.isVararg();
         List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
-        Stream<Type> argTypes;
-        Stream<Sym> argVars;
+        List<Type> argTypes;
+        List<Sym> argVars;
         Stream<Statement> argMatchers;
         if (isVararg) {
             Sym varArg = genSym.generate("varArg");
-            List<Pair<Sym, Stream<Statement>>> pairs = argumentTypes.subList(0, argumentTypes.size() - 1).stream()
-                    .map(argumentType -> mapArgumentType(argumentType, classResolver))
-                    .collect(Collectors.toList());
-            argTypes = Stream.concat(
-                    argumentTypes.subList(0, argumentTypes.size() - 1)
-                            .stream()
-                            .map(type -> Type.of(type, classResolver)),
-                    Stream.of(
-                            Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray()));
-            argVars = Stream.concat(pairs.stream().map(Pair::getFirst),
-                    Stream.of(varArg));
+            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs =
+                    argumentTypes.subList(0, argumentTypes.size() - 1).stream()
+                            .map(argumentType -> mapArgumentType(argumentType, classResolver))
+                            .collect(Collectors.toList());
+            Pair<List<Type>, List<Sym>> typesAndVars =
+                    Pair.unzip(
+                            Stream.concat(
+                                    pairs.stream().map(Pair::getFirst),
+                                    Stream.of(
+                                            new Pair<>(
+                                                    Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray(),
+                                                    varArg)))
+                                    .collect(Collectors.toList()));
+            argTypes = typesAndVars.getFirst();
+            argVars = typesAndVars.getSecond();
             argMatchers = Stream.concat(
                     pairs.stream().flatMap(Pair::getSecond),
                     Stream.<Statement>of(
@@ -211,11 +214,13 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Type.OBJECT),
                                     span)));
         } else {
-            List<Pair<Sym, Stream<Statement>>> pairs = argumentTypes.stream()
+            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
                     .collect(Collectors.toList());
-            argTypes = methodPattern.getParamTypes().stream().map(type -> Type.of(type, classResolver));
-            argVars = pairs.stream().map(Pair::getFirst);
+            Pair<List<Type>, List<Sym>> typesAndVars =
+                    Pair.unzip(pairs.stream().map(Pair::getFirst).collect(Collectors.toList()));
+            argTypes = typesAndVars.getFirst();
+            argVars = typesAndVars.getSecond();
             argMatchers = pairs.stream().flatMap(Pair::getSecond);
         }
 
@@ -229,8 +234,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                 ClassType.of(classToStub, classResolver),
                                 var,
                                 methodName,
-                                argTypes.collect(Collectors.toList()),
-                                argVars.collect(Collectors.toList()),
+                                argTypes,
+                                argVars,
                                 returnType),
                         span)),
                 // box primitive type if needed
@@ -281,11 +286,12 @@ public class MockitoMockStrategy implements MockStrategy {
         return whenThenReturn;
     }
 
-    private Pair<Sym, Stream<Statement>> mapArgumentType(
+    private Pair<Pair<Type, Sym>, Stream<Statement>> mapArgumentType(
             yokohama.unit.ast.Type argumentType,
             ClassResolver classResolver) {
         Span span = argumentType.getSpan();
         Sym argVar = genSym.generate("arg");
+        Type argType = Type.of(argumentType, classResolver);
         int dims = argumentType.getDims();
         Stream<Statement> statements = argumentType.getNonArrayType().accept(
                 primitiveType -> {
@@ -426,6 +432,6 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Type.OBJECT),
                                     Span.dummySpan()));
                 });
-        return new Pair<>(argVar, statements);
+        return new Pair<>(new Pair<>(argType, argVar), statements);
     }
 }
