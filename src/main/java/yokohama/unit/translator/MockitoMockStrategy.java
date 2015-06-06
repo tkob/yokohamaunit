@@ -26,6 +26,7 @@ import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
+import yokohama.unit.util.Lists;
 import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
@@ -182,37 +183,37 @@ public class MockitoMockStrategy implements MockStrategy {
         List<Sym> argVars;
         Stream<Statement> argMatchers;
         if (isVararg) {
-            Sym varArg = genSym.generate("varArg");
-            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs =
-                    argumentTypes.subList(0, argumentTypes.size() - 1).stream()
-                            .map(argumentType -> mapArgumentType(argumentType, classResolver))
-                            .collect(Collectors.toList());
+            List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs = 
+                    Lists.mapInitAndLast(
+                            argumentTypes,
+                            argumentType -> 
+                                mapArgumentType(argumentType, classResolver),
+                            argumentType -> { 
+                                Sym varArg = genSym.generate("varArg");
+                                Type varType =
+                                        Type.of(argumentType, classResolver)
+                                                .toArray();
+                                Statement statement =
+                                        new VarInitStatement(
+                                                varType,
+                                                varArg,
+                                                new InvokeStaticExpr(
+                                                        classTypeOf(MOCKITO),
+                                                        Arrays.asList(varType),
+                                                        "anyVararg",
+                                                        Arrays.asList(),
+                                                        Arrays.asList(),
+                                                        Type.OBJECT),
+                                                span);
+                                return new Pair<>(
+                                        new Pair<>(varType, varArg),
+                                        Stream.of(statement));
+                            });
             Pair<List<Type>, List<Sym>> typesAndVars =
-                    Pair.unzip(
-                            Stream.concat(
-                                    pairs.stream().map(Pair::getFirst),
-                                    Stream.of(
-                                            new Pair<>(
-                                                    Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray(),
-                                                    varArg)))
-                                    .collect(Collectors.toList()));
+                    Pair.unzip(pairs.stream().map(Pair::getFirst).collect(Collectors.toList()));
             argTypes = typesAndVars.getFirst();
             argVars = typesAndVars.getSecond();
-            argMatchers = Stream.concat(
-                    pairs.stream().flatMap(Pair::getSecond),
-                    Stream.<Statement>of(
-                            new VarInitStatement(
-                                    Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray(),
-                                    varArg,
-                                    new InvokeStaticExpr(
-                                            classTypeOf(MOCKITO),
-                                            Arrays.asList(
-                                                    Type.of(argumentTypes.get(argumentTypes.size() - 1), classResolver).toArray()),
-                                            "anyVararg",
-                                            Arrays.asList(),
-                                            Arrays.asList(),
-                                            Type.OBJECT),
-                                    span)));
+            argMatchers = pairs.stream().flatMap(Pair::getSecond);
         } else {
             List<Pair<Pair<Type, Sym>, Stream<Statement>>> pairs = argumentTypes.stream()
                     .map(argumentType -> mapArgumentType(argumentType, classResolver))
