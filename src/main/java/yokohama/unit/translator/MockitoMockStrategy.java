@@ -140,12 +140,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
         Sym invokeVar = genSym.generate("invoke");
         Stream<Statement> invokeWithMatchers = invokeWithMatchers(
-                var,
-                invokeVar,
-                classToStub,
-                returnType,
-                methodPattern,
-                span);
+                var, invokeVar, classToStub, returnType, methodPattern);
 
         // when ... thenReturn
         Stream<Statement> whenThenReturn =
@@ -163,8 +158,9 @@ public class MockitoMockStrategy implements MockStrategy {
             Sym invokeVar,
             yokohama.unit.ast.ClassType classToStub,
             Type returnType,
-            MethodPattern methodPattern,
-            Span span) {
+            MethodPattern methodPattern) {
+        Span span = methodPattern.getSpan();
+
         /*
         a. Prepare matchers (`argMatchers`)
         b. Invoke the method with the matchers (`invoke`)
