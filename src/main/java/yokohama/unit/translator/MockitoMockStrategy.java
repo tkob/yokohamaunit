@@ -126,9 +126,6 @@ public class MockitoMockStrategy implements MockStrategy {
 
         Span span = stubReturns.getSpan();
         MethodPattern methodPattern = stubReturns.getMethodPattern();
-        String methodName = methodPattern.getName();
-        boolean isVararg = methodPattern.isVararg();
-        List<yokohama.unit.ast.Type> argumentTypes = methodPattern.getParamTypes();
 
         Type returnType =
                 methodPattern.getReturnType(classToStub, classResolver)
