@@ -63,22 +63,20 @@ public class MockitoMockStrategy implements MockStrategy {
         /*
           Create a mock first, and then define "when...then" behavior.
         */
-        Stream<Statement> createMock = createMock(var, stubExpr.getClassToStub(), classResolver);
+        Stream<Statement> createMock = createMock(var, stubExpr.getClassToStub());
         Stream<Statement> defineBehavior = behavior.stream().flatMap(
                 b -> defineBehavior(
                         var,
                         stubExpr.getClassToStub(),
                         b,
                         astToJUnitAstVisitor,
-                        envVar,
-                        classResolver));
+                        envVar));
         return Stream.concat(createMock, defineBehavior).collect(Collectors.toList());
     }
 
     private Stream<Statement> createMock(
             Sym var,
-            yokohama.unit.ast.ClassType classToStub,
-            ClassResolver classResolver) {
+            yokohama.unit.ast.ClassType classToStub) {
         // Call Mockito.mock method with the class and bind the variable to the result.
         Sym classToStubVar = genSym.generate("classToStub");
         Type clazz = Type.of(classToStub.toType(), classResolver);
@@ -101,8 +99,7 @@ public class MockitoMockStrategy implements MockStrategy {
             yokohama.unit.ast.ClassType classToStub,
             StubBehavior behavior,
             AstToJUnitAstVisitor astToJUnitAstVisitor,
-            Sym envVar,
-            ClassResolver classResolver) {
+            Sym envVar) {
         return behavior.accept(
                 stubReturns ->
                         defineReturns(
@@ -110,7 +107,7 @@ public class MockitoMockStrategy implements MockStrategy {
                                 classToStub,
                                 stubReturns,
                                 astToJUnitAstVisitor,
-                                envVar, classResolver),
+                                envVar),
                 stubThrows -> { throw new UnsupportedOperationException(); });
     }
 
@@ -119,8 +116,7 @@ public class MockitoMockStrategy implements MockStrategy {
             yokohama.unit.ast.ClassType classToStub,
             StubReturns stubReturns,
             AstToJUnitAstVisitor astToJUnitAstVisitor,
-            Sym envVar,
-            ClassResolver classResolver) {
+            Sym envVar) {
         /*
         Defining behavior consists of three parts:
         1. Define value to return when the stub method is called (`returned`)
@@ -228,8 +224,7 @@ public class MockitoMockStrategy implements MockStrategy {
         if (isVararg) {
             return Lists.mapInitAndLast(
                     argumentTypes,
-                    argumentType -> 
-                        mapArgumentType(argumentType, classResolver),
+                    this::mapArgumentType,
                     argumentType -> { 
                         Sym varArg = genSym.generate("varArg");
                         Type varType =
@@ -253,8 +248,7 @@ public class MockitoMockStrategy implements MockStrategy {
                     });
         } else {
             return argumentTypes.stream()
-                    .map(argumentType ->
-                            mapArgumentType(argumentType, classResolver))
+                    .map(this::mapArgumentType)
                     .collect(Collectors.toList());
         }
     }
@@ -288,8 +282,7 @@ public class MockitoMockStrategy implements MockStrategy {
     }
 
     private Pair<Pair<Type, Sym>, Stream<Statement>> mapArgumentType(
-            yokohama.unit.ast.Type argumentType,
-            ClassResolver classResolver) {
+            yokohama.unit.ast.Type argumentType) {
         Span span = argumentType.getSpan();
         Sym argVar = genSym.generate("arg");
         Type argType = Type.of(argumentType, classResolver);
