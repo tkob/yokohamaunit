@@ -60,6 +60,7 @@ bindings: WHERE binding (AND binding)* ;
 binding: singleBinding | choiceBinding ;
 singleBinding: Identifier (EQ | IS) expr ;
 choiceBinding: Identifier (EQ | IS) ANY_OF expr (COMMA expr)* (OR expr)? ;
+tableBinding: Identifier (COMMA Identifier)* (EQ | IS) ANY_DEFINED_BY tableRef ;
 
 fourPhaseTest: TEST Line setup? exercise? verify teardown? ;
 

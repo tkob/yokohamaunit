@@ -212,6 +212,11 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     }
 
     @Override
+    public Stream<T> visitTableBinding(TableBinding tableBinding) {
+        return tableBinding.getIdents().stream().flatMap(this::visitIdent);
+    }
+
+    @Override
     public Stream<T> visitFourPhaseTest(FourPhaseTest fourPhaseTest) {
         return Stream.concat(
                 Stream.concat(

@@ -574,7 +574,8 @@ class AstToJUnitAstVisitor {
             Sym envVar) {
         return binding.accept(
                 singleBinding -> translateSingleBinding(singleBinding, envVar),
-                choiceBinding -> translateChoiceBinding(choiceBinding, choice, envVar));
+                choiceBinding -> translateChoiceBinding(choiceBinding, choice, envVar),
+                tableBinding -> { throw new UnsupportedOperationException(); });
     }
 
     Stream<Statement> translateSingleBinding(
