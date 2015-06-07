@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,6 +67,7 @@ import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableBinding;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.Test;
@@ -250,25 +252,38 @@ class AstToJUnitAstVisitor {
                             }).collect(Collectors.toList());
                 },
                 bindings -> {
-                    Stream<ChoiceBinding> candidates =
-                            choiceCollectVisitor.visitBindings(bindings);
-                    List<Map<Ident, yokohama.unit.ast.Expr>> choices =
-                            combinationStrategy.generate(
-                                    candidates
-                                            .map(ChoiceBinding::toPair)
-                                            .collect(Collectors.toList()));
-                    return choices.stream().map(choice -> 
-                            Stream.concat(
-                                    bindings.getBindings()
-                                            .stream()
-                                            .flatMap(binding ->
-                                                    translateBinding(binding, choice, env)),
-                                    propositions.stream()
-                                            .flatMap(proposition ->
-                                                    translateProposition(proposition, env)))
-                                    .collect(Collectors.toList()))
+                    List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
+                            choiceCollectVisitor.visitBindings(bindings).collect(Collectors.toList());
+                    List<Map<Ident, yokohama.unit.ast.Expr>> choices = candidatesToChoices(candidates);
+                    return choices.stream()
+                            .map((Map<Ident, yokohama.unit.ast.Expr> choice) ->
+                                    Stream.concat(
+                                            bindings.getBindings()
+                                                    .stream()
+                                                    .flatMap(binding ->
+                                                            translateBinding(binding, choice, env)),
+                                            propositions.stream()
+                                                    .flatMap(proposition ->
+                                                            translateProposition(proposition, env)))
+                                            .collect(Collectors.toList()))
                             .collect(Collectors.toList());
                 });
+    }
+
+    private List<Map<Ident, yokohama.unit.ast.Expr>> candidatesToChoices(
+            List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates) {
+        return combinationStrategy.generate(candidates)
+                .stream()
+                .map((List<Pair<List<Ident>, List<yokohama.unit.ast.Expr>>> choice) ->
+                        choice.stream()
+                                .map(p -> Pair.zip(p.getFirst(), p.getSecond()))
+                                .flatMap(List::stream))
+                .map((Stream<Pair<Ident, yokohama.unit.ast.Expr>> choice) ->
+                        choice.<Map<Ident, yokohama.unit.ast.Expr>>collect(
+                                () -> new HashMap<>(),
+                                (m, kv) -> m.put(kv.getFirst(), kv.getSecond()),
+                                (m1, m2) -> m1.putAll(m2)))
+                .collect(Collectors.toList());
     }
 
     Stream<Statement> translateProposition(
@@ -575,7 +590,7 @@ class AstToJUnitAstVisitor {
         return binding.accept(
                 singleBinding -> translateSingleBinding(singleBinding, envVar),
                 choiceBinding -> translateChoiceBinding(choiceBinding, choice, envVar),
-                tableBinding -> { throw new UnsupportedOperationException(); });
+                tableBinding -> translateTableBinding(tableBinding, choice, envVar));
     }
 
     Stream<Statement> translateSingleBinding(
@@ -592,12 +607,25 @@ class AstToJUnitAstVisitor {
             Map<Ident, yokohama.unit.ast.Expr> choice,
             Sym envVar) {
         Ident name = choiceBinding.getName();
-        List<yokohama.unit.ast.Expr> choices = choiceBinding.getChoices();
         yokohama.unit.ast.Expr expr = choice.get(name);
         Sym var = genSym.generate(name.getName());
         return Stream.concat(
                 translateExpr(expr, var, Object.class, envVar),
                 expressionStrategy.bind(envVar, name, var).stream());
+    }
+
+    Stream<Statement> translateTableBinding(
+            TableBinding tableBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar) {
+        List<Ident> idents = tableBinding.getIdents();
+        return idents.stream().flatMap(ident -> {
+            yokohama.unit.ast.Expr expr = choice.get(ident);
+            Sym var = genSym.generate(ident.getName());
+            return Stream.concat(
+                    translateExpr(expr, var, Object.class, envVar),
+                    expressionStrategy.bind(envVar, ident, var).stream());
+        });
     }
 
     Stream<Statement> translateExpr(
@@ -1084,19 +1112,16 @@ class AstToJUnitAstVisitor {
     List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
         Sym env = genSym.generate("env");
 
-        Stream<ChoiceBinding> candidates =
+        List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
                 Optionals.toStream(
                         fourPhaseTest
                                 .getSetup()
                                 .map(Phase::getLetStatements)
                                 .map(List::stream))
                         .flatMap(x -> x)
-                        .flatMap(choiceCollectVisitor::visitLetStatement); 
-        List<Map<Ident, yokohama.unit.ast.Expr>> choices =
-                combinationStrategy.generate(
-                        candidates
-                                .map(ChoiceBinding::toPair)
-                                .collect(Collectors.toList()));
+                        .flatMap(choiceCollectVisitor::visitLetStatement)
+                .collect(Collectors.toList()); 
+        List<Map<Ident, yokohama.unit.ast.Expr>> choices = candidatesToChoices(candidates);
 
         IntStream indexes = IntStream.range(0, choices.size());
         return indexes.mapToObj(index -> {
