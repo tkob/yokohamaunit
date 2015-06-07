@@ -28,3 +28,24 @@ Do `sb.append(seq, 10, 13)`.
 ## Verify
 
 Assert `sb.toString()` is `"aaa"`.
+
+# Test: Stub throws an excetion
+
+Assert `s.call()` throws an instance of `UnsupportedOperationException`
+where s is a stub of `java.util.concurrent.Callable` such that
+method `call()` throws `new UnsupportedOperationException()`.
+
+Assert `s.get("")` throws an instance of `UnsupportedOperationException`
+where s is a stub of `java.util.Map` such that method `get(java.lang.Object)`
+throws `new UnsupportedOperationException()`.
+
+# Test: Stub throws an excetion (void)
+
+Assert `s.run()` throws an instance of `UnsupportedOperationException`
+where s is a stub of `Runnable` such that method `run()` throws
+`new UnsupportedOperationException()`.
+
+Assert `s.write("".getBytes(), 0, 0)` throws an instance of
+`UnsupportedOperationException` where s is a stub of `java.io.OutputStream`
+such that method `write(byte[], int, int)` throws
+`new UnsupportedOperationException()`.

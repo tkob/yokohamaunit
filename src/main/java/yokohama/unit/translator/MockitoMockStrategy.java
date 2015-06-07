@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -13,11 +14,13 @@ import yokohama.unit.ast.MethodPattern;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.StubReturns;
+import yokohama.unit.ast.StubThrows;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeStaticExpr;
+import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.Type;
@@ -38,6 +41,7 @@ public class MockitoMockStrategy implements MockStrategy {
 
     static final String MOCKITO = "org.mockito.Mockito";
     static final String ONGOING_STUBBING = "org.mockito.stubbing.OngoingStubbing";
+    static final String STUBBER = "org.mockito.stubbing.Stubber";
 
     @SneakyThrows(ClassNotFoundException.class)
     ClassType classTypeOf(String name) {
@@ -108,7 +112,13 @@ public class MockitoMockStrategy implements MockStrategy {
                                 stubReturns,
                                 astToJUnitAstVisitor,
                                 envVar),
-                stubThrows -> { throw new UnsupportedOperationException(); });
+                stubThrows -> 
+                        defineThrows(
+                                var,
+                                classToStub,
+                                stubThrows,
+                                astToJUnitAstVisitor,
+                                envVar));
     }
 
     private Stream<Statement> defineReturns(
@@ -150,6 +160,73 @@ public class MockitoMockStrategy implements MockStrategy {
                 .append(returned)
                 .append(invokeWithMatchers)
                 .append(whenThenReturn)
+                .getStream();
+    }
+
+    private Stream<Statement> defineThrows(
+            Sym var,
+            yokohama.unit.ast.ClassType classToStub,
+            StubThrows stubThrows,
+            AstToJUnitAstVisitor astToJUnitAstVisitor,
+            Sym envVar) {
+        /*
+        1. Define exception thrown when the stub method is called (`exception`)
+        2. Call doThrow with the exception. This returns a Stubber
+        3. Call Stubber.when method with the receiver object
+        4. Invoke the method with appropriate matchers
+        */
+
+        Span span = stubThrows.getSpan();
+        MethodPattern methodPattern = stubThrows.getMethodPattern();
+
+        Sym exVar = genSym.generate("ex");
+        Stream<Statement> thrown = astToJUnitAstVisitor.translateExpr(
+                stubThrows.getException(), exVar, Throwable.class, envVar);
+
+        Sym stubberVar = genSym.generate("stubber");
+        Statement doThrow = new VarInitStatement(
+                typeOf(STUBBER),
+                stubberVar,
+                new InvokeStaticExpr(
+                        classTypeOf(MOCKITO),
+                        Collections.emptyList(),
+                        "doThrow",
+                        Arrays.asList(Type.THROWABLE),
+                        Arrays.asList(exVar),
+                        typeOf(STUBBER)),
+                span);
+
+        Sym stubVar = genSym.generate("stub");
+        Type stubType = Type.of(classToStub.toType(), classResolver);
+        Statement when = new VarInitStatement(
+                stubType,
+                stubVar,
+                new InvokeExpr(
+                        classTypeOf(STUBBER),
+                        stubberVar,
+                        "when",
+                        Arrays.asList(Type.OBJECT),
+                        Arrays.asList(var),
+                        Type.OBJECT),
+                span);
+
+        Optional<yokohama.unit.ast.Type> returnType =
+                methodPattern.getReturnType(classToStub, classResolver);
+        Stream<Statement> invoke;
+        if (returnType.isPresent()) {
+            Type returnType_ = Type.of(returnType.get(), classResolver);
+            Sym invokeVar = genSym.generate("invoke");
+            invoke = invokeWithMatchers(
+                    stubVar, invokeVar, classToStub, returnType_, methodPattern);
+        } else {
+            invoke = invokeVoidWithMatchers(stubVar, classToStub, methodPattern);
+        }
+
+        return StreamCollector.<Statement>empty()
+                .append(thrown)
+                .append(doThrow)
+                .append(when)
+                .append(invoke)
                 .getStream();
     }
 
@@ -206,6 +283,37 @@ public class MockitoMockStrategy implements MockStrategy {
                                 },
                                 classType -> Stream.empty())
                         : Stream.empty());
+        return Stream.concat(argMatchers, invoke);
+    }
+
+    private Stream<Statement> invokeVoidWithMatchers(
+            Sym var,
+            yokohama.unit.ast.ClassType classToStub,
+            MethodPattern methodPattern) {
+        /*
+        a. Prepare matchers (`argMatchers`)
+        b. Invoke the method with the matchers (`invoke`)
+        */
+
+        // prepare matchers
+        List<Pair<Pair<Type, Sym>, Stream<Statement>>> matchers =
+                prepareMatchers(methodPattern);
+        Pair<List<Type>, List<Sym>> typesAndVars =
+                Pair.unzip(matchers.stream().map(Pair::getFirst).collect(Collectors.toList()));
+        List<Type> argTypes = typesAndVars.getFirst();
+        List<Sym> argVars = typesAndVars.getSecond();
+        Stream<Statement> argMatchers = matchers.stream().flatMap(Pair::getSecond);
+
+        // invoke the method
+        Stream<Statement> invoke = Stream.of(
+                new InvokeVoidStatement(
+                        ClassType.of(classToStub, classResolver),
+                        var,
+                        methodPattern.getName(),
+                        argTypes,
+                        argVars,
+                        methodPattern.getSpan()));
+
         return Stream.concat(argMatchers, invoke);
     }
 
