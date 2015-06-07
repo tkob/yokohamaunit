@@ -103,7 +103,9 @@ expr: quotedExpr
 quotedExpr: BACK_TICK Expr BACK_TICK ;
 
 stubExpr: A_STUB_OF_BACK_TICK classType BACK_TICK ( SUCH THAT stubBehavior (AND stubBehavior)* )? ;
-stubBehavior: METHOD_BACK_TICK methodPattern BACK_TICK RETURNS expr ;
+stubBehavior: stubReturns | stubThrows ;
+stubReturns: METHOD_BACK_TICK methodPattern BACK_TICK RETURNS expr ;
+stubThrows: METHOD_BACK_TICK methodPattern BACK_TICK THROWS expr ;
 
 methodPattern: Identifier LPAREN (type COMMA)* (type THREEDOTS?)? RPAREN ;
 

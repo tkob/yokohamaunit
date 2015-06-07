@@ -65,6 +65,8 @@ import yokohama.unit.ast.StringExpr;
 import yokohama.unit.position.Span;
 import yokohama.unit.ast.StubBehavior;
 import yokohama.unit.ast.StubExpr;
+import yokohama.unit.ast.StubReturns;
+import yokohama.unit.ast.StubThrows;
 import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
@@ -478,9 +480,21 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public StubBehavior visitStubBehavior(YokohamaUnitParser.StubBehaviorContext ctx) {
+        return (StubBehavior)visitChildren(ctx);
+    }
+
+    @Override
+    public StubReturns visitStubReturns(YokohamaUnitParser.StubReturnsContext ctx) {
         MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
         Expr toBeReturned = visitExpr(ctx.expr());
-        return new StubBehavior(methodPattern, toBeReturned, getSpan(ctx));
+        return new StubReturns(methodPattern, toBeReturned, getSpan(ctx));
+    }
+
+    @Override
+    public StubThrows visitStubThrows(YokohamaUnitParser.StubThrowsContext ctx) {
+        MethodPattern methodPattern = visitMethodPattern(ctx.methodPattern());
+        Expr exception = visitExpr(ctx.expr());
+        return new StubThrows(methodPattern, exception, getSpan(ctx));
     }
 
     @Override

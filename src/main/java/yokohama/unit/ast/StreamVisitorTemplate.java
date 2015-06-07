@@ -151,10 +151,15 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     }
 
     @Override
-    public Stream<T> visitStubBehavior(StubBehavior behavior) {
-        return Stream.concat(
-                visitMethodPattern(behavior.getMethodPattern()),
-                visitExpr(behavior.getToBeReturned()));
+    public Stream<T> visitStubReturns(StubReturns stubReturns) {
+        return Stream.concat(visitMethodPattern(stubReturns.getMethodPattern()),
+                visitExpr(stubReturns.getToBeReturned()));
+    }
+
+    @Override
+    public Stream<T> visitStubThrows(StubThrows stubThrows) {
+        return Stream.concat(visitMethodPattern(stubThrows.getMethodPattern()),
+                visitExpr(stubThrows.getException()));
     }
 
     @Override
