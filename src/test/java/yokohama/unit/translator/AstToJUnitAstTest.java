@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import yokohama.unit.ast.Assertion;
+import yokohama.unit.ast.ChoiceCollectVisitor;
 import yokohama.unit.ast.Fixture;
 import yokohama.unit.ast.Group;
 import yokohama.unit.ast.TableExtractVisitor;
@@ -60,7 +61,8 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyMap());
+                        Collections.emptyMap(),
+                        new ChoiceCollectVisitor(Collections.emptyList()));
         List<Method> actual = instance.translateTest(test);
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
@@ -84,7 +86,8 @@ public class AstToJUnitAstTest {
                         genSym,
                         new ClassResolver(),
                         Collections.emptyList(),
-                        Collections.emptyMap());
+                        Collections.emptyMap(),
+                        new ChoiceCollectVisitor(Collections.emptyList()));
         List<List<Statement>> actual = instance.translateAssertion(assertion, Sym.of("env"));
         List<List<Statement>> expected = Arrays.asList(Arrays.asList());
         assertThat(actual, is(expected));

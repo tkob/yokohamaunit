@@ -129,6 +129,8 @@ public class AstToJUnitAst {
         final List<Table> tables = tableExtractVisitor.extractTables(group);
         Map<String, CodeBlock> codeBlockMap =
                 codeBlockExtractVisitor.extractMap(group);
+        final ChoiceCollectVisitor choiceCollectVisitor =
+                new ChoiceCollectVisitor(tables);
         return new AstToJUnitAstVisitor(
                 name,
                 packageName,
@@ -138,7 +140,8 @@ public class AstToJUnitAst {
                 genSym,
                 classResolver,
                 tables,
-                codeBlockMap)
+                codeBlockMap,
+                choiceCollectVisitor)
                 .translateGroup(group);
     }
 }
@@ -154,9 +157,8 @@ class AstToJUnitAstVisitor {
     final ClassResolver classResolver;
     final List<Table> tables;
     final Map<String, CodeBlock> codeBlockMap;
+    final ChoiceCollectVisitor choiceCollectVisitor;
 
-    final ChoiceCollectVisitor choiceCollectVisitor =
-            new ChoiceCollectVisitor();
     final DataConverterFinder dataConverterFinder = new DataConverterFinder();
 
     static final String MATCHER = "org.hamcrest.Matcher";
