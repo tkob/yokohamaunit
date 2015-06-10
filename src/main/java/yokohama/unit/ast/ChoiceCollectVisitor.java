@@ -50,7 +50,7 @@ public class ChoiceCollectVisitor extends
                                                             p.getSecond()),
                                                     (m1, m2) -> m1.putAll(m2)))
                             .map(m -> {
-                                return header.stream()
+                                return idents.stream()
                                         .map(ident -> m.get(ident))
                                         .map(cell -> {
                                             return cell.accept(
