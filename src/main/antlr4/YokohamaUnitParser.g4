@@ -73,6 +73,7 @@ letStatement: LET letBinding (AND letBinding)* STOP ;
 letBinding: letSingleBinding | letChoiceBinding ;
 letSingleBinding: Identifier (EQ | BE) expr ;
 letChoiceBinding: Identifier (EQ | BE) ANY_OF expr (COMMA expr)* (OR expr)? ;
+letTableBinding: Identifier (COMMA Identifier)* (EQ | BE) ANY_DEFINED_BY tableRef ;
 
 statement: execution | invoke ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;

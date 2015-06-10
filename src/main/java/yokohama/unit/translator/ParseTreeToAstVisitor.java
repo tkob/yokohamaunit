@@ -444,6 +444,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitLetTableBinding(YokohamaUnitParser.LetTableBindingContext ctx) {
+        List<Ident> names = ctx.Identifier().stream()
+                .map(node -> new Ident(node.getText(), nodeSpan(node)))
+                .collect(Collectors.toList());
+        Pair<TableType, String> tableRef = visitTableRef(ctx.tableRef());
+        return new TableBinding(
+                names, tableRef.getFirst(), tableRef.getSecond(), getSpan(ctx));
+    }
+
+    @Override
     public Statement visitStatement(YokohamaUnitParser.StatementContext ctx) {
         return (Statement)visitChildren(ctx);
     }
