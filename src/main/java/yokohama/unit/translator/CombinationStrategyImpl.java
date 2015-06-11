@@ -2,9 +2,7 @@ package yokohama.unit.translator;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.ListUtils;
@@ -13,13 +11,8 @@ import yokohama.unit.util.Pair;
 
 public class CombinationStrategyImpl implements CombinationStrategy {
     @Override
-    public <K, V> List<Map<K, V>> generate(List<Pair<K, List<V>>> candidates) {
-        return comb(candidates).map(kvs ->
-                kvs.stream().<Map<K, V>>collect(
-                        () -> new HashMap(),
-                        (m, kv) -> m.put(kv.getFirst(), kv.getSecond()),
-                        (m1, m2) -> m1.putAll(m2)))
-                .collect(Collectors.toList());
+    public <K, V> List<List<Pair<K, V>>> generate(List<Pair<K, List<V>>> candidates) {
+        return comb(candidates).collect(Collectors.toList());
     }
 
     private <K, V> Stream<List<Pair<K, V>>> comb(List<Pair<K, List<V>>> candidates) {

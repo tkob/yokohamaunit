@@ -68,6 +68,7 @@ import yokohama.unit.ast.StubExpr;
 import yokohama.unit.ast.StubReturns;
 import yokohama.unit.ast.StubThrows;
 import yokohama.unit.ast.Table;
+import yokohama.unit.ast.TableBinding;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
 import yokohama.unit.ast.Test;
@@ -303,6 +304,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public TableBinding visitTableBinding(YokohamaUnitParser.TableBindingContext ctx) {
+        List<Ident> names = ctx.Identifier().stream()
+                .map(node -> new Ident(node.getText(), nodeSpan(node)))
+                .collect(Collectors.toList());
+        Pair<TableType, String> tableRef = visitTableRef(ctx.tableRef());
+        return new TableBinding(
+                names, tableRef.getFirst(), tableRef.getSecond(), getSpan(ctx));
+    }
+
+    @Override
     public Table visitTableDef(YokohamaUnitParser.TableDefContext ctx) {
         String name = ctx.Anchor().getText();
         List<Ident> header = visitHeader(ctx.header());
@@ -430,6 +441,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         Ident ident = new Ident(ctx.Identifier().getText(), nodeSpan(ctx.Identifier()));
         List<Expr> exprs = ctx.expr().stream().map(this::visitExpr).collect(Collectors.toList());
         return new ChoiceBinding(ident, exprs, getSpan(ctx));
+    }
+
+    @Override
+    public Object visitLetTableBinding(YokohamaUnitParser.LetTableBindingContext ctx) {
+        List<Ident> names = ctx.Identifier().stream()
+                .map(node -> new Ident(node.getText(), nodeSpan(node)))
+                .collect(Collectors.toList());
+        Pair<TableType, String> tableRef = visitTableRef(ctx.tableRef());
+        return new TableBinding(
+                names, tableRef.getFirst(), tableRef.getSecond(), getSpan(ctx));
     }
 
     @Override

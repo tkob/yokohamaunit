@@ -93,10 +93,12 @@ public abstract class AstVisitor<T> {
     public T visitBinding(Binding binding) {
         return binding.accept(
                 this::visitSingleBinding,
-                this::visitChoiceBinding);
+                this::visitChoiceBinding,
+                this::visitTableBinding);
     }
     public abstract T visitSingleBinding(SingleBinding singleBinding);
     public abstract T visitChoiceBinding(ChoiceBinding choiceBinding);
+    public abstract T visitTableBinding(TableBinding tableBinding);
     public abstract T visitFourPhaseTest(FourPhaseTest fourPhaseTest);
     public abstract T visitPhase(Phase phase);
     public abstract T visitVerifyPhase(VerifyPhase verifyPhase);

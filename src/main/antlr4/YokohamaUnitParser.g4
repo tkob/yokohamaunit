@@ -57,9 +57,10 @@ tableRef: UTABLE LBRACKET Anchor RBRACKET
         ;
 
 bindings: WHERE binding (AND binding)* ;
-binding: singleBinding | choiceBinding ;
+binding: singleBinding | choiceBinding | tableBinding ;
 singleBinding: Identifier (EQ | IS) expr ;
 choiceBinding: Identifier (EQ | IS) ANY_OF expr (COMMA expr)* (OR expr)? ;
+tableBinding: Identifier (COMMA Identifier)* (EQ | IS) ANY_DEFINED_BY tableRef ;
 
 fourPhaseTest: TEST Line setup? exercise? verify teardown? ;
 
@@ -69,9 +70,10 @@ verify: VERIFY Line? assertion+ ;
 teardown: TEARDOWN Line? statement+ ;
 
 letStatement: LET letBinding (AND letBinding)* STOP ;
-letBinding: letSingleBinding | letChoiceBinding ;
+letBinding: letSingleBinding | letChoiceBinding | letTableBinding ;
 letSingleBinding: Identifier (EQ | BE) expr ;
 letChoiceBinding: Identifier (EQ | BE) ANY_OF expr (COMMA expr)* (OR expr)? ;
+letTableBinding: Identifier (COMMA Identifier)* (EQ | BE) ANY_DEFINED_BY tableRef ;
 
 statement: execution | invoke ;
 execution: DO quotedExpr (AND quotedExpr)* STOP ;

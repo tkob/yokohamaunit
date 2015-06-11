@@ -1,44 +1,65 @@
-*[ChoiceBinding]: yokohama.unit.ast.ChoiceBinding
 *[ChoiceCollectVisitor]: yokohama.unit.ast.ChoiceCollectVisitor
+*[TableExtractVisitor]: yokohama.unit.ast.TableExtractVisitor
 *[Collectors]: java.util.stream.Collectors
 *[Ident]: yokohama.unit.ast.Ident
 *[IntegerExpr]: yokohama.unit.ast.IntegerExpr
+*[Pair]: yokohama.unit.util.Pair
 *[Span]: yokohama.unit.position.Span
 
 # Test: Test ChoiceCollectVisitor
 ## Setup
 Let ast = [Source] as `yokohama.unit.ast.Group`.
 
-Let visitor = `new ChoiceCollectVisitor()`.
+Let tables = `new TableExtractVisitor().extractTables(ast)`.
+
+Let visitor = `new ChoiceCollectVisitor(tables)`.
 
 ## Verify
 
 Assert `visitor.visitGroup(ast).collect(Collectors.toList())` is
 `[
-  new ChoiceBinding(
-    new Ident("x", Span.dummySpan()),
-    [ new IntegerExpr(true, "1", Span.dummySpan()),
-      new IntegerExpr(true, "2", Span.dummySpan()),
-      new IntegerExpr(true, "3", Span.dummySpan())],
-    Span.dummySpan()),
-  new ChoiceBinding(
-    new Ident("y", Span.dummySpan()),
-    [ new IntegerExpr(true, "4", Span.dummySpan()),
-      new IntegerExpr(true, "5", Span.dummySpan()),
-      new IntegerExpr(true, "6", Span.dummySpan())],
-    Span.dummySpan())
+  new Pair(
+    [ new Ident("x", Span.dummySpan()) ],
+    [ [ new IntegerExpr(true, "1", Span.dummySpan())],
+      [ new IntegerExpr(true, "2", Span.dummySpan())],
+      [ new IntegerExpr(true, "3", Span.dummySpan())] ]),
+  new Pair(
+    [ new Ident("b", Span.dummySpan()), new Ident("c", Span.dummySpan()) ],
+    [ [ new IntegerExpr(true, "8", Span.dummySpan()),
+        new IntegerExpr(true, "6", Span.dummySpan()) ],
+      [ new IntegerExpr(true, "0", Span.dummySpan()),
+        new IntegerExpr(true, "8", Span.dummySpan()) ] ]),
+  new Pair(
+    [ new Ident("y", Span.dummySpan()) ],
+    [ [ new IntegerExpr(true, "4", Span.dummySpan())],
+      [ new IntegerExpr(true, "5", Span.dummySpan())],
+      [ new IntegerExpr(true, "6", Span.dummySpan())] ]),
+  new Pair(
+    [ new Ident("a", Span.dummySpan()), new Ident("b", Span.dummySpan()) ],
+    [ [ new IntegerExpr(true, "7", Span.dummySpan()),
+        new IntegerExpr(true, "8", Span.dummySpan()) ],
+      [ new IntegerExpr(true, "9", Span.dummySpan()),
+        new IntegerExpr(true, "0", Span.dummySpan()) ] ])
 ]`.
 
 ### Source
 
 ```
 # Test: test
-Assert `x < 4` is true where x = any of 1, 2 or 3.
+Assert `x < 4` is true where x = any of 1, 2 or 3 and b, c = any values defined
+by Table [abc].
 
 # Test: test 2
 ## Setup
 Let y = any of 4, 5 or 6.
+Let a, b = any defined by Table [abc].
 
 ## Verify
 Assert `y < 4` is true.
+
+[abc]
+| c | a | b |
+| - | - | - |
+| 6 | 7 | 8 |
+| 8 | 9 | 0 |
 ```

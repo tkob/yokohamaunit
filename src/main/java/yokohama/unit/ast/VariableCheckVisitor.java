@@ -107,9 +107,10 @@ public class VariableCheckVisitor {
 
     private Stream<ErrorMessage> checkBindings(Bindings bindings, FList<String> env) {
         List<Ident> idents = bindings.getBindings().stream()
-                .map(binding -> binding.accept(
-                        single -> single.getName(),
-                        choice -> choice.getName()))
+                .flatMap(binding -> binding.accept(
+                        single -> Stream.of(single.getName()),
+                        choice -> Stream.of(choice.getName()),
+                        table -> table.getIdents().stream()))
                 .collect(Collectors.toList());
         return checkIdents(idents, env);
     }
@@ -120,9 +121,10 @@ public class VariableCheckVisitor {
                 phase -> phase.getLetStatements().stream()
                         .flatMap(letStatement ->
                                 letStatement.getBindings().stream()
-                                        .map(binding -> binding.accept(
-                                                single -> single.getName(),
-                                                choice -> choice.getName()))))
+                                        .flatMap(binding -> binding.accept(
+                                                single -> Stream.of(single.getName()),
+                                                choice -> Stream.of(choice.getName()),
+                                                table -> table.getIdents().stream()))))
                 .collect(Collectors.toList());
         Stream<ErrorMessage> setupErrors = checkIdents(setupIdents, env);
 
