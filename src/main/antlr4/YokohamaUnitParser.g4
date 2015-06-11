@@ -57,7 +57,7 @@ tableRef: UTABLE LBRACKET Anchor RBRACKET
         ;
 
 bindings: WHERE binding (AND binding)* ;
-binding: singleBinding | choiceBinding ;
+binding: singleBinding | choiceBinding | tableBinding ;
 singleBinding: Identifier (EQ | IS) expr ;
 choiceBinding: Identifier (EQ | IS) ANY_OF expr (COMMA expr)* (OR expr)? ;
 tableBinding: Identifier (COMMA Identifier)* (EQ | IS) ANY_DEFINED_BY tableRef ;
