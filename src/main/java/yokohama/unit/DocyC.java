@@ -108,6 +108,7 @@ public class DocyC implements Command {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int run(InputStream in, PrintStream out, PrintStream err, String... args) {
         URI baseDir;
         Optional<Path> dest;
