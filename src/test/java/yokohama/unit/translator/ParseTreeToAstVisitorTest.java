@@ -234,18 +234,18 @@ public class ParseTreeToAstVisitorTest {
     }
 
     @Test
-    public void testVisitPropositions() throws IOException {
-        YokohamaUnitParser.PropositionsContext ctx = parser("`a` is `b`").propositions();
+    public void testVisitClauses() throws IOException {
+        YokohamaUnitParser.ClausesContext ctx = parser("`a` is `b`").clauses();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        List<Proposition> result = instance.visitPropositions(ctx);
+        List<Proposition> result = instance.visitClauses(ctx);
         assertThat(result.size(), is(1));
     }
 
     @Test
-    public void testVisitPropositions2() throws IOException {
-        YokohamaUnitParser.PropositionsContext ctx = parser("`a` is `b` and `c` is `d`").propositions();
+    public void testVisitClauses2() throws IOException {
+        YokohamaUnitParser.ClausesContext ctx = parser("`a` is `b` and `c` is `d`").clauses();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        List<Proposition> result = instance.visitPropositions(ctx);
+        List<Proposition> result = instance.visitClauses(ctx);
         assertThat(result.size(), is(2));
     }
 

@@ -136,7 +136,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Assertion visitAssertion(YokohamaUnitParser.AssertionContext ctx) {
-        List<Proposition> propositions = visitPropositions(ctx.propositions());
+        List<Proposition> propositions = visitClauses(ctx.clauses());
         YokohamaUnitParser.ConditionContext conditionCtx = (ctx.condition());
         Fixture fixture =
                 conditionCtx == null ? Fixture.none()
@@ -145,10 +145,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public List<Proposition> visitPropositions(YokohamaUnitParser.PropositionsContext ctx) {
-        return ctx.proposition().stream()
-                                .map(this::visitProposition)
+    public List<Proposition> visitClauses(YokohamaUnitParser.ClausesContext ctx) {
+        return ctx.clause().stream()
+                                .map(this::visitClause)
                                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Proposition visitClause(YokohamaUnitParser.ClauseContext ctx) {
+        // just a place holder implementation
+        return visitProposition(ctx.proposition().get(0));
     }
 
     @Override
