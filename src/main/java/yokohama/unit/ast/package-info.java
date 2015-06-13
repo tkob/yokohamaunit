@@ -8,8 +8,8 @@
  * 
  * Test ::= Assertion*
  * 
- * Assertion ::= Proposition* Fixture
- * 
+ * Assertion ::= Clause+ Fixture
+ * Clause ::= Proposition+
  * Proposition ::= QuotedExpr Predicate
  * 
  * Predicate ::= IsPredicate | IsNotPredicate | ThrowsPredicate

@@ -23,6 +23,7 @@ import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ChoiceBinding;
 import yokohama.unit.ast.ClassType;
+import yokohama.unit.ast.Clause;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.DoesNotMatchPredicate;
@@ -136,25 +137,28 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
 
     @Override
     public Assertion visitAssertion(YokohamaUnitParser.AssertionContext ctx) {
-        List<Proposition> propositions = visitClauses(ctx.clauses());
+        List<Clause> clauses = visitClauses(ctx.clauses());
         YokohamaUnitParser.ConditionContext conditionCtx = (ctx.condition());
         Fixture fixture =
                 conditionCtx == null ? Fixture.none()
                                      : visitCondition(ctx.condition());
-        return new Assertion(propositions, fixture, getSpan(ctx));
+        return new Assertion(clauses, fixture, getSpan(ctx));
     }
 
     @Override
-    public List<Proposition> visitClauses(YokohamaUnitParser.ClausesContext ctx) {
+    public List<Clause> visitClauses(YokohamaUnitParser.ClausesContext ctx) {
         return ctx.clause().stream()
                                 .map(this::visitClause)
                                 .collect(Collectors.toList());
     }
 
     @Override
-    public Proposition visitClause(YokohamaUnitParser.ClauseContext ctx) {
-        // just a place holder implementation
-        return visitProposition(ctx.proposition().get(0));
+    public Clause visitClause(YokohamaUnitParser.ClauseContext ctx) {
+        List<Proposition> propositions =
+                ctx.proposition().stream()
+                        .map(this::visitProposition)
+                        .collect(Collectors.toList());
+        return new Clause(propositions, getSpan(ctx));
     }
 
     @Override

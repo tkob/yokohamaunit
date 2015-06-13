@@ -37,6 +37,7 @@ import yokohama.unit.ast.Cell;
 import yokohama.unit.ast.CharExpr;
 import yokohama.unit.ast.ChoiceBinding;
 import yokohama.unit.ast.ChoiceCollectVisitor;
+import yokohama.unit.ast.Clause;
 import yokohama.unit.ast.CodeBlock;
 import yokohama.unit.ast.CodeBlockExtractVisitor;
 import yokohama.unit.ast.Definition;
@@ -230,12 +231,12 @@ class AstToJUnitAstVisitor {
     }
 
     List<List<Statement>> translateAssertion(Assertion assertion, Sym env) {
-        List<Proposition> propositions = assertion.getPropositions();
+        List<Clause> clauses = assertion.getClauses();
         return assertion.getFixture().accept(
                 () -> {
-                    List<Statement> body = propositions.stream()
-                            .flatMap(proposition ->
-                                    translateProposition(proposition, env))
+                    List<Statement> body = clauses.stream()
+                            .flatMap(clause ->
+                                    translateClause(clause, env))
                             .collect(Collectors.toList());
                     return Arrays.asList(body);
                 },
@@ -247,9 +248,9 @@ class AstToJUnitAstVisitor {
                             .map(i -> {
                                 return ListUtils.union(
                                         table.get(i),
-                                        propositions.stream()
-                                                .flatMap(proposition ->
-                                                        translateProposition(proposition, env))
+                                        clauses.stream()
+                                                .flatMap(clause ->
+                                                        translateClause(clause, env))
                                                 .collect(Collectors.toList()));
                             }).collect(Collectors.toList());
                 },
@@ -264,9 +265,9 @@ class AstToJUnitAstVisitor {
                                                     .stream()
                                                     .flatMap(binding ->
                                                             translateBinding(binding, choice, env)),
-                                            propositions.stream()
-                                                    .flatMap(proposition ->
-                                                            translateProposition(proposition, env)))
+                                            clauses.stream()
+                                                    .flatMap(clause ->
+                                                            translateClause(clause, env)))
                                             .collect(Collectors.toList()))
                             .collect(Collectors.toList());
                 });
@@ -286,6 +287,15 @@ class AstToJUnitAstVisitor {
                                 (m, kv) -> m.put(kv.getFirst(), kv.getSecond()),
                                 (m1, m2) -> m1.putAll(m2)))
                 .collect(Collectors.toList());
+    }
+
+    Stream<Statement> translateClause(Clause clause, Sym envVar) {
+        List<Proposition> propositions = clause.getPropositions();
+        if (propositions.size() == 1) {
+            return translateProposition(propositions.get(0), envVar);
+        } else {
+            throw new UnsupportedOperationException("disjunctive clause");
+        }
     }
 
     Stream<Statement> translateProposition(

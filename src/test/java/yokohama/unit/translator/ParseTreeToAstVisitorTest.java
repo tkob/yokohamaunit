@@ -21,6 +21,7 @@ import yokohama.unit.ast.Binding;
 import yokohama.unit.ast.Bindings;
 import yokohama.unit.ast.BooleanExpr;
 import yokohama.unit.ast.ClassType;
+import yokohama.unit.ast.Clause;
 import yokohama.unit.ast.Definition;
 import yokohama.unit.ast.EqualToMatcher;
 import yokohama.unit.ast.Execution;
@@ -107,14 +108,14 @@ public class ParseTreeToAstVisitorTest {
         Assertion actual = instance.visitAssertion(ctx);
         Assertion expected = new Assertion(
                 Arrays.asList(
-                        new Proposition(
+                        new Clause(Arrays.asList(new Proposition(
                                 new QuotedExpr("a", Span.dummySpan()),
                                 new IsPredicate(
                                         new EqualToMatcher(
                                                 new QuotedExpr("b", Span.dummySpan()),
                                                 Span.dummySpan()),
                                         Span.dummySpan()),
-                                Span.dummySpan())),
+                                Span.dummySpan())), Span.dummySpan())),
                 Fixture.none(),
                 Span.dummySpan());
         assertThat(actual, is(expected));
@@ -127,14 +128,14 @@ public class ParseTreeToAstVisitorTest {
         Assertion actual = instance.visitAssertion(ctx);
         Assertion expected = new Assertion(
                 Arrays.asList(
-                        new Proposition(
+                        new Clause(Arrays.asList(new Proposition(
                                 new QuotedExpr("x", Span.dummySpan()),
                                 new IsPredicate(
                                         new EqualToMatcher(
                                                 new QuotedExpr("y", Span.dummySpan()),
                                                 Span.dummySpan()),
                                         Span.dummySpan()),
-                                Span.dummySpan())),
+                                Span.dummySpan())), Span.dummySpan())),
                 new Bindings(
                         Arrays.asList(
                                 new SingleBinding(
@@ -237,7 +238,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitClauses() throws IOException {
         YokohamaUnitParser.ClausesContext ctx = parser("`a` is `b`").clauses();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        List<Proposition> result = instance.visitClauses(ctx);
+        List<Clause> result = instance.visitClauses(ctx);
         assertThat(result.size(), is(1));
     }
 
@@ -245,7 +246,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitClauses2() throws IOException {
         YokohamaUnitParser.ClausesContext ctx = parser("`a` is `b` and `c` is `d`").clauses();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        List<Proposition> result = instance.visitClauses(ctx);
+        List<Clause> result = instance.visitClauses(ctx);
         assertThat(result.size(), is(2));
     }
 
@@ -340,14 +341,14 @@ public class ParseTreeToAstVisitorTest {
                         Arrays.asList(
                                 new Assertion(
                                         Arrays.asList(
-                                                new Proposition(
+                                                new Clause(Arrays.asList(new Proposition(
                                                         new QuotedExpr("x", Span.dummySpan()),
                                                         new IsPredicate(
                                                                 new EqualToMatcher(
                                                                         new QuotedExpr("1", Span.dummySpan()),
                                                                         Span.dummySpan()),
                                                                 Span.dummySpan()),
-                                                        Span.dummySpan())),
+                                                        Span.dummySpan())), Span.dummySpan())),
                                         Fixture.none(),
                                         Span.dummySpan())),
                         Span.dummySpan()
@@ -390,14 +391,14 @@ public class ParseTreeToAstVisitorTest {
                         Arrays.asList(
                                 new Assertion(
                                         Arrays.asList(
-                                                new Proposition(
+                                                new Clause(Arrays.asList(new Proposition(
                                                         new QuotedExpr("x", Span.dummySpan()),
                                                         new IsPredicate(
                                                                 new EqualToMatcher(
                                                                         new QuotedExpr("1", Span.dummySpan()),
                                                                         Span.dummySpan()),
                                                                 Span.dummySpan()),
-                                                        Span.dummySpan())),
+                                                        Span.dummySpan())), Span.dummySpan())),
                                 Fixture.none(),
                                 Span.dummySpan())),
                         Span.dummySpan()),
@@ -514,14 +515,14 @@ public class ParseTreeToAstVisitorTest {
                 Arrays.asList(
                         new Assertion(
                                 Arrays.asList(
-                                        new Proposition(
+                                        new Clause(Arrays.asList(new Proposition(
                                                 new QuotedExpr("x", Span.dummySpan()),
                                                 new IsPredicate(
                                                         new EqualToMatcher(
                                                                 new QuotedExpr("1", Span.dummySpan()),
                                                                 Span.dummySpan()),
                                                         Span.dummySpan()),
-                                                Span.dummySpan())),
+                                                Span.dummySpan())), Span.dummySpan())),
                                 Fixture.none(),
                                 Span.dummySpan())),
                 Span.dummySpan());
