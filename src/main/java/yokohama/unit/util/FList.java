@@ -124,4 +124,11 @@ public abstract class FList<E> {
         }
         return l;
     }
+    public static <E> FList<E> fromReverseList(List<E> list) {
+        FList<E> l = empty();
+        for (int i = 0; i < list.size(); i++) {
+            l = l.add(list.get(i));
+        }
+        return l;
+    }
 }
