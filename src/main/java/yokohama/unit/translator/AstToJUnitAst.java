@@ -107,6 +107,7 @@ import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Position;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
+import yokohama.unit.util.FList;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Lists;
 import yokohama.unit.util.Optionals;
@@ -290,12 +291,48 @@ class AstToJUnitAstVisitor {
     }
 
     Stream<Statement> translateClause(Clause clause, Sym envVar) {
-        List<Proposition> propositions = clause.getPropositions();
-        if (propositions.size() == 1) {
-            return translateProposition(propositions.get(0), envVar);
-        } else {
-            throw new UnsupportedOperationException("disjunctive clause");
-        }
+        /* Disjunctive clause is translated as follows:
+            try {
+              assertThat(...); 
+            } catch (Throwable e) {
+              try {
+                assertThat(...);
+              } catch (Throwable e) { 
+                assertThat(...);
+              } 
+            }
+        */
+        FList<Proposition> revPropositions =
+                FList.fromReverseList(clause.getPropositions());
+        return revPropositions.match(
+                () -> {
+                    throw new TranslationException(
+                            "clause is empty", clause.getSpan());
+                },
+                (last, init) -> {
+                    Stream<Statement> lastStatements =
+                            translateProposition(last, envVar);
+                    return init.foldLeft(
+                            lastStatements,
+                            (statements, prop) -> {
+                                Stream<Statement> propStatements =
+                                        translateProposition(prop, envVar);
+                                Sym e = genSym.generate("e");
+                                CatchClause catchClause =
+                                        new CatchClause(
+                                                ClassType.THROWABLE,
+                                                e,
+                                                statements.collect(
+                                                        Collectors.toList()));
+                                Statement tryStatement =
+                                        new TryStatement(
+                                                propStatements.collect(
+                                                        Collectors.toList()),
+                                                Arrays.asList(catchClause),
+                                                Collections.emptyList());
+                                return Stream.of(tryStatement);
+                            });
+                });
     }
 
     Stream<Statement> translateProposition(
