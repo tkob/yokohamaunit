@@ -42,8 +42,14 @@ public class VariableCheckVisitor {
 
     private Stream<ErrorMessage> checkAssertion(Assertion assertion, FList<String> env) {
         return Stream.concat(
-                assertion.getPropositions().stream().flatMap(proposition -> checkProposition(proposition, env)),
+                assertion.getClauses().stream()
+                        .flatMap(clause -> checkClause(clause, env)),
                 checkFixture(assertion.getFixture(), env));
+    }
+
+    private Stream<ErrorMessage> checkClause(Clause clause, FList<String> env) {
+        return clause.getPropositions().stream()
+                .flatMap(proposition -> checkProposition(proposition, env));
     }
 
     private Stream<ErrorMessage> checkProposition(Proposition proposition, FList<String> env) {

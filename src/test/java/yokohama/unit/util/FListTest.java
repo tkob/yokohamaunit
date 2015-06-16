@@ -1,6 +1,7 @@
 package yokohama.unit.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -184,6 +185,20 @@ public class FListTest {
         assertThat(actual.size(), is(2));
         assertThat(actual.get(0), is(1));
         assertThat(actual.get(1), is(3.14));
+    }
+
+    @Test
+    public void testFromReverseList() {
+        FList<Number> actual = FList.fromReverseList(Collections.emptyList());
+        assertThat(actual.size(), is(0));
+    }
+
+    @Test
+    public void testFromReverseList1() {
+        FList<Number> actual = FList.fromReverseList(Arrays.asList(1, 3.14));
+        assertThat(actual.size(), is(2));
+        assertThat(actual.get(0), is(3.14));
+        assertThat(actual.get(1), is(1));
     }
 
     @Test

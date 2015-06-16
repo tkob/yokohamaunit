@@ -15,10 +15,10 @@ definition: test
 
 test: TEST Line assertion+ ;
 
-assertion: ASSERT THAT? propositions condition? STOP ;
+assertion: ASSERT THAT? clauses condition? STOP ;
 
-propositions: proposition (AND THAT? proposition)* ;
-
+clauses: clause (AND THAT? clause)* ;
+clause: proposition (OR proposition)* ;
 proposition: subject predicate ;
 
 subject: quotedExpr | invokeExpr ;

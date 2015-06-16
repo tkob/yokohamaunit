@@ -24,8 +24,13 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     @Override
     public Stream<T> visitAssertion(Assertion assertion) {
         return Stream.concat(
-                assertion.getPropositions().stream().flatMap(this::visitProposition),
+                assertion.getClauses().stream().flatMap(this::visitClause),
                 visitFixture(assertion.getFixture()));
+    }
+
+    @Override
+    public Stream<T> visitClause(Clause clause) {
+        return clause.getPropositions().stream().flatMap(this::visitProposition);
     }
 
     @Override

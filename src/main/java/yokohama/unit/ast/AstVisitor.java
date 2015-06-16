@@ -13,6 +13,7 @@ public abstract class AstVisitor<T> {
     }
     public abstract T visitTest(Test test);
     public abstract T visitAssertion(Assertion assertion);
+    public abstract T visitClause(Clause clause);
     public abstract T visitProposition(Proposition proposition);
     public T visitPredicate(Predicate predicate) {
         return predicate.accept(
