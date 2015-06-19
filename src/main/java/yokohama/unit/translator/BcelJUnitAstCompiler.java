@@ -464,6 +464,14 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         Constants.INVOKESTATIC));
                 return returnType;
             },
+            fieldStaticExpr -> {
+                Type fieldType = typeOf(fieldStaticExpr.getFieldType());
+                il.append(factory.createGetStatic(
+                        fieldStaticExpr.getClazz().getText(),
+                        fieldStaticExpr.getFieldName(),
+                        fieldType));
+                return fieldType;
+            },
             intLitExpr -> {
                 il.append(new PUSH(cp, intLitExpr.getValue()));
                 return Type.INT;

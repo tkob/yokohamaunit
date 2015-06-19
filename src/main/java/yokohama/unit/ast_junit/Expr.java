@@ -16,6 +16,7 @@ public interface Expr {
             Function<NullExpr, T> visitNullExpr_,
             Function<InvokeExpr, T> visitInvokeExpr_,
             Function<InvokeStaticExpr, T> visitInvokeStaticExpr_,
+            Function<FieldStaticExpr, T> visitFieldStaticExpr_,
             Function<IntLitExpr, T> visitIntLitExpr_,
             Function<LongLitExpr, T> visitLongLitExpr_,
             Function<FloatLitExpr, T> visitFloatLitExpr_,
@@ -66,6 +67,10 @@ public interface Expr {
             @Override
             public T visitInvokeStaticExpr(InvokeStaticExpr invokeStaticExpr) {
                 return visitInvokeStaticExpr_.apply(invokeStaticExpr);
+            }
+            @Override
+            public T visitFieldStaticExpr(FieldStaticExpr fieldStaticExpr) {
+                return visitFieldStaticExpr_.apply(fieldStaticExpr);
             }
             @Override
             public T visitIntLitExpr(IntLitExpr intLitExpr) {

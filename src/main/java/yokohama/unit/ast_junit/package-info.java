@@ -18,6 +18,7 @@
  *        | NullExpr
  *        | InvokeExpr
  *        | InvokeStaticExpr
+ *        | FieldStaticExpr
  *        | IntLitExpr
  *        | LongLitExpr
  *        | FloatLitExpr
