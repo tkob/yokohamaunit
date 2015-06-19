@@ -13,10 +13,12 @@ import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
+import yokohama.unit.ast_junit.FieldStaticExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Span;
@@ -35,6 +37,9 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
     static final String SETTINGS = "scala.tools.nsc.Settings";
     static final String BOOLEAN_SETTING =
             "scala.tools.nsc.settings.MutableSettings$BooleanSetting";
+    static final String NIL$ = "scala.collection.immutable.Nil$";
+    static final String LIST = "scala.collection.immutable.List";
+    static final String RESULT = "scala.tools.nsc.interpreter.Results$Result";
 
     @SneakyThrows(ClassNotFoundException.class)
     ClassType classTypeOf(String name) {
@@ -98,7 +103,47 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public List<Statement> bind(Sym envVar, Ident ident, Sym rhs) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Sym nameVar = genSym.generate(ident.getName());
+        Sym boundTypeVar = genSym.generate("boundType");
+        Sym modifiersVar = genSym.generate("modifiers");
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        nameVar,
+                        new StrLitExpr(ident.getName()),
+                        ident.getSpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        boundTypeVar,
+                        new StrLitExpr("java.lang.Object"),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        typeOf(LIST),
+                        modifiersVar,
+                        new FieldStaticExpr(
+                                classTypeOf(NIL$),
+                                typeOf(LIST),
+                                "MODULE$"),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        typeOf(RESULT),
+                        genSym.generate("__"),
+                        new InvokeExpr(
+                                classTypeOf(IMAIN),
+                                envVar,
+                                "bind",
+                                Arrays.asList(
+                                        Type.STRING,
+                                        Type.STRING,
+                                        Type.OBJECT,
+                                        typeOf(LIST)),
+                                Arrays.asList(
+                                        nameVar,
+                                        boundTypeVar,
+                                        rhs,
+                                        modifiersVar),
+                                typeOf(RESULT)),
+                        Span.dummySpan()));
     }
 
     @Override
