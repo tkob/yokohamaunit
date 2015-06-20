@@ -40,6 +40,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
     static final String NIL$ = "scala.collection.immutable.Nil$";
     static final String LIST = "scala.collection.immutable.List";
     static final String RESULT = "scala.tools.nsc.interpreter.Results$Result";
+    static final String OPTION = "scala.Option";
 
     @SneakyThrows(ClassNotFoundException.class)
     ClassType classTypeOf(String name) {
@@ -153,7 +154,61 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
 
     @Override
     public List<Statement> eval(Sym var, QuotedExpr quotedExpr, Class<?> expectedType, Sym envVar) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Span span = quotedExpr.getSpan();
+        Sym exprVar = genSym.generate("expression");
+        Sym resultVar = genSym.generate("result");
+        Sym mostRecentVar = genSym.generate("mostRecent");
+        Sym valueOfTermVar = genSym.generate("valueOfTerm");
+        return Arrays.asList(
+                new VarInitStatement(
+                        Type.STRING,
+                        exprVar,
+                        new StrLitExpr(quotedExpr.getText()),
+                        span),
+                new VarInitStatement(
+                        typeOf(RESULT),
+                        resultVar,
+                        new InvokeExpr(
+                                classTypeOf(IMAIN),
+                                envVar,
+                                "interpret",
+                                Arrays.asList(Type.STRING),
+                                Arrays.asList(exprVar),
+                                typeOf(RESULT)),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        mostRecentVar,
+                        new InvokeExpr(
+                                classTypeOf(IMAIN),
+                                envVar,
+                                "mostRecnetVar",
+                                Arrays.asList(),
+                                Arrays.asList(),
+                                Type.STRING),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        typeOf(OPTION),
+                        valueOfTermVar,
+                        new InvokeExpr(
+                                classTypeOf(IMAIN),
+                                envVar,
+                                "valueOfTerm",
+                                Arrays.asList(Type.STRING),
+                                Arrays.asList(mostRecentVar),
+                                typeOf(OPTION)),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        Type.fromClass(expectedType),
+                        var,
+                        new InvokeExpr(
+                                classTypeOf(OPTION),
+                                valueOfTermVar,
+                                "get",
+                                Arrays.asList(),
+                                Arrays.asList(),
+                                Type.OBJECT),
+                        Span.dummySpan()));
     }
 
     @Override
