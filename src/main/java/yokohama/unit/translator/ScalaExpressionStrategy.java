@@ -70,7 +70,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList()),
                         Span.dummySpan()),
                 new VarInitStatement(
-                        typeOf(SETTINGS),
+                        typeOf(BOOLEAN_SETTING),
                         usejavacp,
                         new InvokeExpr(
                                 classTypeOf(SETTINGS),
@@ -182,7 +182,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                         new InvokeExpr(
                                 classTypeOf(IMAIN),
                                 envVar,
-                                "mostRecnetVar",
+                                "mostRecentVar",
                                 Arrays.asList(),
                                 Arrays.asList(),
                                 Type.STRING),
