@@ -112,6 +112,14 @@ public class DocyCompilerImplTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    public static class FailurePrintListener extends RunListener {
+        @Override
+        public void testFailure(Failure failure) {
+            System.err.println(failure.getTestHeader());
+            System.err.println(failure.getTrace());
+        }
+    };
+
     @Theory
     public void testCompile(final Fixture fixture, final JUnitAstCompiler jUnitAstCompiler) throws Exception {
         try (InputStream ins = getClass().getResourceAsStream(fixture.docy)) {
@@ -162,13 +170,7 @@ public class DocyCompilerImplTest {
 
             // run the tests
             JUnitCore junit = new JUnitCore();
-            RunListener listener = new RunListener() {
-                @Override
-                public void testFailure(Failure failure) {
-                    System.err.println(failure.getTestHeader());
-                    System.err.println(failure.getTrace());
-                }
-            };
+            RunListener listener = new FailurePrintListener();
             RunListener listenerSpy = spy(listener);
             junit.addListener(listenerSpy);
             junit.run(klass);
