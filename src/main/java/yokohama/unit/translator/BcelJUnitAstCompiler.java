@@ -171,7 +171,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
 
         for (Annotation annotation : method.getAnnotations())  {
             AnnotationEntryGen ag = new AnnotationEntryGen(
-                    new ObjectType(annotation.getClazz().getText()),
+                    new ObjectType(annotation.getClazz().getTypeName()),
                     Arrays.asList(),
                     true,
                     cp);
@@ -434,7 +434,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 }
                 // then call method
                 il.append(factory.createInvoke(
-                        invokeExpr.getClassType().getText(),
+                        invokeExpr.getClassType().getTypeName(),
                         invokeExpr.getMethodName(),
                         returnType,
                         invokeExpr.getArgTypes().stream()
@@ -454,7 +454,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
                 }
                 il.append(factory.createInvoke(
-                        invokeStaticExpr.getClazz().getText(),
+                        invokeStaticExpr.getClazz().getTypeName(),
                         invokeStaticExpr.getMethodName(),
                         returnType,
                         invokeStaticExpr.getArgTypes().stream()
@@ -467,7 +467,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             fieldStaticExpr -> {
                 Type fieldType = typeOf(fieldStaticExpr.getFieldType());
                 il.append(factory.createGetStatic(
-                        fieldStaticExpr.getClazz().getText(),
+                        fieldStaticExpr.getClazz().getTypeName(),
                         fieldStaticExpr.getFieldName(),
                         fieldType));
                 return fieldType;
@@ -503,7 +503,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                 /* this is strange since BCEL has ArrayType apart from ObjectType,
                                    but there is no PUSH constructor in BCEL which takes ArrayType. */
                                 ? type_.getFieldDescriptor()
-                                : type_.getText())));
+                                : type_.getTypeName())));
                 return Type.CLASS;
             },
             equalOpExpr -> {
@@ -593,7 +593,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                         }
                         throw new RuntimeException("should not reach here");
                     },
-                    classType -> new ObjectType(classType.getText()));
+                    classType -> new ObjectType(classType.getTypeName()));
         } else {
             return new ArrayType(
                     typeOf(new yokohama.unit.ast_junit.Type(type.getNonArrayType() , 0)),
@@ -620,7 +620,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         }
         // then call method
         il.append(factory.createInvoke(
-                invokeVoidStatement.getClassType().getText(),
+                invokeVoidStatement.getClassType().getTypeName(),
                 invokeVoidStatement.getMethodName(),
                 Type.VOID,
                 invokeVoidStatement.getArgTypes().stream()
@@ -646,7 +646,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
         }
         il.append(factory.createInvoke(
-                invokeStaticVoidStatement.getClazz().getText(),
+                invokeStaticVoidStatement.getClazz().getTypeName(),
                 invokeStaticVoidStatement.getMethodName(),
                 Type.VOID,
                 invokeStaticVoidStatement.getArgTypes().stream()

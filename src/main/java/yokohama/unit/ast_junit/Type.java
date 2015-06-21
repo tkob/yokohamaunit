@@ -33,6 +33,10 @@ public class Type {
         return nonArrayType.getText() + StringUtils.repeat("[]", dims);
     }
 
+    public String getTypeName() {
+        return nonArrayType.getTypeName() + StringUtils.repeat("[]", dims);
+    }
+
     public Type box() {
         if (dims > 0) return this;
 
@@ -85,7 +89,7 @@ public class Type {
                     }
                     throw new RuntimeException("should not reach here");
                 },
-                classType -> "L" + classType.getText() + ";");
+                classType -> "L" + classType.getTypeName() + ";");
     }
 
     @SneakyThrows(ClassNotFoundException.class)
