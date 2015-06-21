@@ -35,6 +35,8 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
 
     static final String IMAIN = "scala.tools.nsc.interpreter.IMain";
     static final String SETTINGS = "scala.tools.nsc.Settings";
+    static final String ABS_SETTING =
+            "scala.tools.nsc.settings.AbsSettings$AbsSetting";
     static final String BOOLEAN_SETTING =
             "scala.tools.nsc.settings.MutableSettings$BooleanSetting";
     static final String NIL$ = "scala.collection.immutable.Nil$";
@@ -78,7 +80,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                                 "usejavacp",
                                 Arrays.asList(),
                                 Arrays.asList(),
-                                typeOf(BOOLEAN_SETTING)),
+                                typeOf(ABS_SETTING)),
                         Span.dummySpan()),
                 new VarInitStatement(
                         Type.BOOLEAN,
