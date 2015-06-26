@@ -80,6 +80,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                                     Stream.concat(
                                             tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
                                             visitStatements(tryStatement.getFinallyStatements()))),
+                    throwStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
                     ifStatement ->
                             Stream.concat(
                                     visitStatements(ifStatement.getThen()),
@@ -268,6 +269,9 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 }
 
                 return null;
+            },
+            throwStatement -> {
+                throw new UnsupportedOperationException();
             },
             ifStatement -> {
                 LocalVariableGen lv = locals.get(ifStatement.getCond().getName());

@@ -12,6 +12,7 @@ public interface Statement {
             Function<IsStatement, T> visitIsStatement_,
             Function<VarInitStatement, T> visitVarInitStatement_,
             Function<TryStatement, T> visitTryStatement_,
+            Function<ThrowStatement, T> visitThrowStatement_,
             Function<IfStatement, T> visitIfStatement_,
             Function<ReturnStatement, T> visitReturnStatement_,
             Function<InvokeVoidStatement, T> visitInvokeVoidStatement_,
@@ -31,6 +32,11 @@ public interface Statement {
             @Override
             public T visitTryStatement(TryStatement tryStatement) {
                 return visitTryStatement_.apply(tryStatement);
+            }
+
+            @Override
+            public T visitThrowStatement(ThrowStatement throwStatement) {
+                return visitThrowStatement_.apply(throwStatement);
             }
 
             @Override

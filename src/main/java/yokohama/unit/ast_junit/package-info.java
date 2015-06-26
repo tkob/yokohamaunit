@@ -37,6 +37,7 @@
  *             | IsNotStatement
  *             | VarInitStatement
  *             | TryStatement
+ *             | ThrowStatement
  *             | IfStatement
  *             | ReturnStatement
  *             | InvokeVoidStatement
