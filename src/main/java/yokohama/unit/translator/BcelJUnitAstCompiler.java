@@ -361,7 +361,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return from.getType();
             },
             instanceOfMatcherExpr -> {
-                il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClassName())));
+                il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClazz().getTypeName())));
                 il.append(factory.createInvoke(
                         "org.hamcrest.CoreMatchers",
                         "instanceOf",

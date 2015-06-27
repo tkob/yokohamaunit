@@ -560,9 +560,9 @@ class AstToJUnitAstVisitor {
                                 typeOf(MATCHER),
                                 matcherVar,
                                 new InstanceOfMatcherExpr(
-                                        lookupClassName(
-                                                instanceOf.getClazz().getName(),
-                                                instanceOf.getSpan())),
+                                        ClassType.of(
+                                                instanceOf.getClazz(),
+                                                classResolver)),
                                 instanceOf.getSpan()))
                         .append(cont.apply(matcherVar))
                         .getStream();
@@ -580,9 +580,9 @@ class AstToJUnitAstVisitor {
                                         typeOf(MATCHER),
                                         instanceOfVar,
                                         new InstanceOfMatcherExpr(
-                                                lookupClassName(
-                                                        clazz.getName(),
-                                                        clazz.getSpan())),
+                                                ClassType.of(
+                                                        instanceSuchThat.getClazz(),
+                                                        classResolver)),
                                         clazz.getSpan()))
                                 .append(cont.apply(instanceOfVar))
                                 .getStream();

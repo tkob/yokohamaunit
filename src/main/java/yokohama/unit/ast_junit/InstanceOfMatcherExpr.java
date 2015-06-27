@@ -7,10 +7,10 @@ import yokohama.unit.util.SBuilder;
 @Value
 @EqualsAndHashCode(callSuper=false)
 public class InstanceOfMatcherExpr implements Expr {
-    private String className;
+    private ClassType clazz;
 
     public void getExpr(SBuilder sb, String varName) {
-        sb.appendln(varName, " = org.hamcrest.CoreMatchers.instanceOf(", className, ".class);");
+        sb.appendln(varName, " = org.hamcrest.CoreMatchers.instanceOf(", clazz.getText(), ".class);");
     }
 
     @Override
