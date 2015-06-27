@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.apache.bcel.Constants;
 import org.apache.bcel.Repository;
+import org.apache.bcel.generic.ATHROW;
 import org.apache.bcel.generic.AnnotationEntryGen;
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BranchInstruction;
@@ -46,6 +47,7 @@ import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.Method;
 import yokohama.unit.ast_junit.ReturnStatement;
 import yokohama.unit.ast_junit.Statement;
+import yokohama.unit.ast_junit.ThrowStatement;
 import yokohama.unit.util.Sym;
 import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
@@ -271,7 +273,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                 return null;
             },
             throwStatement -> {
-                throw new UnsupportedOperationException();
+                visitThrowStatement(throwStatement, locals, mg, il, factory, cp);
+                return null;
             },
             ifStatement -> {
                 LocalVariableGen lv = locals.get(ifStatement.getCond().getName());
@@ -566,6 +569,17 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             il.append(InstructionFactory.createArrayStore(componentType));
         }
         return typeOf(arrayExpr.getType());
+    }
+
+    private void visitThrowStatement(
+            ThrowStatement throwStatement,
+            Map<String, LocalVariableGen> locals,
+            MethodGen mg, InstructionList il,
+            InstructionFactory factory,
+            ConstantPoolGen cp) {
+        LocalVariableGen lv = locals.get(throwStatement.getE().getName());
+        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+        il.append(new ATHROW());
     }
 
     private void visitReturnStatement(
