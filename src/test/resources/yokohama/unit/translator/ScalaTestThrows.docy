@@ -1,0 +1,14 @@
+# Test: Division by zero
+Assert that `1 / 0` throws an instance of `Throwable`.
+
+# Test: Applying null to a method does not throw NPE in EL
+Assert that `null.toString()` throws an instance of `Throwable`.
+
+# Test: IndexOutOfBoundsException
+Assert that `"".charAt(1)` throws an instance of `Throwable`.
+
+# Test: Compilation Error
+Assert that `"".noSuchMethod()` throws an instance of `Throwable`.
+
+# Test: No exception
+Assert that `1 + 1` throws nothing.

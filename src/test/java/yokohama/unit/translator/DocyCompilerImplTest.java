@@ -84,6 +84,8 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "ScalaTestNull.docy", new ScalaExpressionStrategyFactory(), 2),
         new Fixture(
+                "ScalaTestThrows.docy", new ScalaExpressionStrategyFactory(), 5),
+        new Fixture(
                 "GroovyTestNull.docy", new GroovyExpressionStrategyFactory(), 2),
         new Fixture(
                 "GroovyTestThrows.docy", new GroovyExpressionStrategyFactory(), 5),

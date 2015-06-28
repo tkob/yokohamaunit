@@ -14,8 +14,10 @@ import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.ClassDecl;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.FieldStaticExpr;
+import yokohama.unit.ast_junit.InstanceOfMatcherExpr;
 import yokohama.unit.ast_junit.InvokeExpr;
 import yokohama.unit.ast_junit.InvokeVoidStatement;
+import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
@@ -33,6 +35,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
     final GenSym genSym;
     final ClassResolver classResolver;
 
+    static final String MATCHER = "org.hamcrest.Matcher";
     static final String IMAIN = "scala.tools.nsc.interpreter.IMain";
     static final String SETTINGS = "scala.tools.nsc.Settings";
     static final String ABS_SETTING =
@@ -42,6 +45,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
     static final String NIL$ = "scala.collection.immutable.Nil$";
     static final String LIST = "scala.collection.immutable.List";
     static final String RESULT = "scala.tools.nsc.interpreter.Results$Result";
+    static final String SUCCESS$ = "scala.tools.nsc.interpreter.Results$Success$";
     static final String OPTION = "scala.Option";
 
     @SneakyThrows(ClassNotFoundException.class)
@@ -159,6 +163,8 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
         Span span = quotedExpr.getSpan();
         Sym exprVar = genSym.generate("expression");
         Sym resultVar = genSym.generate("result");
+        Sym messageVar = genSym.generate("message");
+        Sym instanceOfMatcherVar = genSym.generate("instanceOfMatcher");
         Sym mostRecentVar = genSym.generate("mostRecent");
         Sym valueOfTermVar = genSym.generate("valueOfTerm");
         return Arrays.asList(
@@ -177,6 +183,21 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(Type.STRING),
                                 Arrays.asList(exprVar),
                                 typeOf(RESULT)),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        messageVar,
+                        new StrLitExpr(""),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        typeOf(MATCHER),
+                        instanceOfMatcherVar,
+                        new InstanceOfMatcherExpr(classTypeOf(SUCCESS$)),
+                        Span.dummySpan()),
+                new IsStatement(
+                        messageVar,
+                        resultVar,
+                        instanceOfMatcherVar,
                         Span.dummySpan()),
                 new VarInitStatement(
                         Type.STRING,
