@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import yokohama.unit.ast.Ident;
@@ -66,7 +68,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
         Sym settings = genSym.generate("settings");
         Sym usejavacp = genSym.generate("usejavacp");
         Sym true_ = genSym.generate("true_");
-        return Arrays.asList(
+        Stream<Statement> main = Stream.of(
                 new VarInitStatement(
                         typeOf(SETTINGS),
                         settings,
@@ -106,6 +108,30 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(typeOf(SETTINGS)),
                                 Arrays.asList(settings)),
                         Span.dummySpan()));
+        Stream<Statement> importClasses = classResolver.flatMap((shortName, longName) -> {
+            int dotIndex = longName.lastIndexOf('.');
+            String packageName = longName.substring(0, dotIndex);
+            String simpleName = longName.substring(dotIndex + 1);
+            Sym importVar = genSym.generate("import_");
+            Sym resultVar = genSym.generate("result");
+            return Stream.of(new VarInitStatement(
+                        Type.STRING,
+                        importVar,
+                        new StrLitExpr("import " + packageName + ".{" + simpleName + " => " + shortName + "}"),
+                        Span.dummySpan()),
+                new VarInitStatement(
+                        typeOf(RESULT),
+                        resultVar,
+                        new InvokeExpr(
+                                classTypeOf(IMAIN),
+                                var,
+                                "interpret",
+                                Arrays.asList(Type.STRING),
+                                Arrays.asList(importVar),
+                                typeOf(RESULT)),
+                        Span.dummySpan()));
+        });
+        return Stream.concat(main, importClasses).collect(Collectors.toList());
     }
 
     @Override
