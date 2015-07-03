@@ -82,6 +82,12 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "ElTestImport.docy", new ElExpressionStrategyFactory(), 4),
         new Fixture(
+                "ScalaTestNull.docy", new ScalaExpressionStrategyFactory(), 2),
+        new Fixture(
+                "ScalaTestThrows.docy", new ScalaExpressionStrategyFactory(), 5),
+        new Fixture(
+                "ScalaTestImport.docy", new ScalaExpressionStrategyFactory(), 4),
+        new Fixture(
                 "GroovyTestNull.docy", new GroovyExpressionStrategyFactory(), 2),
         new Fixture(
                 "GroovyTestThrows.docy", new GroovyExpressionStrategyFactory(), 5),
@@ -111,6 +117,14 @@ public class DocyCompilerImplTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    public static class FailurePrintListener extends RunListener {
+        @Override
+        public void testFailure(Failure failure) {
+            System.err.println(failure.getTestHeader());
+            System.err.println(failure.getTrace());
+        }
+    };
 
     @Theory
     public void testCompile(final Fixture fixture, final JUnitAstCompiler jUnitAstCompiler) throws Exception {
@@ -162,13 +176,7 @@ public class DocyCompilerImplTest {
 
             // run the tests
             JUnitCore junit = new JUnitCore();
-            RunListener listener = new RunListener() {
-                @Override
-                public void testFailure(Failure failure) {
-                    System.err.println(failure.getTestHeader());
-                    System.err.println(failure.getTrace());
-                }
-            };
+            RunListener listener = new FailurePrintListener();
             RunListener listenerSpy = spy(listener);
             junit.addListener(listenerSpy);
             junit.run(klass);

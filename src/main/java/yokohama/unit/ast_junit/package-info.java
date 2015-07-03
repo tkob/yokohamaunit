@@ -18,6 +18,7 @@
  *        | NullExpr
  *        | InvokeExpr
  *        | InvokeStaticExpr
+ *        | FieldStaticExpr
  *        | IntLitExpr
  *        | LongLitExpr
  *        | FloatLitExpr
@@ -36,6 +37,7 @@
  *             | IsNotStatement
  *             | VarInitStatement
  *             | TryStatement
+ *             | ThrowStatement
  *             | IfStatement
  *             | ReturnStatement
  *             | InvokeVoidStatement

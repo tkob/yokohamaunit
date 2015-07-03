@@ -57,6 +57,10 @@ public class VarInitStatement implements Statement {
                     invokeStaticExpr.getExpr(sb, type, var.getName());
                     return null;
                 },
+                fieldStaticExpr -> {
+                    fieldStaticExpr.getExpr(sb, type, var.getName());
+                    return null;
+                },
                 intLitExpr -> {
                     sb.appendln(var.getName(), " = ", intLitExpr.getValue(), ";");
                     return null;

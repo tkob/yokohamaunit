@@ -12,6 +12,11 @@ public class PrimitiveType implements NonArrayType {
         return kind.name().toLowerCase();
     }
 
+    @Override
+    public String getTypeName() {
+        return kind.name().toLowerCase();
+    }
+
     public ClassType box() {
         switch (kind) {
             case BOOLEAN: return new ClassType(Boolean.class);

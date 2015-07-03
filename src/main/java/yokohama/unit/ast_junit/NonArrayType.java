@@ -5,6 +5,7 @@ import yokohama.unit.util.ClassResolver;
 
 public interface NonArrayType {
     String getText();
+    String getTypeName();
 
     <T> T accept(NonArrayTypeVisitor<T> visitor);
 
