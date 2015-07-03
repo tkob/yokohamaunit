@@ -155,7 +155,7 @@ public class ScalaExpressionStrategy implements ExpressionStrategy {
                         modifiersVar,
                         new FieldStaticExpr(
                                 classTypeOf(NIL$),
-                                typeOf(LIST),
+                                typeOf(NIL$),
                                 "MODULE$"),
                         Span.dummySpan()),
                 new VarInitStatement(
