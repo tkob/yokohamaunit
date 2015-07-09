@@ -105,6 +105,8 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 17),
         new Fixture(
+                "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), new JCUnitIPO2CombinationStrategy(), -1),
+        new Fixture(
                 "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
                 "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7),
@@ -172,7 +174,8 @@ public class DocyCompilerImplTest {
                         runner.getTestClass().getAnnotatedMethods(Test.class)
                                 .stream().count();
                 long expected = fixture.numMethods;
-                assertThat(actual, is(expected));
+                if (expected >= 0)
+                    assertThat(actual, is(expected));
             }
 
             // run the tests
