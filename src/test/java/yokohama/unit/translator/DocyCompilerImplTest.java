@@ -38,75 +38,78 @@ public class DocyCompilerImplTest {
     public static class Fixture {
         public final String docy;
         public final ExpressionStrategyFactory expressionStrategyFactory;
+        public final CombinationStrategy combinationStrategy;
         public final long numMethods;
     }
 
     @DataPoints
     public static Fixture[] PARAMs = {
         new Fixture(
-                "OgnlTestIs.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestIs.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestIsNot.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestIsNot.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestNull.docy", new OgnlExpressionStrategyFactory(), 2),
+                "OgnlTestNull.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "OgnlTestThrows.docy", new OgnlExpressionStrategyFactory(), 5),
+                "OgnlTestThrows.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 5),
         new Fixture(
-                "OgnlTestMultiplePropositions.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestMultiplePropositions.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestMultipleAssertions.docy", new OgnlExpressionStrategyFactory(), 2),
+                "OgnlTestMultipleAssertions.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "OgnlTestBindings.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestBindings.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestTable.docy", new OgnlExpressionStrategyFactory(), 6),
+                "OgnlTestTable.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 6),
         new Fixture(
-                "OgnlTestCSV.docy", new OgnlExpressionStrategyFactory(), 3),
+                "OgnlTestCSV.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(),  3),
         new Fixture(
-                "OgnlTestExcel.docy", new OgnlExpressionStrategyFactory(), 3),
+                "OgnlTestExcel.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 3),
         new Fixture(
-                "OgnlTestFourPhase.docy", new OgnlExpressionStrategyFactory(), 2),
+                "OgnlTestFourPhase.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "OgnlTestFourPhaseWithTeardown.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestFourPhaseWithTeardown.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestStub.docy", new OgnlExpressionStrategyFactory(), 7),
+                "OgnlTestStub.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 7),
         new Fixture(
-                "OgnlTestStubVariations.docy", new OgnlExpressionStrategyFactory(), 1),
+                "OgnlTestStubVariations.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
-                "OgnlTestInstanceSuchThat.docy", new OgnlExpressionStrategyFactory(), 4),
+                "OgnlTestInstanceSuchThat.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
-                "OgnlTestImport.docy", new OgnlExpressionStrategyFactory(), 4),
+                "OgnlTestImport.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
-                "ElTestNull.docy", new ElExpressionStrategyFactory(), 2),
+                "ElTestNull.docy", new ElExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "ElTestThrows.docy", new ElExpressionStrategyFactory(), 5),
+                "ElTestThrows.docy", new ElExpressionStrategyFactory(), new CombinationStrategyImpl(), 5),
         new Fixture(
-                "ElTestImport.docy", new ElExpressionStrategyFactory(), 4),
+                "ElTestImport.docy", new ElExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
-                "ScalaTestNull.docy", new ScalaExpressionStrategyFactory(), 2),
+                "ScalaTestNull.docy", new ScalaExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "ScalaTestThrows.docy", new ScalaExpressionStrategyFactory(), 5),
+                "ScalaTestThrows.docy", new ScalaExpressionStrategyFactory(), new CombinationStrategyImpl(), 5),
         new Fixture(
-                "ScalaTestImport.docy", new ScalaExpressionStrategyFactory(), 4),
+                "ScalaTestImport.docy", new ScalaExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
-                "GroovyTestNull.docy", new GroovyExpressionStrategyFactory(), 2),
+                "GroovyTestNull.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "GroovyTestThrows.docy", new GroovyExpressionStrategyFactory(), 5),
+                "GroovyTestThrows.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 5),
         new Fixture(
-                "GroovyTestImport.docy", new GroovyExpressionStrategyFactory(), 4),
+                "GroovyTestImport.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
-                "GroovyTestLiterals.docy", new GroovyExpressionStrategyFactory(), 54),
+                "GroovyTestLiterals.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 54),
         new Fixture(
-                "GroovyTestInvocation.docy", new GroovyExpressionStrategyFactory(), 15),
+                "GroovyTestInvocation.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 15),
         new Fixture(
-                "GroovyTestCodeBlock.docy", new GroovyExpressionStrategyFactory(), 7),
+                "GroovyTestCodeBlock.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7),
         new Fixture(
-                "GroovyTestInvoke.docy", new GroovyExpressionStrategyFactory(), 2),
+                "GroovyTestInvoke.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
-                "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), 17),
+                "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 17),
         new Fixture(
-                "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), 1),
+                "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), new JCUnitIPO2CombinationStrategy(), -1),
         new Fixture(
-                "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), 7),
+                "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
+        new Fixture(
+                "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7),
     };
 
     @DataPoints
@@ -142,7 +145,7 @@ public class DocyCompilerImplTest {
                         new AstToJUnitAstFactory(),
                         fixture.expressionStrategyFactory,
                         new MockitoMockStrategyFactory(),
-                        new CombinationStrategyImpl(),
+                        fixture.combinationStrategy,
                         jUnitAstCompiler);
                 List<ErrorMessage> actual = instance.compile(
                         docyPath,
@@ -171,7 +174,8 @@ public class DocyCompilerImplTest {
                         runner.getTestClass().getAnnotatedMethods(Test.class)
                                 .stream().count();
                 long expected = fixture.numMethods;
-                assertThat(actual, is(expected));
+                if (expected >= 0)
+                    assertThat(actual, is(expected));
             }
 
             // run the tests
