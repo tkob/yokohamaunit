@@ -165,10 +165,8 @@ public class OgnlExpressionStrategy implements ExpressionStrategy {
                 Arrays.asList(),
                 "classForName",
                 Arrays.asList(
-                        new Pair<Type, String>(Type.STRING, classNameVar.getName()),
-                        new Pair<Type, String>(
-                                MAP.toType(),
-                                contextVar.getName())),
+                        Pair.of(Type.STRING, classNameVar.getName()),
+                        Pair.of(MAP.toType(), contextVar.getName())),
                 Optional.of(Type.CLASS),
                 Arrays.asList(new ClassType(ClassNotFoundException.class)),
                 statements);

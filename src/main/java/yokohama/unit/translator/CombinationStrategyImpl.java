@@ -33,7 +33,7 @@ public class CombinationStrategyImpl implements CombinationStrategy {
         K k = candidates.get(0).getFirst();
         List<V> vs = candidates.get(0).getSecond();
         List<Pair<K, List<V>>> cs = candidates.subList(1, candidates.size());
-        List<Pair<K, V>> kvs = Lists.map(vs, v -> new Pair<>(k, v));
+        List<Pair<K, V>> kvs = Lists.map(vs, v -> Pair.of(k, v));
         Stream<List<Pair<K, V>>> kvss = comb(cs);
         return kvss.flatMap(kvs_ ->
                 kvs.stream().map(kv -> ListUtils.union(Arrays.asList(kv), kvs_)));

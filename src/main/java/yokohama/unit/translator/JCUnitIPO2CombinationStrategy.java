@@ -49,7 +49,7 @@ public class JCUnitIPO2CombinationStrategy implements CombinationStrategy {
                                     .map(key -> {
                                         @SuppressWarnings("unchecked") V v =
                                                 (V)tuple.get(key);
-                                        return new Pair<>(map.get(key), v);
+                                        return Pair.of(map.get(key), v);
                                     }).collect(Collectors.toList());
                         }).collect(Collectors.toList());
         return tuples;

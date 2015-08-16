@@ -95,7 +95,7 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
             return Stream.concat(
                     Stream.of(
-                            new Pair<>(
+                            Pair.of(
                                     catchClause.getClassType().toType(),
                                     catchClause.getVar().getName())),
                     visitStatements(catchClause.getStatements()));

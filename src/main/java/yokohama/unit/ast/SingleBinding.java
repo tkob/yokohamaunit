@@ -13,7 +13,7 @@ public class SingleBinding implements Binding {
     Span span;
 
     public Pair<Ident, Expr> toPair() {
-        return new Pair<>(name, value);
+        return Pair.of(name, value);
     }
 
     @Override

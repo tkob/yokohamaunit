@@ -185,6 +185,6 @@ public class DocyCompilerImpl implements DocyCompiler {
                 bindingsOrErrors.stream()
                         .flatMap(Either::leftStream)
                         .collect(Collectors.toList());
-        return new Pair<>(new ClassResolver(bindings, classLoader), errors);
+        return Pair.of(new ClassResolver(bindings, classLoader), errors);
     }
 }

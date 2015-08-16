@@ -202,7 +202,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("Table [a'b]").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = new Pair<>(TableType.INLINE, "a'b");
+        Pair<TableType, String> expected = Pair.of(TableType.INLINE, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
@@ -211,7 +211,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef2() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("CSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = new Pair<>(TableType.CSV, "a'b");
+        Pair<TableType, String> expected = Pair.of(TableType.CSV, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
@@ -220,7 +220,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef3() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("TSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = new Pair<>(TableType.TSV, "a'b");
+        Pair<TableType, String> expected = Pair.of(TableType.TSV, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
@@ -229,7 +229,7 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef4() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("Excel 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = new Pair<>(TableType.EXCEL, "a'b");
+        Pair<TableType, String> expected = Pair.of(TableType.EXCEL, "a'b");
         Pair<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }

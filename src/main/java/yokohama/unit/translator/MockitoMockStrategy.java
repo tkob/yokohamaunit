@@ -343,8 +343,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                 Arrays.asList(),
                                                 Type.OBJECT),
                                         argumentType.getSpan());
-                        return new Pair<>(
-                                new Pair<>(varType, varArg),
+                        return Pair.of(
+                                Pair.of(varType, varArg),
                                 Stream.of(statement));
                     });
         } else {
@@ -527,6 +527,6 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Type.OBJECT),
                                     Span.dummySpan()));
                 });
-        return new Pair<>(new Pair<>(argType, argVar), statements);
+        return Pair.of(Pair.of(argType, argVar), statements);
     }
 }

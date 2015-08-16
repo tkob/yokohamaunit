@@ -13,6 +13,6 @@ public class Abbreviation {
     private final Span span;
 
     public Pair<String, String> toPair() {
-        return new Pair<>(shortName, longName);
+        return Pair.of(shortName, longName);
     }
 }

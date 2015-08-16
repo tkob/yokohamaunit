@@ -271,16 +271,16 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public Pair<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
         if (ctx.UTABLE() != null) {
             String name = ctx.Anchor().getText();
-            return new Pair<>(TableType.INLINE, name);
+            return Pair.of(TableType.INLINE, name);
         } else if (ctx.CSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
-            return new Pair<>(TableType.CSV, name);
+            return Pair.of(TableType.CSV, name);
         } else if (ctx.TSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
-            return new Pair<>(TableType.TSV, name);
+            return Pair.of(TableType.TSV, name);
         } else if (ctx.EXCEL_SINGLE_QUOTE() != null) {
             String name = ctx.BookName().getText().replace("''", "'");
-            return new Pair<>(TableType.EXCEL, name);
+            return Pair.of(TableType.EXCEL, name);
         } else {
             throw new IllegalArgumentException("'" + ctx.getText() + "' is not a table reference.");
         }

@@ -21,7 +21,7 @@ public class ChoiceCollectVisitor extends
         List<List<Expr>> ess = Lists.map(
                 choiceBinding.getChoices(),
                 choice -> Arrays.asList(choice));
-        return Stream.of(new Pair<>(idents, ess));
+        return Stream.of(Pair.of(idents, ess));
     }
 
     @Override
@@ -73,6 +73,6 @@ public class ChoiceCollectVisitor extends
             default:
                 throw new UnsupportedOperationException();
         }
-        return Stream.of(new Pair<>(idents, ess));
+        return Stream.of(Pair.of(idents, ess));
     }
 }

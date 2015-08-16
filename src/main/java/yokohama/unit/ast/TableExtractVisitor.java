@@ -11,7 +11,7 @@ public class TableExtractVisitor {
     public Map<String, Table> extractMap(Group group) {
         List<Table> tables = extractTables(group);
         return Lists.listToMap(
-                tables, table -> new Pair<>(table.getName(), table));
+                tables, table -> Pair.of(table.getName(), table));
     }
 
     public List<Table> extractTables(Group group) {

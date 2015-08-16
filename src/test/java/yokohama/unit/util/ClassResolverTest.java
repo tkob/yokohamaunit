@@ -20,7 +20,7 @@ public class ClassResolverTest {
 
     @Test
     public void testLookup2() throws Exception {
-        ClassResolver instance = new ClassResolver(Arrays.asList(new Pair<String, String>("ArrayList", "java.util.ArrayList")));
+        ClassResolver instance = new ClassResolver(Arrays.asList(Pair.of("ArrayList", "java.util.ArrayList")));
         Class<?> expected = java.util.ArrayList.class;
         Class<?> actual = instance.lookup("ArrayList");
         assertThat(actual, is(equalTo(expected)));
@@ -36,7 +36,7 @@ public class ClassResolverTest {
 
     @Test
     public void testLookup4() throws Exception {
-        ClassResolver instance = new ClassResolver(Arrays.asList(new Pair<String, String>("String", "java.util.ArrayList")));
+        ClassResolver instance = new ClassResolver(Arrays.asList(Pair.of("String", "java.util.ArrayList")));
         Class<?> expected = java.util.ArrayList.class;
         Class<?> actual = instance.lookup("String");
         assertThat(actual, is(equalTo(expected)));
@@ -52,7 +52,7 @@ public class ClassResolverTest {
 
     @Test
     public void testIsEmpty2() {
-        ClassResolver instance = new ClassResolver(Arrays.asList(new Pair<String, String>("ArrayList", "java.util.ArrayList")));
+        ClassResolver instance = new ClassResolver(Arrays.asList(Pair.of("ArrayList", "java.util.ArrayList")));
         boolean expected = false;
         boolean actual = instance.isEmpty();
         assertThat(actual, is(expected));
@@ -68,7 +68,7 @@ public class ClassResolverTest {
 
     @Test
     public void testMap2() {
-        ClassResolver instance = new ClassResolver(Arrays.asList(new Pair<String, String>("ArrayList", "java.util.ArrayList")));
+        ClassResolver instance = new ClassResolver(Arrays.asList(Pair.of("ArrayList", "java.util.ArrayList")));
         List<String> expected = Arrays.asList("ArrayList, java.util.ArrayList");
         List<String> actual = instance.map((k, v) -> k + ", " + v).collect(Collectors.toList());
         assertThat(actual, is(expected));
@@ -84,7 +84,7 @@ public class ClassResolverTest {
 
     @Test
     public void testFlatMap2() {
-        ClassResolver instance = new ClassResolver(Arrays.asList(new Pair<String, String>("ArrayList", "java.util.ArrayList")));
+        ClassResolver instance = new ClassResolver(Arrays.asList(Pair.of("ArrayList", "java.util.ArrayList")));
         List<String> expected = Arrays.asList("ArrayList", "java.util.ArrayList");
         List<String> actual = instance.flatMap((k, v) -> Stream.of(k, v)).collect(Collectors.toList());
         assertThat(actual, is(expected));

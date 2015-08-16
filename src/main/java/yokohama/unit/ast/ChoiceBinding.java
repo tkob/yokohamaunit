@@ -14,7 +14,7 @@ public class ChoiceBinding implements Binding {
     Span span;
 
     public Pair<Ident, List<Expr>> toPair() {
-        return new Pair<>(name, choices);
+        return Pair.of(name, choices);
     }
 
     @Override

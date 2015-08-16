@@ -1324,7 +1324,7 @@ class AstToJUnitAstVisitor {
                         Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
                         Stream<Statement> expr = translateExpr(arg.get(0), argVar, paramType.toClass(), envVar);
-                        return new Pair<>(argVar, expr);
+                        return Pair.of(argVar, expr);
                     }),
                     typeAndArg -> typeAndArg.map((t, varargs) -> {
                         Type paramType = Type.of(t, classResolver);
@@ -1334,7 +1334,7 @@ class AstToJUnitAstVisitor {
                                             varargVar,
                                             paramType.toClass(),
                                             envVar);
-                                    return new Pair<>(varargVar, expr);
+                                    return Pair.of(varargVar, expr);
                                 }).collect(Collectors.toList());
                         List<Sym> varargVars = Pair.unzip(exprs).getFirst();
                         Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
@@ -1345,7 +1345,7 @@ class AstToJUnitAstVisitor {
                                         argVar,
                                         new ArrayExpr(paramType.toArray(), varargVars),
                                         t.getSpan()));
-                        return new Pair<>(argVar, Stream.concat(varargStatements, arrayStatement));
+                        return Pair.of(argVar, Stream.concat(varargStatements, arrayStatement));
                     }));
         } else {
             List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
@@ -1356,14 +1356,14 @@ class AstToJUnitAstVisitor {
                         Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
                         Stream<Statement> expr = translateExpr(arg, argVar, paramType.toClass(), envVar);
-                        return new Pair<>(argVar, expr);
+                        return Pair.of(argVar, expr);
                     })).collect(Collectors.toList());
         }
         List<Sym> argVars = Pair.unzip(setupArgs).getFirst();
         Stream<Statement> setupStatements =
                 setupArgs.stream().flatMap(Pair::getSecond);
 
-        return new Pair<>(argVars, setupStatements);
+        return Pair.of(argVars, setupStatements);
     }
 
     Stream<Statement> generateInvoke(

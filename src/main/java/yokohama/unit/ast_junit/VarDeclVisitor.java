@@ -25,7 +25,7 @@ public class VarDeclVisitor {
         return statement.accept(
                 isStatement -> Stream.<Pair<Type, String>>empty(),
                 varInitStatement ->
-                        Stream.of(new Pair<Type, String>(varInitStatement.getType(), varInitStatement.getVar().getName())),
+                        Stream.of(Pair.of(varInitStatement.getType(), varInitStatement.getVar().getName())),
                 tryStatement ->
                         Stream.concat(
                                 visitStatements(tryStatement.getTryStatements()),

@@ -98,12 +98,12 @@ public class VariableCheckVisitor {
 
     private Stream<ErrorMessage> checkIdents(List<Ident> idents, FList<String> env) {
         return FList.fromList(idents).foldLeft(
-                new Pair<FList<String>, FList<ErrorMessage>>(env, FList.empty()), (pair, ident) -> {
+                Pair.<FList<String>, FList<ErrorMessage>>of(env, FList.empty()), (pair, ident) -> {
                     String var = ident.getName();
                     Span span = ident.getSpan();
                     FList<String> env_ = pair.getFirst();
                     FList<ErrorMessage> msgs = pair.getSecond();
-                    return new Pair<>(
+                    return Pair.of(
                             env_.add(var),
                             env_.contains(var) ? msgs.add(mkErr(var, span))
                                                : msgs);

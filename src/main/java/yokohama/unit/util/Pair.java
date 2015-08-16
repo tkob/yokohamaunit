@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.Value;
 
-@Value
+@Value(staticConstructor="of")
 public class Pair<T, U> {
     private final T first;
     private final U second;

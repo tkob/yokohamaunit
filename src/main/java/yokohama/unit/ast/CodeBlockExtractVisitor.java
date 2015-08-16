@@ -13,7 +13,7 @@ public class CodeBlockExtractVisitor {
         return Lists.listToMap(
                 codeBlocks,
                 codeBlock ->
-                        new Pair<>(
+                        Pair.of(
                                 codeBlock.getHeading().getLine(), codeBlock));
     }
 
