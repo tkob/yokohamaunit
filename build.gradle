@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'jacoco'
-apply plugin: 'me.champeau.gradle.antlr4'
+apply plugin: 'antlr'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -57,7 +57,7 @@ dependencies {
     compile 'com.google.code.findbugs:bcel-findbugs:6.0'
     compile 'org.springframework:spring-context:4.1.6.RELEASE'
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
-    antlr4 group: "org.antlr", name: "antlr4", version: "4.5"
+    antlr "org.antlr:antlr4:4.5"
     compile project(':yokohamaunit-annotations')
 }
 
@@ -66,30 +66,9 @@ compileJava {
     sourceSets.test.compileClasspath += configurations.providedCompile
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
-    dependencies {
-        // https://github.com/melix/antlr4-gradle-plugin
-        classpath 'me.champeau.gradle:antlr4-gradle-plugin:0.1'
-    }
+generateGrammarSource {
+    arguments += ["-visitor", "-package", "yokohama.unit.grammar"]
 }
-
-// make the Java compile task depend on the antlr4 task
-compileJava.dependsOn antlr4
-
-// add the generated source files to the list of java sources
-sourceSets.main.java.srcDirs += antlr4.output
-
-// add antlr4 to classpath
-configurations {
-   compile.extendsFrom antlr4
-}
-
-antlr4.extraArgs = ["-package", "yokohama.unit.grammar"]
 
 task console(dependsOn: 'classes', type: JavaExec) {
     main = 'groovy.ui.Console'
@@ -160,6 +139,6 @@ task compileDocy(type:Exec) {
     environment DOCY_CLASSPATH: ext.classpath
     commandLine ext.command
 }
-compileDocy.dependsOn installApp
+compileDocy.dependsOn installDist
 compileDocy.dependsOn compileTestJava
 test.dependsOn compileDocy
