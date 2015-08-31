@@ -1,4 +1,4 @@
-package yokohama.unit.translator;
+package yokohama.unit.translator.experimental;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +26,7 @@ import yokohama.unit.ast_junit.StrLitExpr;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.Span;
+import yokohama.unit.translator.ExpressionStrategy;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Sym;

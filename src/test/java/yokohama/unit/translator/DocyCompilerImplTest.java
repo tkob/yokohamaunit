@@ -76,6 +76,7 @@ public class DocyCompilerImplTest {
                 "OgnlTestInstanceSuchThat.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
                 "OgnlTestImport.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
+        /*
         new Fixture(
                 "ElTestNull.docy", new ElExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(
@@ -88,6 +89,7 @@ public class DocyCompilerImplTest {
                 "ScalaTestThrows.docy", new ScalaExpressionStrategyFactory(), new CombinationStrategyImpl(), 5),
         new Fixture(
                 "ScalaTestImport.docy", new ScalaExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
+        */
         new Fixture(
                 "GroovyTestNull.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(

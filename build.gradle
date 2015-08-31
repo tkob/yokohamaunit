@@ -50,9 +50,9 @@ dependencies {
 
     testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.7'
     testCompile group: 'ognl', name: 'ognl', version: '3.0.8'
-    testCompile 'org.scala-lang:scala-compiler:2.11.7'
-    testCompile 'org.glassfish:javax.el:3.0.0'
-    providedCompile 'javax.el:javax.el-api:3.0.0'
+    //testCompile 'org.scala-lang:scala-compiler:2.11.7'
+    //testCompile 'org.glassfish:javax.el:3.0.0'
+    //providedCompile 'javax.el:javax.el-api:3.0.0'
 
     compile 'com.google.code.findbugs:bcel-findbugs:6.0'
     compile 'org.springframework:spring-context:4.1.6.RELEASE'
@@ -64,6 +64,8 @@ dependencies {
 compileJava {
     sourceSets.main.compileClasspath += configurations.providedCompile
     sourceSets.test.compileClasspath += configurations.providedCompile
+    sourceSets.main.java.exclude "**/experimental/**"
+    sourceSets.test.java.exclude "**/experimental/**"
 }
 
 generateGrammarSource {
