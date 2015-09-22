@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.3.1"
+        classpath "com.smokejumperit.gradle.license:Gradle-License-Report:0.0.2"
     }
 }
 
@@ -13,6 +14,7 @@ apply plugin: 'jacoco'
 apply plugin: 'antlr'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'license-report' 
 
 group = 'yokohama.unit'
 version = '0.1.0'
@@ -85,6 +87,11 @@ compileJava {
 generateGrammarSource {
     arguments += ["-visitor", "-package", "yokohama.unit.grammar"]
 }
+
+//applicationDistribution.from(dependencyLicenseReport) {
+//    into "license"
+//}
+dependencyLicenseReport.dependsOn ':yokohamaunit-annotations:jar'
 
 task console(dependsOn: 'classes', type: JavaExec) {
     main = 'groovy.ui.Console'
