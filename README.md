@@ -4,8 +4,8 @@
 
 YokohamaUnit is a unit testing framework for Java.
 
-Tests are written in a dedicated external DSL (and an embedded expression
-language like Groovy) and directly compiled into JUnit test class files.
+Tests are written in a dedicated external DSL (and Groovy as an embedded
+expression language) and directly compiled into JUnit test class files.
 
 ## Installation
 ```
