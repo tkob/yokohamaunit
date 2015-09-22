@@ -36,7 +36,7 @@ public class AstToJUnitAstTest {
         AstToJUnitAst instance = new AstToJUnitAst(
                 name,
                 packageName,
-                new OgnlExpressionStrategy(name, packageName, genSym, new ClassResolver()),
+                new GroovyExpressionStrategy(name, packageName, genSym, new ClassResolver()),
                 new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                 new CombinationStrategyImpl(),
                 genSym,
@@ -55,7 +55,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new GroovyExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new CombinationStrategyImpl(),
                         genSym,
@@ -80,7 +80,7 @@ public class AstToJUnitAstTest {
                 new AstToJUnitAstVisitor(
                         "",
                         "",
-                        new OgnlExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
+                        new GroovyExpressionStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new MockitoMockStrategy("Name", "com.example", genSym, new ClassResolver()),
                         new CombinationStrategyImpl(),
                         genSym,

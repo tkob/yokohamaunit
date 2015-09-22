@@ -44,6 +44,7 @@ public class DocyCompilerImplTest {
 
     @DataPoints
     public static Fixture[] PARAMs = {
+        /*
         new Fixture(
                 "OgnlTestIs.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
@@ -76,7 +77,6 @@ public class DocyCompilerImplTest {
                 "OgnlTestInstanceSuchThat.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
         new Fixture(
                 "OgnlTestImport.docy", new OgnlExpressionStrategyFactory(), new CombinationStrategyImpl(), 4),
-        /*
         new Fixture(
                 "ElTestNull.docy", new ElExpressionStrategyFactory(), new CombinationStrategyImpl(), 2),
         new Fixture(

@@ -1,5 +1,7 @@
-package yokohama.unit.translator;
+package yokohama.unit.translator.experimental;
 
+import yokohama.unit.translator.ExpressionStrategy;
+import yokohama.unit.translator.ExpressionStrategyFactory;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 

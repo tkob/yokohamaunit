@@ -43,11 +43,7 @@ public class MethodTest {
                 Arrays.asList(),
                 Optional.empty(),
                 Arrays.asList(new ClassType(java.lang.Exception.class)),
-                Arrays.asList(new VarInitStatement(
-                                new Type(new ClassType(ognl.OgnlContext.class), 0),
-                                Sym.of("env"),
-                                new NewExpr("ognl.OgnlContext", Arrays.asList(), Arrays.asList()),
-                                Span.dummySpan()),
+                Arrays.asList(
                         new VarInitStatement(Type.STRING, Sym.of("message"), new StrLitExpr(""), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, Sym.of("actual"), new IntLitExpr(1), Span.dummySpan()),
                         new VarInitStatement(Type.OBJECT, Sym.of("expected"), new IntLitExpr(1), Span.dummySpan()),
@@ -58,10 +54,8 @@ public class MethodTest {
         expected.appendln("@org.junit.Test");
         expected.appendln("public void test() throws java.lang.Exception {");
         expected.appendln("    java.lang.Object actual;");
-        expected.appendln("    ognl.OgnlContext env;");
         expected.appendln("    java.lang.Object expected;");
         expected.appendln("    java.lang.String message;");
-        expected.appendln("    env = new ognl.OgnlContext();");
         expected.appendln("    message = \"\";");
         expected.appendln("    actual = 1;");
         expected.appendln("    expected = 1;");
