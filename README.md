@@ -54,6 +54,8 @@ compileDocy.dependsOn compileTestJava
 test.dependsOn compileDocy
 ```
 
+An example project is available from https://github.com/tkob/yokohamaunit-example
+
 ## Usage from Command Line
 
 Download and extract the
