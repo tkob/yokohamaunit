@@ -7,6 +7,30 @@ YokohamaUnit is a unit testing framework for Java.
 Tests are written in a dedicated external DSL (and Groovy as an embedded
 expression language) and directly compiled into JUnit test class files.
 
+## A Taste of YokohamaUnit
+
+```
+*[StringUtils]: yokohama.unit.example.StringUtils
+
+# Test: Test cases for `toSnakeCase`
+
+Assert that `StringUtils.toSnakeCase(input)` is `expected`
+for all input and expected in Table [1].
+
+Assert that `StringUtils.toSnakeCase(null)` throws
+an instance of `java.lang.NullPointerException`.
+
+| input           | expected          |
+| --------------- | ----------------- |
+| ""              | ""                |
+| "aaa"           | "aaa"             |
+| "HelloWorld"    | "hello_world"     |
+| "practiceJunit" | "practice_junit"  |
+| "practiceJUnit" | "practice_j_unit" |
+| "hello_world"   | "hello_world"     |
+[1]
+```
+
 ## Usage with Gradle
 
 Add to your build.gradle the following:
