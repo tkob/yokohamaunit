@@ -47,7 +47,8 @@ task compileDocy << {
     if (!ext.classesDir.exists()) {
         ext.classesDir.mkdirs()
     }
-    yokohama.unit.Main.main(ext.args as String[])
+    def main = new yokohama.unit.Main(new yokohama.unit.CommandFactory());
+    main.run(System.in, System.out, System.err, ext.args as String[])
 }
 compileDocy.dependsOn compileTestJava
 test.dependsOn compileDocy
