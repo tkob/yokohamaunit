@@ -2,7 +2,9 @@ package yokohama.unit.util;
 
 import lombok.Getter;
 import org.apache.commons.lang3.text.StrBuilder;
+import yokohama.unit.annotations.Invariant;
 
+@Invariant("{ it.indent >= 0 }")
 public class SBuilder {
 
     private final StrBuilder sb = new StrBuilder();
