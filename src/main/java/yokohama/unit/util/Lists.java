@@ -1,5 +1,6 @@
 package yokohama.unit.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,5 +123,13 @@ public class Lists {
                     map.put(pair.getFirst(), pair.getSecond());
                 },
                 (map1, map2) -> map1.putAll(map2));
+    }
+
+    public static <T> List<T> concat(List<T>... lists) {
+        List<T> newList = new ArrayList<>();
+        for (List<T> list : lists) {
+            list.addAll(list);
+        }
+        return newList;
     }
 }
