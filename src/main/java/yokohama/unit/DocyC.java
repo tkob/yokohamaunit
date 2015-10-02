@@ -45,6 +45,9 @@ public class DocyC implements Command {
                 .withDescription("Print a synopsis of standard options")
                 .create("help"));
         options.addOption(OptionBuilder
+                .withDescription("Generate code to check @Invariant annotation")
+                .create("contract"));
+        options.addOption(OptionBuilder
                 .withDescription("Emit Java code")
                 .create("j"));
         options.addOption(OptionBuilder
@@ -113,6 +116,7 @@ public class DocyC implements Command {
         URI baseDir;
         Optional<Path> dest;
         boolean emitJava;
+        boolean checkContract;
         List<String> classPath;
         List<String> javacArgs;
         List<String> files;
@@ -142,6 +146,7 @@ public class DocyC implements Command {
             baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
             String d = commandLine.getOptionValue("d");
             emitJava = commandLine.hasOption('j');
+            checkContract = commandLine.hasOption("contract");
             dest = d == null ? Optional.empty() : Optional.of(Paths.get(d));
             classPath = getClassPath(commandLine);
             javacArgs = extractOptions(
@@ -179,6 +184,7 @@ public class DocyC implements Command {
                         classPath,
                         dest,
                         emitJava,
+                        checkContract,
                         javacArgs)
                         .stream();
         }).collect(Collectors.toList());

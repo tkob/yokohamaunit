@@ -79,6 +79,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             List<String> classPath,
             Optional<Path> dest,
             boolean emitJava,
+            boolean checkContract,
             List<String> javacArgs) {
         // Make a class loader
         ClassLoader classLoader = new URLClassLoader(
@@ -138,7 +139,8 @@ public class DocyCompilerImpl implements DocyCompiler {
                     mockStrategy,
                     combinationStrategy,
                     genSym,
-                    classResolver)
+                    classResolver,
+                    checkContract)
                     .translate(ast);
         } catch (TranslationException e) {
             return Arrays.asList(e.toErrorMessage());

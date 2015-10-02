@@ -93,6 +93,7 @@ import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
@@ -126,6 +127,7 @@ public class AstToJUnitAst {
     final TableExtractVisitor tableExtractVisitor;
     final CodeBlockExtractVisitor codeBlockExtractVisitor =
             new CodeBlockExtractVisitor();
+    final boolean checkContract;
 
     public CompilationUnit translate(Group group) {
         final List<Table> tables = tableExtractVisitor.extractTables(group);
@@ -143,7 +145,8 @@ public class AstToJUnitAst {
                 classResolver,
                 tables,
                 codeBlockMap,
-                choiceCollectVisitor)
+                choiceCollectVisitor,
+                checkContract)
                 .translateGroup(group);
     }
 }
@@ -160,6 +163,7 @@ class AstToJUnitAstVisitor {
     final List<Table> tables;
     final Map<String, CodeBlock> codeBlockMap;
     final ChoiceCollectVisitor choiceCollectVisitor;
+    final boolean checkContract;
 
     final DataConverterFinder dataConverterFinder = new DataConverterFinder();
 
@@ -1160,6 +1164,20 @@ class AstToJUnitAstVisitor {
 
     List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
         Sym env = genSym.generate("env");
+        Sym contractVar = genSym.generate("contract");
+
+        List<Statement> contract =
+                checkContract
+                ? Arrays.asList(
+                        new VarInitStatement(
+                                Type.fromClass(Contract.class),
+                                contractVar,
+                                new NewExpr(
+                                        "yokohama.unit.translator.GroovyContract",
+                                        Collections.emptyList(),
+                                        Collections.emptyList()),
+                                Span.dummySpan()))
+                : Collections.emptyList();
 
         List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
                 Optionals.toStream(
@@ -1233,8 +1251,9 @@ class AstToJUnitAstVisitor {
                     Arrays.asList(),
                     Optional.empty(),
                     Arrays.asList(ClassType.EXCEPTION),
-                    ListUtils.union(
+                    Lists.concat(
                             expressionStrategy.env(env),
+                            contract,
                             actionsAfter.size() > 0
                                     ?  Arrays.asList(
                                             new TryStatement(

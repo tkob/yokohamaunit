@@ -12,7 +12,8 @@ public class AstToJUnitAstFactory {
             MockStrategy mockStrategy,
             CombinationStrategy combinationStrategy,
             GenSym genSym,
-            ClassResolver classResolver) {
+            ClassResolver classResolver,
+            boolean checkContract) {
         return new AstToJUnitAst(
                 name,
                 packageName,
@@ -21,6 +22,7 @@ public class AstToJUnitAstFactory {
                 combinationStrategy,
                 genSym,
                 classResolver,
-                new TableExtractVisitor());
+                new TableExtractVisitor(),
+                checkContract);
     }
 }
