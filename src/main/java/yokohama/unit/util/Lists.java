@@ -128,7 +128,7 @@ public class Lists {
     public static <T> List<T> concat(List<T>... lists) {
         List<T> newList = new ArrayList<>();
         for (List<T> list : lists) {
-            list.addAll(list);
+            newList.addAll(list);
         }
         return newList;
     }
