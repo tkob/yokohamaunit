@@ -151,6 +151,7 @@ task compileDocy(type:Exec) {
         + (System.getProperty("os.name").contains("Windows") ? ".bat" : ""),
         'docyc',
         '-j',
+        '-contract',
         '-d', ext.classesDir,
         '-basedir', ext.baseDir
         ]
