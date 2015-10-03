@@ -647,6 +647,30 @@ class AstToJUnitAstVisitor {
                 tableBinding -> translateTableBinding(tableBinding, choice, envVar));
     }
 
+    Stream<Statement> translateBindingWithContract(
+            yokohama.unit.ast.Binding binding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        return binding.accept(
+                singleBinding -> translateSingleBindingWithContract(singleBinding, envVar, contractVar),
+                choiceBinding -> translateChoiceBindingWithContract(choiceBinding, choice, envVar, contractVar),
+                tableBinding -> translateTableBindingWithContract(tableBinding, choice, envVar, contractVar));
+    }
+
+    Stream<Statement> insertContract(Sym contractVar, Sym objVar) {
+        return checkContract
+                ? Stream.of(
+                        new InvokeVoidStatement(
+                                ClassType.fromClass(Contract.class),
+                                contractVar,
+                                "assertSatisfied",
+                                Arrays.asList(Type.OBJECT),
+                                Arrays.asList(objVar),
+                                Span.dummySpan()))
+                : Stream.empty();
+    }
+
     Stream<Statement> translateSingleBinding(
             SingleBinding singleBinding, Sym envVar) {
         Ident name = singleBinding.getName();
@@ -654,6 +678,17 @@ class AstToJUnitAstVisitor {
         return Stream.concat(
                 translateExpr(singleBinding.getValue(), var, Object.class, envVar),
                 expressionStrategy.bind(envVar, name, var).stream());
+    }
+
+    Stream<Statement> translateSingleBindingWithContract(
+            SingleBinding singleBinding, Sym envVar, Sym contractVar) {
+        Ident name = singleBinding.getName();
+        Sym var = genSym.generate(name.getName());
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(singleBinding.getValue(), var, Object.class, envVar))
+                .append(insertContract(contractVar, var))
+                .append(expressionStrategy.bind(envVar, name, var).stream())
+                .getStream();
     }
 
     Stream<Statement> translateChoiceBinding(
@@ -668,6 +703,21 @@ class AstToJUnitAstVisitor {
                 expressionStrategy.bind(envVar, name, var).stream());
     }
 
+    Stream<Statement> translateChoiceBindingWithContract(
+            ChoiceBinding choiceBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        Ident name = choiceBinding.getName();
+        yokohama.unit.ast.Expr expr = choice.get(name);
+        Sym var = genSym.generate(name.getName());
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(expr, var, Object.class, envVar))
+                .append(insertContract(contractVar, var))
+                .append(expressionStrategy.bind(envVar, name, var).stream())
+                .getStream();
+    }
+
     Stream<Statement> translateTableBinding(
             TableBinding tableBinding,
             Map<Ident, yokohama.unit.ast.Expr> choice,
@@ -679,6 +729,23 @@ class AstToJUnitAstVisitor {
             return Stream.concat(
                     translateExpr(expr, var, Object.class, envVar),
                     expressionStrategy.bind(envVar, ident, var).stream());
+        });
+    }
+
+    Stream<Statement> translateTableBindingWithContract(
+            TableBinding tableBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        List<Ident> idents = tableBinding.getIdents();
+        return idents.stream().flatMap(ident -> {
+            yokohama.unit.ast.Expr expr = choice.get(ident);
+            Sym var = genSym.generate(ident.getName());
+            return StreamCollector.<Statement>empty()
+                    .append(translateExpr(expr, var, Object.class, envVar))
+                    .append(insertContract(contractVar, var))
+                    .append(expressionStrategy.bind(envVar, ident, var).stream())
+                    .getStream();
         });
     }
 
@@ -1203,7 +1270,9 @@ class AstToJUnitAstVisitor {
                         .flatMap(letStatement ->
                                 letStatement.getBindings().stream()
                                         .flatMap(binding ->
-                                                translateBinding(binding, choice, env)));
+                                                checkContract
+                                                ? translateBindingWithContract(binding, choice, env, contractVar)
+                                                : translateBinding(binding, choice, env)));
                 vars = setup.getLetStatements().stream()
                         .flatMap(s ->
                                 s.getBindings().stream()
