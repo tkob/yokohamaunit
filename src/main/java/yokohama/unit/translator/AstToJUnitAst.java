@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import yokohama.unit.contract.Contract;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1173,7 +1174,7 @@ class AstToJUnitAstVisitor {
                                 Type.fromClass(Contract.class),
                                 contractVar,
                                 new NewExpr(
-                                        "yokohama.unit.translator.GroovyContract",
+                                        "yokohama.unit.contract.GroovyContract",
                                         Collections.emptyList(),
                                         Collections.emptyList()),
                                 fourPhaseTest.getSpan()))

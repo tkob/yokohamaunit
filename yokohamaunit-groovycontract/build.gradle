@@ -1,0 +1,53 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.3.1"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+group = 'yokohama.unit'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    providedCompile
+}
+
+dependencies {
+    providedCompile group: "org.projectlombok", name: "lombok", version: "1.14.8"
+    compile group: 'junit', name: 'junit', version: '4.10'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.7'
+    compile project(':yokohamaunit-annotations')
+}
+
+publishing {
+    publications {
+        annotations(MavenPublication) {
+                from components.java
+        }
+    }
+}
+
+bintray {
+    user = project.has("bintrayUser") ? bintrayUser : ""
+    key = project.has("bintrayKey") ? bintrayKey : ""
+
+    publications = ["annotations"]
+    pkg {
+        repo = "maven"
+        name = "yokohamaunit"
+    }
+}

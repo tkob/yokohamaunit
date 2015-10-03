@@ -1,4 +1,4 @@
-package yokohama.unit.translator;
+package yokohama.unit.contract;
 
 public interface Contract {
     void assertSatisfied(Object obj); 
