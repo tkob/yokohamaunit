@@ -1194,7 +1194,8 @@ class AstToJUnitAstVisitor {
         return indexes.mapToObj(index -> {
             Map<Ident, yokohama.unit.ast.Expr> choice = choices.get(index);
             String testName = SUtils.toIdent(fourPhaseTest.getName()) + "_" + index;
-            Stream<Statement> bindings;
+            final Stream<Statement> bindings;
+            final List<String> vars;
             if (fourPhaseTest.getSetup().isPresent()) {
                 Phase setup = fourPhaseTest.getSetup().get();
                 bindings = setup.getLetStatements().stream()
@@ -1202,8 +1203,18 @@ class AstToJUnitAstVisitor {
                                 letStatement.getBindings().stream()
                                         .flatMap(binding ->
                                                 translateBinding(binding, choice, env)));
+                vars = setup.getLetStatements().stream()
+                        .flatMap(s ->
+                                s.getBindings().stream()
+                                        .flatMap(b -> b.accept(
+                                                singleBinding -> Stream.of(singleBinding.getName()),
+                                                choiceBinding -> Stream.of(choiceBinding.getName()),
+                                                tableBinding -> tableBinding.getIdents().stream())))
+                        .map(Ident::getName)
+                        .collect(Collectors.toList());
             } else {
                 bindings = Stream.empty();
+                vars = Collections.emptyList();
             }
 
             Optional<Stream<Statement>> setupActions =
