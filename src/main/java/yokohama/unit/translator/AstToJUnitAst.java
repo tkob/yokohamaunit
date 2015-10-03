@@ -1176,7 +1176,7 @@ class AstToJUnitAstVisitor {
                                         "yokohama.unit.translator.GroovyContract",
                                         Collections.emptyList(),
                                         Collections.emptyList()),
-                                Span.dummySpan()))
+                                fourPhaseTest.getSpan()))
                 : Collections.emptyList();
 
         List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
