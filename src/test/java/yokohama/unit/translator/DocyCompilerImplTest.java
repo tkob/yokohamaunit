@@ -112,6 +112,8 @@ public class DocyCompilerImplTest {
                 "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
         new Fixture(
                 "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7),
+        new Fixture(
+                "GroovyTestInvariant.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1),
     };
 
     @DataPoints
