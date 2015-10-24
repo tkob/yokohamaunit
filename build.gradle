@@ -62,7 +62,7 @@ dependencies {
     compile group: "org.apache.commons", name: "commons-collections4", version: "4.0"
     compile group: "commons-io", name: "commons-io", version: "2.4"
     compile group: "commons-cli", name: "commons-cli", version: "1.2"
-    compile 'com.github.dakusui:jcunit:0.4.24'
+    compile 'com.github.dakusui:jcunit:0.5.4'
 
     testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.7'
     //testCompile group: 'ognl', name: 'ognl', version: '3.0.8'

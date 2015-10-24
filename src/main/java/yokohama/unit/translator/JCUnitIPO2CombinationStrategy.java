@@ -25,8 +25,7 @@ public class JCUnitIPO2CombinationStrategy implements CombinationStrategy {
             K key = candidate.getFirst();
             String sym = genSym.generate(key.toString()).getName();
             map.put(sym, key);
-            Factor.Builder factorBuilder = new Factor.Builder();
-            factorBuilder.setName(sym);
+            Factor.Builder factorBuilder = new Factor.Builder(sym);
             for (V v : candidate.getSecond()) {
                 factorBuilder.addLevel(v);
             }
