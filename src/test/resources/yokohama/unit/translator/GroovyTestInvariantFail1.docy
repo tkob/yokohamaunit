@@ -1,0 +1,15 @@
+*[DummyCounter]: yokohama.unit.translator.DummyCounter
+
+# Test: invariant check (violated at the creation time)
+
+## Setup
+
+Let counter be `new DummyCounter(-1)`.
+
+## Exercise
+
+Do `counter.increment()`.
+
+## Verify
+
+Assert that `counter.count` is 0.
