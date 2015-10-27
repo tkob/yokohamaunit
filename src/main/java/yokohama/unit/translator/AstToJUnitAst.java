@@ -64,6 +64,7 @@ import yokohama.unit.ast.Pattern;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.RegExpPattern;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
@@ -1300,6 +1301,21 @@ class AstToJUnitAstVisitor {
                             .flatMap(assertion ->
                                     translateAssertion(assertion, env)
                                             .stream().flatMap(s -> s.stream()));
+            
+            Stream<Statement> contractAfterExercise = checkContract
+                    ? vars.stream()
+                            .flatMap(name -> {
+                                Sym objVar = genSym.generate("obj");
+                                return Stream.concat(
+                                        expressionStrategy.eval(
+                                                objVar,
+                                                new QuotedExpr(
+                                                        name, Span.dummySpan()),
+                                                Object.class,
+                                                env).stream(),
+                                        insertContract(contractVar, objVar));
+                            })
+                    : Stream.empty();
 
             List<Statement> statements =
                     Lists.fromStreams(
@@ -1310,6 +1326,7 @@ class AstToJUnitAstVisitor {
                             exerciseActions.isPresent()
                                     ? exerciseActions.get()
                                     : Stream.empty(),
+                            contractAfterExercise,
                             testStatements);
 
             List<Statement> actionsAfter;
