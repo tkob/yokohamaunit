@@ -71,3 +71,23 @@ where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.
 
 Assert `Lists.flatMapFirstAndRest([1, 2, 3], firstf, restf)` is `[1, 1, 2, 3]`
 where firstf = `{it -> Stream.of(it, it)}` and restf = `{it -> Stream.of(it)}`.
+
+#Test: Tests for List.fromStreams
+
+Assert `Lists.fromStreams()` is `[]`.
+
+Assert `Lists.fromStreams(s1)` is `[]` where s1 = `Stream.empty()`.
+
+Assert `Lists.fromStreams(s1)` is `[1]` where s1 = `Stream.of(1)`.
+
+Assert `Lists.fromStreams(s1, s2)` is `[]` where s1 = `Stream.empty()`
+and s2 = `Stream.empty()`.
+
+Assert `Lists.fromStreams(s1, s2)` is `[1, 2, 3]` where s1 = `Stream.of(1)`
+and s2 = `Stream.of(2, 3)`.
+
+Assert `Lists.fromStreams(s1, s2)` is `[2, 3]` where s1 = `Stream.empty()`
+and s2 = `Stream.of(2, 3)`.
+
+Assert `Lists.fromStreams(s1, s2)` is `[1]` where s1 = `Stream.of(1)`
+and s2 = `Stream.empty()`.

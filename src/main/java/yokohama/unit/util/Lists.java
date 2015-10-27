@@ -132,4 +132,12 @@ public class Lists {
         }
         return newList;
     }
+
+    public static <T> List<T> fromStreams(Stream<T>... streams) {
+        Stream<T> newStream = Stream.empty();
+        for (Stream<T> stream : streams) {
+            newStream = Stream.concat(newStream, stream);
+        }
+        return newStream.collect(Collectors.toList());
+    }
 }
