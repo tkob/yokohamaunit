@@ -1302,19 +1302,15 @@ class AstToJUnitAstVisitor {
                                             .stream().flatMap(s -> s.stream()));
 
             List<Statement> statements =
-                    Stream.concat(
+                    Lists.fromStreams(
                             bindings,
-                            Stream.concat(
-                                    Stream.concat(
-                                            setupActions.isPresent()
-                                                    ? setupActions.get()
-                                                    : Stream.empty(),
-                                            exerciseActions.isPresent()
-                                                    ? exerciseActions.get()
-                                                    : Stream.empty()),
-                                    testStatements)
-                    ).collect(Collectors.toList());
-
+                            setupActions.isPresent()
+                                    ? setupActions.get()
+                                    : Stream.empty(),
+                            exerciseActions.isPresent()
+                                    ? exerciseActions.get()
+                                    : Stream.empty(),
+                            testStatements);
 
             List<Statement> actionsAfter;
             if (fourPhaseTest.getTeardown().isPresent()) {
