@@ -75,6 +75,7 @@ dependencies {
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
     antlr "org.antlr:antlr4:4.5"
     compile project(':yokohamaunit-annotations')
+    compile project(':yokohamaunit-groovycontract')
 }
 
 compileJava {
@@ -151,6 +152,7 @@ task compileDocy(type:Exec) {
         + (System.getProperty("os.name").contains("Windows") ? ".bat" : ""),
         'docyc',
         '-j',
+        '-contract',
         '-d', ext.classesDir,
         '-basedir', ext.baseDir
         ]

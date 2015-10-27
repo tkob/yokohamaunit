@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import yokohama.unit.contract.Contract;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -63,6 +64,7 @@ import yokohama.unit.ast.Pattern;
 import yokohama.unit.ast.Phase;
 import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
+import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.RegExpPattern;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
@@ -93,6 +95,7 @@ import yokohama.unit.ast_junit.InvokeVoidStatement;
 import yokohama.unit.ast_junit.IsStatement;
 import yokohama.unit.ast_junit.LongLitExpr;
 import yokohama.unit.ast_junit.Method;
+import yokohama.unit.ast_junit.NewExpr;
 import yokohama.unit.ast_junit.NullExpr;
 import yokohama.unit.ast_junit.NullValueMatcherExpr;
 import yokohama.unit.ast_junit.PrimitiveType;
@@ -126,6 +129,7 @@ public class AstToJUnitAst {
     final TableExtractVisitor tableExtractVisitor;
     final CodeBlockExtractVisitor codeBlockExtractVisitor =
             new CodeBlockExtractVisitor();
+    final boolean checkContract;
 
     public CompilationUnit translate(Group group) {
         final List<Table> tables = tableExtractVisitor.extractTables(group);
@@ -143,7 +147,8 @@ public class AstToJUnitAst {
                 classResolver,
                 tables,
                 codeBlockMap,
-                choiceCollectVisitor)
+                choiceCollectVisitor,
+                checkContract)
                 .translateGroup(group);
     }
 }
@@ -160,6 +165,7 @@ class AstToJUnitAstVisitor {
     final List<Table> tables;
     final Map<String, CodeBlock> codeBlockMap;
     final ChoiceCollectVisitor choiceCollectVisitor;
+    final boolean checkContract;
 
     final DataConverterFinder dataConverterFinder = new DataConverterFinder();
 
@@ -642,6 +648,30 @@ class AstToJUnitAstVisitor {
                 tableBinding -> translateTableBinding(tableBinding, choice, envVar));
     }
 
+    Stream<Statement> translateBindingWithContract(
+            yokohama.unit.ast.Binding binding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        return binding.accept(
+                singleBinding -> translateSingleBindingWithContract(singleBinding, envVar, contractVar),
+                choiceBinding -> translateChoiceBindingWithContract(choiceBinding, choice, envVar, contractVar),
+                tableBinding -> translateTableBindingWithContract(tableBinding, choice, envVar, contractVar));
+    }
+
+    Stream<Statement> insertContract(Sym contractVar, Sym objVar) {
+        return checkContract
+                ? Stream.of(
+                        new InvokeVoidStatement(
+                                ClassType.fromClass(Contract.class),
+                                contractVar,
+                                "assertSatisfied",
+                                Arrays.asList(Type.OBJECT),
+                                Arrays.asList(objVar),
+                                Span.dummySpan()))
+                : Stream.empty();
+    }
+
     Stream<Statement> translateSingleBinding(
             SingleBinding singleBinding, Sym envVar) {
         Ident name = singleBinding.getName();
@@ -649,6 +679,17 @@ class AstToJUnitAstVisitor {
         return Stream.concat(
                 translateExpr(singleBinding.getValue(), var, Object.class, envVar),
                 expressionStrategy.bind(envVar, name, var).stream());
+    }
+
+    Stream<Statement> translateSingleBindingWithContract(
+            SingleBinding singleBinding, Sym envVar, Sym contractVar) {
+        Ident name = singleBinding.getName();
+        Sym var = genSym.generate(name.getName());
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(singleBinding.getValue(), var, Object.class, envVar))
+                .append(insertContract(contractVar, var))
+                .append(expressionStrategy.bind(envVar, name, var).stream())
+                .getStream();
     }
 
     Stream<Statement> translateChoiceBinding(
@@ -663,6 +704,21 @@ class AstToJUnitAstVisitor {
                 expressionStrategy.bind(envVar, name, var).stream());
     }
 
+    Stream<Statement> translateChoiceBindingWithContract(
+            ChoiceBinding choiceBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        Ident name = choiceBinding.getName();
+        yokohama.unit.ast.Expr expr = choice.get(name);
+        Sym var = genSym.generate(name.getName());
+        return StreamCollector.<Statement>empty()
+                .append(translateExpr(expr, var, Object.class, envVar))
+                .append(insertContract(contractVar, var))
+                .append(expressionStrategy.bind(envVar, name, var).stream())
+                .getStream();
+    }
+
     Stream<Statement> translateTableBinding(
             TableBinding tableBinding,
             Map<Ident, yokohama.unit.ast.Expr> choice,
@@ -674,6 +730,23 @@ class AstToJUnitAstVisitor {
             return Stream.concat(
                     translateExpr(expr, var, Object.class, envVar),
                     expressionStrategy.bind(envVar, ident, var).stream());
+        });
+    }
+
+    Stream<Statement> translateTableBindingWithContract(
+            TableBinding tableBinding,
+            Map<Ident, yokohama.unit.ast.Expr> choice,
+            Sym envVar,
+            Sym contractVar) {
+        List<Ident> idents = tableBinding.getIdents();
+        return idents.stream().flatMap(ident -> {
+            yokohama.unit.ast.Expr expr = choice.get(ident);
+            Sym var = genSym.generate(ident.getName());
+            return StreamCollector.<Statement>empty()
+                    .append(translateExpr(expr, var, Object.class, envVar))
+                    .append(insertContract(contractVar, var))
+                    .append(expressionStrategy.bind(envVar, ident, var).stream())
+                    .getStream();
         });
     }
 
@@ -1160,6 +1233,20 @@ class AstToJUnitAstVisitor {
 
     List<Method> translateFourPhaseTest(FourPhaseTest fourPhaseTest) {
         Sym env = genSym.generate("env");
+        Sym contractVar = genSym.generate("contract");
+
+        List<Statement> contract =
+                checkContract
+                ? Arrays.asList(
+                        new VarInitStatement(
+                                Type.fromClass(Contract.class),
+                                contractVar,
+                                new NewExpr(
+                                        "yokohama.unit.contract.GroovyContract",
+                                        Collections.emptyList(),
+                                        Collections.emptyList()),
+                                fourPhaseTest.getSpan()))
+                : Collections.emptyList();
 
         List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
                 Optionals.toStream(
@@ -1176,16 +1263,29 @@ class AstToJUnitAstVisitor {
         return indexes.mapToObj(index -> {
             Map<Ident, yokohama.unit.ast.Expr> choice = choices.get(index);
             String testName = SUtils.toIdent(fourPhaseTest.getName()) + "_" + index;
-            Stream<Statement> bindings;
+            final Stream<Statement> bindings;
+            final List<String> vars;
             if (fourPhaseTest.getSetup().isPresent()) {
                 Phase setup = fourPhaseTest.getSetup().get();
                 bindings = setup.getLetStatements().stream()
                         .flatMap(letStatement ->
                                 letStatement.getBindings().stream()
                                         .flatMap(binding ->
-                                                translateBinding(binding, choice, env)));
+                                                checkContract
+                                                ? translateBindingWithContract(binding, choice, env, contractVar)
+                                                : translateBinding(binding, choice, env)));
+                vars = setup.getLetStatements().stream()
+                        .flatMap(s ->
+                                s.getBindings().stream()
+                                        .flatMap(b -> b.accept(
+                                                singleBinding -> Stream.of(singleBinding.getName()),
+                                                choiceBinding -> Stream.of(choiceBinding.getName()),
+                                                tableBinding -> tableBinding.getIdents().stream())))
+                        .map(Ident::getName)
+                        .collect(Collectors.toList());
             } else {
                 bindings = Stream.empty();
+                vars = Collections.emptyList();
             }
 
             Optional<Stream<Statement>> setupActions =
@@ -1201,21 +1301,33 @@ class AstToJUnitAstVisitor {
                             .flatMap(assertion ->
                                     translateAssertion(assertion, env)
                                             .stream().flatMap(s -> s.stream()));
+            
+            Stream<Statement> contractAfterExercise = checkContract
+                    ? vars.stream()
+                            .flatMap(name -> {
+                                Sym objVar = genSym.generate("obj");
+                                return Stream.concat(
+                                        expressionStrategy.eval(
+                                                objVar,
+                                                new QuotedExpr(
+                                                        name, Span.dummySpan()),
+                                                Object.class,
+                                                env).stream(),
+                                        insertContract(contractVar, objVar));
+                            })
+                    : Stream.empty();
 
             List<Statement> statements =
-                    Stream.concat(
+                    Lists.fromStreams(
                             bindings,
-                            Stream.concat(
-                                    Stream.concat(
-                                            setupActions.isPresent()
-                                                    ? setupActions.get()
-                                                    : Stream.empty(),
-                                            exerciseActions.isPresent()
-                                                    ? exerciseActions.get()
-                                                    : Stream.empty()),
-                                    testStatements)
-                    ).collect(Collectors.toList());
-
+                            setupActions.isPresent()
+                                    ? setupActions.get()
+                                    : Stream.empty(),
+                            exerciseActions.isPresent()
+                                    ? exerciseActions.get()
+                                    : Stream.empty(),
+                            contractAfterExercise,
+                            testStatements);
 
             List<Statement> actionsAfter;
             if (fourPhaseTest.getTeardown().isPresent()) {
@@ -1233,8 +1345,9 @@ class AstToJUnitAstVisitor {
                     Arrays.asList(),
                     Optional.empty(),
                     Arrays.asList(ClassType.EXCEPTION),
-                    ListUtils.union(
+                    Lists.concat(
                             expressionStrategy.env(env),
+                            contract,
                             actionsAfter.size() > 0
                                     ?  Arrays.asList(
                                             new TryStatement(

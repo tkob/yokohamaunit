@@ -15,6 +15,7 @@ public interface DocyCompiler {
             List<String> classPath,
             Optional<Path> dest,
             boolean emitJava,
+            boolean checkContract,
             List<String> javacArgs
     );
 }

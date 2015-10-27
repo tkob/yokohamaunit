@@ -41,7 +41,8 @@ public class AstToJUnitAstTest {
                 new CombinationStrategyImpl(),
                 genSym,
                 new ClassResolver(),
-                new TableExtractVisitor());
+                new TableExtractVisitor(),
+                false);
         CompilationUnit actual = instance.translate(group);
         CompilationUnit expected = new CompilationUnit(packageName, Arrays.asList(new ClassDecl(true, name, Optional.empty(), Arrays.asList(), Arrays.asList())));
         assertThat(actual, is(expected));
@@ -62,7 +63,8 @@ public class AstToJUnitAstTest {
                         new ClassResolver(),
                         Collections.emptyList(),
                         Collections.emptyMap(),
-                        new ChoiceCollectVisitor(Collections.emptyList()));
+                        new ChoiceCollectVisitor(Collections.emptyList()),
+                        false);
         List<Method> actual = instance.translateTest(test);
         List<Method> expected = Arrays.asList();
         assertThat(actual, is(expected));
@@ -87,7 +89,8 @@ public class AstToJUnitAstTest {
                         new ClassResolver(),
                         Collections.emptyList(),
                         Collections.emptyMap(),
-                        new ChoiceCollectVisitor(Collections.emptyList()));
+                        new ChoiceCollectVisitor(Collections.emptyList()),
+                        false);
         List<List<Statement>> actual = instance.translateAssertion(assertion, Sym.of("env"));
         List<List<Statement>> expected = Arrays.asList(Arrays.asList());
         assertThat(actual, is(expected));

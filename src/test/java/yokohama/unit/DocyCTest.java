@@ -129,6 +129,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 anyBoolean(),
+                anyBoolean(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
@@ -145,6 +146,7 @@ public class DocyCTest {
                 eq("yokohama.unit"),
                 anyObject(),
                 anyObject(),
+                eq(false),
                 eq(false),
                 eq(Arrays.asList()));
     }
@@ -162,6 +164,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 anyBoolean(),
+                anyBoolean(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
@@ -179,6 +182,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 eq(false),
+                eq(false),
                 eq(Arrays.asList()));
     }
 
@@ -194,6 +198,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 anyObject(),
+                anyBoolean(),
                 anyBoolean(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
@@ -211,6 +216,7 @@ public class DocyCTest {
                 eq("yokohama.unit"),
                 anyObject(),
                 anyObject(),
+                eq(false),
                 eq(false),
                 eq(Arrays.asList()));
     }
@@ -228,6 +234,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 anyBoolean(),
+                anyBoolean(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
@@ -245,6 +252,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 eq(false),
+                eq(false),
                 eq(Arrays.asList()));
     }
 
@@ -259,6 +267,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 anyObject(),
+                anyBoolean(),
                 anyBoolean(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
@@ -277,6 +286,7 @@ public class DocyCTest {
                 anyObject(),
                 anyObject(),
                 eq(true),
+                eq(false),
                 eq(Arrays.asList()));
     }
 

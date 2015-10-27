@@ -1,4 +1,4 @@
 rootProject.name = 'yokohamaunit'
 
 include "yokohamaunit-annotations"
-
+include "yokohamaunit-groovycontract"

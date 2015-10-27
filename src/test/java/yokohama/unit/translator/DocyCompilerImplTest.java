@@ -113,6 +113,12 @@ public class DocyCompilerImplTest {
                 "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, true),
         new Fixture(
                 "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7, true),
+        new Fixture(
+                "GroovyTestInvariant.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, true),
+        new Fixture(
+                "GroovyTestInvariantFail1.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, false),
+        new Fixture(
+                "GroovyTestInvariantFail2.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, false),
     };
 
     @DataPoints
@@ -158,6 +164,7 @@ public class DocyCompilerImplTest {
                         Arrays.asList(),
                         Optional.of(Paths.get(dest.getAbsolutePath())),
                         false,
+                        true,
                         Arrays.asList());
                 List<ErrorMessage> expected = Collections.emptyList();
                 assertThat(actual, is(expected));
