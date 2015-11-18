@@ -11,3 +11,9 @@ Let cl = `ClassLoader.getSystemClassLoader()`.
 ## Verify: Will find yokohama.unit.translator.DataConverters#asAst
 
 Assert `finder.find(Group.class, cl).get().getName()` is "asAst".
+
+# Test: Find methods with @GroovyAs
+
+Assert `finder.findGroovyAs(cl).collect{it.name}` is `["inputStreamAsString"]`
+where cl = `ClassLoader.getSystemClassLoader()`
+and finder = `new yokohama.unit.translator.DataConverterFinder()`.
