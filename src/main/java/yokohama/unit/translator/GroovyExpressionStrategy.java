@@ -147,9 +147,8 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(configurationVar)),
                         Span.dummySpan()));
 
-        return Stream.concat(importCustomizer,
-                Stream.concat(importClasses,
-                        Stream.concat(configuration, groovyShell)))
+        return Stream.of(importCustomizer, importClasses, configuration, groovyShell)
+                .flatMap(s -> s)
                 .collect(Collectors.toList());
     }
 
