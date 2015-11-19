@@ -147,7 +147,16 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(configurationVar)),
                         Span.dummySpan()));
 
-        return Stream.of(importCustomizer, importClasses, configuration, groovyShell)
+        Sym __2 = genSym.generate("__");
+        QuotedExpr initExpr = new QuotedExpr("def __$oldAsType", Span.dummySpan());
+        Stream<Statement> init = eval(__2, initExpr, Object.class, var).stream();
+
+        return Stream.of(
+                importCustomizer,
+                importClasses,
+                configuration,
+                groovyShell,
+                init)
                 .flatMap(s -> s)
                 .collect(Collectors.toList());
     }
