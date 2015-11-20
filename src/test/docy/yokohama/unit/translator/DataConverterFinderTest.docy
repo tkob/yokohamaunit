@@ -2,15 +2,9 @@
 
 # Test: Find DataConverter
 
-## Setup
-
-Let finder = `new yokohama.unit.translator.DataConverterFinder()`.
-
-Let cl = `ClassLoader.getSystemClassLoader()`.
-
-## Verify: Will find yokohama.unit.translator.DataConverters#asAst
-
-Assert `finder.find(Group.class, cl).get().getName()` is "asAst".
+Assert `finder.find(Group.class, cl).get().getName()` is "asAst"
+where cl = `ClassLoader.getSystemClassLoader()`
+and finder = `new yokohama.unit.translator.DataConverterFinder()`.
 
 # Test: Find methods with @GroovyAs
 
