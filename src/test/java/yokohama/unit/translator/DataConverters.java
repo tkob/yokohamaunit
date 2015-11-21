@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.apache.commons.io.IOUtils;
 import yokohama.unit.annotations.As;
 import yokohama.unit.ast.Group;
 import yokohama.unit.grammar.YokohamaUnitLexer;
@@ -34,7 +35,6 @@ public class DataConverters {
         }
     }
 
-    @As
     @SneakyThrows(IOException.class)
     public static Group asAst(String input) {
         ErrorListener errorListener = new ErrorListener();
@@ -50,5 +50,11 @@ public class DataConverters {
             throw new RuntimeException("Error while parsing docy");
         }
         return new ParseTreeToAstVisitor(Optional.empty()).visitGroup(ctx);
+    }
+
+    @As
+    @SneakyThrows(IOException.class)
+    public static String inputStreamAsString(InputStream is) {
+        return IOUtils.toString(is, "UTF-8");
     }
 }

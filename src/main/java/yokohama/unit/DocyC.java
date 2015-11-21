@@ -9,6 +9,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,6 +48,11 @@ public class DocyC implements Command {
         options.addOption(OptionBuilder
                 .withDescription("Generate code to check @Invariant annotation")
                 .create("contract"));
+        options.addOption(OptionBuilder
+                .hasArg()
+                .withArgName("base-packages")
+                .withDescription("Base packages where converter classes are located")
+                .create("converter"));
         options.addOption(OptionBuilder
                 .withDescription("Emit Java code")
                 .create("j"));
@@ -117,6 +123,7 @@ public class DocyC implements Command {
         Optional<Path> dest;
         boolean emitJava;
         boolean checkContract;
+        List<String> converterBasePackages;
         List<String> classPath;
         List<String> javacArgs;
         List<String> files;
@@ -145,9 +152,13 @@ public class DocyC implements Command {
             }
             baseDir = Paths.get(commandLine.getOptionValue("basedir"), "").toUri();
             String d = commandLine.getOptionValue("d");
+            dest = d == null ? Optional.empty() : Optional.of(Paths.get(d));
             emitJava = commandLine.hasOption('j');
             checkContract = commandLine.hasOption("contract");
-            dest = d == null ? Optional.empty() : Optional.of(Paths.get(d));
+            String converter= commandLine.getOptionValue("converter");
+            converterBasePackages = converter == null
+                    ? Collections.emptyList()
+                    : Arrays.asList(converter.split(","));
             classPath = getClassPath(commandLine);
             javacArgs = extractOptions(
                     Arrays.asList(commandLine.getOptions()),
@@ -185,6 +196,7 @@ public class DocyC implements Command {
                         dest,
                         emitJava,
                         checkContract,
+                        converterBasePackages,
                         javacArgs)
                         .stream();
         }).collect(Collectors.toList());

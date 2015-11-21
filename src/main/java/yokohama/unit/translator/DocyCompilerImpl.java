@@ -80,6 +80,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             boolean checkContract,
+            List<String> converterBasePackages,
             List<String> javacArgs) {
         // Make a class loader
         ClassLoader classLoader = new URLClassLoader(
@@ -129,7 +130,11 @@ public class DocyCompilerImpl implements DocyCompiler {
             GenSym genSym = new GenSym();
             ExpressionStrategy expressionStrategy =
                     expressionStrategyFactory.create(
-                            name, packageName, genSym, classResolver);
+                            name,
+                            packageName,
+                            genSym,
+                            classResolver,
+                            converterBasePackages);
             MockStrategy mockStrategy =
                     mockStrategyFactory.create(
                             name, packageName, genSym, classResolver);

@@ -153,6 +153,7 @@ task compileDocy(type:Exec) {
         'docyc',
         '-j',
         '-contract',
+        '-converter', "yokohama.unit",
         '-d', ext.classesDir,
         '-basedir', ext.baseDir
         ]

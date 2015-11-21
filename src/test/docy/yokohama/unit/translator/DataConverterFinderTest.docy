@@ -2,12 +2,18 @@
 
 # Test: Find DataConverter
 
-## Setup
+Assert `finder.find(Group.class, cl).get().getName()` is "asAst"
+where cl = `ClassLoader.getSystemClassLoader()`
+and finder = `new yokohama.unit.translator.DataConverterFinder()`.
 
-Let finder = `new yokohama.unit.translator.DataConverterFinder()`.
+# Test: Find methods with @GroovyAs
 
-Let cl = `ClassLoader.getSystemClassLoader()`.
+Assert `finder.find(cl, ["yokohama.unit"]).collect{it.name}`
+    is `["inputStreamAsString"]`
+where cl = `ClassLoader.getSystemClassLoader()`
+and finder = `new yokohama.unit.translator.DataConverterFinder()`.
 
-## Verify: Will find yokohama.unit.translator.DataConverters#asAst
+# Test: Convert InputStream into String using "as"
 
-Assert `finder.find(Group.class, cl).get().getName()` is "asAst".
+Assert `bais as String` is "hello"
+where bais = `new ByteArrayInputStream("hello".getBytes("UTF-8"))`.

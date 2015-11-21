@@ -2,11 +2,14 @@ package yokohama.unit.translator;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.util.ClassUtils;
 import yokohama.unit.annotations.As;
 
 public class DataConverterFinder {
@@ -30,5 +33,25 @@ public class DataConverterFinder {
                     throw new RuntimeException(e);
                 }
             }).findFirst();
+    }
+
+    public List<Method> find(
+            ClassLoader classLoader, List<String> basePackages) {
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false);
+        scanner.setResourceLoader(new DefaultResourceLoader(classLoader));
+        scanner.addIncludeFilter(new AnnotationTypeFilter(As.class));
+
+        return basePackages.stream().flatMap(basePackage ->
+                scanner.findCandidateComponents(basePackage).stream()
+                        .map(BeanDefinition::getBeanClassName)
+                        .flatMap(className -> {
+                                Class<?> clazz = ClassUtils.resolveClassName(className, classLoader);
+                                return Arrays.<Method>asList(clazz.getMethods()).stream()
+                                        .filter(method -> true &&
+                                                Arrays.stream(method.getAnnotations()).anyMatch(ann ->
+                                                        ann.annotationType().equals(As.class)) &&
+                                                method.getParameterCount() == 1);
+                        })).collect(Collectors.toList());
     }
 }
