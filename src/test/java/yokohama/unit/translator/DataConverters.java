@@ -56,23 +56,7 @@ public class DataConverters {
 
     @GroovyAs
     @SneakyThrows(IOException.class)
-    public static String inputStreamAsString(InputStream is, Class<?> clazz) {
+    public static String inputStreamAsString(InputStream is) {
         return IOUtils.toString(is, "UTF-8");
-    }
-
-    // dummy conversion methods for test
-
-    public static String noAnnotation(InputStream is, Class<?> clazz) {
-        throw new UnsupportedOperationException("shoud not use this method");
-    }
-
-    @GroovyAs
-    public static String onlyOneArgument(InputStream is) {
-        throw new UnsupportedOperationException("shoud not use this method");
-    }
-
-    @GroovyAs
-    public static String secondArgumentNotClass(InputStream is, String s) {
-        throw new UnsupportedOperationException("shoud not use this method");
     }
 }
