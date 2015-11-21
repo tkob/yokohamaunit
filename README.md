@@ -43,7 +43,7 @@ buildscript {
         maven { url 'https://dl.bintray.com/tkob/maven' }
     }
     dependencies {
-        classpath 'yokohama.unit:yokohamaunit:0.1.0'
+        classpath 'yokohama.unit:yokohamaunit:0.2.0'
     }
 }
 
