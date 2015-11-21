@@ -1,5 +1,6 @@
 package yokohama.unit.translator;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
     private final String packageName;
     private final GenSym genSym;
     private final ClassResolver classResolver;
+    private final List<Method> asMethods;
 
     static final String COMPILATION_CUSTOMIZER =
             "org.codehaus.groovy.control.customizers.CompilationCustomizer";
@@ -151,12 +153,36 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
         QuotedExpr initExpr = new QuotedExpr("def __$oldAsType", Span.dummySpan());
         Stream<Statement> init = eval(__2, initExpr, Object.class, var).stream();
 
+        Stream<Statement> installConverters = asMethods.stream()
+                .flatMap(method -> {
+                    Class<?> fromType = method.getParameterTypes()[0];
+                    Class<?> toType = method.getReturnType();
+                    String install = String.format(
+                            "__$oldAsType = %s.metaClass.getMetaMethod(\"asType\", [Class] as Class[] )\n" +
+                            "%s.metaClass.asType = { Class c ->\n" +
+                            "    if( c == %s ) {\n" +
+                            "        %s.%s(delegate)\n" +
+                            "    } else {\n" +
+                            "        __$oldAsType.invoke(delegate, c)\n" +
+                            "    }\n" +
+                            "}",
+                            fromType.getCanonicalName(),
+                            fromType.getCanonicalName(),
+                            toType.getCanonicalName(),
+                            method.getDeclaringClass().getName(),
+                            method.getName());
+                    Sym __3 = genSym.generate("__");
+                    QuotedExpr installExpr = new QuotedExpr(install, Span.dummySpan());
+                    return eval(__3, installExpr, Object.class, var).stream();
+                });
+
         return Stream.of(
                 importCustomizer,
                 importClasses,
                 configuration,
                 groovyShell,
-                init)
+                init,
+                installConverters)
                 .flatMap(s -> s)
                 .collect(Collectors.toList());
     }

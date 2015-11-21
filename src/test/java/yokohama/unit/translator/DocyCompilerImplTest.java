@@ -165,6 +165,7 @@ public class DocyCompilerImplTest {
                         Optional.of(Paths.get(dest.getAbsolutePath())),
                         false,
                         true,
+                        Arrays.asList(),
                         Arrays.asList());
                 List<ErrorMessage> expected = Collections.emptyList();
                 assertThat(actual, is(expected));

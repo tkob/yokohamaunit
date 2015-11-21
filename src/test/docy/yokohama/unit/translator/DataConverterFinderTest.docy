@@ -12,3 +12,8 @@ Assert `finder.find(cl, ["yokohama.unit"]).collect{it.name}`
     is `["inputStreamAsString"]`
 where cl = `ClassLoader.getSystemClassLoader()`
 and finder = `new yokohama.unit.translator.DataConverterFinder()`.
+
+# Test: Convert InputStream into String using "as"
+
+Assert `bais as String` is "hello"
+where bais = `new ByteArrayInputStream("hello".getBytes("UTF-8"))`.
