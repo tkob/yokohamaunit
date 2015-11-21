@@ -11,7 +11,6 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.ClassUtils;
 import yokohama.unit.annotations.As;
-import yokohama.unit.annotations.GroovyAs;
 
 public class DataConverterFinder {
     public Optional<Method> find(Class<?> returnType, ClassLoader classLoader) {
@@ -51,7 +50,7 @@ public class DataConverterFinder {
                                 return Arrays.<Method>asList(clazz.getMethods()).stream()
                                         .filter(method -> true &&
                                                 Arrays.stream(method.getAnnotations()).anyMatch(ann ->
-                                                        ann.annotationType().equals(GroovyAs.class)) &&
+                                                        ann.annotationType().equals(As.class)) &&
                                                 method.getParameterCount() == 1);
                         })).collect(Collectors.toList());
     }
