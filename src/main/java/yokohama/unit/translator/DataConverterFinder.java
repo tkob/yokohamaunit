@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.ClassUtils;
@@ -46,11 +47,13 @@ public class DataConverterFinder {
                 scanner.findCandidateComponents(basePackage).stream()
                         .map(BeanDefinition::getBeanClassName)
                         .flatMap(className -> {
-                                Class<?> clazz = ClassUtils.resolveClassName(className, classLoader);
+                                Class<?> clazz = ClassUtils.resolveClassName(
+                                        className, classLoader);
+                                Class asAnn = ClassUtils.resolveClassName(
+                                        "yokohama.unit.annotations.As", classLoader);
                                 return Arrays.<Method>asList(clazz.getMethods()).stream()
                                         .filter(method -> true &&
-                                                Arrays.stream(method.getAnnotations()).anyMatch(ann ->
-                                                        ann.annotationType().equals(As.class)) &&
+                                                AnnotationUtils.getAnnotation(method, asAnn) != null &&
                                                 method.getParameterCount() == 1);
                         })).collect(Collectors.toList());
     }
