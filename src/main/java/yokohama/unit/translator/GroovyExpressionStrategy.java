@@ -149,28 +149,27 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                                 Arrays.asList(configurationVar)),
                         Span.dummySpan()));
 
-        Sym __2 = genSym.generate("__");
-        QuotedExpr initExpr = new QuotedExpr("def __$oldAsType", Span.dummySpan());
-        Stream<Statement> init = eval(__2, initExpr, Object.class, var).stream();
-
         Stream<Statement> installConverters = asMethods.stream()
                 .flatMap(method -> {
+                    Sym oldType = genSym.generate("__$oldType");
                     Class<?> fromType = method.getParameterTypes()[0];
                     Class<?> toType = method.getReturnType();
                     String install = String.format(
-                            "__$oldAsType = %s.metaClass.getMetaMethod(\"asType\", [Class] as Class[] )\n" +
+                            "def %s = %s.metaClass.getMetaMethod(\"asType\", [Class] as Class[] )\n" +
                             "%s.metaClass.asType = { Class c ->\n" +
                             "    if( c == %s ) {\n" +
                             "        %s.%s(delegate)\n" +
                             "    } else {\n" +
-                            "        __$oldAsType.invoke(delegate, c)\n" +
+                            "        %s.invoke(delegate, c)\n" +
                             "    }\n" +
                             "}",
+                            oldType.getName(),
                             fromType.getCanonicalName(),
                             fromType.getCanonicalName(),
                             toType.getCanonicalName(),
                             method.getDeclaringClass().getName(),
-                            method.getName());
+                            method.getName(),
+                            oldType.getName());
                     Sym __3 = genSym.generate("__");
                     QuotedExpr installExpr = new QuotedExpr(install, Span.dummySpan());
                     return eval(__3, installExpr, Object.class, var).stream();
@@ -181,7 +180,6 @@ public class GroovyExpressionStrategy implements ExpressionStrategy {
                 importClasses,
                 configuration,
                 groovyShell,
-                init,
                 installConverters)
                 .flatMap(s -> s)
                 .collect(Collectors.toList());
