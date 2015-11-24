@@ -634,7 +634,6 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         return new AnchorExpr(ctx.Anchor().getText(), getSpan(ctx));
     }
 
-
     @Override
     public AsExpr visitAsExpr(YokohamaUnitParser.AsExprContext ctx) {
         return new AsExpr(
@@ -646,6 +645,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Expr visitSourceExpr(YokohamaUnitParser.SourceExprContext ctx) {
         return (Expr)visitChildren(ctx);
+    }
+
+    @Override
+    public AsExpr visitResourceExpr(YokohamaUnitParser.ResourceExprContext ctx) {
+        throw new UnsupportedOperationException("not implemented yet"); // TODO
     }
 
     @Override
