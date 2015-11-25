@@ -756,7 +756,8 @@ class AstToJUnitAstVisitor {
             Class<?> expectedType,
             Sym envVar) {
         Sym exprVar = genSym.generate("expr");
-        Stream<Statement> statements = expr.accept(quotedExpr -> {
+        Stream<Statement> statements = expr.accept(
+                quotedExpr -> {
                     return expressionStrategy.eval(
                             exprVar,
                             quotedExpr,
@@ -793,6 +794,9 @@ class AstToJUnitAstVisitor {
                 },
                 asExpr -> {
                     return translateAsExpr(asExpr, exprVar, envVar);
+                },
+                resourceExpr -> {
+                    throw new UnsupportedOperationException("TODO");
                 });
 
         // box or unbox if needed
@@ -1092,7 +1096,10 @@ class AstToJUnitAstVisitor {
                 charExpr -> Type.CHAR,
                 stringExpr -> Type.STRING,
                 anchorExpr -> Type.STRING,
-                asExpr -> Type.of(asExpr.getClassType().toType(), classResolver));
+                asExpr -> Type.of(asExpr.getClassType().toType(), classResolver),
+                resourceExpr -> {
+                    throw new UnsupportedOperationException("TODO");
+                });
     }
 
     List<List<Statement>> translateTableRef(

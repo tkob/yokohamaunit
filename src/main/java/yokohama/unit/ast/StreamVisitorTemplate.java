@@ -156,6 +156,12 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     }
 
     @Override
+    public Stream<T> visitResourceExpr(ResourceExpr resourceExpr) {
+        return Optionals.toStream(resourceExpr.getClassType())
+                .flatMap(this::visitClassType);
+    }
+
+    @Override
     public Stream<T> visitStubReturns(StubReturns stubReturns) {
         return Stream.concat(visitMethodPattern(stubReturns.getMethodPattern()),
                 visitExpr(stubReturns.getToBeReturned()));

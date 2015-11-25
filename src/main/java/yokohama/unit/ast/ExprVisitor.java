@@ -11,4 +11,5 @@ public interface ExprVisitor<T> {
     T visitStringExpr(StringExpr stringExpr);
     T visitAnchorExpr(AnchorExpr anchorExpr);
     T visitAsExpr(AsExpr asExpr);
+    T visitResourceExpr(ResourceExpr resourceExpr);
 }

@@ -54,7 +54,8 @@ public abstract class AstVisitor<T> {
                 this::visitCharExpr,
                 this::visitStringExpr,
                 this::visitAnchorExpr,
-                this::visitAsExpr);
+                this::visitAsExpr,
+                this::visitResourceExpr);
     }
     public abstract T visitQuotedExpr(QuotedExpr quotedExpr);
     public abstract T visitStubExpr(StubExpr stubExpr);
@@ -66,6 +67,7 @@ public abstract class AstVisitor<T> {
     public abstract T visitStringExpr(StringExpr stringExpr);
     public abstract T visitAnchorExpr(AnchorExpr anchorExpr);
     public abstract T visitAsExpr(AsExpr asExpr);
+    public abstract T visitResourceExpr(ResourceExpr resourceExpr);
     public T visitStubBehavior(StubBehavior behavior) {
         return behavior.accept(
                 this::visitStubReturns,
