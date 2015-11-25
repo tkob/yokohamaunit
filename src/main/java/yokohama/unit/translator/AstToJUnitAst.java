@@ -1097,9 +1097,11 @@ class AstToJUnitAstVisitor {
                 stringExpr -> Type.STRING,
                 anchorExpr -> Type.STRING,
                 asExpr -> Type.of(asExpr.getClassType().toType(), classResolver),
-                resourceExpr -> {
-                    throw new UnsupportedOperationException("TODO");
-                });
+                resourceExpr -> 
+                        resourceExpr.getClassType()
+                                .map(classType ->
+                                        Type.of(classType.toType(), classResolver))
+                                .orElse(Type.URL));
     }
 
     List<List<Statement>> translateTableRef(
