@@ -145,7 +145,7 @@ anchorExpr: LBRACKET Anchor RBRACKET ;
 asExpr: sourceExpr AS_BACK_TICK classType BACK_TICK ;
 sourceExpr: stringExpr | anchorExpr ;
 
-resourceExpr: RESOURCE stringExpr (AS_BACK_TICK classType BACK_TICK)? ;
+resourceExpr: RESOURCE DOUBLE_QUOTE Str DOUBLE_QUOTE (AS_BACK_TICK classType BACK_TICK)? ;
 
 codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
 attributes: CodeLine ;
