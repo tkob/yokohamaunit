@@ -652,7 +652,7 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     public ResourceExpr visitResourceExpr(YokohamaUnitParser.ResourceExprContext ctx) {
         return new ResourceExpr(
                 ctx.Str().getText(),
-                Optional.ofNullable(visitClassType(ctx.classType())),
+                Optional.ofNullable(ctx.classType()).map(this::visitClassType),
                 getSpan(ctx));
     }
 
