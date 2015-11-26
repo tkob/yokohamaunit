@@ -7,6 +7,7 @@ import yokohama.unit.util.ClassResolver;
 public class ClassType implements NonArrayType {
     private Class<?> clazz;
 
+    public static final ClassType CLASS = new ClassType(Class.class);
     public static final ClassType STRING = new ClassType(String.class);
     public static final ClassType THROWABLE = new ClassType(Throwable.class);
     public static final ClassType EXCEPTION = new ClassType(Exception.class);
