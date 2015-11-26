@@ -100,6 +100,7 @@ expr: quotedExpr
     | stringExpr
     | anchorExpr
     | asExpr
+    | resourceExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
