@@ -538,7 +538,10 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
 
                     return Type.BOOLEAN;
                 },
-                arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp));
+                arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp),
+                thisClassExpr -> {
+                    throw new UnsupportedOperationException("TODO");
+                });
         if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
             ReferenceType fromType_ = (ReferenceType)fromType;
             ReferenceType type_ = (ReferenceType)type;

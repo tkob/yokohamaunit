@@ -97,6 +97,10 @@ public class VarInitStatement implements Statement {
                 arrayExpr -> {
                     arrayExpr.getExpr(sb, type, var.getName());
                     return null;
+                },
+                thisClassExpr -> {
+                    sb.appendln(var.getName(), " = this.getClass();");
+                    return null;
                 });
     }
 
