@@ -355,189 +355,190 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
         addLineNumber(mg, ih, varInitStatement.getSpan());
         LocalVariableGen var = locals.get(varInitStatement.getVar().getName());
         Type type = typeOf(varInitStatement.getType());
-        Type fromType = varInitStatement.getValue().<Type>accept(varExpr -> {
-                LocalVariableGen from = locals.get(varExpr.getVar().getName());
-                il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
-                return from.getType();
-            },
-            instanceOfMatcherExpr -> {
-                il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClazz().getTypeName())));
-                il.append(factory.createInvoke(
-                        "org.hamcrest.CoreMatchers",
-                        "instanceOf",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        new Type[] { new ObjectType("java.lang.Class") },
-                        Constants.INVOKESTATIC));
-                return new ObjectType("org.hamcrest.Matcher");
-            },
-            nullValueMatcherExpr -> {
-                il.append(factory.createInvoke(
-                        "org.hamcrest.CoreMatchers",
-                        "nullValue",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        Type.NO_ARGS,
-                        Constants.INVOKESTATIC));
-                return new ObjectType("org.hamcrest.Matcher");
-            },
-            equalToMatcherExpr -> {
-                Sym operand = equalToMatcherExpr.getOperand();
-                LocalVariableGen lv = locals.get(operand.getName());
-                il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
-                il.append(factory.createInvoke(
-                        "org.hamcrest.CoreMatchers",
-                        "is",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        new Type[] { lv.getType() },
-                        Constants.INVOKESTATIC));
-                return new ObjectType("org.hamcrest.Matcher");
-            },
-            regExpMatcherExpr -> {
-                il.append(new PUSH(cp, regExpMatcherExpr.getPattern()));
-                il.append(factory.createInvoke(
-                        "com.jcabi.matchers.RegexMatchers",
-                        "containsPattern",
-                        new ObjectType("org.hamcrest.Matcher"),
-                        new Type[] { Type.STRING },
-                        Constants.INVOKESTATIC));
-                return new ObjectType("org.hamcrest.Matcher");
-            },
-            newExpr -> {
-                il.append(factory.createNew(newExpr.getType()));
-                il.append(InstructionConstants.DUP);
-                // push arguments
-                for (Sym arg : newExpr.getArgs()) {
-                    LocalVariableGen lv = locals.get(arg.getName());
+        Type fromType = varInitStatement.getValue().<Type>accept(
+                varExpr -> {
+                    LocalVariableGen from = locals.get(varExpr.getVar().getName());
+                    il.append(InstructionFactory.createLoad(from.getType(), from.getIndex()));
+                    return from.getType();
+                },
+                instanceOfMatcherExpr -> {
+                    il.append(new PUSH(cp, new ObjectType(instanceOfMatcherExpr.getClazz().getTypeName())));
+                    il.append(factory.createInvoke(
+                            "org.hamcrest.CoreMatchers",
+                            "instanceOf",
+                            new ObjectType("org.hamcrest.Matcher"),
+                            new Type[] { new ObjectType("java.lang.Class") },
+                            Constants.INVOKESTATIC));
+                    return new ObjectType("org.hamcrest.Matcher");
+                },
+                nullValueMatcherExpr -> {
+                    il.append(factory.createInvoke(
+                            "org.hamcrest.CoreMatchers",
+                            "nullValue",
+                            new ObjectType("org.hamcrest.Matcher"),
+                            Type.NO_ARGS,
+                            Constants.INVOKESTATIC));
+                    return new ObjectType("org.hamcrest.Matcher");
+                },
+                equalToMatcherExpr -> {
+                    Sym operand = equalToMatcherExpr.getOperand();
+                    LocalVariableGen lv = locals.get(operand.getName());
                     il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
-                }
-                il.append(factory.createInvoke(
-                        newExpr.getType(),
-                        "<init>",
-                        Type.VOID,
-                        newExpr.getArgTypes().stream()
-                                .map(BcelJUnitAstCompiler::typeOf)
-                                .collect(Collectors.toList())
-                                .toArray(new Type[]{}),
-                        Constants.INVOKESPECIAL));
-                return new ObjectType(newExpr.getType());
-            },
-            strLitExpr -> {
-                il.append(new PUSH(cp, strLitExpr.getText()));
-                return Type.STRING;
-            },
-            nullExpr -> {
-                il.append(InstructionConstants.ACONST_NULL);
-                return Type.NULL;
-            },
-            invokeExpr -> {
-                Type returnType = typeOf(invokeExpr.getReturnType());
+                    il.append(factory.createInvoke(
+                            "org.hamcrest.CoreMatchers",
+                            "is",
+                            new ObjectType("org.hamcrest.Matcher"),
+                            new Type[] { lv.getType() },
+                            Constants.INVOKESTATIC));
+                    return new ObjectType("org.hamcrest.Matcher");
+                },
+                regExpMatcherExpr -> {
+                    il.append(new PUSH(cp, regExpMatcherExpr.getPattern()));
+                    il.append(factory.createInvoke(
+                            "com.jcabi.matchers.RegexMatchers",
+                            "containsPattern",
+                            new ObjectType("org.hamcrest.Matcher"),
+                            new Type[] { Type.STRING },
+                            Constants.INVOKESTATIC));
+                    return new ObjectType("org.hamcrest.Matcher");
+                },
+                newExpr -> {
+                    il.append(factory.createNew(newExpr.getType()));
+                    il.append(InstructionConstants.DUP);
+                    // push arguments
+                    for (Sym arg : newExpr.getArgs()) {
+                        LocalVariableGen lv = locals.get(arg.getName());
+                        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                    }
+                    il.append(factory.createInvoke(
+                            newExpr.getType(),
+                            "<init>",
+                            Type.VOID,
+                            newExpr.getArgTypes().stream()
+                                    .map(BcelJUnitAstCompiler::typeOf)
+                                    .collect(Collectors.toList())
+                                    .toArray(new Type[]{}),
+                            Constants.INVOKESPECIAL));
+                    return new ObjectType(newExpr.getType());
+                },
+                strLitExpr -> {
+                    il.append(new PUSH(cp, strLitExpr.getText()));
+                    return Type.STRING;
+                },
+                nullExpr -> {
+                    il.append(InstructionConstants.ACONST_NULL);
+                    return Type.NULL;
+                },
+                invokeExpr -> {
+                    Type returnType = typeOf(invokeExpr.getReturnType());
 
-                // first push target object
-                LocalVariableGen object = locals.get(invokeExpr.getObject().getName());
-                il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
-                // push arguments
-                for (Sym arg : invokeExpr.getArgs()) {
-                    LocalVariableGen lv = locals.get(arg.getName());
-                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
-                }
-                // then call method
-                il.append(factory.createInvoke(
-                        invokeExpr.getClassType().getTypeName(),
-                        invokeExpr.getMethodName(),
-                        returnType,
-                        invokeExpr.getArgTypes().stream()
-                                .map(BcelJUnitAstCompiler::typeOf)
-                                .collect(Collectors.toList())
-                                .toArray(new Type[]{}),
-                        invokeExpr.getClassType().isInterface()
-                                ? Constants.INVOKEINTERFACE                
-                                : Constants.INVOKEVIRTUAL));
+                    // first push target object
+                    LocalVariableGen object = locals.get(invokeExpr.getObject().getName());
+                    il.append(InstructionFactory.createLoad(object.getType(), object.getIndex()));
+                    // push arguments
+                    for (Sym arg : invokeExpr.getArgs()) {
+                        LocalVariableGen lv = locals.get(arg.getName());
+                        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                    }
+                    // then call method
+                    il.append(factory.createInvoke(
+                            invokeExpr.getClassType().getTypeName(),
+                            invokeExpr.getMethodName(),
+                            returnType,
+                            invokeExpr.getArgTypes().stream()
+                                    .map(BcelJUnitAstCompiler::typeOf)
+                                    .collect(Collectors.toList())
+                                    .toArray(new Type[]{}),
+                            invokeExpr.getClassType().isInterface()
+                                    ? Constants.INVOKEINTERFACE                
+                                    : Constants.INVOKEVIRTUAL));
 
-                return returnType;
-            },
-            invokeStaticExpr -> {
-                Type returnType = typeOf(invokeStaticExpr.getReturnType());
-                for (Sym arg : invokeStaticExpr.getArgs()) {
-                    LocalVariableGen lv = locals.get(arg.getName());
-                    il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
-                }
-                il.append(factory.createInvoke(
-                        invokeStaticExpr.getClazz().getTypeName(),
-                        invokeStaticExpr.getMethodName(),
-                        returnType,
-                        invokeStaticExpr.getArgTypes().stream()
-                                .map(BcelJUnitAstCompiler::typeOf)
-                                .collect(Collectors.toList())
-                                .toArray(new Type[]{}),
-                        Constants.INVOKESTATIC));
-                return returnType;
-            },
-            fieldStaticExpr -> {
-                Type fieldType = typeOf(fieldStaticExpr.getFieldType());
-                il.append(factory.createGetStatic(
-                        fieldStaticExpr.getClazz().getTypeName(),
-                        fieldStaticExpr.getFieldName(),
-                        fieldType));
-                return fieldType;
-            },
-            intLitExpr -> {
-                il.append(new PUSH(cp, intLitExpr.getValue()));
-                return Type.INT;
-            },
-            longLitExpr -> {
-                il.append(new PUSH(cp, longLitExpr.getValue()));
-                return Type.LONG;
-            },
-            floatLitExpr -> {
-                il.append(new PUSH(cp, floatLitExpr.getValue()));
-                return Type.FLOAT;
-            },
-            doubleLitExpr -> {
-                il.append(new PUSH(cp, doubleLitExpr.getValue()));
-                return Type.DOUBLE;
-            },
-            booleanLitExpr -> {
-                il.append(new PUSH(cp, booleanLitExpr.getValue()));
-                return Type.BOOLEAN;
-            },
-            charLitExpr -> {
-                il.append(new PUSH(cp, new Character(charLitExpr.getValue())));
-                return Type.CHAR;
-            },
-            classLitExpr -> {
-                yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
-                il.append(new PUSH(cp, new ObjectType(
-                        type_.getDims() > 0
-                                /* this is strange since BCEL has ArrayType apart from ObjectType,
-                                   but there is no PUSH constructor in BCEL which takes ArrayType. */
-                                ? type_.getFieldDescriptor()
-                                : type_.getTypeName())));
-                return Type.CLASS;
-            },
-            equalOpExpr -> {
-                LocalVariableGen lhs = locals.get(equalOpExpr.getLhs().getName());
-                il.append(InstructionFactory.createLoad(lhs.getType(), lhs.getIndex()));
-                LocalVariableGen rhs = locals.get(equalOpExpr.getRhs().getName());
-                il.append(InstructionFactory.createLoad(rhs.getType(), rhs.getIndex()));
+                    return returnType;
+                },
+                invokeStaticExpr -> {
+                    Type returnType = typeOf(invokeStaticExpr.getReturnType());
+                    for (Sym arg : invokeStaticExpr.getArgs()) {
+                        LocalVariableGen lv = locals.get(arg.getName());
+                        il.append(InstructionFactory.createLoad(lv.getType(), lv.getIndex()));
+                    }
+                    il.append(factory.createInvoke(
+                            invokeStaticExpr.getClazz().getTypeName(),
+                            invokeStaticExpr.getMethodName(),
+                            returnType,
+                            invokeStaticExpr.getArgTypes().stream()
+                                    .map(BcelJUnitAstCompiler::typeOf)
+                                    .collect(Collectors.toList())
+                                    .toArray(new Type[]{}),
+                            Constants.INVOKESTATIC));
+                    return returnType;
+                },
+                fieldStaticExpr -> {
+                    Type fieldType = typeOf(fieldStaticExpr.getFieldType());
+                    il.append(factory.createGetStatic(
+                            fieldStaticExpr.getClazz().getTypeName(),
+                            fieldStaticExpr.getFieldName(),
+                            fieldType));
+                    return fieldType;
+                },
+                intLitExpr -> {
+                    il.append(new PUSH(cp, intLitExpr.getValue()));
+                    return Type.INT;
+                },
+                longLitExpr -> {
+                    il.append(new PUSH(cp, longLitExpr.getValue()));
+                    return Type.LONG;
+                },
+                floatLitExpr -> {
+                    il.append(new PUSH(cp, floatLitExpr.getValue()));
+                    return Type.FLOAT;
+                },
+                doubleLitExpr -> {
+                    il.append(new PUSH(cp, doubleLitExpr.getValue()));
+                    return Type.DOUBLE;
+                },
+                booleanLitExpr -> {
+                    il.append(new PUSH(cp, booleanLitExpr.getValue()));
+                    return Type.BOOLEAN;
+                },
+                charLitExpr -> {
+                    il.append(new PUSH(cp, new Character(charLitExpr.getValue())));
+                    return Type.CHAR;
+                },
+                classLitExpr -> {
+                    yokohama.unit.ast_junit.Type type_ = classLitExpr.getType();
+                    il.append(new PUSH(cp, new ObjectType(
+                            type_.getDims() > 0
+                                    /* this is strange since BCEL has ArrayType apart from ObjectType,
+                                       but there is no PUSH constructor in BCEL which takes ArrayType. */
+                                    ? type_.getFieldDescriptor()
+                                    : type_.getTypeName())));
+                    return Type.CLASS;
+                },
+                equalOpExpr -> {
+                    LocalVariableGen lhs = locals.get(equalOpExpr.getLhs().getName());
+                    il.append(InstructionFactory.createLoad(lhs.getType(), lhs.getIndex()));
+                    LocalVariableGen rhs = locals.get(equalOpExpr.getRhs().getName());
+                    il.append(InstructionFactory.createLoad(rhs.getType(), rhs.getIndex()));
 
-                // if
-                BranchInstruction if_acmpne = InstructionFactory.createBranchInstruction(Constants.IF_ACMPNE, null);
-                il.append(if_acmpne);
-                // then
-                il.append(new PUSH(cp, true));
-                BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
-                il.append(goto_);
-                // else
-                InstructionHandle else_ = il.append(new PUSH(cp, false));
+                    // if
+                    BranchInstruction if_acmpne = InstructionFactory.createBranchInstruction(Constants.IF_ACMPNE, null);
+                    il.append(if_acmpne);
+                    // then
+                    il.append(new PUSH(cp, true));
+                    BranchInstruction goto_ = InstructionFactory.createBranchInstruction(Constants.GOTO, null);
+                    il.append(goto_);
+                    // else
+                    InstructionHandle else_ = il.append(new PUSH(cp, false));
 
-                InstructionHandle endIf = il.append(InstructionFactory.NOP);
+                    InstructionHandle endIf = il.append(InstructionFactory.NOP);
 
-                // tie the knot
-                if_acmpne.setTarget(else_);
-                goto_.setTarget(endIf);
+                    // tie the knot
+                    if_acmpne.setTarget(else_);
+                    goto_.setTarget(endIf);
 
-                return Type.BOOLEAN;
-            },
-            arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp));
+                    return Type.BOOLEAN;
+                },
+                arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp));
         if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
             ReferenceType fromType_ = (ReferenceType)fromType;
             ReferenceType type_ = (ReferenceType)type;
