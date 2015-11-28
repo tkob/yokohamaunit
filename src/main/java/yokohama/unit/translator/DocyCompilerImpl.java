@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.control.Either;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
@@ -29,7 +30,6 @@ import yokohama.unit.grammar.YokohamaUnitParser.GroupContext;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
-import yokohama.unit.util.Either;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Pair;
 
@@ -187,10 +187,13 @@ public class DocyCompilerImpl implements DocyCompiler {
                     return Either.<ErrorMessage, Pair<String, String>>right(abbreviation.toPair());
                 }).collect(Collectors.toList());
         Stream<Pair<String, String>> bindings =
-                bindingsOrErrors.stream().flatMap(Either::rightStream);
+                bindingsOrErrors.stream()
+                        .filter(Either::isRight)
+                        .map(e -> e.right().get());
         List<ErrorMessage> errors =
                 bindingsOrErrors.stream()
-                        .flatMap(Either::leftStream)
+                        .filter(Either::isLeft)
+                        .map(e -> e.left().get())
                         .collect(Collectors.toList());
         return Pair.of(new ClassResolver(bindings, classLoader), errors);
     }
