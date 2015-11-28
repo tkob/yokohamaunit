@@ -1011,6 +1011,31 @@ class AstToJUnitAstVisitor {
                                                 Arrays.asList(nameVar),
                                                 typeOf("java.io.InputStream")),
                                         resourceExpr.getSpan()));
+                    } else if (classType.toClass(classResolver).equals(java.net.URI.class)) {
+                        Sym urlVar = genSym.generate("url");
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.URL,
+                                        urlVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResource",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                Type.URL),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.net.URI"),
+                                        exprVar,
+                                        new InvokeExpr(
+                                                classTypeOf("java.net.URL"),
+                                                urlVar,
+                                                "toURI",
+                                                Arrays.asList(),
+                                                Arrays.asList(),
+                                                typeOf("java.net.URI")),
+                                        resourceExpr.getSpan()));
                     } else {
                         throw new TranslationException(
                                 "Conversion into " + classType + "not supported",

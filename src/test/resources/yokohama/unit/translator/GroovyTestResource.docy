@@ -8,3 +8,9 @@ Assert `url` is  an instance of `java.net.URL`
 
 Assert `instream` is  an instance of `java.io.InputStream`
  where instream = resource "GroovyTestResource.docy" as `java.io.InputStream`.
+
+# Test: resource as URI
+
+Assert `uri` is  an instance of `java.net.URI`
+   and `uri.toString()` matches regex `/GroovyTestResource\.docy$`
+ where uri = resource "GroovyTestResource.docy" as `java.net.URI`.
