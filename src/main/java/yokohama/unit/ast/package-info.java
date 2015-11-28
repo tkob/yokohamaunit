@@ -59,6 +59,8 @@
  * 
  * AsExpr ::= Expr ClassType
  * 
+ * ResourceExpr ::= ClassType
+ * 
  * Fixture ::= | TableRef | Bindings
  * 
  * TableRef ::= Ident+ TableType
