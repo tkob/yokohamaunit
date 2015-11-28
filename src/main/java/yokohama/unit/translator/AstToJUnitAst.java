@@ -82,7 +82,6 @@ import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CharLitExpr;
 import yokohama.unit.ast_junit.ClassDecl;
-import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.DoubleLitExpr;
