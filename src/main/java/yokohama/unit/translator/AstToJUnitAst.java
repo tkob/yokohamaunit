@@ -1012,7 +1012,9 @@ class AstToJUnitAstVisitor {
                                                 typeOf("java.io.InputStream")),
                                         resourceExpr.getSpan()));
                     } else {
-                        throw new UnsupportedOperationException("TODO");
+                        throw new TranslationException(
+                                "Conversion into " + classType + "not supported",
+                                resourceExpr.getSpan());
                     }
                 });
         return Stream.concat(classAndName, getResource);
