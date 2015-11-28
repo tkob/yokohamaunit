@@ -969,22 +969,22 @@ class AstToJUnitAstVisitor {
     private Stream<Statement> translateResourceExpr(
             ResourceExpr resourceExpr, Sym exprVar, Sym envVar) {
         Sym classVar = genSym.generate("clazz");
-        Stream<Statement> thisClass = Stream.of(
+        Sym nameVar = genSym.generate("name");
+        Stream<Statement> classAndName = Stream.of(
                 new VarInitStatement(
                         Type.CLASS,
                         classVar,
                         new ThisClassExpr(),
+                        resourceExpr.getSpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        nameVar,
+                        new StrLitExpr(resourceExpr.getName()),
                         resourceExpr.getSpan()));
         Stream<Statement> getResource = Optionals.match(
                 resourceExpr.getClassType(),
                 () -> {
-                    Sym nameVar = genSym.generate("namd");
                     return Stream.of(
-                            new VarInitStatement(
-                                    Type.STRING,
-                                    nameVar,
-                                    new StrLitExpr(resourceExpr.getName()),
-                                    resourceExpr.getSpan()),
                             new VarInitStatement(
                                     Type.URL,
                                     exprVar,
@@ -999,13 +999,7 @@ class AstToJUnitAstVisitor {
                 },
                 classType -> {
                     if (classType.toClass(classResolver).equals(java.io.InputStream.class)) {
-                        Sym nameVar = genSym.generate("name");
                         return Stream.of(
-                                new VarInitStatement(
-                                        Type.STRING,
-                                        nameVar,
-                                        new StrLitExpr(resourceExpr.getName()),
-                                        resourceExpr.getSpan()),
                                 new VarInitStatement(
                                         typeOf("java.io.InputStream"),
                                         exprVar,
@@ -1021,7 +1015,7 @@ class AstToJUnitAstVisitor {
                         throw new UnsupportedOperationException("TODO");
                     }
                 });
-        return Stream.concat(thisClass, getResource);
+        return Stream.concat(classAndName, getResource);
     }
 
     Stream<Statement> boxOrUnbox(
