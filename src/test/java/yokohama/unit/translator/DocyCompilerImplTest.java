@@ -120,7 +120,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestInvariantFail2.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, false),
         new Fixture(
-                "GroovyTestResource.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, true),
+                "GroovyTestResource.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 2, true),
     };
 
     @DataPoints

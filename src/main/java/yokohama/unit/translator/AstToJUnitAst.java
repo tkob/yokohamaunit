@@ -997,7 +997,30 @@ class AstToJUnitAstVisitor {
                                             Type.URL),
                                     resourceExpr.getSpan()));
                 },
-                classType -> { throw new UnsupportedOperationException("TODO"); });
+                classType -> {
+                    if (classType.toClass(classResolver).equals(java.io.InputStream.class)) {
+                        Sym nameVar = genSym.generate("name");
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.STRING,
+                                        nameVar,
+                                        new StrLitExpr(resourceExpr.getName()),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.io.InputStream"),
+                                        exprVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResourceAsStream",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                typeOf("java.io.InputStream")),
+                                        resourceExpr.getSpan()));
+                    } else {
+                        throw new UnsupportedOperationException("TODO");
+                    }
+                });
         return Stream.concat(thisClass, getResource);
     }
 

@@ -1,6 +1,10 @@
 # Test: resource without "as" is a URL
 
-{>> Note that we do not compare URLs directly, to avoid URL.equals() <<}
 Assert `url` is  an instance of `java.net.URL`
    and `url.toString()` matches regex `/GroovyTestResource\.docy$`
  where url = resource "GroovyTestResource.docy".
+
+# Test: resource as InputStream
+
+Assert `instream` is  an instance of `java.io.InputStream`
+ where instream = resource "GroovyTestResource.docy" as `java.io.InputStream`.
