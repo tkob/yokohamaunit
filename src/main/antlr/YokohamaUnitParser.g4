@@ -100,6 +100,7 @@ expr: quotedExpr
     | stringExpr
     | anchorExpr
     | asExpr
+    | resourceExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
@@ -127,6 +128,7 @@ argumentExpr: quotedExpr
             | charExpr
             | stringExpr
             | anchorExpr
+            | resourceExpr
             ;
 
 integerExpr: MINUS? Integer ;
@@ -143,6 +145,8 @@ anchorExpr: LBRACKET Anchor RBRACKET ;
 
 asExpr: sourceExpr AS_BACK_TICK classType BACK_TICK ;
 sourceExpr: stringExpr | anchorExpr ;
+
+resourceExpr: RESOURCE DOUBLE_QUOTE Str DOUBLE_QUOTE (AS_BACK_TICK classType BACK_TICK)? ;
 
 codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
 attributes: CodeLine ;

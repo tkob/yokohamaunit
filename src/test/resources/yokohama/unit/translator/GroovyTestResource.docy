@@ -1,0 +1,37 @@
+*[InputStream]: java.io.InputStream
+*[URI]: java.net.URI
+*[File]: java.io.File
+
+# Test: resource without "as" is a URL
+
+Assert `url` is  an instance of `java.net.URL`
+   and `url.toString()` matches regex `/GroovyTestResource\.docy$`
+ where url = resource "GroovyTestResource.docy".
+
+# Test: resource as InputStream
+
+Assert `instream` is  an instance of `java.io.InputStream`
+ where instream = resource "GroovyTestResource.docy" as `java.io.InputStream`.
+
+Assert `instream` is  an instance of `java.io.InputStream`
+ where instream = resource "GroovyTestResource.docy" as `InputStream`.
+
+# Test: resource as URI
+
+Assert `uri` is  an instance of `java.net.URI`
+   and `uri.toString()` matches regex `/GroovyTestResource\.docy$`
+ where uri = resource "GroovyTestResource.docy" as `java.net.URI`.
+
+Assert `uri` is  an instance of `java.net.URI`
+   and `uri.toString()` matches regex `/GroovyTestResource\.docy$`
+ where uri = resource "GroovyTestResource.docy" as `URI`.
+
+# Test: resource as File
+
+Assert `file` is  an instance of `java.io.File`
+   and `file.toString()` matches regex `(/|\\)GroovyTestResource\.docy$`
+ where file = resource "GroovyTestResource.docy" as `java.io.File`.
+
+Assert `file` is  an instance of `java.io.File`
+   and `file.toString()` matches regex `(/|\\)GroovyTestResource\.docy$`
+ where file = resource "GroovyTestResource.docy" as `File`.

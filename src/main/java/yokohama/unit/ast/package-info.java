@@ -41,6 +41,7 @@
  *        | StringExpr
  *        | AnchorExpr
  *        | AsExpr
+ *        | ResourceExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

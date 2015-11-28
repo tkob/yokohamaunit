@@ -66,6 +66,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.RegExpPattern;
+import yokohama.unit.ast.ResourceExpr;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
@@ -102,6 +103,7 @@ import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.RegExpMatcherExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
+import yokohama.unit.ast_junit.ThisClassExpr;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.Sym;
@@ -756,7 +758,8 @@ class AstToJUnitAstVisitor {
             Class<?> expectedType,
             Sym envVar) {
         Sym exprVar = genSym.generate("expr");
-        Stream<Statement> statements = expr.accept(quotedExpr -> {
+        Stream<Statement> statements = expr.accept(
+                quotedExpr -> {
                     return expressionStrategy.eval(
                             exprVar,
                             quotedExpr,
@@ -793,6 +796,9 @@ class AstToJUnitAstVisitor {
                 },
                 asExpr -> {
                     return translateAsExpr(asExpr, exprVar, envVar);
+                },
+                resourceExpr -> {
+                    return translateResourceExpr(resourceExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
@@ -959,6 +965,119 @@ class AstToJUnitAstVisitor {
         return Stream.concat(source, convert);
     }
 
+    private Stream<Statement> translateResourceExpr(
+            ResourceExpr resourceExpr, Sym exprVar, Sym envVar) {
+        Sym classVar = genSym.generate("clazz");
+        Sym nameVar = genSym.generate("name");
+        Stream<Statement> classAndName = Stream.of(
+                new VarInitStatement(
+                        Type.CLASS,
+                        classVar,
+                        new ThisClassExpr(),
+                        resourceExpr.getSpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        nameVar,
+                        new StrLitExpr(resourceExpr.getName()),
+                        resourceExpr.getSpan()));
+        Stream<Statement> getResource = Optionals.match(
+                resourceExpr.getClassType(),
+                () -> {
+                    return Stream.of(
+                            new VarInitStatement(
+                                    Type.URL,
+                                    exprVar,
+                                    new InvokeExpr(
+                                            ClassType.CLASS,
+                                            classVar,
+                                            "getResource",
+                                            Arrays.asList(Type.STRING),
+                                            Arrays.asList(nameVar),
+                                            Type.URL),
+                                    resourceExpr.getSpan()));
+                },
+                classType -> {
+                    if (classType.toClass(classResolver).equals(java.io.InputStream.class)) {
+                        return Stream.of(
+                                new VarInitStatement(
+                                        typeOf("java.io.InputStream"),
+                                        exprVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResourceAsStream",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                typeOf("java.io.InputStream")),
+                                        resourceExpr.getSpan()));
+                    } else if (classType.toClass(classResolver).equals(java.net.URI.class)) {
+                        Sym urlVar = genSym.generate("url");
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.URL,
+                                        urlVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResource",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                Type.URL),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.net.URI"),
+                                        exprVar,
+                                        new InvokeExpr(
+                                                classTypeOf("java.net.URL"),
+                                                urlVar,
+                                                "toURI",
+                                                Arrays.asList(),
+                                                Arrays.asList(),
+                                                typeOf("java.net.URI")),
+                                        resourceExpr.getSpan()));
+                    } else if (classType.toClass(classResolver).equals(java.io.File.class)) {
+                        Sym urlVar = genSym.generate("url");
+                        Sym uriVar = genSym.generate("uri");
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.URL,
+                                        urlVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResource",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                Type.URL),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.net.URI"),
+                                        uriVar,
+                                        new InvokeExpr(
+                                                classTypeOf("java.net.URL"),
+                                                urlVar,
+                                                "toURI",
+                                                Arrays.asList(),
+                                                Arrays.asList(),
+                                                typeOf("java.net.URI")),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.io.File"),
+                                        exprVar,
+                                        new NewExpr(
+                                                "java.io.File",
+                                                Arrays.asList(typeOf("java.net.URI")),
+                                                Arrays.asList(uriVar)),
+                                        resourceExpr.getSpan()));
+                    } else {
+                        throw new TranslationException(
+                                "Conversion into " + classType + "not supported",
+                                resourceExpr.getSpan());
+                    }
+                });
+        return Stream.concat(classAndName, getResource);
+    }
+
     Stream<Statement> boxOrUnbox(
             Type toType, Sym toVar, Type fromType, Sym fromVar) {
         return fromType.<Stream<Statement>>matchPrimitiveOrNot(
@@ -1092,7 +1211,12 @@ class AstToJUnitAstVisitor {
                 charExpr -> Type.CHAR,
                 stringExpr -> Type.STRING,
                 anchorExpr -> Type.STRING,
-                asExpr -> Type.of(asExpr.getClassType().toType(), classResolver));
+                asExpr -> Type.of(asExpr.getClassType().toType(), classResolver),
+                resourceExpr -> 
+                        resourceExpr.getClassType()
+                                .map(classType ->
+                                        Type.of(classType.toType(), classResolver))
+                                .orElse(Type.URL));
     }
 
     List<List<Statement>> translateTableRef(

@@ -28,6 +28,7 @@
  *        | ClassLitExpr
  *        | EqualOpExpr
  *        | ArrayExpr
+ *        | ThisClassExpr
  * 
  * Type ::= NonArrayType
  * NonArrayType ::= PrimitiveType | ClassType

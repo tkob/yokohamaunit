@@ -59,6 +59,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.RegExpPattern;
+import yokohama.unit.ast.ResourceExpr;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.Statement;
@@ -634,7 +635,6 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         return new AnchorExpr(ctx.Anchor().getText(), getSpan(ctx));
     }
 
-
     @Override
     public AsExpr visitAsExpr(YokohamaUnitParser.AsExprContext ctx) {
         return new AsExpr(
@@ -646,6 +646,14 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public Expr visitSourceExpr(YokohamaUnitParser.SourceExprContext ctx) {
         return (Expr)visitChildren(ctx);
+    }
+
+    @Override
+    public ResourceExpr visitResourceExpr(YokohamaUnitParser.ResourceExprContext ctx) {
+        return new ResourceExpr(
+                ctx.Str().getText(),
+                Optional.ofNullable(ctx.classType()).map(this::visitClassType),
+                getSpan(ctx));
     }
 
     @Override
