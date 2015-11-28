@@ -1035,6 +1035,40 @@ class AstToJUnitAstVisitor {
                                                 Arrays.asList(),
                                                 typeOf("java.net.URI")),
                                         resourceExpr.getSpan()));
+                    } else if (classType.toClass(classResolver).equals(java.io.File.class)) {
+                        Sym urlVar = genSym.generate("url");
+                        Sym uriVar = genSym.generate("uri");
+                        return Stream.of(
+                                new VarInitStatement(
+                                        Type.URL,
+                                        urlVar,
+                                        new InvokeExpr(
+                                                ClassType.CLASS,
+                                                classVar,
+                                                "getResource",
+                                                Arrays.asList(Type.STRING),
+                                                Arrays.asList(nameVar),
+                                                Type.URL),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.net.URI"),
+                                        uriVar,
+                                        new InvokeExpr(
+                                                classTypeOf("java.net.URL"),
+                                                urlVar,
+                                                "toURI",
+                                                Arrays.asList(),
+                                                Arrays.asList(),
+                                                typeOf("java.net.URI")),
+                                        resourceExpr.getSpan()),
+                                new VarInitStatement(
+                                        typeOf("java.io.File"),
+                                        exprVar,
+                                        new NewExpr(
+                                                "java.io.File",
+                                                Arrays.asList(typeOf("java.net.URI")),
+                                                Arrays.asList(uriVar)),
+                                        resourceExpr.getSpan()));
                     } else {
                         throw new TranslationException(
                                 "Conversion into " + classType + "not supported",
