@@ -555,7 +555,8 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                     },
                     arrayExpr -> this.visitArrayExpr(arrayExpr, locals, il, factory, cp),
                     thisClassExpr -> {
-                        throw new UnsupportedOperationException("TODO");
+                        il.append(new PUSH(cp, new ObjectType(packageName + "." + className)));
+                        return Type.CLASS;
                     });
             if (fromType instanceof ReferenceType && type instanceof ReferenceType) {
                 ReferenceType fromType_ = (ReferenceType)fromType;
