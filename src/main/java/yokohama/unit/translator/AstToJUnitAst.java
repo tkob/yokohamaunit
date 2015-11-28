@@ -66,6 +66,7 @@ import yokohama.unit.ast.Predicate;
 import yokohama.unit.ast.Proposition;
 import yokohama.unit.ast.QuotedExpr;
 import yokohama.unit.ast.RegExpPattern;
+import yokohama.unit.ast.ResourceExpr;
 import yokohama.unit.ast.Row;
 import yokohama.unit.ast.SingleBinding;
 import yokohama.unit.ast.StringExpr;
@@ -81,6 +82,7 @@ import yokohama.unit.ast_junit.BooleanLitExpr;
 import yokohama.unit.ast_junit.CatchClause;
 import yokohama.unit.ast_junit.CharLitExpr;
 import yokohama.unit.ast_junit.ClassDecl;
+import yokohama.unit.ast_junit.ClassLitExpr;
 import yokohama.unit.ast_junit.ClassType;
 import yokohama.unit.ast_junit.CompilationUnit;
 import yokohama.unit.ast_junit.DoubleLitExpr;
@@ -102,6 +104,7 @@ import yokohama.unit.ast_junit.PrimitiveType;
 import yokohama.unit.ast_junit.RegExpMatcherExpr;
 import yokohama.unit.ast_junit.Statement;
 import yokohama.unit.ast_junit.StrLitExpr;
+import yokohama.unit.ast_junit.ThisClassExpr;
 import yokohama.unit.ast_junit.TryStatement;
 import yokohama.unit.ast_junit.Type;
 import yokohama.unit.util.Sym;
@@ -796,7 +799,7 @@ class AstToJUnitAstVisitor {
                     return translateAsExpr(asExpr, exprVar, envVar);
                 },
                 resourceExpr -> {
-                    throw new UnsupportedOperationException("TODO");
+                    return translateResourceExpr(resourceExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
@@ -961,6 +964,41 @@ class AstToJUnitAstVisitor {
                 });
 
         return Stream.concat(source, convert);
+    }
+
+    private Stream<Statement> translateResourceExpr(
+            ResourceExpr resourceExpr, Sym exprVar, Sym envVar) {
+        Sym classVar = genSym.generate("clazz");
+        Stream<Statement> thisClass = Stream.of(
+                new VarInitStatement(
+                        Type.CLASS,
+                        classVar,
+                        new ThisClassExpr(),
+                        resourceExpr.getSpan()));
+        Stream<Statement> getResource = Optionals.match(
+                resourceExpr.getClassType(),
+                () -> {
+                    Sym nameVar = genSym.generate("namd");
+                    return Stream.of(
+                            new VarInitStatement(
+                                    Type.STRING,
+                                    nameVar,
+                                    new StrLitExpr(resourceExpr.getName()),
+                                    resourceExpr.getSpan()),
+                            new VarInitStatement(
+                                    Type.URL,
+                                    exprVar,
+                                    new InvokeExpr(
+                                            ClassType.CLASS,
+                                            classVar,
+                                            "getResource",
+                                            Arrays.asList(Type.STRING),
+                                            Arrays.asList(nameVar),
+                                            Type.URL),
+                                    resourceExpr.getSpan()));
+                },
+                classType -> { throw new UnsupportedOperationException("TODO"); });
+        return Stream.concat(thisClass, getResource);
     }
 
     Stream<Statement> boxOrUnbox(
