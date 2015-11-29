@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -51,7 +53,6 @@ import yokohama.unit.ast.Type;
 import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitLexer;
 import yokohama.unit.grammar.YokohamaUnitParser;
-import yokohama.unit.util.Pair;
 
 public class ParseTreeToAstVisitorTest {
 
@@ -202,8 +203,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("Table [a'b]").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = Pair.of(TableType.INLINE, "a'b");
-        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        Tuple2<TableType, String> expected = Tuple.of(TableType.INLINE, "a'b");
+        Tuple2<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
 
@@ -211,8 +212,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef2() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("CSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = Pair.of(TableType.CSV, "a'b");
-        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        Tuple2<TableType, String> expected = Tuple.of(TableType.CSV, "a'b");
+        Tuple2<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
 
@@ -220,8 +221,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef3() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("TSV 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = Pair.of(TableType.TSV, "a'b");
-        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        Tuple2<TableType, String> expected = Tuple.of(TableType.TSV, "a'b");
+        Tuple2<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
 
@@ -229,8 +230,8 @@ public class ParseTreeToAstVisitorTest {
     public void testVisitTableRef4() throws IOException {
         YokohamaUnitParser.TableRefContext ctx = parser("Excel 'a''b'").tableRef();
         ParseTreeToAstVisitor instance = new ParseTreeToAstVisitor(Optional.empty());
-        Pair<TableType, String> expected = Pair.of(TableType.EXCEL, "a'b");
-        Pair<TableType, String> actual = instance.visitTableRef(ctx);
+        Tuple2<TableType, String> expected = Tuple.of(TableType.EXCEL, "a'b");
+        Tuple2<TableType, String> actual = instance.visitTableRef(ctx);
         assertThat(actual, is(expected));
     }
 

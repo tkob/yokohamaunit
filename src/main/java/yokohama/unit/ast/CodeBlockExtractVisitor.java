@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
 import yokohama.unit.util.Lists;
-import yokohama.unit.util.Pair;
 
 public class CodeBlockExtractVisitor {
     public Map<String, CodeBlock> extractMap(Group group) {
@@ -13,7 +13,7 @@ public class CodeBlockExtractVisitor {
         return Lists.listToMap(
                 codeBlocks,
                 codeBlock ->
-                        Pair.of(
+                        Tuple.of(
                                 codeBlock.getHeading().getLine(), codeBlock));
     }
 

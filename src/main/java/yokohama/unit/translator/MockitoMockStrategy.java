@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import yokohama.unit.ast.Kind;
@@ -30,7 +32,6 @@ import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Lists;
-import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
 public class MockitoMockStrategy implements MockStrategy {
@@ -244,13 +245,13 @@ public class MockitoMockStrategy implements MockStrategy {
         */
 
         // prepare matchers
-        List<Pair<Pair<Type, Sym>, Stream<Statement>>> matchers =
+        List<Tuple2<Tuple2<Type, Sym>, Stream<Statement>>> matchers =
                 prepareMatchers(methodPattern);
-        Pair<List<Type>, List<Sym>> typesAndVars =
-                Pair.unzip(matchers.stream().map(Pair::getFirst).collect(Collectors.toList()));
-        List<Type> argTypes = typesAndVars.getFirst();
-        List<Sym> argVars = typesAndVars.getSecond();
-        Stream<Statement> argMatchers = matchers.stream().flatMap(Pair::getSecond);
+        Tuple2<List<Type>, List<Sym>> typesAndVars =
+                Lists.unzip(matchers.stream().map(Tuple2::_1).collect(Collectors.toList()));
+        List<Type> argTypes = typesAndVars._1();
+        List<Sym> argVars = typesAndVars._2();
+        Stream<Statement> argMatchers = matchers.stream().flatMap(Tuple2::_2);
 
         // invoke the method
         Sym invokeTmpVar = returnType.isPrimitive() ? genSym.generate("invoke") : invokeVar;
@@ -296,13 +297,13 @@ public class MockitoMockStrategy implements MockStrategy {
         */
 
         // prepare matchers
-        List<Pair<Pair<Type, Sym>, Stream<Statement>>> matchers =
+        List<Tuple2<Tuple2<Type, Sym>, Stream<Statement>>> matchers =
                 prepareMatchers(methodPattern);
-        Pair<List<Type>, List<Sym>> typesAndVars =
-                Pair.unzip(matchers.stream().map(Pair::getFirst).collect(Collectors.toList()));
-        List<Type> argTypes = typesAndVars.getFirst();
-        List<Sym> argVars = typesAndVars.getSecond();
-        Stream<Statement> argMatchers = matchers.stream().flatMap(Pair::getSecond);
+        Tuple2<List<Type>, List<Sym>> typesAndVars =
+                Lists.unzip(matchers.stream().map(Tuple2::_1).collect(Collectors.toList()));
+        List<Type> argTypes = typesAndVars._1();
+        List<Sym> argVars = typesAndVars._2();
+        Stream<Statement> argMatchers = matchers.stream().flatMap(Tuple2::_2);
 
         // invoke the method
         Stream<Statement> invoke = Stream.of(
@@ -317,7 +318,7 @@ public class MockitoMockStrategy implements MockStrategy {
         return Stream.concat(argMatchers, invoke);
     }
 
-    private List<Pair<Pair<Type, Sym>, Stream<Statement>>>
+    private List<Tuple2<Tuple2<Type, Sym>, Stream<Statement>>>
         prepareMatchers(MethodPattern methodPattern) {
         boolean isVararg = methodPattern.isVararg();
         List<yokohama.unit.ast.Type> argumentTypes =
@@ -343,8 +344,8 @@ public class MockitoMockStrategy implements MockStrategy {
                                                 Arrays.asList(),
                                                 Type.OBJECT),
                                         argumentType.getSpan());
-                        return Pair.of(
-                                Pair.of(varType, varArg),
+                        return Tuple.of(
+                                Tuple.of(varType, varArg),
                                 Stream.of(statement));
                     });
         } else {
@@ -382,7 +383,7 @@ public class MockitoMockStrategy implements MockStrategy {
         return whenThenReturn;
     }
 
-    private Pair<Pair<Type, Sym>, Stream<Statement>> mapArgumentType(
+    private Tuple2<Tuple2<Type, Sym>, Stream<Statement>> mapArgumentType(
             yokohama.unit.ast.Type argumentType) {
         Span span = argumentType.getSpan();
         Sym argVar = genSym.generate("arg");
@@ -527,6 +528,6 @@ public class MockitoMockStrategy implements MockStrategy {
                                             Type.OBJECT),
                                     Span.dummySpan()));
                 });
-        return Pair.of(Pair.of(argType, argVar), statements);
+        return Tuple.of(Tuple.of(argType, argVar), statements);
     }
 }

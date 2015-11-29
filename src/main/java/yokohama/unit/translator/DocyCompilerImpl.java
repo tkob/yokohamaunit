@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import javaslang.control.Either;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -31,7 +33,6 @@ import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
 import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
-import yokohama.unit.util.Pair;
 
 @RequiredArgsConstructor
 class ErrorCollector {
@@ -104,10 +105,10 @@ public class DocyCompilerImpl implements DocyCompiler {
 
         // Check AST
         // Create ClassResolver and get errors if any
-        Pair<ClassResolver, List<ErrorMessage>> classResolverAndErrors =
+        Tuple2<ClassResolver, List<ErrorMessage>> classResolverAndErrors =
                 createClassResolver(ast.getAbbreviations(), classLoader);
-        ClassResolver classResolver = classResolverAndErrors.getFirst();
-        List<ErrorMessage> classResolverErrors = classResolverAndErrors.getSecond();
+        ClassResolver classResolver = classResolverAndErrors._1();
+        List<ErrorMessage> classResolverErrors = classResolverAndErrors._2();
         ClassCheckVisitor classCheckVisitor = new ClassCheckVisitor(classResolver);
         AnyOfCheckVisitor anyOfCheckVisitor = new AnyOfCheckVisitor();
         RegExpCheckVisitor regExpCheckVisitor = new RegExpCheckVisitor();
@@ -172,21 +173,21 @@ public class DocyCompilerImpl implements DocyCompiler {
                 javacArgs);
     }
 
-    private Pair<ClassResolver, List<ErrorMessage>> createClassResolver(
+    private Tuple2<ClassResolver, List<ErrorMessage>> createClassResolver(
             List<Abbreviation> abbreviations, ClassLoader classLoader) {
-        List<Either<ErrorMessage, Pair<String, String>>> bindingsOrErrors =
+        List<Either<ErrorMessage, Tuple2<String, String>>> bindingsOrErrors =
                 abbreviations.stream().map(abbreviation -> {
                     String longName = abbreviation.getLongName();
                     Span span = abbreviation.getSpan();
                     try {
                         Class.forName(longName, false, classLoader);
                     } catch (ClassNotFoundException e) {
-                        return Either.<ErrorMessage, Pair<String, String>>left(
+                        return Either.<ErrorMessage, Tuple2<String, String>>left(
                                 new ErrorMessage("cannot find class: " + longName, span));
                     }
-                    return Either.<ErrorMessage, Pair<String, String>>right(abbreviation.toPair());
+                    return Either.<ErrorMessage, Tuple2<String, String>>right(abbreviation.toPair());
                 }).collect(Collectors.toList());
-        Stream<Pair<String, String>> bindings =
+        Stream<Tuple2<String, String>> bindings =
                 bindingsOrErrors.stream()
                         .filter(Either::isRight)
                         .map(e -> e.right().get());
@@ -195,6 +196,6 @@ public class DocyCompilerImpl implements DocyCompiler {
                         .filter(Either::isLeft)
                         .map(e -> e.left().get())
                         .collect(Collectors.toList());
-        return Pair.of(new ClassResolver(bindings, classLoader), errors);
+        return Tuple.of(new ClassResolver(bindings, classLoader), errors);
     }
 }

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -80,7 +82,6 @@ import yokohama.unit.ast.VerifyPhase;
 import yokohama.unit.grammar.YokohamaUnitParser;
 import yokohama.unit.grammar.YokohamaUnitParserVisitor;
 import yokohama.unit.util.Lists;
-import yokohama.unit.util.Pair;
 
 @AllArgsConstructor
 public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> implements YokohamaUnitParserVisitor<Object> 
@@ -255,9 +256,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     @Override
     public TableRef visitForAll(YokohamaUnitParser.ForAllContext ctx) {
         List<Ident> idents = visitVars(ctx.vars());
-        Pair<TableType, String> typeAndName =  visitTableRef(ctx.tableRef());
-        TableType tableType = typeAndName.getFirst();
-        String name = typeAndName.getSecond();
+        Tuple2<TableType, String> typeAndName =  visitTableRef(ctx.tableRef());
+        TableType tableType = typeAndName._1();
+        String name = typeAndName._2();
         return new TableRef(idents, tableType, name, getSpan(ctx));
     }
 
@@ -269,19 +270,19 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
-    public Pair<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
+    public Tuple2<TableType, String> visitTableRef(YokohamaUnitParser.TableRefContext ctx) {
         if (ctx.UTABLE() != null) {
             String name = ctx.Anchor().getText();
-            return Pair.of(TableType.INLINE, name);
+            return Tuple.of(TableType.INLINE, name);
         } else if (ctx.CSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
-            return Pair.of(TableType.CSV, name);
+            return Tuple.of(TableType.CSV, name);
         } else if (ctx.TSV_SINGLE_QUOTE() != null) {
             String name = ctx.FileName().getText().replace("''", "'");
-            return Pair.of(TableType.TSV, name);
+            return Tuple.of(TableType.TSV, name);
         } else if (ctx.EXCEL_SINGLE_QUOTE() != null) {
             String name = ctx.BookName().getText().replace("''", "'");
-            return Pair.of(TableType.EXCEL, name);
+            return Tuple.of(TableType.EXCEL, name);
         } else {
             throw new IllegalArgumentException("'" + ctx.getText() + "' is not a table reference.");
         }
@@ -319,9 +320,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         List<Ident> names = ctx.Identifier().stream()
                 .map(node -> new Ident(node.getText(), nodeSpan(node)))
                 .collect(Collectors.toList());
-        Pair<TableType, String> tableRef = visitTableRef(ctx.tableRef());
+        Tuple2<TableType, String> tableRef = visitTableRef(ctx.tableRef());
         return new TableBinding(
-                names, tableRef.getFirst(), tableRef.getSecond(), getSpan(ctx));
+                names, tableRef._1(), tableRef._2(), getSpan(ctx));
     }
 
     @Override
@@ -459,9 +460,9 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
         List<Ident> names = ctx.Identifier().stream()
                 .map(node -> new Ident(node.getText(), nodeSpan(node)))
                 .collect(Collectors.toList());
-        Pair<TableType, String> tableRef = visitTableRef(ctx.tableRef());
+        Tuple2<TableType, String> tableRef = visitTableRef(ctx.tableRef());
         return new TableBinding(
-                names, tableRef.getFirst(), tableRef.getSecond(), getSpan(ctx));
+                names, tableRef._1(), tableRef._2(), getSpan(ctx));
     }
 
     @Override

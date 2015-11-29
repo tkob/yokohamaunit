@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -115,7 +117,6 @@ import yokohama.unit.util.ClassResolver;
 import yokohama.unit.util.GenSym;
 import yokohama.unit.util.Lists;
 import yokohama.unit.util.Optionals;
-import yokohama.unit.util.Pair;
 import yokohama.unit.util.SUtils;
 
 @RequiredArgsConstructor
@@ -263,7 +264,7 @@ class AstToJUnitAstVisitor {
                             }).collect(Collectors.toList());
                 },
                 bindings -> {
-                    List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
+                    List<Tuple2<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
                             choiceCollectVisitor.visitBindings(bindings).collect(Collectors.toList());
                     List<Map<Ident, yokohama.unit.ast.Expr>> choices = candidatesToChoices(candidates);
                     return choices.stream()
@@ -282,17 +283,17 @@ class AstToJUnitAstVisitor {
     }
 
     private List<Map<Ident, yokohama.unit.ast.Expr>> candidatesToChoices(
-            List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates) {
+            List<Tuple2<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates) {
         return combinationStrategy.generate(candidates)
                 .stream()
-                .map((List<Pair<List<Ident>, List<yokohama.unit.ast.Expr>>> choice) ->
+                .map((List<Tuple2<List<Ident>, List<yokohama.unit.ast.Expr>>> choice) ->
                         choice.stream()
-                                .map(p -> Pair.zip(p.getFirst(), p.getSecond()))
+                                .map(p -> Lists.zip(p._1(), p._2()))
                                 .flatMap(List::stream))
-                .map((Stream<Pair<Ident, yokohama.unit.ast.Expr>> choice) ->
+                .map((Stream<Tuple2<Ident, yokohama.unit.ast.Expr>> choice) ->
                         choice.<Map<Ident, yokohama.unit.ast.Expr>>collect(
                                 () -> new HashMap<>(),
-                                (m, kv) -> m.put(kv.getFirst(), kv.getSecond()),
+                                (m, kv) -> m.put(kv._1(), kv._2()),
                                 (m1, m2) -> m1.putAll(m2)))
                 .collect(Collectors.toList());
     }
@@ -822,10 +823,10 @@ class AstToJUnitAstVisitor {
 
         Type returnType = typeOfExpr(invocationExpr);
 
-        Pair<List<Sym>, Stream<Statement>> argVarsAndStatements =
+        Tuple2<List<Sym>, Stream<Statement>> argVarsAndStatements =
                 setupArgs(argTypes, isVararg, args, envVar);
-        List<Sym> argVars = argVarsAndStatements.getFirst();
-        Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
+        List<Sym> argVars = argVarsAndStatements._1();
+        Stream<Statement> setupStatements = argVarsAndStatements._2();
 
         Stream<Statement> invocation = generateInvoke(
                 var,
@@ -1368,7 +1369,7 @@ class AstToJUnitAstVisitor {
                                 fourPhaseTest.getSpan()))
                 : Collections.emptyList();
 
-        List<Pair<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
+        List<Tuple2<List<Ident>, List<List<yokohama.unit.ast.Expr>>>> candidates =
                 Optionals.toStream(
                         fourPhaseTest
                                 .getSetup()
@@ -1503,10 +1504,10 @@ class AstToJUnitAstVisitor {
         Optional<yokohama.unit.ast.Expr> receiver = invoke.getReceiver();
         List<yokohama.unit.ast.Expr> args = invoke.getArgs();
 
-        Pair<List<Sym>, Stream<Statement>> argVarsAndStatements =
+        Tuple2<List<Sym>, Stream<Statement>> argVarsAndStatements =
                 setupArgs(argTypes, isVararg, args, envVar);
-        List<Sym> argVars = argVarsAndStatements.getFirst();
-        Stream<Statement> setupStatements = argVarsAndStatements.getSecond();
+        List<Sym> argVars = argVarsAndStatements._1();
+        Stream<Statement> setupStatements = argVarsAndStatements._2();
 
         Optional<Type> returnType = invoke.getMethodPattern()
                 .getReturnType(classType, classResolver)
@@ -1537,40 +1538,42 @@ class AstToJUnitAstVisitor {
         return Stream.concat(setupStatements, invocation);
     }
 
-    Pair<List<Sym>, Stream<Statement>> setupArgs(
+    Tuple2<List<Sym>, Stream<Statement>> setupArgs(
             List<yokohama.unit.ast.Type> argTypes,
             boolean isVararg,
             List<yokohama.unit.ast.Expr> args,
             Sym envVar) {
-        List<Pair<Sym, Stream<Statement>>> setupArgs;
+        List<Tuple2<Sym, Stream<Statement>>> setupArgs;
         if (isVararg) {
             int splitAt = argTypes.size() - 1;
-            List<Pair<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
-                    Pair.zip(
-                            argTypes,
-                            Lists.split(args, splitAt).map((nonVarargs, varargs) ->
-                                    ListUtils.union(
-                                            Lists.map(nonVarargs, Arrays::asList),
-                                            Arrays.asList(varargs))));
+            List<Tuple2<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
+                    Lists.zip(argTypes,
+                            Lists.split(args, splitAt).transform(pair -> {
+                                List<yokohama.unit.ast.Expr> nonVarargs = pair._1();
+                                List<yokohama.unit.ast.Expr> varargs = pair._2();
+                                return ListUtils.union(
+                                        Lists.map(nonVarargs, Arrays::asList),
+                                        Arrays.asList(varargs));
+                            }));
             setupArgs = Lists.mapInitAndLast(typesAndArgs,
-                    typeAndArg -> typeAndArg.map((t, arg) -> {
+                    typeAndArg -> typeAndArg.flatMap((t, arg) -> {
                         Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
                         Stream<Statement> expr = translateExpr(arg.get(0), argVar, paramType.toClass(), envVar);
-                        return Pair.of(argVar, expr);
+                        return Tuple.of(argVar, expr);
                     }),
-                    typeAndArg -> typeAndArg.map((t, varargs) -> {
+                    typeAndArg -> typeAndArg.flatMap((t, varargs) -> {
                         Type paramType = Type.of(t, classResolver);
-                        List<Pair<Sym, Stream<Statement>>> exprs = varargs.stream().map(vararg -> {
+                        List<Tuple2<Sym, Stream<Statement>>> exprs = varargs.stream().map(vararg -> {
                                     Sym varargVar = genSym.generate("vararg");
                                     Stream<Statement> expr = translateExpr(vararg,
                                             varargVar,
                                             paramType.toClass(),
                                             envVar);
-                                    return Pair.of(varargVar, expr);
+                                    return Tuple.of(varargVar, expr);
                                 }).collect(Collectors.toList());
-                        List<Sym> varargVars = Pair.unzip(exprs).getFirst();
-                        Stream<Statement> varargStatements = exprs.stream().flatMap(Pair::getSecond);
+                        List<Sym> varargVars = Lists.unzip(exprs)._1();
+                        Stream<Statement> varargStatements = exprs.stream().flatMap(Tuple2::_2);
                         Sym argVar = genSym.generate("arg");
                         Stream<Statement> arrayStatement = Stream.of(
                                 new VarInitStatement(
@@ -1578,25 +1581,25 @@ class AstToJUnitAstVisitor {
                                         argVar,
                                         new ArrayExpr(paramType.toArray(), varargVars),
                                         t.getSpan()));
-                        return Pair.of(argVar, Stream.concat(varargStatements, arrayStatement));
+                        return Tuple.of(argVar, Stream.concat(varargStatements, arrayStatement));
                     }));
         } else {
-            List<Pair<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
-                    Pair.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
+            List<Tuple2<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>> pairs =
+                    Lists.<yokohama.unit.ast.Type, yokohama.unit.ast.Expr>zip(
                             argTypes, args);
-            setupArgs = pairs.stream().map(pair -> pair.map((t, arg) -> {
+            setupArgs = pairs.stream().map(pair -> pair.flatMap((t, arg) -> {
                         // evaluate actual args and coerce to parameter types
                         Sym argVar = genSym.generate("arg");
                         Type paramType = Type.of(t, classResolver);
                         Stream<Statement> expr = translateExpr(arg, argVar, paramType.toClass(), envVar);
-                        return Pair.of(argVar, expr);
+                        return Tuple.of(argVar, expr);
                     })).collect(Collectors.toList());
         }
-        List<Sym> argVars = Pair.unzip(setupArgs).getFirst();
+        List<Sym> argVars = Lists.unzip(setupArgs)._1();
         Stream<Statement> setupStatements =
-                setupArgs.stream().flatMap(Pair::getSecond);
+                setupArgs.stream().flatMap(Tuple2::_2);
 
-        return Pair.of(argVars, setupStatements);
+        return Tuple.of(argVars, setupStatements);
     }
 
     Stream<Statement> generateInvoke(

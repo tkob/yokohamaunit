@@ -3,8 +3,8 @@
 *[Collectors]: java.util.stream.Collectors
 *[Ident]: yokohama.unit.ast.Ident
 *[IntegerExpr]: yokohama.unit.ast.IntegerExpr
-*[Pair]: yokohama.unit.util.Pair
 *[Span]: yokohama.unit.position.Span
+*[Tuple]: javaslang.Tuple
 
 # Test: Test ChoiceCollectVisitor
 ## Setup
@@ -18,23 +18,23 @@ Let visitor = `new ChoiceCollectVisitor(tables)`.
 
 Assert `visitor.visitGroup(ast).collect(Collectors.toList())` is
 `[
-  new Pair(
+  Tuple.of(
     [ new Ident("x", Span.dummySpan()) ],
     [ [ new IntegerExpr(true, "1", Span.dummySpan())],
       [ new IntegerExpr(true, "2", Span.dummySpan())],
       [ new IntegerExpr(true, "3", Span.dummySpan())] ]),
-  new Pair(
+  Tuple.of(
     [ new Ident("b", Span.dummySpan()), new Ident("c", Span.dummySpan()) ],
     [ [ new IntegerExpr(true, "8", Span.dummySpan()),
         new IntegerExpr(true, "6", Span.dummySpan()) ],
       [ new IntegerExpr(true, "0", Span.dummySpan()),
         new IntegerExpr(true, "8", Span.dummySpan()) ] ]),
-  new Pair(
+  Tuple.of(
     [ new Ident("y", Span.dummySpan()) ],
     [ [ new IntegerExpr(true, "4", Span.dummySpan())],
       [ new IntegerExpr(true, "5", Span.dummySpan())],
       [ new IntegerExpr(true, "6", Span.dummySpan())] ]),
-  new Pair(
+  Tuple.of(
     [ new Ident("a", Span.dummySpan()), new Ident("b", Span.dummySpan()) ],
     [ [ new IntegerExpr(true, "7", Span.dummySpan()),
         new IntegerExpr(true, "8", Span.dummySpan()) ],

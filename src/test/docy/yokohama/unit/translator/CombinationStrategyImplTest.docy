@@ -1,6 +1,6 @@
 *[Collections]: java.util.Collections
 *[CombinationStrategyImpl]: yokohama.unit.translator.CombinationStrategyImpl
-*[Pair]: yokohama.unit.util.Pair
+*[Tuple]: javaslang.Tuple
 
 # Test: generateMap (no variable)
 
@@ -9,7 +9,7 @@ where sut = `new CombinationStrategyImpl()`.
 
 # Test: generateMap (one variable)
 
-Assert `sut.generateMap([new Pair("a", [1, 2, 3])]) as Set` is
+Assert `sut.generateMap([Tuple.of("a", [1, 2, 3])]) as Set` is
 `[ [a:1], [a:2], [a:3] ] as Set`
 where sut = `new CombinationStrategyImpl()`.
 
@@ -17,7 +17,7 @@ where sut = `new CombinationStrategyImpl()`.
 
 Assert `sut.generateMap(vars) as Set` is `coms as Set`
 where sut = `new CombinationStrategyImpl()`
-and vars = `[new Pair("a", [1, 2, 3]), new Pair("b", [4, 5, 6])]`
+and vars = `[Tuple.of("a", [1, 2, 3]), Tuple.of("b", [4, 5, 6])]`
 and coms = `[
     [a:1, b:4], [a:1, b:5], [a:1, b:6],
     [a:2, b:4], [a:2, b:5], [a:2, b:6],

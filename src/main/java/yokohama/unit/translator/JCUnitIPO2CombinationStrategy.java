@@ -13,20 +13,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import yokohama.unit.util.GenSym;
-import yokohama.unit.util.Pair;
 
 public class JCUnitIPO2CombinationStrategy implements CombinationStrategy {
-    public <K, V> List<List<Pair<K, V>>> generate(List<Pair<K, List<V>>> candidates) {
+    public <K, V> List<List<Tuple2<K, V>>> generate(List<Tuple2<K, List<V>>> candidates) {
         GenSym genSym = new GenSym();
         Map<String, K> map = new HashMap<>();
         Factors.Builder factorsBuilder = new Factors.Builder();
-        for (Pair<K, List<V>> candidate : candidates) {
-            K key = candidate.getFirst();
+        for (Tuple2<K, List<V>> candidate : candidates) {
+            K key = candidate._1();
             String sym = genSym.generate(key.toString()).getName();
             map.put(sym, key);
             Factor.Builder factorBuilder = new Factor.Builder(sym);
-            for (V v : candidate.getSecond()) {
+            for (V v : candidate._2()) {
                 factorBuilder.addLevel(v);
             }
             Factor factor = factorBuilder.build();
@@ -40,7 +41,7 @@ public class JCUnitIPO2CombinationStrategy implements CombinationStrategy {
                 .setFactors(factors)
                 .setParameters(new Param[0])
                 .build();
-        List<List<Pair<K, V>>> tuples =
+        List<List<Tuple2<K, V>>> tuples =
                 StreamSupport.stream(tg.spliterator(), false)
                         .map(tuple -> {
                             Set<String> keys = tuple.keySet();
@@ -48,7 +49,7 @@ public class JCUnitIPO2CombinationStrategy implements CombinationStrategy {
                                     .map(key -> {
                                         @SuppressWarnings("unchecked") V v =
                                                 (V)tuple.get(key);
-                                        return Pair.of(map.get(key), v);
+                                        return Tuple.of(map.get(key), v);
                                     }).collect(Collectors.toList());
                         }).collect(Collectors.toList());
         return tuples;

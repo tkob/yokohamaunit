@@ -4,9 +4,9 @@ import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
 import javaslang.collection.List;
 import yokohama.unit.util.Optionals;
-import yokohama.unit.util.Pair;
 
 public class VariableCheckVisitor {
     static ErrorMessage mkErr(String var, Span span) {
@@ -98,17 +98,17 @@ public class VariableCheckVisitor {
     private Stream<ErrorMessage> checkIdents(
             java.util.List<Ident> idents, List<String> env) {
         return List.ofAll(idents).foldLeft(
-                Pair.<List<String>, List<ErrorMessage>>of(env, List.empty()), (pair, ident) -> {
+                Tuple.<List<String>, List<ErrorMessage>>of(env, List.empty()), (pair, ident) -> {
                     String var = ident.getName();
                     Span span = ident.getSpan();
-                    List<String> env_ = pair.getFirst();
-                    List<ErrorMessage> msgs = pair.getSecond();
-                    return Pair.of(
+                    List<String> env_ = pair._1();
+                    List<ErrorMessage> msgs = pair._2();
+                    return Tuple.of(
                             env_.push(var),
                             env_.contains(var) ? msgs.push(mkErr(var, span))
                                                : msgs);
                 })
-                .getSecond().reverse().toJavaStream();
+                ._2().reverse().toJavaStream();
     }
 
     private Stream<ErrorMessage> checkBindings(Bindings bindings, List<String> env) {
