@@ -6,26 +6,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lombok.RequiredArgsConstructor;
 import yokohama.unit.util.Lists;
-import yokohama.unit.util.Pair;
 
 @RequiredArgsConstructor
 public class ChoiceCollectVisitor extends 
-        StreamVisitorTemplate<Pair<List<Ident>, List<List<Expr>>>> {
+        StreamVisitorTemplate<Tuple2<List<Ident>, List<List<Expr>>>> {
     final List<Table> tables;
 
     @Override
-    public Stream<Pair<List<Ident>, List<List<Expr>>>> visitChoiceBinding(ChoiceBinding choiceBinding) {
+    public Stream<Tuple2<List<Ident>, List<List<Expr>>>> visitChoiceBinding(ChoiceBinding choiceBinding) {
         List<Ident> idents = Arrays.asList(choiceBinding.getName());
         List<List<Expr>> ess = Lists.map(
                 choiceBinding.getChoices(),
                 choice -> Arrays.asList(choice));
-        return Stream.of(Pair.of(idents, ess));
+        return Stream.of(Tuple.of(idents, ess));
     }
 
     @Override
-    public Stream<Pair<List<Ident>, List<List<Expr>>>> visitTableBinding(
+    public Stream<Tuple2<List<Ident>, List<List<Expr>>>> visitTableBinding(
             TableBinding tableBinding) {
         List<Ident> idents = tableBinding.getIdents();
         String name = tableBinding.getName();
@@ -41,13 +42,11 @@ public class ChoiceCollectVisitor extends
                     List<Ident> header = table.getHeader();
                     ess = table.getRows().stream()
                             .map(row ->
-                                    Pair.zip(header, row.getCells())
+                                    Lists.zip(header, row.getCells())
                                             .stream()
                                             .collect(
                                                     () -> new HashMap<Ident, Cell>(),
-                                                    (m, p) -> m.put(
-                                                            p.getFirst(),
-                                                            p.getSecond()),
+                                                    (m, p) -> m.put(p._1(), p._2()),
                                                     (m1, m2) -> m1.putAll(m2)))
                             .map(m -> {
                                 return idents.stream()
@@ -73,6 +72,6 @@ public class ChoiceCollectVisitor extends
             default:
                 throw new UnsupportedOperationException();
         }
-        return Stream.of(Pair.of(idents, ess));
+        return Stream.of(Tuple.of(idents, ess));
     }
 }

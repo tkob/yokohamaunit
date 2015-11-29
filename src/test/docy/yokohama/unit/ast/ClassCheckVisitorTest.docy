@@ -3,7 +3,7 @@
 *[ClassCheckVisitor]: yokohama.unit.ast.ClassCheckVisitor
 *[ErrorMessage]: yokohama.unit.position.ErrorMessage
 *[ClassResolver]: yokohama.unit.util.ClassResolver
-*[Pair]: yokohama.unit.util.Pair
+*[Tuple]: javaslang.Tuple
 
 # Test: ClassCheckVisitor.check
 
@@ -24,7 +24,7 @@ Let factory = `new yokohama.unit.translator.ParseTreeToAstVisitorFactory()`.
 
 Let ast = `factory.create(Optional.of(docyPath)).visitGroup(ctx)`.
 
-Let classResolver = `new ClassResolver([new Pair("List", "java.util.List")])`.
+Let classResolver = `new ClassResolver([Tuple.of("List", "java.util.List")])`.
 
 Let visitor = `new ClassCheckVisitor(classResolver)`.
 

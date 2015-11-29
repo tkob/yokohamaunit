@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple2;
 import lombok.Getter;
 
 public class ClassResolver {
@@ -21,12 +22,12 @@ public class ClassResolver {
         this(ClassLoader.getSystemClassLoader());
     }
     
-    public ClassResolver(Iterable<Pair<String, String>> source, ClassLoader classLoader) {
+    public ClassResolver(Iterable<Tuple2<String, String>> source, ClassLoader classLoader) {
         this.classLoader = classLoader;
         Map<String, String> table = new HashMap<>();
-        for (Pair<String, String> kv : source) {
-            String key = kv.getFirst();
-            String value = kv.getSecond();
+        for (Tuple2<String, String> kv : source) {
+            String key = kv._1();
+            String value = kv._2();
             if (key.contains("."))
                 throw new IllegalArgumentException("The key '" + key + "' contains a dot.");
             table.put(key, value);
@@ -34,15 +35,15 @@ public class ClassResolver {
         this.table = table;
     }
 
-    public ClassResolver(Iterable<Pair<String, String>> source) {
+    public ClassResolver(Iterable<Tuple2<String, String>> source) {
         this(source, ClassLoader.getSystemClassLoader());
     }
 
-    public ClassResolver(Stream<Pair<String, String>> source, ClassLoader classLoader) {
+    public ClassResolver(Stream<Tuple2<String, String>> source, ClassLoader classLoader) {
         this(source.collect(Collectors.toList()), classLoader);
     }
 
-    public ClassResolver(Stream<Pair<String, String>> source) {
+    public ClassResolver(Stream<Tuple2<String, String>> source) {
         this(source, ClassLoader.getSystemClassLoader());
     }
 

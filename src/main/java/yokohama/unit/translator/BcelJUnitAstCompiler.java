@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.bcel.Constants;
@@ -54,49 +56,48 @@ import yokohama.unit.ast_junit.VarDeclVisitor;
 import yokohama.unit.ast_junit.VarInitStatement;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
-import yokohama.unit.util.Pair;
 
 public class BcelJUnitAstCompiler implements JUnitAstCompiler {
     public static class CaughtExceptionVarVisitor {
-        public static List<Pair<yokohama.unit.ast_junit.Type, String>> sortedSet(Stream<Pair<yokohama.unit.ast_junit.Type, String>> i) {
+        public static List<Tuple2<yokohama.unit.ast_junit.Type, String>> sortedSet(Stream<Tuple2<yokohama.unit.ast_junit.Type, String>> i) {
             return i.collect(Collectors.toSet())
                     .stream()
-                    .sorted((o1, o2) -> o1.getSecond().compareTo(o2.getSecond()))
+                    .sorted((o1, o2) -> o1._2().compareTo(o2._2()))
                     .collect(Collectors.toList());
         }
 
-        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitTestMethod(Method method) {
+        public Stream<Tuple2<yokohama.unit.ast_junit.Type, String>> visitTestMethod(Method method) {
             return visitStatements(method.getStatements());
         }
 
-        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatements(List<Statement> statements) {
+        public Stream<Tuple2<yokohama.unit.ast_junit.Type, String>> visitStatements(List<Statement> statements) {
             return statements.stream().flatMap(this::visitStatement);
         }
 
-        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitStatement(Statement statement) {
+        public Stream<Tuple2<yokohama.unit.ast_junit.Type, String>> visitStatement(Statement statement) {
             return statement.accept(
-                    isStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    varInitStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    isStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty(),
+                    varInitStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty(),
                     tryStatement ->
                             Stream.concat(
                                     visitStatements(tryStatement.getTryStatements()),
                                     Stream.concat(
                                             tryStatement.getCatchClauses().stream().flatMap(this::visitCatchClause),
                                             visitStatements(tryStatement.getFinallyStatements()))),
-                    throwStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
+                    throwStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty(),
                     ifStatement ->
                             Stream.concat(
                                     visitStatements(ifStatement.getThen()),
                                     visitStatements(ifStatement.getOtherwise())),
-                    returnStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    invokeVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty(),
-                    invokeStaticVoidStatement -> Stream.<Pair<yokohama.unit.ast_junit.Type, String>>empty());
+                    returnStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty(),
+                    invokeVoidStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty(),
+                    invokeStaticVoidStatement -> Stream.<Tuple2<yokohama.unit.ast_junit.Type, String>>empty());
         }
 
-        public Stream<Pair<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
+        public Stream<Tuple2<yokohama.unit.ast_junit.Type, String>> visitCatchClause(CatchClause catchClause) {
             return Stream.concat(
                     Stream.of(
-                            Pair.of(
+                            Tuple.of(
                                     catchClause.getClassType().toType(),
                                     catchClause.getVar().getName())),
                     visitStatements(catchClause.getStatements()));
@@ -181,11 +182,11 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
                             ? typeOf(method.getReturnType().get())
                             : Type.VOID,
                     method.getArgs().stream()
-                            .map(Pair::getFirst)
+                            .map(Tuple2::_1)
                             .map(JUnitAstVisitor::typeOf)
                             .collect(Collectors.toList()).toArray(new Type[]{}),
                     method.getArgs().stream()
-                            .map(Pair::getSecond)
+                            .map(Tuple2::_2)
                             .collect(Collectors.toList()).toArray(new String[]{}),
                     method.getName(),
                     cg.getClassName(),
@@ -203,15 +204,15 @@ public class BcelJUnitAstCompiler implements JUnitAstCompiler {
             InstructionFactory factory = new InstructionFactory(cg);
 
             Map<String, LocalVariableGen> locals = new HashMap<>();
-            List<Pair<yokohama.unit.ast_junit.Type, String>> args = method.getArgs();
-            List<Pair<yokohama.unit.ast_junit.Type, String>> varDecls =
+            List<Tuple2<yokohama.unit.ast_junit.Type, String>> args = method.getArgs();
+            List<Tuple2<yokohama.unit.ast_junit.Type, String>> varDecls =
                     VarDeclVisitor.sortedSet(new VarDeclVisitor().visitMethod(method));
-            List<Pair<yokohama.unit.ast_junit.Type, String>> caughtExVars =
+            List<Tuple2<yokohama.unit.ast_junit.Type, String>> caughtExVars =
                     CaughtExceptionVarVisitor.sortedSet(new CaughtExceptionVarVisitor().visitTestMethod(method));
-            for (Pair<yokohama.unit.ast_junit.Type,String> pair :
+            for (Tuple2<yokohama.unit.ast_junit.Type,String> pair :
                     ListUtils.union(varDecls, caughtExVars)) {
-                yokohama.unit.ast_junit.Type type = pair.getFirst();
-                String name = pair.getSecond();
+                yokohama.unit.ast_junit.Type type = pair._1();
+                String name = pair._2();
                 if (locals.containsKey(name))
                     throw new RuntimeException("duplicate local variable: " + name);
                 LocalVariableGen lv = mg.addLocalVariable(name, typeOf(type), null, null);

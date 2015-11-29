@@ -10,7 +10,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 
 public class Lists {
     public static <T> List<T> repeat(T obj, int times) {
@@ -31,10 +34,10 @@ public class Lists {
         }
     }
 
-    public static <T> Pair<List<T>, List<T>> split(List<T> list, int pos) {
+    public static <T> Tuple2<List<T>, List<T>> split(List<T> list, int pos) {
         List<T> left = list.subList(0, pos);
         List<T> right = list.subList(pos, list.size());
-        return Pair.of(left, right);
+        return Tuple.of(left, right);
     }
 
     public static <T, U> List<U> map(List<T> list, Function<T, U> f) {
@@ -115,12 +118,12 @@ public class Lists {
     }
 
     public static <T, U, V> Map<U, V> listToMap(
-            List<T> list, Function<T, Pair<U, V>> f) {
+            List<T> list, Function<T, Tuple2<U, V>> f) {
         return list.stream().collect(
                 () -> new HashMap<>(),
                 (map, e) -> {
-                    Pair<U, V> pair = f.apply(e);
-                    map.put(pair.getFirst(), pair.getSecond());
+                    Tuple2<U, V> pair = f.apply(e);
+                    map.put(pair._1(), pair._2());
                 },
                 (map1, map2) -> map1.putAll(map2));
     }
@@ -139,5 +142,20 @@ public class Lists {
             newStream = Stream.concat(newStream, stream);
         }
         return newStream.collect(Collectors.toList());
+    }
+
+    public static <T, U> Tuple2<List<T>, List<U>> unzip(List<Tuple2<T, U>> list) {
+        List<T> firsts = list.stream().map(Tuple2::_1).collect(Collectors.toList());
+        List<U> seconds = list.stream().map(Tuple2::_2).collect(Collectors.toList());
+        return Tuple.of(firsts, seconds);
+    }
+
+    public static <T, U> List<Tuple2<T, U>> zip(List<T> firsts, List<U> seconds) {
+        if (firsts.size() != seconds.size()) {
+            throw new IllegalArgumentException("List size not match");
+        }
+        return IntStream.range(0, firsts.size())
+                .mapToObj((int i) -> Tuple.of(firsts.get(i), seconds.get(i)))
+                .collect(Collectors.toList());
     }
 }
