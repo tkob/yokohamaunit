@@ -658,6 +658,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
     }
 
     @Override
+    public Object visitTempFileExpr(YokohamaUnitParser.TempFileExprContext ctx) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Heading visitHeading(YokohamaUnitParser.HeadingContext ctx) {
         return new Heading(ctx.Line().getText(), getSpan(ctx));
     }
