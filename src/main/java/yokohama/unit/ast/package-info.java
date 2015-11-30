@@ -42,6 +42,7 @@
  *        | AnchorExpr
  *        | AsExpr
  *        | ResourceExpr
+ *        | TempFileExpr
  * 
  * StubExpr ::= ClassType StubBehavior*
  * 

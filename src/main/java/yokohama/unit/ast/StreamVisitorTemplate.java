@@ -162,6 +162,11 @@ public class StreamVisitorTemplate<T> extends AstVisitor<Stream<T>> {
     }
 
     @Override
+    public Stream<T> visitTempFileExpr(TempFileExpr tempFileExpr) {
+        return Stream.empty();
+    }
+
+    @Override
     public Stream<T> visitStubReturns(StubReturns stubReturns) {
         return Stream.concat(visitMethodPattern(stubReturns.getMethodPattern()),
                 visitExpr(stubReturns.getToBeReturned()));

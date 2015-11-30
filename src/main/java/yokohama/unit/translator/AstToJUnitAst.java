@@ -76,6 +76,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableBinding;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
+import yokohama.unit.ast.TempFileExpr;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
@@ -796,6 +797,9 @@ class AstToJUnitAstVisitor {
                 },
                 resourceExpr -> {
                     return translateResourceExpr(resourceExpr, exprVar, envVar);
+                },
+                tempFileExpr -> {
+                    return translateTempFileExpr(tempFileExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
@@ -1075,6 +1079,11 @@ class AstToJUnitAstVisitor {
         return Stream.concat(classAndName, getResource);
     }
 
+    private Stream<Statement> translateTempFileExpr(
+            TempFileExpr tempFileExpr, Sym exprVar, Sym envVar) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     Stream<Statement> boxOrUnbox(
             Type toType, Sym toVar, Type fromType, Sym fromVar) {
         return fromType.<Stream<Statement>>matchPrimitiveOrNot(
@@ -1213,7 +1222,8 @@ class AstToJUnitAstVisitor {
                         resourceExpr.getClassType()
                                 .map(classType ->
                                         Type.of(classType.toType(), classResolver))
-                                .orElse(Type.URL));
+                                .orElse(Type.URL),
+                tempFileExpr -> typeOf("java.io.File"));
     }
 
     List<List<Statement>> translateTableRef(
