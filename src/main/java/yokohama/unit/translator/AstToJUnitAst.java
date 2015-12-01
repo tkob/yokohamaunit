@@ -1081,7 +1081,37 @@ class AstToJUnitAstVisitor {
 
     private Stream<Statement> translateTempFileExpr(
             TempFileExpr tempFileExpr, Sym exprVar, Sym envVar) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Sym prefixVar = genSym.generate("prefix");
+        Sym suffixVar = genSym.generate("suffix");
+        return Stream.of(
+                new VarInitStatement(
+                        Type.STRING,
+                        prefixVar,
+                        new StrLitExpr(name),
+                        tempFileExpr.getSpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        suffixVar,
+                        new StrLitExpr(".tmp"),
+                        tempFileExpr.getSpan()),
+                new VarInitStatement(
+                        typeOf("java.io.File"),
+                        exprVar,
+                        new InvokeStaticExpr(
+                                classTypeOf("java.io.File"),
+                                Collections.emptyList(),
+                                "createTempFile",
+                                Arrays.asList(Type.STRING, Type.STRING),
+                                Arrays.asList(prefixVar, suffixVar),
+                                typeOf("java.io.File")),
+                        tempFileExpr.getSpan()),
+                new InvokeVoidStatement(
+                        classTypeOf("java.io.File"),
+                        exprVar,
+                        "deleteOnExit",
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        tempFileExpr.getSpan()));
     }
 
     Stream<Statement> boxOrUnbox(
