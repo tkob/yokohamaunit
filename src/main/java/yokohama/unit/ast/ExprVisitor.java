@@ -12,4 +12,5 @@ public interface ExprVisitor<T> {
     T visitAnchorExpr(AnchorExpr anchorExpr);
     T visitAsExpr(AsExpr asExpr);
     T visitResourceExpr(ResourceExpr resourceExpr);
+    T visitTempFileExpr(TempFileExpr tempFileExpr);
 }

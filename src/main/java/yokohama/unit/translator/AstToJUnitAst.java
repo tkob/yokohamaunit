@@ -76,6 +76,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableBinding;
 import yokohama.unit.ast.TableExtractVisitor;
 import yokohama.unit.ast.TableRef;
+import yokohama.unit.ast.TempFileExpr;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast_junit.Annotation;
@@ -796,6 +797,9 @@ class AstToJUnitAstVisitor {
                 },
                 resourceExpr -> {
                     return translateResourceExpr(resourceExpr, exprVar, envVar);
+                },
+                tempFileExpr -> {
+                    return translateTempFileExpr(tempFileExpr, exprVar, envVar);
                 });
 
         // box or unbox if needed
@@ -1075,6 +1079,41 @@ class AstToJUnitAstVisitor {
         return Stream.concat(classAndName, getResource);
     }
 
+    private Stream<Statement> translateTempFileExpr(
+            TempFileExpr tempFileExpr, Sym exprVar, Sym envVar) {
+        Sym prefixVar = genSym.generate("prefix");
+        Sym suffixVar = genSym.generate("suffix");
+        return Stream.of(
+                new VarInitStatement(
+                        Type.STRING,
+                        prefixVar,
+                        new StrLitExpr(name),
+                        tempFileExpr.getSpan()),
+                new VarInitStatement(
+                        Type.STRING,
+                        suffixVar,
+                        new StrLitExpr(".tmp"),
+                        tempFileExpr.getSpan()),
+                new VarInitStatement(
+                        typeOf("java.io.File"),
+                        exprVar,
+                        new InvokeStaticExpr(
+                                classTypeOf("java.io.File"),
+                                Collections.emptyList(),
+                                "createTempFile",
+                                Arrays.asList(Type.STRING, Type.STRING),
+                                Arrays.asList(prefixVar, suffixVar),
+                                typeOf("java.io.File")),
+                        tempFileExpr.getSpan()),
+                new InvokeVoidStatement(
+                        classTypeOf("java.io.File"),
+                        exprVar,
+                        "deleteOnExit",
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        tempFileExpr.getSpan()));
+    }
+
     Stream<Statement> boxOrUnbox(
             Type toType, Sym toVar, Type fromType, Sym fromVar) {
         return fromType.<Stream<Statement>>matchPrimitiveOrNot(
@@ -1213,7 +1252,8 @@ class AstToJUnitAstVisitor {
                         resourceExpr.getClassType()
                                 .map(classType ->
                                         Type.of(classType.toType(), classResolver))
-                                .orElse(Type.URL));
+                                .orElse(Type.URL),
+                tempFileExpr -> typeOf("java.io.File"));
     }
 
     List<List<Statement>> translateTableRef(

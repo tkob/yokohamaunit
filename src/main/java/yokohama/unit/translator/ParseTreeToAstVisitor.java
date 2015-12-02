@@ -75,6 +75,7 @@ import yokohama.unit.ast.Table;
 import yokohama.unit.ast.TableBinding;
 import yokohama.unit.ast.TableRef;
 import yokohama.unit.ast.TableType;
+import yokohama.unit.ast.TempFileExpr;
 import yokohama.unit.ast.Test;
 import yokohama.unit.ast.ThrowsPredicate;
 import yokohama.unit.ast.Type;
@@ -655,6 +656,11 @@ public class ParseTreeToAstVisitor extends AbstractParseTreeVisitor<Object> impl
                 ctx.Str().getText(),
                 Optional.ofNullable(ctx.classType()).map(this::visitClassType),
                 getSpan(ctx));
+    }
+
+    @Override
+    public Object visitTempFileExpr(YokohamaUnitParser.TempFileExprContext ctx) {
+        return new TempFileExpr(getSpan(ctx));
     }
 
     @Override

@@ -101,6 +101,7 @@ expr: quotedExpr
     | anchorExpr
     | asExpr
     | resourceExpr
+    | tempFileExpr
     ;
 
 quotedExpr: BACK_TICK Expr BACK_TICK ;
@@ -147,6 +148,8 @@ asExpr: sourceExpr AS_BACK_TICK classType BACK_TICK ;
 sourceExpr: stringExpr | anchorExpr ;
 
 resourceExpr: RESOURCE DOUBLE_QUOTE Str DOUBLE_QUOTE (AS_BACK_TICK classType BACK_TICK)? ;
+
+tempFileExpr: A_TEMPORARY_FILE | A_TEMP_FILE ;
 
 codeBlock: heading BACK_TICKS attributes CodeLine* BACK_TICKS ;
 attributes: CodeLine ;

@@ -1,0 +1,23 @@
+# Test: create a temp file
+
+## Setup
+
+Let temp = a temp file.
+
+## Verify
+
+Assert `temp.exists()` is true.
+
+# Test: create temporary file
+
+## Setup
+
+Let temp = a temporary file.
+
+## Verify
+
+Assert `temp.exists()` is true.
+
+# Test: create a temp file inside where clause
+
+Assert `temp.exists()` is true where temp is a temp file.

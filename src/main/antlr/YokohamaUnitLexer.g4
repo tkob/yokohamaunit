@@ -59,6 +59,8 @@ REGEX_TICK2: 'regex' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
 REGEXP_TICK: 'regexp' Spaces? '`' -> mode(REGEXP) ;
 REGEXP_TICK2: 'regexp' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
 RESOURCE: 'resource' ;
+A_TEMPORARY_FILE: 'a' Spaces 'temporary' Spaces 'file' ;
+A_TEMP_FILE: 'a' Spaces 'temp' Spaces 'file' ;
 NULL: 'null' ;
 NOTHING: 'nothing' ;
 TRUE: 'true' ;
