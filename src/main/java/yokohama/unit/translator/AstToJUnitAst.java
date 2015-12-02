@@ -1588,13 +1588,10 @@ class AstToJUnitAstVisitor {
             int splitAt = argTypes.size() - 1;
             List<Tuple2<yokohama.unit.ast.Type, List<yokohama.unit.ast.Expr>>> typesAndArgs = 
                     Lists.zip(argTypes,
-                            Lists.split(args, splitAt).transform(pair -> {
-                                List<yokohama.unit.ast.Expr> nonVarargs = pair._1();
-                                List<yokohama.unit.ast.Expr> varargs = pair._2();
-                                return ListUtils.union(
-                                        Lists.map(nonVarargs, Arrays::asList),
-                                        Arrays.asList(varargs));
-                            }));
+                            Lists.split(args, splitAt).transform((nonVarargs, varargs) ->
+                                    ListUtils.union(
+                                            Lists.map(nonVarargs, Arrays::asList),
+                                            Arrays.asList(varargs))));
             setupArgs = Lists.mapInitAndLast(typesAndArgs,
                     typeAndArg -> typeAndArg.flatMap((t, arg) -> {
                         Sym argVar = genSym.generate("arg");
