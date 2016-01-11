@@ -54,6 +54,11 @@ public class DocyC implements Command {
                 .withDescription("Base packages where converter classes are located")
                 .create("converter"));
         options.addOption(OptionBuilder
+                .hasArg()
+                .withArgName("strategy")
+                .withDescription("Choose combination test strategy")
+                .create("combination"));
+        options.addOption(OptionBuilder
                 .withDescription("Emit Java code")
                 .create("j"));
         options.addOption(OptionBuilder
