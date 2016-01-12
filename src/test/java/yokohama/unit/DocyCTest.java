@@ -72,7 +72,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -85,7 +85,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -98,7 +98,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -111,7 +111,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -137,7 +137,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -174,7 +174,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -211,7 +211,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -248,7 +248,7 @@ public class DocyCTest {
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -285,7 +285,7 @@ public class DocyCTest {
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
 
-        int ignored = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int ignored = new DocyC(null, compiler, fisFactory).run(in, out, err, args);
 
         verify(compiler).compile(
                 anyObject(),

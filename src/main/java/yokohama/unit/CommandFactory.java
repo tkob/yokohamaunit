@@ -16,6 +16,7 @@ public class CommandFactory {
                     try (ConfigurableApplicationContext context =
                             new ClassPathXmlApplicationContext("applicationContext.xml")) {
                         return new DocyC(
+                                context,
                                 context.getBean(DocyCompilerImpl.class),
                                 new FileInputStreamFactory());
                     }
