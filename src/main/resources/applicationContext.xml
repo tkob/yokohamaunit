@@ -2,13 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean id="product" class="yokohama.unit.translator.CombinationStrategyImpl" />
   <bean id="docyCompiler" class="yokohama.unit.translator.DocyCompilerImpl">
     <constructor-arg><bean class="yokohama.unit.translator.DocyParserImpl"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.ParseTreeToAstVisitorFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.AstToJUnitAstFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.GroovyExpressionStrategyFactory"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.MockitoMockStrategyFactory"/></constructor-arg>
-    <constructor-arg><bean class="yokohama.unit.translator.CombinationStrategyImpl"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.BcelJUnitAstCompiler"/></constructor-arg>
   </bean>
 </beans>

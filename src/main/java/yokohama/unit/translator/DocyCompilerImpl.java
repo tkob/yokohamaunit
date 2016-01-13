@@ -60,7 +60,6 @@ public class DocyCompilerImpl implements DocyCompiler {
     final AstToJUnitAstFactory astToJUnitAstFactory;
     final ExpressionStrategyFactory expressionStrategyFactory;
     final MockStrategyFactory mockStrategyFactory;
-    final CombinationStrategy combinationStrategy;
     final JUnitAstCompiler jUnitAstCompiler;
     
     final VariableCheckVisitor variableCheckVisitor = new VariableCheckVisitor();
@@ -81,6 +80,7 @@ public class DocyCompilerImpl implements DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             boolean checkContract,
+            CombinationStrategy combinationStrategy,
             List<String> converterBasePackages,
             List<String> javacArgs) {
         // Make a class loader

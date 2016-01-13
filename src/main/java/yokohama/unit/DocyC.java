@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
+import yokohama.unit.translator.CombinationStrategy;
 import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
@@ -130,6 +131,7 @@ public class DocyC implements Command {
         Optional<Path> dest;
         boolean emitJava;
         boolean checkContract;
+        CombinationStrategy combinationStrategy;
         List<String> converterBasePackages;
         List<String> classPath;
         List<String> javacArgs;
@@ -162,6 +164,9 @@ public class DocyC implements Command {
             dest = d == null ? Optional.empty() : Optional.of(Paths.get(d));
             emitJava = commandLine.hasOption('j');
             checkContract = commandLine.hasOption("contract");
+            combinationStrategy = context.getBean(
+                    commandLine.getOptionValue("combination", "product"),
+                    CombinationStrategy.class);
             String converter= commandLine.getOptionValue("converter");
             converterBasePackages = converter == null
                     ? Collections.emptyList()
@@ -203,6 +208,7 @@ public class DocyC implements Command {
                         dest,
                         emitJava,
                         checkContract,
+                        combinationStrategy,
                         converterBasePackages,
                         javacArgs)
                         .stream();
