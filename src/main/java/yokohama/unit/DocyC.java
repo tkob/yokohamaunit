@@ -25,7 +25,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.BeanFactory;
 import yokohama.unit.position.ErrorMessage;
 import yokohama.unit.position.Span;
 import yokohama.unit.translator.CombinationStrategy;
@@ -33,7 +33,7 @@ import yokohama.unit.translator.DocyCompiler;
 
 @AllArgsConstructor
 public class DocyC implements Command {
-   ConfigurableApplicationContext context;
+    BeanFactory context;
     private final DocyCompiler compiler;
     FileInputStreamFactory fileInputStreamFactory;
 
