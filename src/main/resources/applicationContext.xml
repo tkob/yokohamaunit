@@ -3,6 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   <bean id="product" class="yokohama.unit.translator.CombinationStrategyImpl" />
+  <bean id="jcunit" class="yokohama.unit.translator.JCUnitIPO2CombinationStrategy" />
   <bean id="docyCompiler" class="yokohama.unit.translator.DocyCompilerImpl">
     <constructor-arg><bean class="yokohama.unit.translator.DocyParserImpl"/></constructor-arg>
     <constructor-arg><bean class="yokohama.unit.translator.ParseTreeToAstVisitorFactory"/></constructor-arg>
