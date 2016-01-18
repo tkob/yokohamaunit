@@ -110,7 +110,7 @@ public class DocyCompilerImplTest {
         new Fixture(
                 "GroovyTestCombination.docy", new GroovyExpressionStrategyFactory(), new JCUnitIPO2CombinationStrategy(), -1, true),
         new Fixture(
-                "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 1, true),
+                "GroovyTestComment.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 2, true),
         new Fixture(
                 "GroovyTestRegExp.docy", new GroovyExpressionStrategyFactory(), new CombinationStrategyImpl(), 7, true),
         new Fixture(

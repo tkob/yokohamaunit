@@ -95,6 +95,7 @@ mode AFTER_AN_INSTANCE;
 OF: 'of' ;
 Identifier_AFTER_AN_INSTANCE : IdentStart IdentPart* -> type(Identifier) ;
 BACK_TICK_AFTER_AN_INSTANCE: '`' -> type(BACK_TICK), mode(CLASS) ;
+COMMENT_AFTER_AN_INSTANCE : '{>>' .*? '<<}' -> skip ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
 mode IN_DOUBLE_QUOTE;

@@ -3,3 +3,8 @@
 {>> Capital 'A' <<} Assert {>> insert space between 'Assert' and 'that<<} that
 {>> By the way, 'that' can be ommitted <<} `1` {>> subject <<} is {>> copula<<}
 `1` {>> complement <<}. {>> and fullu stop<<}
+
+# Test: comment after 'an instance'
+
+Assert that `""` is an instance {>> <<} s {>> <<} of {>> <<} `String`
+such that `s.contains("")` is `true`.
