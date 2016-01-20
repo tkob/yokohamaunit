@@ -12,7 +12,7 @@ EXERCISE_NO_DESC: Hashes [ \t]* 'Exercise' -> type(EXERCISE) ;
 VERIFY_NO_DESC:   Hashes [ \t]* 'Verify'   -> type(VERIFY) ;
 TEARDOWN_NO_DESC: Hashes [ \t]* 'Teardown' -> type(TEARDOWN) ;
 LBRACKET_DEFAULT_MODE: '[' -> type(LBRACKET), mode(ANCHOR);
-AS_BACK_TICK: 'as' Spaces? '`' -> mode(CLASS) ;
+AS_BACK_TICK: 'as' SpacesOrComments? '`' -> mode(CLASS) ;
 BAR: '|' ;
 BAR_EOL: '|' [ \t]* '\r'? '\n' ;
 HBAR: '|' [|\-=\:\.\+ \t]* '|' [ \t]* '\r'? '\n' ;
@@ -28,39 +28,39 @@ ALL: 'all' ;
 COMMA: ',' ;
 IN: 'in' ;
 UTABLE: 'Table' ;
-CSV_SINGLE_QUOTE: 'CSV' Spaces? '\'' -> mode(IN_FILE_NAME) ;
-TSV_SINGLE_QUOTE: 'TSV'  Spaces? '\''-> mode(IN_FILE_NAME) ;
-EXCEL_SINGLE_QUOTE: 'Excel' Spaces? '\'' -> mode(IN_BOOK_NAME) ;
+CSV_SINGLE_QUOTE: 'CSV' SpacesOrComments? '\'' -> mode(IN_FILE_NAME) ;
+TSV_SINGLE_QUOTE: 'TSV'  SpacesOrComments? '\''-> mode(IN_FILE_NAME) ;
+EXCEL_SINGLE_QUOTE: 'Excel' SpacesOrComments? '\'' -> mode(IN_BOOK_NAME) ;
 WHERE: 'where' ;
 EQ: '=' ;
 LET: 'Let' ;
 BE: 'be' ;
-ANY_OF: 'any' Spaces 'of' ;
-ANY_DEFINED_BY: 'any' Spaces ('value' 's'? Spaces)? 'defined' Spaces 'by' ;
+ANY_OF: 'any' SpacesOrComments 'of' ;
+ANY_DEFINED_BY: 'any' SpacesOrComments ('value' 's'? SpacesOrComments)? 'defined' SpacesOrComments 'by' ;
 OR: 'or' ;
 DO: 'Do' ;
-A_STUB_OF_BACK_TICK: 'a' Spaces 'stub' Spaces 'of' Spaces? '`' -> mode(CLASS) ;
+A_STUB_OF_BACK_TICK: 'a' SpacesOrComments 'stub' SpacesOrComments 'of' SpacesOrComments? '`' -> mode(CLASS) ;
 SUCH: 'such' ;
-METHOD_BACK_TICK: 'method' Spaces? '`' -> mode(METHOD_PATTERN) ;
+METHOD_BACK_TICK: 'method' SpacesOrComments? '`' -> mode(METHOD_PATTERN) ;
 RETURNS: 'returns' ;
-AN_INSTANCE_OF_BACK_TICK: 'an' Spaces 'instance' Spaces 'of' Spaces? '`' -> mode(CLASS) ;
-AN_INSTANCE: 'an' Spaces 'instance' -> mode(AFTER_AN_INSTANCE) ;
-AN_INVOCATION_OF_BACK_TICK: 'an' Spaces 'invocation' Spaces 'of' Spaces? '`' -> mode(METHOD_PATTERN) ;
+AN_INSTANCE_OF_BACK_TICK: 'an' SpacesOrComments 'instance' Spaces 'of' SpacesOrComments? '`' -> mode(CLASS) ;
+AN_INSTANCE: 'an' SpacesOrComments 'instance' -> mode(AFTER_AN_INSTANCE) ;
+AN_INVOCATION_OF_BACK_TICK: 'an' SpacesOrComments 'invocation' SpacesOrComments 'of' SpacesOrComments? '`' -> mode(METHOD_PATTERN) ;
 ON: 'on' ;
 WITH: 'with' ;
-INVOKE_TICK: 'Invoke' Spaces? '`' -> mode (METHOD_PATTERN) ;
+INVOKE_TICK: 'Invoke' SpacesOrComments? '`' -> mode (METHOD_PATTERN) ;
 MATCHES: 'matches' ;
 DOES: 'does' ;
 MATCH: 'match' ;
-RE_TICK: 're' Spaces? '`' -> mode(REGEXP) ;
-RE_TICK2: 're' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
-REGEX_TICK: 'regex' Spaces? '`' -> mode(REGEXP) ;
-REGEX_TICK2: 'regex' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
-REGEXP_TICK: 'regexp' Spaces? '`' -> mode(REGEXP) ;
-REGEXP_TICK2: 'regexp' Spaces? '``' -> type(RE_TICK), mode(REGEXP2) ;
+RE_TICK: 're' SpacesOrComments? '`' -> mode(REGEXP) ;
+RE_TICK2: 're' SpacesOrComments? '``' -> type(RE_TICK), mode(REGEXP2) ;
+REGEX_TICK: 'regex' SpacesOrComments? '`' -> mode(REGEXP) ;
+REGEX_TICK2: 'regex' SpacesOrComments? '``' -> type(RE_TICK), mode(REGEXP2) ;
+REGEXP_TICK: 'regexp' SpacesOrComments? '`' -> mode(REGEXP) ;
+REGEXP_TICK2: 'regexp' SpacesOrComments? '``' -> type(RE_TICK), mode(REGEXP2) ;
 RESOURCE: 'resource' ;
-A_TEMPORARY_FILE: 'a' Spaces 'temporary' Spaces 'file' ;
-A_TEMP_FILE: 'a' Spaces 'temp' Spaces 'file' ;
+A_TEMPORARY_FILE: 'a' SpacesOrComments 'temporary' SpacesOrComments 'file' ;
+A_TEMP_FILE: 'a' SpacesOrComments 'temp' SpacesOrComments 'file' ;
 NULL: 'null' ;
 NOTHING: 'nothing' ;
 TRUE: 'true' ;
@@ -95,6 +95,7 @@ mode AFTER_AN_INSTANCE;
 OF: 'of' ;
 Identifier_AFTER_AN_INSTANCE : IdentStart IdentPart* -> type(Identifier) ;
 BACK_TICK_AFTER_AN_INSTANCE: '`' -> type(BACK_TICK), mode(CLASS) ;
+COMMENT_AFTER_AN_INSTANCE : '{>>' .*? '<<}' -> skip ;
 WS_AFTER_AN_INSTANCE: Spaces -> skip ;
 
 mode IN_DOUBLE_QUOTE;
@@ -169,6 +170,9 @@ Hashes: '#' | '##' | '###' | '####' | '#####' | '######' ;
 
 fragment
 Spaces: [ \t\r\n]+ ;
+
+fragment
+SpacesOrComments: ([ \t\r\n] | ('{>>' .*? '<<}') )+ ;
 
 fragment
 IdentStart: ~[\uD800-\uDBFF]
