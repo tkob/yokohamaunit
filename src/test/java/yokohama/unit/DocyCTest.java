@@ -20,6 +20,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.context.ConfigurableApplicationContext;
 import yokohama.unit.translator.DocyCompiler;
 
 public class DocyCTest {
@@ -67,12 +68,13 @@ public class DocyCTest {
     @Test
     public void testRun() {
         String[] args = { "-help" };
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -80,12 +82,13 @@ public class DocyCTest {
     @Test
     public void testRun0() {
         String[] args = {};
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
     }
@@ -93,12 +96,13 @@ public class DocyCTest {
     @Test
     public void testRun1() {
         String[] args = { "-d" };
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -106,12 +110,13 @@ public class DocyCTest {
     @Test
     public void testRun2() {
         String[] args = { "-xxxxxx" };
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_FAILURE;
         assertThat(actual, is(expected));
     }
@@ -120,6 +125,7 @@ public class DocyCTest {
     public void testRun3() throws IOException {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(
                 anyObject(),
@@ -131,13 +137,14 @@ public class DocyCTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyObject(),
+                anyObject(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -149,6 +156,7 @@ public class DocyCTest {
                 anyObject(),
                 eq(false),
                 eq(false),
+                anyObject(),
                 eq(Arrays.asList()),
                 eq(Arrays.asList()));
     }
@@ -157,6 +165,7 @@ public class DocyCTest {
     public void testRun4() throws IOException {
         assumeTrue(System.getProperty("os.name").contains("Windows"));
         String[] args = { "-basedir", "E:\\src\\main\\", "E:\\src\\main\\yokohama\\unit\\Foo.docy"};
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(
                 anyObject(),
@@ -168,13 +177,14 @@ public class DocyCTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyObject(),
+                anyObject(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -186,6 +196,7 @@ public class DocyCTest {
                 anyObject(),
                 eq(false),
                 eq(false),
+                anyObject(),
                 eq(Arrays.asList()),
                 eq(Arrays.asList()));
     }
@@ -194,6 +205,7 @@ public class DocyCTest {
     public void testRun5() throws IOException {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main", "/home/user/src/main/yokohama/unit/Foo.docy"};
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(
                 anyObject(),
@@ -205,13 +217,14 @@ public class DocyCTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyObject(),
+                anyObject(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -223,6 +236,7 @@ public class DocyCTest {
                 anyObject(),
                 eq(false),
                 eq(false),
+                anyObject(),
                 eq(Arrays.asList()),
                 eq(Arrays.asList()));
     }
@@ -231,6 +245,7 @@ public class DocyCTest {
     public void testRun6() throws IOException {
         assumeTrue(System.getProperty("os.name").contains("Linux"));
         String[] args = { "-basedir", "/home/user/src/main/", "/home/user/src/main/yokohama/unit/Foo.docy"};
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(
                 anyObject(),
@@ -242,13 +257,14 @@ public class DocyCTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyObject(),
+                anyObject(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
         InputStream in = mock(InputStream.class);
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
-        int actual = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int actual = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
         int expected = Command.EXIT_SUCCESS;
         assertThat(actual, is(expected));
         verify(compiler).compile(
@@ -260,6 +276,7 @@ public class DocyCTest {
                 anyObject(),
                 eq(false),
                 eq(false),
+                anyObject(),
                 eq(Arrays.asList()),
                 eq(Arrays.asList()));
     }
@@ -267,6 +284,7 @@ public class DocyCTest {
     @Test
     public void testRun7() throws IOException {
         String[] args = { "-j", "Foo.docy" };
+        ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
         DocyCompiler compiler = mock(DocyCompiler.class);
         when(compiler.compile(
                 anyObject(),
@@ -278,6 +296,7 @@ public class DocyCTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyObject(),
+                anyObject(),
                 anyObject()))
                 .thenReturn(Collections.emptyList());
         FileInputStreamFactory fisFactory = mock(FileInputStreamFactory.class);
@@ -285,7 +304,7 @@ public class DocyCTest {
         PrintStream out = mock(PrintStream.class);
         PrintStream err = mock(PrintStream.class);
 
-        int ignored = new DocyC(compiler, fisFactory).run(in, out, err, args);
+        int ignored = new DocyC(context, compiler, fisFactory).run(in, out, err, args);
 
         verify(compiler).compile(
                 anyObject(),
@@ -296,6 +315,7 @@ public class DocyCTest {
                 anyObject(),
                 eq(true),
                 eq(false),
+                anyObject(),
                 eq(Arrays.asList()),
                 eq(Arrays.asList()));
     }

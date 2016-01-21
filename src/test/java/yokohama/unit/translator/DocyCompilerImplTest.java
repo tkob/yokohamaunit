@@ -158,7 +158,6 @@ public class DocyCompilerImplTest {
                         new AstToJUnitAstFactory(),
                         fixture.expressionStrategyFactory,
                         new MockitoMockStrategyFactory(),
-                        fixture.combinationStrategy,
                         jUnitAstCompiler);
                 List<ErrorMessage> actual = instance.compile(
                         docyPath,
@@ -169,6 +168,7 @@ public class DocyCompilerImplTest {
                         Optional.of(Paths.get(dest.getAbsolutePath())),
                         false,
                         true,
+                        fixture.combinationStrategy,
                         Arrays.asList(),
                         Arrays.asList());
                 List<ErrorMessage> expected = Collections.emptyList();

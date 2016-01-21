@@ -13,12 +13,12 @@ public class CommandFactory {
     private static final Map<String, Supplier<Command>> subCommands =
             new HashMap<String, Supplier<Command>>() {{
                 put("docyc", () -> {
-                    try (ConfigurableApplicationContext context =
-                            new ClassPathXmlApplicationContext("applicationContext.xml")) {
-                        return new DocyC(
-                                context.getBean(DocyCompilerImpl.class),
-                                new FileInputStreamFactory());
-                    }
+                    ConfigurableApplicationContext context =
+                            new ClassPathXmlApplicationContext("applicationContext.xml");
+                    return new DocyC(
+                            context,
+                            context.getBean(DocyCompilerImpl.class),
+                            new FileInputStreamFactory());
                 });
             }};
 

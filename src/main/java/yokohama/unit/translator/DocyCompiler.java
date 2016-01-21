@@ -16,6 +16,7 @@ public interface DocyCompiler {
             Optional<Path> dest,
             boolean emitJava,
             boolean checkContract,
+            CombinationStrategy combinationStrategy,
             List<String> converterBasePackages,
             List<String> javacArgs
     );

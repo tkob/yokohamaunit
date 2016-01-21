@@ -1,0 +1,94 @@
+*[InputStream]: java.io.InputStream
+*[PrintStream]: java.io.PrintStream
+*[Path]: java.nio.file.Path
+*[ConfigurableApplicationContext]: org.springframework.context.ConfigurableApplicationContext
+*[ClassPathXmlApplicationContext]: org.springframework.context.support.ClassPathXmlApplicationContext
+*[DocyC]: yokohama.unit.DocyC
+*[DocyCompiler]: yokohama.unit.translator.DocyCompiler
+*[CombinationStrategy]: yokohama.unit.translator.CombinationStrategy
+*[CombinationStrategyImpl]: yokohama.unit.translator.CombinationStrategyImpl
+*[JCUnitIPO2CombinationStrategy]: yokohama.unit.translator.JCUnitIPO2CombinationStrategy
+*[FileInputStreamFactory]: yokohama.unit.FileInputStreamFactory
+*[ErrorMessage]: yokohama.unit.position.ErrorMessage
+
+# Test: CombinationStrategyImpl is used for -combination product option
+
+## Setup
+
+Let args = `["-combination", "product", "dummy.docy"]`.
+Let context = `new ClassPathXmlApplicationContext("applicationContext.xml")`.
+Let compiler = `
+    new DocyCompiler() {
+        CombinationStrategy combinationStrategy;
+        public List<ErrorMessage> compile(
+                Path docyPath,
+                InputStream ins,
+                String name,
+                String packageName,
+                List<String> classPath,
+                Optional<Path> dest,
+                boolean emitJava,
+                boolean checkContract,
+                CombinationStrategy combinationStrategy,
+                List<String> converterBasePackages,
+                List<String> javacArgs) {
+            this.combinationStrategy = combinationStrategy;
+            return Collections.emptyList();
+        }
+    }
+`.
+Let fisFactory = a stub of `FileInputStreamFactory`.
+Let ins = a stub of `InputStream`.
+Let out = a stub of `PrintStream`.
+Let err = a stub of `PrintStream`.
+Let docyC = `new DocyC(context, compiler, fisFactory)`.
+
+## Exercise
+
+Do `docyC.run(ins, out, err, args as String[])`.
+
+## Verify
+
+Assert that `compiler.combinationStrategy` is an instance of
+`CombinationStrategyImpl`.
+
+# Test: JCUnitIPO2CombinationStrategy is used for -combination jcunit option
+
+## Setup
+
+Let args = `["-combination", "jcunit", "dummy.docy"]`.
+Let context = `new ClassPathXmlApplicationContext("applicationContext.xml")`.
+Let compiler = `
+    new DocyCompiler() {
+        CombinationStrategy combinationStrategy;
+        public List<ErrorMessage> compile(
+                Path docyPath,
+                InputStream ins,
+                String name,
+                String packageName,
+                List<String> classPath,
+                Optional<Path> dest,
+                boolean emitJava,
+                boolean checkContract,
+                CombinationStrategy combinationStrategy,
+                List<String> converterBasePackages,
+                List<String> javacArgs) {
+            this.combinationStrategy = combinationStrategy;
+            return Collections.emptyList();
+        }
+    }
+`.
+Let fisFactory = a stub of `FileInputStreamFactory`.
+Let ins = a stub of `InputStream`.
+Let out = a stub of `PrintStream`.
+Let err = a stub of `PrintStream`.
+Let docyC = `new DocyC(context, compiler, fisFactory)`.
+
+## Exercise
+
+Do `docyC.run(ins, out, err, args as String[])`.
+
+## Verify
+
+Assert that `compiler.combinationStrategy` is an instance of
+`JCUnitIPO2CombinationStrategy`.
